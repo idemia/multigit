@@ -1,0 +1,13 @@
+
+
+git status --short --branch
+## <branch name>...<remote branch name> [behind N]
+## <branch name>...<remote branch name> [ahead N]
+?? <untracked files>
+ M <fname with or without quotes>
+ A <fname> -> <fname>
+ D 
+ R 
+ C 
+ U
+ 

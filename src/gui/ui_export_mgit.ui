@@ -1,0 +1,176 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>ExportMgit</class>
+ <widget class="QDialog" name="ExportMgit">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>646</width>
+    <height>196</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Export to multigit file</string>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <item>
+    <widget class="QLabel" name="label">
+     <property name="font">
+      <font>
+       <weight>50</weight>
+       <bold>false</bold>
+      </font>
+     </property>
+     <property name="text">
+      <string>Select destination multigit file :</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="horizontalLayout_2">
+     <item>
+      <widget class="QLineEdit" name="lineEditMgitFile">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+         <horstretch>10</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="font">
+        <font>
+         <weight>50</weight>
+         <bold>false</bold>
+        </font>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="MgButtonHistory" name="historyButtonMgitFile">
+       <property name="toolTip">
+        <string>Choose recent multigit file</string>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
+       <property name="icon">
+        <iconset resource="../../images/multigit_resources.qrc">
+         <normaloff>:/img/icons8-history-64.png</normaloff>:/img/icons8-history-64.png</iconset>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="pushButtonChooseMgitFile">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+         <horstretch>1</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="minimumSize">
+        <size>
+         <width>24</width>
+         <height>0</height>
+        </size>
+       </property>
+       <property name="font">
+        <font>
+         <weight>50</weight>
+         <bold>false</bold>
+        </font>
+       </property>
+       <property name="toolTip">
+        <string>Select multigit file</string>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
+       <property name="icon">
+        <iconset resource="../../images/multigit_resources.qrc">
+         <normaloff>:/img/icons8-open-folder-64.png</normaloff>:/img/icons8-open-folder-64.png</iconset>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <widget class="QLabel" name="label_2">
+     <property name="text">
+      <string>Description of your multigit file</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QLineEdit" name="lineEditDescMgit">
+     <property name="toolTip">
+      <string>Description of your multigit file</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <spacer name="verticalSpacer">
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>20</width>
+       <height>48</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="horizontalLayout">
+     <item>
+      <widget class="QPushButton" name="pushButtonCancel">
+       <property name="text">
+        <string>Cancel</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="pushButtonExportSnapshot">
+       <property name="toolTip">
+        <string>Export all repos with detached HEAD set on last commit, to create a snapshot of the project</string>
+       </property>
+       <property name="text">
+        <string>Export as snapshot (commit)</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="pushButtonExportProject">
+       <property name="toolTip">
+        <string>Export all repos with HEAD set on current branch or tag for regular project development</string>
+       </property>
+       <property name="text">
+        <string>Export as project (tag/branch)</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+  </layout>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>MgButtonHistory</class>
+   <extends>QPushButton</extends>
+   <header>src.mg_button_history</header>
+  </customwidget>
+ </customwidgets>
+ <tabstops>
+  <tabstop>lineEditMgitFile</tabstop>
+  <tabstop>historyButtonMgitFile</tabstop>
+  <tabstop>pushButtonChooseMgitFile</tabstop>
+  <tabstop>lineEditDescMgit</tabstop>
+  <tabstop>pushButtonCancel</tabstop>
+  <tabstop>pushButtonExportSnapshot</tabstop>
+  <tabstop>pushButtonExportProject</tabstop>
+ </tabstops>
+ <resources>
+  <include location="../../images/multigit_resources.qrc"/>
+ </resources>
+ <connections/>
+</ui>

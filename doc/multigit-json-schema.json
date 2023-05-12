@@ -1,0 +1,46 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "Multigit-schema",
+
+  "title": "Multigit File Format",
+  "description": "The format exported by Multigit to describe a list of repositories and their status",
+  "type": "object",
+
+  "properties": {
+    "fileFormatVersion": {
+      "description" : "The version of the file format used",
+      "type": "string"
+    },
+    "description": {
+      "description" : "Description of the multigit file content",
+      "type": "string"
+    },
+    "repositories": {
+      "description" : "List of repositories properties",
+      "type" : "array",
+      "items" : {
+        "type": "object",
+        "properties": {
+          "url": {
+            "description" : "URL of the project (https or ssh). Username shall be exlucded from the URL",
+            "type": "string"
+          },
+          "head": {
+            "description" : "On what commit does the head point. This is either a branch name, a tag name or a commit SHA",
+            "type": "string"
+          },
+          "head_type": {
+            "description" : "What is 'head' describing: a branch, a tag or a commit ?",
+            "enum": [ "branch", "tag", "commit", "" ]
+          },
+          "destination":{
+            "description" : "Target directory relative to the base directory, using \\ as separators",
+            "type": "string"
+          }
+        },
+        "required": ["url", "head", "destination"]
+      }
+    }
+  },
+  "required": ["fileFormatVersion", "repositories"]
+}

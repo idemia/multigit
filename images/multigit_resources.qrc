@@ -1,0 +1,58 @@
+<!--
+  ~   Copyright (c) 2023 IDEMIA
+  ~   Author: IDEMIA (Philippe Fremy, Florent Oulieres)
+  ~
+  ~    Licensed under the Apache License, Version 2.0 (the "License");
+  ~    you may not use this file except in compliance with the License.
+  ~    You may obtain a copy of the License at
+  ~
+  ~        http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~    Unless required by applicable law or agreed to in writing, software
+  ~    distributed under the License is distributed on an "AS IS" BASIS,
+  ~    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~    See the License for the specific language governing permissions and
+  ~    limitations under the License.
+  -->
+
+<RCC>
+  <qresource prefix="img">
+    <file>multigit-logo-256.png</file>
+    <file>multigit-logo-16.png</file>
+    <file>tgit_tortoise.ico</file>
+    <file>tgit_tag.ico</file>
+    <file>tgit_push.ico</file>
+    <file>tgit_pull.ico</file>
+    <file>tgit_log.ico</file>
+    <file>tgit_revert.ico</file>
+    <file>tgit_diff.ico</file>
+    <file>tgit_commit.ico</file>
+    <file>tgit_refresh.ico</file>
+    <file>tgit_open.ico</file>
+    <file>tgit_explorer.ico</file>
+    <file>tgit_branch.ico</file>
+    <file>tgit_switch.ico</file>
+    <file>git_white.png</file>
+    <file>git_black.png</file>
+    <file>sublime_merge.ico</file>
+    <file>sourcetree.ico</file>
+    <file>git-bash.ico</file>
+    <file>icons8-loader-96.png</file>
+    <file>icons8-show-property-96.png</file>
+    <file>icons8-clipboard-48.png</file>
+    <file>icons8-checked-96.png</file>
+    <file>icons8-cancel-96.png</file>
+    <file>icons8-history-64.png</file>
+    <file>icons8-open-folder-64.png</file>
+    <file>icons8-double-down-52.png</file>
+    <file>icons8-double-up-52.png</file>
+    <file>icons8-chevron-down-52.png</file>
+    <file>icons8-chevron-up-52.png</file>
+    <file>icons8-question-mark-96.png</file>
+    <file>icons8-general-warning-sign-96.png</file>
+    <file>icons8-stop-sign-96.png</file>
+    <file>icons8-reset-96.png</file>
+    <file>icons8-checkmark-96.png</file>
+    <file>idemia-logo.png</file>
+  </qresource>
+</RCC>

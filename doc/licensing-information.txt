@@ -1,0 +1,11 @@
+
+Pyside2/Qt5:
+* Qt5 license: LGPL v3
+* Qt5 for Python license: LGPLv3 or GPLv2
+-> MultiGit: license is free to choose, must allow relinking
+
+Pyside6/Qt6:
+* Qt6 license: LGPL v3
+* Qt6 for Python license: LGPLv3 or GPLv2
+-> MultiGit: license is free to choose, must allow relinking
+

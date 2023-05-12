@@ -1,0 +1,335 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>290</width>
+    <height>625</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>MultiGit</string>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <layout class="QHBoxLayout" name="horizontalLayout_2">
+    <item>
+     <widget class="QTabWidget" name="tabRepos">
+      <property name="currentIndex">
+       <number>-1</number>
+      </property>
+      <property name="movable">
+       <bool>true</bool>
+      </property>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QMenuBar" name="menubar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>290</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <widget class="QMenu" name="menuFile">
+    <property name="title">
+     <string>File</string>
+    </property>
+    <property name="toolTipsVisible">
+     <bool>true</bool>
+    </property>
+    <widget class="QMenu" name="menuOpenRecentDirectory">
+     <property name="title">
+      <string>Open recent directory</string>
+     </property>
+     <property name="toolTipsVisible">
+      <bool>true</bool>
+     </property>
+     <addaction name="actionDir1"/>
+     <addaction name="actionDir2"/>
+    </widget>
+    <addaction name="actionOpenDirectory"/>
+    <addaction name="menuOpenRecentDirectory"/>
+    <addaction name="actionEditPreferences"/>
+    <addaction name="separator"/>
+    <addaction name="actionAddTab"/>
+    <addaction name="actionDupTab"/>
+    <addaction name="actionRenameTab"/>
+    <addaction name="actionCloseTab"/>
+    <addaction name="separator"/>
+    <addaction name="actionOpenProject"/>
+    <addaction name="actionApplyMultigitFile"/>
+    <addaction name="actionExportToMgit"/>
+    <addaction name="actionExportCSV"/>
+    <addaction name="separator"/>
+    <addaction name="actionQuit"/>
+   </widget>
+   <widget class="QMenu" name="menuView">
+    <property name="title">
+     <string>View</string>
+    </property>
+    <property name="toolTipsVisible">
+     <bool>true</bool>
+    </property>
+    <widget class="QMenu" name="menuShow">
+     <property name="title">
+      <string>Show</string>
+     </property>
+     <widget class="QMenu" name="menuColumns">
+      <property name="title">
+       <string>Show Columns</string>
+      </property>
+      <addaction name="actionViewColSha1"/>
+      <addaction name="actionViewColURL"/>
+     </widget>
+     <addaction name="actionViewLastCommit"/>
+     <addaction name="actionViewModifiedFiles"/>
+     <addaction name="menuColumns"/>
+    </widget>
+    <addaction name="menuShow"/>
+    <addaction name="actionRefreshAll"/>
+   </widget>
+   <widget class="QMenu" name="menuGit">
+    <property name="title">
+     <string>Git</string>
+    </property>
+    <property name="toolTipsVisible">
+     <bool>true</bool>
+    </property>
+   </widget>
+   <widget class="QMenu" name="menuGitPrograms">
+    <property name="title">
+     <string>Git Programs</string>
+    </property>
+    <property name="toolTipsVisible">
+     <bool>true</bool>
+    </property>
+   </widget>
+   <widget class="QMenu" name="menuAbout">
+    <property name="title">
+     <string>About</string>
+    </property>
+    <property name="toolTipsVisible">
+     <bool>true</bool>
+    </property>
+    <addaction name="actionWhatIsNew"/>
+    <addaction name="actionShowMultiGitLogFiles"/>
+    <addaction name="actionAbout"/>
+   </widget>
+   <addaction name="menuFile"/>
+   <addaction name="menuView"/>
+   <addaction name="menuGit"/>
+   <addaction name="menuGitPrograms"/>
+   <addaction name="menuAbout"/>
+  </widget>
+  <widget class="QStatusBar" name="statusbar"/>
+  <action name="actionOpenDirectory">
+   <property name="icon">
+    <iconset resource="../../images/multigit_resources.qrc">
+     <normaloff>:/img/icons8-open-folder-64.png</normaloff>:/img/icons8-open-folder-64.png</iconset>
+   </property>
+   <property name="text">
+    <string>Open base directory</string>
+   </property>
+   <property name="toolTip">
+    <string>Open base directory</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+O</string>
+   </property>
+   <property name="shortcutContext">
+    <enum>Qt::ApplicationShortcut</enum>
+   </property>
+  </action>
+  <action name="actionEditPreferences">
+   <property name="text">
+    <string>Edit settings</string>
+   </property>
+   <property name="toolTip">
+    <string>Edit settings</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+S</string>
+   </property>
+   <property name="shortcutContext">
+    <enum>Qt::ApplicationShortcut</enum>
+   </property>
+  </action>
+  <action name="actionQuit">
+   <property name="text">
+    <string>Quit</string>
+   </property>
+   <property name="iconText">
+    <string>Quit</string>
+   </property>
+   <property name="toolTip">
+    <string>Quit</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+X</string>
+   </property>
+   <property name="shortcutContext">
+    <enum>Qt::ApplicationShortcut</enum>
+   </property>
+  </action>
+  <action name="actionRefreshAll">
+   <property name="text">
+    <string>Refresh local view</string>
+   </property>
+   <property name="toolTip">
+    <string>Refresh repository information from disk</string>
+   </property>
+   <property name="shortcut">
+    <string>F5</string>
+   </property>
+  </action>
+  <action name="actionDir1">
+   <property name="text">
+    <string>Dir1</string>
+   </property>
+  </action>
+  <action name="actionDir2">
+   <property name="text">
+    <string>Dir2</string>
+   </property>
+  </action>
+  <action name="actionAbout">
+   <property name="text">
+    <string>About MultiGit</string>
+   </property>
+  </action>
+  <action name="actionWhatIsNew">
+   <property name="text">
+    <string>What's new</string>
+   </property>
+   <property name="toolTip">
+    <string>Show dialog with What's New information</string>
+   </property>
+  </action>
+  <action name="actionExportCSV">
+   <property name="text">
+    <string>Export to CSV</string>
+   </property>
+   <property name="toolTip">
+    <string>Export repository informations to a CSV files</string>
+   </property>
+  </action>
+  <action name="actionOpenProject">
+   <property name="text">
+    <string>Clone from Multigit file</string>
+   </property>
+   <property name="toolTip">
+    <string>Clone repositories described in a Multigit file</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+J</string>
+   </property>
+  </action>
+  <action name="actionExportToMgit">
+   <property name="text">
+    <string>Export to Multigit file</string>
+   </property>
+   <property name="toolTip">
+    <string>Export repositories setup to a Multigit file</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Shift+J</string>
+   </property>
+  </action>
+  <action name="actionShowMultiGitLogFiles">
+   <property name="text">
+    <string>Open directory of log files</string>
+   </property>
+   <property name="toolTip">
+    <string>Open directory containing log files and configuration</string>
+   </property>
+  </action>
+  <action name="actionViewLastCommit">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Show Last Commit tab</string>
+   </property>
+  </action>
+  <action name="actionViewModifiedFiles">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Show Modified Files tab</string>
+   </property>
+  </action>
+  <action name="actionViewColSha1">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Sha1</string>
+   </property>
+  </action>
+  <action name="actionApplyMultigitFile">
+   <property name="text">
+    <string>Apply Multigit file</string>
+   </property>
+   <property name="toolTip">
+    <string>Adjust existing repositories according to content of Multigit file</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Shift+A</string>
+   </property>
+  </action>
+  <action name="actionViewColURL">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Remote URL</string>
+   </property>
+  </action>
+  <action name="actionAddTab">
+   <property name="text">
+    <string>New tab</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+N</string>
+   </property>
+  </action>
+  <action name="actionDupTab">
+   <property name="text">
+    <string>Duplicate tab</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+D</string>
+   </property>
+  </action>
+  <action name="actionCloseTab">
+   <property name="text">
+    <string>Close current tab</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+W</string>
+   </property>
+  </action>
+  <action name="actionRenameTab">
+   <property name="text">
+    <string>Rename tab</string>
+   </property>
+   <property name="shortcut">
+    <string>F2</string>
+   </property>
+  </action>
+ </widget>
+ <resources>
+  <include location="../../images/multigit_resources.qrc"/>
+ </resources>
+ <connections/>
+</ui>

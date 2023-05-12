@@ -1,0 +1,19 @@
+# Use me by typing:
+#    pip-compile requirements-dev.in
+
+
+# for running multigit
+pyside2
+concurrent-log-handler
+lxml
+
+# for developing multigit
+pip-tools
+mypy
+pyside2-stubs
+pytest
+pyinstaller
+markdown2
+pytest
+types-lxml
+jsonschema-cli
