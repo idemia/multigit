@@ -147,20 +147,20 @@ class TestRepoInfo(unittest.TestCase):
     a test function is run for each of these tests:
     * run_test_on_empty_git()
     * run_test_on_main()
-    * run_test_on_master_modified_files()
-    * run_test_on_master_with_one_tag()
+    * run_test_on_main_modified_files()
+    * run_test_on_main_with_one_tag()
     * run_test_on_tag()
     * run_test_on_tag2_with_tag3(self.dir1, 'tag2', 'tag3')
     * run_test_on_commit()
     * run_test_on_tag_like_sha1()
     * run_test_on_other_branch()
-    * run_test_on_other_branch_merged_master()
+    * run_test_on_other_branch_merged_main()
 
 
     if LONG_TEST is set to True, an additional set of longer tests is run, involving clones:
     * run_clone_test_on_empty_git(self.dir1, self.dir3)
-    * run_clone_test_on_origin_master_2_commits()
-    * run_clone_test_on_origin_master_more_commits(self.dir1, self.dir3)
+    * run_clone_test_on_origin_main_2_commits()
+    * run_clone_test_on_origin_main_more_commits(self.dir1, self.dir3)
 
     '''
 
@@ -246,29 +246,29 @@ class TestRepoInfo(unittest.TestCase):
         self.run_test_on_main(self.dir1, 'file1', sha1)
 
         # add 2nd commit
-        # checkout is still on master
+        # checkout is still on main
         sha1 = add_content(self.dir1, 'file2')
         self.run_test_on_main(self.dir1, 'file2', sha1)
 
         if LONG_TESTS:
-            self.run_clone_test_on_origin_master_2_commits(self.dir1, self.dir3)
+            self.run_clone_test_on_origin_main_2_commits(self.dir1, self.dir3)
 
-        self.run_test_on_master_modified_files(self.dir1, sha1)
+        self.run_test_on_main_modified_files(self.dir1, sha1)
 
         # tag the file
         git_exec('tag', 'tag1')
-        self.run_test_on_master_with_one_tag(self.dir1, 'tag1')
+        self.run_test_on_main_with_one_tag(self.dir1, 'tag1')
 
         # checkout tag1
         git_exec('checkout', 'tag1')
         self.run_test_on_tag(self.dir1, 'tag1')
 
         if LONG_TESTS:
-            # checkout master, add 3rd commit, checkout tag1
+            # checkout main, add 3rd commit, checkout tag1
             git_exec('checkout', 'main')
             _sha1 = add_content(self.dir1, 'tata')
 
-            self.run_clone_test_on_origin_master_more_commits(self.dir1, self.dir3)
+            self.run_clone_test_on_origin_main_more_commits(self.dir1, self.dir3)
 
             # clone a directory while it is pointing to a tag
             git_exec('checkout', 'tag1')
@@ -280,7 +280,7 @@ class TestRepoInfo(unittest.TestCase):
             self.dir4.mkdir()
             self.run_clone_test_on_tag(self.dir1, 'tag1', self.dir4, tag_sha1)
 
-        # checkout master, tag the file twice, checkout one tag
+        # checkout main, tag the file twice, checkout one tag
         git_exec('checkout', 'main')
         _sha1 = add_content(self.dir1, 'tata')
         git_exec('tag', 'tag2')
@@ -288,7 +288,7 @@ class TestRepoInfo(unittest.TestCase):
         git_exec('checkout', 'tag2')
         self.run_test_on_tag2_with_tag3(self.dir1, 'tag2', 'tag3')
 
-        # checkout master, add 4th commit, add 5th commit
+        # checkout main, add 4th commit, add 5th commit
         # checkout 4th commit
         git_exec('checkout', 'main')
         sha1_4 = add_content(self.dir1, 'titi')
@@ -310,17 +310,17 @@ class TestRepoInfo(unittest.TestCase):
         sha1 = add_content(self.dir1, 'toto')
         self.run_test_on_other_branch(self.dir1, 'branch1', sha1)
 
-        # merge master into branch1
+        # merge main into branch1
         git_exec('merge', 'main')
-        self.run_test_on_other_branch_merged_master(self.dir1, 'branch1')
+        self.run_test_on_other_branch_merged_main(self.dir1, 'branch1')
 
-        # create branch2, fill it with content, merge it to master and delete it
+        # create branch2, fill it with content, merge it to main and delete it
         git_exec('checkout', '-b', 'branch2')
         add_content(self.dir1, 'toto')
         git_exec('checkout', 'main')
         git_exec('merge', 'branch2')
         git_exec('branch', '-d', 'branch2')
-        self.run_test_on_master_after_branch2_deleted(self.dir1, 'main')
+        self.run_test_on_main_after_branch2_deleted(self.dir1, 'main')
 
 
     def run_test_on_empty_git(self, dir1):
@@ -427,8 +427,8 @@ class TestRepoInfo(unittest.TestCase):
         self.assertEqual(ric.branches_local, ['main'])
 
 
-    def run_test_on_master_modified_files(self, dir1, _sha1: str):
-        print('    - run_test_on_master_modified_files')
+    def run_test_on_main_modified_files(self, dir1, _sha1: str):
+        print('    - run_test_on_main_modified_files')
         n, p, fp = str(dir1), dir1, str(dir1.resolve())
 
         ric = MgRepoInfo(n, fp)
@@ -480,8 +480,8 @@ class TestRepoInfo(unittest.TestCase):
                                        status='OK',
                                        ))
 
-    def run_test_on_master_with_one_tag(self, dir1, tag1: str):
-        print('    - run_test_on_master_with_one_tag')
+    def run_test_on_main_with_one_tag(self, dir1, tag1: str):
+        print('    - run_test_on_main_with_one_tag')
         n, p, fp = str(dir1), dir1, str(dir1.resolve())
         # check refesh() effect
         ric = MgRepoInfo(n, fp)
@@ -642,8 +642,8 @@ class TestRepoInfo(unittest.TestCase):
 
 
 
-    def run_test_on_other_branch_merged_master(self, dir1, branch):
-        print('    - run_test_on_other_branch_merged_master')
+    def run_test_on_other_branch_merged_main(self, dir1, branch):
+        print('    - run_test_on_other_branch_merged_main')
         n, p, fp = str(dir1), dir1, str(dir1.resolve())
         # check refesh() effect
         ric = MgRepoInfo(n, fp)
@@ -667,8 +667,8 @@ class TestRepoInfo(unittest.TestCase):
         self.assertEqual(ric.branches_local, ['branch1', 'main'])
 
 
-    def run_test_on_master_after_branch2_deleted(self, dir1, branch):
-        print('    - run_test_on_master_after_branch2_deleted')
+    def run_test_on_main_after_branch2_deleted(self, dir1, branch):
+        print('    - run_test_on_main_after_branch2_deleted')
         n, p, fp = str(dir1), dir1, str(dir1.resolve())
         # check refesh() effect
         ric = MgRepoInfo(n, fp)
@@ -783,8 +783,8 @@ class TestRepoInfo(unittest.TestCase):
 
 
 
-    def run_clone_test_on_origin_master_2_commits(self, _dir1, dir3):
-        print('    - run_clone_test_on_origin_master_2_commits')
+    def run_clone_test_on_origin_main_2_commits(self, _dir1, dir3):
+        print('    - run_clone_test_on_origin_main_2_commits')
 
         n, p, fp = str(dir3), dir3, str(dir3.resolve())
 
@@ -831,8 +831,8 @@ class TestRepoInfo(unittest.TestCase):
 
 
 
-    def run_clone_test_on_origin_master_more_commits(self, dir1, dir3):
-        print('    - run_clone_test_on_origin_master_more_commits')
+    def run_clone_test_on_origin_main_more_commits(self, dir1, dir3):
+        print('    - run_clone_test_on_origin_main_more_commits')
 
         n, p, fp = str(dir3), dir3, str(dir3.resolve())
 
