@@ -86,6 +86,13 @@ def to_named_tuple(ric: MgRepoInfo) -> RepoInfoTuple:
             branches_local=tuple(ric.branches_local),
         )
 
+
+def git_init_repo(repo: str) -> None:
+    '''Init the repository and creates commit config'''
+    git_exec('init', '-b', 'main', repo)
+    git_exec('config', 'user.email', 'phil_tests@github' , gitdir=repo)
+    git_exec('config', 'user.name', 'philou' , gitdir=repo)
+
 def git_commit(repo: str, msg: str, allow_errors: bool = False) -> str:
     '''Commit the repo with the message passed in argument and return the SHA1 of the commit.'''
     out = git_exec('-C', repo, 'commit', '-m', msg, allow_errors=allow_errors)
@@ -232,7 +239,7 @@ class TestRepoInfo(unittest.TestCase):
         self.dir1 = pathlib.Path(self.gitdir) / 'dir1'
         self.dir1.mkdir()
         os.chdir(self.dir1)
-        git_exec('init', '-b', 'main', '.')
+        git_init_repo('.')
 
         self.run_test_on_empty_git(self.dir1)
 
@@ -697,7 +704,7 @@ class TestRepoInfo(unittest.TestCase):
         self.dir2 = pathlib.Path(self.gitdir) / 'dir2'
         self.dir2.mkdir()
         os.chdir(self.dir2)
-        git_exec('init', '-b', 'main', '.')
+        git_init_repo('.')
 
         git_dir = self.gitdir
         os.chdir(git_dir)
@@ -731,11 +738,11 @@ class TestRepoInfo(unittest.TestCase):
         strange_dir1 = pathlib.Path(self.gitdir) / 'strange_dir[with_bracket]'
         strange_dir1.mkdir()
         os.chdir(strange_dir1)
-        git_exec('init', '-b', 'main', str(strange_dir1))
+        git_init_repo(str(strange_dir1))
 
         strange_dir2 = pathlib.Path(strange_dir1) / 'strange_subdir[with_bracket]'
         strange_dir2.mkdir()
-        git_exec('init', '-b', 'main', str(strange_dir2))
+        git_init_repo(str(strange_dir2))
 
         os.chdir(self.gitdir)
         mr = MultiRepo(str(self.gitdir))
