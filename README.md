@@ -5,7 +5,7 @@ Multigit
 
 *by Philippe Fremy at IDEMIA*
 
-Multigit simplifies working with multiple git repositories at the same time.
+Multigit is a graphical tool designed to simplify working with multiple git repositories at the same time.
 
 Typically, it lets you:
 * fetch or pull on all repositories at the same time
@@ -19,7 +19,7 @@ Typically, it lets you:
 
 The need arose from my work environment, where
 a project typically consists of 30 to 50 git repositories. In such environment, every simple git operation
-becomes a complex task. With Multigit, it is simple again. Any git operation like git fetching in the 
+becomes a complex task. Thank to Multigit, it becomes simple again. Any git operation like git fetching in the 
 morning is run on all the repositories in one click. 
 When time comes to commit changes and push them, having a graphical interface to
 locate in the blink of an eye which repositories are modified and need a commit has been a life saver.
@@ -69,6 +69,8 @@ the workflow and requires learning a new set of commands.
 
 So, Multigit was born. Internally at IDEMIA, people love it for how it made their life simpler in environments
 with 40 git repositories, without a learning curve for a new tool. Just use your git knowledge.
+
+
 
 
 
