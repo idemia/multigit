@@ -15,7 +15,11 @@
 #
 
 
-from typing import TYPE_CHECKING, Literal, Union
+from typing import TYPE_CHECKING, Union
+
+# still needed while we support Python 3.7
+from typing_extensions import Literal
+
 
 import pathlib
 
