@@ -16,7 +16,7 @@ jobs:
       matrix:
         include:
           # oldest version of pyhon / mypy which works
-          - python-version: "3.8"
+          - python-version: "3.7"
 
           # latest version of everything
           - python-version: "3.11"
