@@ -4,7 +4,7 @@
 Multigit
 ========
 
-*by Philippe Fremy at IDEMIA*
+*by Philippe Fremy at IDEMIA (philippe.fremy at idemia.com)*
 
 Multigit is a graphical tool designed to simplify working with multiple git repositories at the same time.
 
@@ -56,6 +56,7 @@ improvements.
 
 See the file CONTRIBUTING.md for details .
 
+If you want to exchange with the author, do not hesitate to contact me: philippe.fremy at idemia.com
 
 History and Alternatives
 -------------------------
