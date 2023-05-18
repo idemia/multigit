@@ -35,9 +35,6 @@ from src.mg_repo_info import MgRepoInfo, MultiRepo
 AUTHOR_NAME = 'philou'
 AUTHOR_EMAIL = 'phil_tests@github'
 
-os.environ['GIT_AUTHOR_NAME'] = AUTHOR_NAME
-os.environ['GIT_AUTHOR_EMAIL'] = AUTHOR_EMAIL
-
 LONG_TESTS = True
 
 init_logging(run_from_tests=True, debug_activated=False) # set to True, True when you want debug on stdout
@@ -96,6 +93,13 @@ def to_named_tuple(ric: MgRepoInfo) -> RepoInfoTuple:
 def git_init_repo(repo: str) -> None:
     '''Init the repository and creates commit config'''
     git_exec('init', '-b', 'main', repo)
+    git_set_commit_author(repo)
+
+
+def git_set_commit_author(repo: str) -> None:
+    git_exec('config', 'user.email', AUTHOR_EMAIL , gitdir=repo)
+    git_exec('config', 'user.name', AUTHOR_NAME , gitdir=repo)
+
 
 def git_commit(repo: str, msg: str, allow_errors: bool = False) -> str:
     '''Commit the repo with the message passed in argument and return the SHA1 of the commit.'''
@@ -772,6 +776,7 @@ class TestRepoInfo(unittest.TestCase):
 
         n, p, fp = str(dir3), dir3, str(dir3.resolve())
         git_exec('clone', str(dir1), fp)
+        git_set_commit_author(str(dir3))
 
         # check refesh() effect
         ric = MgRepoInfo(n, fp)
@@ -901,6 +906,7 @@ class TestRepoInfo(unittest.TestCase):
         n, p, fp = str(dir4), dir4, str(dir4.resolve())
         # clone on the tag, we are in detached state now
         git_exec('clone', str(dir1), str(dir4))
+        git_set_commit_author(str(dir4))
 
         # check refesh() effect
         # the current status is that the fact that we are detached on a specific tag has not been
