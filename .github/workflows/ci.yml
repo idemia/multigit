@@ -15,10 +15,10 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          # oldest version of pyhon / mypy which works
+          # oldest supported version of python
           - python-version: "3.7"
 
-          # latest version of everything
+          # latest supported version of python
           - python-version: "3.11"
 
     steps:
@@ -35,5 +35,9 @@ jobs:
         pip list
 
     - name: run tests
+      run: |
+        pytest
+
+    - name: run type checking
       run: |
         mypy .
