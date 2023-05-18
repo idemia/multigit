@@ -19,18 +19,21 @@ from typing import Union, Any
 import unittest, tempfile, datetime, collections, pathlib, os, stat, shutil
 from logging import warning
 
+import os
+
 from multigit import init_logging
 import src.mg_tools
 from src.mg_tools import git_exec
 from src.mg_const import MSG_EMPTY_REPO, MSG_NO_COMMIT, MSG_LOCAL_BRANCH, MSG_REMOTE_SYNCHRO_OK, SHORT_SHA1_NB_DIGITS
 from src.mg_repo_info import MgRepoInfo, MultiRepo
-from src.mg_utils import deleteDir
 
 # More tests to write
 # * detached head from a remote branch
 #   + deleting the remote branch
 # * clone remote branch + delete the remote branch
 
+AUTHOR_NAME = 'philou'
+AUTHOR_EMAIL = 'phil_tests@github'
 
 LONG_TESTS = True
 
@@ -85,6 +88,18 @@ def to_named_tuple(ric: MgRepoInfo) -> RepoInfoTuple:
             branches_remote=tuple(ric.branches_remote),
             branches_local=tuple(ric.branches_local),
         )
+
+
+def git_init_repo(repo: str) -> None:
+    '''Init the repository and creates commit config'''
+    git_exec('init', '-b', 'main', repo)
+    git_set_commit_author(repo)
+
+
+def git_set_commit_author(repo: str) -> None:
+    git_exec('config', 'user.email', AUTHOR_EMAIL , gitdir=repo)
+    git_exec('config', 'user.name', AUTHOR_NAME , gitdir=repo)
+
 
 def git_commit(repo: str, msg: str, allow_errors: bool = False) -> str:
     '''Commit the repo with the message passed in argument and return the SHA1 of the commit.'''
@@ -146,21 +161,21 @@ class TestRepoInfo(unittest.TestCase):
     A repository is put into various states (empty, one commit, modified, ...) and
     a test function is run for each of these tests:
     * run_test_on_empty_git()
-    * run_test_on_master()
-    * run_test_on_master_modified_files()
-    * run_test_on_master_with_one_tag()
+    * run_test_on_main()
+    * run_test_on_main_modified_files()
+    * run_test_on_main_with_one_tag()
     * run_test_on_tag()
     * run_test_on_tag2_with_tag3(self.dir1, 'tag2', 'tag3')
     * run_test_on_commit()
     * run_test_on_tag_like_sha1()
     * run_test_on_other_branch()
-    * run_test_on_other_branch_merged_master()
+    * run_test_on_other_branch_merged_main()
 
 
     if LONG_TEST is set to True, an additional set of longer tests is run, involving clones:
     * run_clone_test_on_empty_git(self.dir1, self.dir3)
-    * run_clone_test_on_origin_master_2_commits()
-    * run_clone_test_on_origin_master_more_commits(self.dir1, self.dir3)
+    * run_clone_test_on_origin_main_2_commits()
+    * run_clone_test_on_origin_main_more_commits(self.dir1, self.dir3)
 
     '''
 
@@ -201,7 +216,7 @@ class TestRepoInfo(unittest.TestCase):
   dev
   feat/f-1
 * feat/f-2
-  master
+  main
   remotes/origin/HEAD -> origin/fix/toto
   remotes/origin/b2
   remotes/origin/dev
@@ -209,7 +224,7 @@ class TestRepoInfo(unittest.TestCase):
   remotes/origin/feat/GF_2
         
 ''')
-        self.assertEqual(ri.branches_local, ['dev', 'feat/f-1', 'feat/f-2', 'master'])
+        self.assertEqual(ri.branches_local, ['dev', 'feat/f-1', 'feat/f-2', 'main'])
         self.assertEqual(ri.branches_remote, [
             'origin/b2',
             'origin/dev',
@@ -221,9 +236,9 @@ class TestRepoInfo(unittest.TestCase):
         # when head is detached, we have an extra line of information
         ri = MgRepoInfo('toto', '.', '.')
         ri.cb_fill_branches_done('toto', 0, ''' * (HEAD detached at tag1)
-  master
+  main
 ''')
-        self.assertEqual(ri.branches_local, ['master'])
+        self.assertEqual(ri.branches_local, ['main'])
         self.assertEqual(ri.branches_remote, [])
 
 
@@ -232,7 +247,7 @@ class TestRepoInfo(unittest.TestCase):
         self.dir1 = pathlib.Path(self.gitdir) / 'dir1'
         self.dir1.mkdir()
         os.chdir(self.dir1)
-        git_exec('init', '-b', 'master', '.')
+        git_init_repo('.')
 
         self.run_test_on_empty_git(self.dir1)
 
@@ -243,32 +258,32 @@ class TestRepoInfo(unittest.TestCase):
 
         # add one file, one commit, no tag
         sha1 = add_content(self.dir1, 'file1')
-        self.run_test_on_master(self.dir1, 'file1', sha1)
+        self.run_test_on_main(self.dir1, 'file1', sha1)
 
         # add 2nd commit
-        # checkout is still on master
+        # checkout is still on main
         sha1 = add_content(self.dir1, 'file2')
-        self.run_test_on_master(self.dir1, 'file2', sha1)
+        self.run_test_on_main(self.dir1, 'file2', sha1)
 
         if LONG_TESTS:
-            self.run_clone_test_on_origin_master_2_commits(self.dir1, self.dir3)
+            self.run_clone_test_on_origin_main_2_commits(self.dir1, self.dir3)
 
-        self.run_test_on_master_modified_files(self.dir1, sha1)
+        self.run_test_on_main_modified_files(self.dir1, sha1)
 
         # tag the file
         git_exec('tag', 'tag1')
-        self.run_test_on_master_with_one_tag(self.dir1, 'tag1')
+        self.run_test_on_main_with_one_tag(self.dir1, 'tag1')
 
         # checkout tag1
         git_exec('checkout', 'tag1')
         self.run_test_on_tag(self.dir1, 'tag1')
 
         if LONG_TESTS:
-            # checkout master, add 3rd commit, checkout tag1
-            git_exec('checkout', 'master')
+            # checkout main, add 3rd commit, checkout tag1
+            git_exec('checkout', 'main')
             _sha1 = add_content(self.dir1, 'tata')
 
-            self.run_clone_test_on_origin_master_more_commits(self.dir1, self.dir3)
+            self.run_clone_test_on_origin_main_more_commits(self.dir1, self.dir3)
 
             # clone a directory while it is pointing to a tag
             git_exec('checkout', 'tag1')
@@ -280,17 +295,17 @@ class TestRepoInfo(unittest.TestCase):
             self.dir4.mkdir()
             self.run_clone_test_on_tag(self.dir1, 'tag1', self.dir4, tag_sha1)
 
-        # checkout master, tag the file twice, checkout one tag
-        git_exec('checkout', 'master')
+        # checkout main, tag the file twice, checkout one tag
+        git_exec('checkout', 'main')
         _sha1 = add_content(self.dir1, 'tata')
         git_exec('tag', 'tag2')
         git_exec('tag', 'tag3')
         git_exec('checkout', 'tag2')
         self.run_test_on_tag2_with_tag3(self.dir1, 'tag2', 'tag3')
 
-        # checkout master, add 4th commit, add 5th commit
+        # checkout main, add 4th commit, add 5th commit
         # checkout 4th commit
-        git_exec('checkout', 'master')
+        git_exec('checkout', 'main')
         sha1_4 = add_content(self.dir1, 'titi')
         sha1_5 = add_content(self.dir1, 'titi')
         git_exec('checkout', sha1_5)
@@ -310,17 +325,17 @@ class TestRepoInfo(unittest.TestCase):
         sha1 = add_content(self.dir1, 'toto')
         self.run_test_on_other_branch(self.dir1, 'branch1', sha1)
 
-        # merge master into branch1
-        git_exec('merge', 'master')
-        self.run_test_on_other_branch_merged_master(self.dir1, 'branch1')
+        # merge main into branch1
+        git_exec('merge', 'main')
+        self.run_test_on_other_branch_merged_main(self.dir1, 'branch1')
 
-        # create branch2, fill it with content, merge it to master and delete it
+        # create branch2, fill it with content, merge it to main and delete it
         git_exec('checkout', '-b', 'branch2')
         add_content(self.dir1, 'toto')
-        git_exec('checkout', 'master')
+        git_exec('checkout', 'main')
         git_exec('merge', 'branch2')
         git_exec('branch', '-d', 'branch2')
-        self.run_test_on_master_after_branch2_deleted(self.dir1, 'master')
+        self.run_test_on_main_after_branch2_deleted(self.dir1, 'main')
 
 
     def run_test_on_empty_git(self, dir1):
@@ -398,16 +413,16 @@ class TestRepoInfo(unittest.TestCase):
         return
 
 
-    def run_test_on_master(self, dir1, fname, commit_sha1: str):
-        print('    - run_test_on_master')
+    def run_test_on_main(self, dir1, fname, commit_sha1: str):
+        print('    - run_test_on_main')
         n, p, fp = str(dir1), dir1, str(dir1.resolve())
 
         # check refesh() effect
         ric = MgRepoInfo(n, fp)
         self.assertEqual(to_named_tuple(ric.refresh()),
              RepoInfoTuple(name=n,
-                           head='branch master',
-                           branch='master',
+                           head='branch main',
+                           branch='main',
                            remote_synchro = MSG_LOCAL_BRANCH,
                            fullpath=fp,
                            status='OK',
@@ -424,16 +439,16 @@ class TestRepoInfo(unittest.TestCase):
         ric.ensure_branches_filled()
         self.assertEqual(ric.branches_filled, True)
         self.assertEqual(ric.branches_remote, [])
-        self.assertEqual(ric.branches_local, ['master'])
+        self.assertEqual(ric.branches_local, ['main'])
 
 
-    def run_test_on_master_modified_files(self, dir1, _sha1: str):
-        print('    - run_test_on_master_modified_files')
+    def run_test_on_main_modified_files(self, dir1, _sha1: str):
+        print('    - run_test_on_main_modified_files')
         n, p, fp = str(dir1), dir1, str(dir1.resolve())
 
         ric = MgRepoInfo(n, fp)
         self.assertEqual(to_named_tuple(ric.refresh()),
-                         RepoInfoTuple(name=n, head='branch master', branch='master',
+                         RepoInfoTuple(name=n, head='branch main', branch='main',
                                        remote_synchro = MSG_LOCAL_BRANCH, fullpath=fp,
                                        status='OK',
                                        ))
@@ -442,7 +457,7 @@ class TestRepoInfo(unittest.TestCase):
             f.write(generate_content())
 
         self.assertEqual(to_named_tuple(ric.refresh()),
-                         RepoInfoTuple(name=n, head='branch master', branch='master',
+                         RepoInfoTuple(name=n, head='branch main', branch='main',
                                        remote_synchro=MSG_LOCAL_BRANCH, fullpath=fp,
                                        status='1 modified file'
                                        ))
@@ -452,14 +467,14 @@ class TestRepoInfo(unittest.TestCase):
         git_exec('add', 'file3', gitdir=p)
 
         self.assertEqual(to_named_tuple(ric.refresh()),
-                         RepoInfoTuple(name=n, head='branch master', branch='master',
+                         RepoInfoTuple(name=n, head='branch main', branch='main',
                                        remote_synchro=MSG_LOCAL_BRANCH, fullpath=fp,
                                        status='2 modified files'
                                        ))
 
         (p/'file2').unlink()
         self.assertEqual(to_named_tuple(ric.refresh()),
-                         RepoInfoTuple(name=n, head='branch master', branch='master',
+                         RepoInfoTuple(name=n, head='branch main', branch='main',
                                        remote_synchro=MSG_LOCAL_BRANCH, fullpath=fp,
                                        status='3 modified files'
                                        ))
@@ -467,7 +482,7 @@ class TestRepoInfo(unittest.TestCase):
         git_exec('add', 'file1', gitdir=p)
         git_exec('rm', 'file2', gitdir=p)
         self.assertEqual(to_named_tuple(ric.refresh()),
-                         RepoInfoTuple(name=n, head='branch master', branch='master',
+                         RepoInfoTuple(name=n, head='branch main', branch='main',
                                        remote_synchro=MSG_LOCAL_BRANCH, fullpath=fp,
                                        status='3 modified files'
                                        ))
@@ -475,20 +490,20 @@ class TestRepoInfo(unittest.TestCase):
         git_commit(fp, 'check on modified files done')
 
         self.assertEqual(to_named_tuple(ric.refresh()),
-                         RepoInfoTuple(name=n, head='branch master', branch='master',
+                         RepoInfoTuple(name=n, head='branch main', branch='main',
                                        remote_synchro = MSG_LOCAL_BRANCH, fullpath=fp,
                                        status='OK',
                                        ))
 
-    def run_test_on_master_with_one_tag(self, dir1, tag1: str):
-        print('    - run_test_on_master_with_one_tag')
+    def run_test_on_main_with_one_tag(self, dir1, tag1: str):
+        print('    - run_test_on_main_with_one_tag')
         n, p, fp = str(dir1), dir1, str(dir1.resolve())
         # check refesh() effect
         ric = MgRepoInfo(n, fp)
         self.assertEqual(to_named_tuple(ric.refresh()),
                          RepoInfoTuple(name=n,
-                                       head='branch master',
-                                       branch='master',
+                                       head='branch main',
+                                       branch='main',
                                        remote_synchro = MSG_LOCAL_BRANCH,
                                        fullpath=fp,
                                        status='OK',
@@ -502,7 +517,7 @@ class TestRepoInfo(unittest.TestCase):
         ric.ensure_branches_filled()
         self.assertEqual(ric.branches_filled, True)
         self.assertEqual(ric.branches_remote, [])
-        self.assertEqual(ric.branches_local, ['master'])
+        self.assertEqual(ric.branches_local, ['main'])
 
 
 
@@ -530,7 +545,7 @@ class TestRepoInfo(unittest.TestCase):
         ric.ensure_branches_filled()
         self.assertEqual(ric.branches_filled, True)
         self.assertEqual(ric.branches_remote, [])
-        self.assertEqual(ric.branches_local, ['master'])
+        self.assertEqual(ric.branches_local, ['main'])
 
 
 
@@ -557,7 +572,7 @@ class TestRepoInfo(unittest.TestCase):
         ric.ensure_branches_filled()
         self.assertEqual(ric.branches_filled, True)
         self.assertEqual(ric.branches_remote, [])
-        self.assertEqual(ric.branches_local, ['master'])
+        self.assertEqual(ric.branches_local, ['main'])
 
 
 
@@ -586,7 +601,7 @@ class TestRepoInfo(unittest.TestCase):
         ric.ensure_branches_filled()
         self.assertEqual(ric.branches_filled, True)
         self.assertEqual(ric.branches_remote, [])
-        self.assertEqual(ric.branches_local, ['master'])
+        self.assertEqual(ric.branches_local, ['main'])
 
 
 
@@ -611,7 +626,7 @@ class TestRepoInfo(unittest.TestCase):
 
         ric.ensure_branches_filled()
         self.assertEqual(ric.branches_filled, True)
-        self.assertEqual(ric.branches_local, ['master'])
+        self.assertEqual(ric.branches_local, ['main'])
         self.assertEqual(ric.branches_remote, [])
 
 
@@ -638,12 +653,12 @@ class TestRepoInfo(unittest.TestCase):
         ric.ensure_branches_filled()
         self.assertEqual(ric.branches_filled, True)
         self.assertEqual(ric.branches_remote, [])
-        self.assertEqual(ric.branches_local, ['branch1', 'master'])
+        self.assertEqual(ric.branches_local, ['branch1', 'main'])
 
 
 
-    def run_test_on_other_branch_merged_master(self, dir1, branch):
-        print('    - run_test_on_other_branch_merged_master')
+    def run_test_on_other_branch_merged_main(self, dir1, branch):
+        print('    - run_test_on_other_branch_merged_main')
         n, p, fp = str(dir1), dir1, str(dir1.resolve())
         # check refesh() effect
         ric = MgRepoInfo(n, fp)
@@ -664,11 +679,11 @@ class TestRepoInfo(unittest.TestCase):
         ric.ensure_branches_filled()
         self.assertEqual(ric.branches_filled, True)
         self.assertEqual(ric.branches_remote, [])
-        self.assertEqual(ric.branches_local, ['branch1', 'master'])
+        self.assertEqual(ric.branches_local, ['branch1', 'main'])
 
 
-    def run_test_on_master_after_branch2_deleted(self, dir1, branch):
-        print('    - run_test_on_master_after_branch2_deleted')
+    def run_test_on_main_after_branch2_deleted(self, dir1, branch):
+        print('    - run_test_on_main_after_branch2_deleted')
         n, p, fp = str(dir1), dir1, str(dir1.resolve())
         # check refesh() effect
         ric = MgRepoInfo(n, fp)
@@ -689,7 +704,7 @@ class TestRepoInfo(unittest.TestCase):
         ric.ensure_branches_filled()
         self.assertEqual(ric.branches_filled, True)
         self.assertEqual(ric.branches_remote, [])
-        self.assertEqual(ric.branches_local, ['branch1', 'master'])
+        self.assertEqual(ric.branches_local, ['branch1', 'main'])
 
 
 
@@ -697,7 +712,7 @@ class TestRepoInfo(unittest.TestCase):
         self.dir2 = pathlib.Path(self.gitdir) / 'dir2'
         self.dir2.mkdir()
         os.chdir(self.dir2)
-        git_exec('init', '-b', 'master', '.')
+        git_init_repo('.')
 
         git_dir = self.gitdir
         os.chdir(git_dir)
@@ -731,11 +746,11 @@ class TestRepoInfo(unittest.TestCase):
         strange_dir1 = pathlib.Path(self.gitdir) / 'strange_dir[with_bracket]'
         strange_dir1.mkdir()
         os.chdir(strange_dir1)
-        git_exec('init', '-b', 'master', str(strange_dir1))
+        git_init_repo(str(strange_dir1))
 
         strange_dir2 = pathlib.Path(strange_dir1) / 'strange_subdir[with_bracket]'
         strange_dir2.mkdir()
-        git_exec('init', '-b', 'master', str(strange_dir2))
+        git_init_repo(str(strange_dir2))
 
         os.chdir(self.gitdir)
         mr = MultiRepo(str(self.gitdir))
@@ -761,6 +776,7 @@ class TestRepoInfo(unittest.TestCase):
 
         n, p, fp = str(dir3), dir3, str(dir3.resolve())
         git_exec('clone', str(dir1), fp)
+        git_set_commit_author(str(dir3))
 
         # check refesh() effect
         ric = MgRepoInfo(n, fp)
@@ -783,8 +799,8 @@ class TestRepoInfo(unittest.TestCase):
 
 
 
-    def run_clone_test_on_origin_master_2_commits(self, _dir1, dir3):
-        print('    - run_clone_test_on_origin_master_2_commits')
+    def run_clone_test_on_origin_main_2_commits(self, _dir1, dir3):
+        print('    - run_clone_test_on_origin_main_2_commits')
 
         n, p, fp = str(dir3), dir3, str(dir3.resolve())
 
@@ -814,25 +830,25 @@ class TestRepoInfo(unittest.TestCase):
         git_exec('pull', gitdir=dir3)
         self.assertEqual(to_named_tuple(ric.refresh()),
                          RepoInfoTuple(name=n,
-                                       head='branch master',
-                                       branch='master',
+                                       head='branch main',
+                                       branch='main',
                                        fullpath=fp,
                                        status='OK',
                                        remote_synchro=MSG_REMOTE_SYNCHRO_OK,
-                                       remote_branch='origin/master',
+                                       remote_branch='origin/main',
                                        last_commit='',
                                        tags=None,
                                        ))
 
         ric.ensure_branches_filled()
         self.assertEqual(ric.branches_filled, True)
-        self.assertEqual(ric.branches_local, ['master'])
-        self.assertEqual(ric.branches_remote, ['origin/master'])
+        self.assertEqual(ric.branches_local, ['main'])
+        self.assertEqual(ric.branches_remote, ['origin/main'])
 
 
 
-    def run_clone_test_on_origin_master_more_commits(self, dir1, dir3):
-        print('    - run_clone_test_on_origin_master_more_commits')
+    def run_clone_test_on_origin_main_more_commits(self, dir1, dir3):
+        print('    - run_clone_test_on_origin_main_more_commits')
 
         n, p, fp = str(dir3), dir3, str(dir3.resolve())
 
@@ -840,24 +856,24 @@ class TestRepoInfo(unittest.TestCase):
         ric = MgRepoInfo(n, fp)
         self.assertEqual(to_named_tuple(ric.refresh()),
                          RepoInfoTuple(name=n,
-                                       head='branch master',
-                                       branch='master',
+                                       head='branch main',
+                                       branch='main',
                                        fullpath=fp,
                                        status='OK',
                                        remote_synchro=MSG_REMOTE_SYNCHRO_OK,
-                                       remote_branch='origin/master',
+                                       remote_branch='origin/main',
                                        last_commit='',
                                        tags=None,
                                        ))
         git_exec('fetch', gitdir=dir3)
         self.assertEqual(to_named_tuple(ric.refresh()),
                          RepoInfoTuple(name=n,
-                                       head='branch master',
-                                       branch='master',
+                                       head='branch main',
+                                       branch='main',
                                        fullpath=fp,
                                        status='OK',
                                        remote_synchro='2 to pull',
-                                       remote_branch='origin/master',
+                                       remote_branch='origin/main',
                                        last_commit='',
                                        tags=None,
                                        ))
@@ -866,20 +882,20 @@ class TestRepoInfo(unittest.TestCase):
         git_commit(fp, 'add blabla', allow_errors=True) # when creating the commit, git returns 1 because the branches are diverging
         self.assertEqual(to_named_tuple(ric.refresh()),
                          RepoInfoTuple(name=n,
-                                       head='branch master',
-                                       branch='master',
+                                       head='branch main',
+                                       branch='main',
                                        fullpath=fp,
                                        status='OK',
                                        remote_synchro='1 to push, 2 to pull',
-                                       remote_branch='origin/master',
+                                       remote_branch='origin/main',
                                        last_commit='',
                                        tags=None,
                                        ))
 
         ric.ensure_branches_filled()
         self.assertEqual(ric.branches_filled, True)
-        self.assertEqual(ric.branches_local, ['master'])
-        self.assertEqual(ric.branches_remote, ['origin/master'])
+        self.assertEqual(ric.branches_local, ['main'])
+        self.assertEqual(ric.branches_remote, ['origin/main'])
 
 
 
@@ -890,6 +906,7 @@ class TestRepoInfo(unittest.TestCase):
         n, p, fp = str(dir4), dir4, str(dir4.resolve())
         # clone on the tag, we are in detached state now
         git_exec('clone', str(dir1), str(dir4))
+        git_set_commit_author(str(dir4))
 
         # check refesh() effect
         # the current status is that the fact that we are detached on a specific tag has not been
@@ -925,5 +942,5 @@ class TestRepoInfo(unittest.TestCase):
 
         ric.ensure_branches_filled()
         self.assertEqual(ric.branches_filled, True)
-        self.assertEqual(ric.branches_remote, ['origin/master'])
+        self.assertEqual(ric.branches_remote, ['origin/main'])
         self.assertEqual(ric.branches_local, [])

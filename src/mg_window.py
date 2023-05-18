@@ -15,8 +15,9 @@
 #
 
 
-from typing import cast, List, Optional, Callable, Any, Union, Literal
+from typing import cast, List, Optional, Callable, Any, Union
 import subprocess, functools, logging, pathlib
+from typing_extensions import Literal
 
 from PySide2.QtWidgets import QMainWindow, QFileDialog, QMessageBox, QAction, QApplication, QLineEdit, QTabBar
 from PySide2.QtCore import QTimer, Qt, QSignalMapper
