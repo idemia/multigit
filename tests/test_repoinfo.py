@@ -19,18 +19,24 @@ from typing import Union, Any
 import unittest, tempfile, datetime, collections, pathlib, os, stat, shutil
 from logging import warning
 
+import os
+
 from multigit import init_logging
 import src.mg_tools
 from src.mg_tools import git_exec
 from src.mg_const import MSG_EMPTY_REPO, MSG_NO_COMMIT, MSG_LOCAL_BRANCH, MSG_REMOTE_SYNCHRO_OK, SHORT_SHA1_NB_DIGITS
 from src.mg_repo_info import MgRepoInfo, MultiRepo
-from src.mg_utils import deleteDir
 
 # More tests to write
 # * detached head from a remote branch
 #   + deleting the remote branch
 # * clone remote branch + delete the remote branch
 
+AUTHOR_NAME = 'philou'
+AUTHOR_EMAIL = 'phil_tests@github'
+
+os.environ['GIT_AUTHOR_NAME'] = AUTHOR_NAME
+os.environ['GIT_AUTHOR_EMAIL'] = AUTHOR_EMAIL
 
 LONG_TESTS = True
 
@@ -90,8 +96,6 @@ def to_named_tuple(ric: MgRepoInfo) -> RepoInfoTuple:
 def git_init_repo(repo: str) -> None:
     '''Init the repository and creates commit config'''
     git_exec('init', '-b', 'main', repo)
-    git_exec('config', 'user.email', 'phil_tests@github' , gitdir=repo)
-    git_exec('config', 'user.name', 'philou' , gitdir=repo)
 
 def git_commit(repo: str, msg: str, allow_errors: bool = False) -> str:
     '''Commit the repo with the message passed in argument and return the SHA1 of the commit.'''
