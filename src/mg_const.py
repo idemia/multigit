@@ -15,8 +15,9 @@
 #
 
 
-from typing import List, Optional
-import pathlib, os, platform, enum
+from typing import Optional
+
+import pathlib, platform, enum
 
 ############################################
 #   Product Constants
@@ -38,8 +39,6 @@ COL_NB = 7
 COL_TITLES = ['', 'Git Repo Path', 'Head', 'Status', 'Last Remote Synchro', 'SHA1', 'URL']
 
 SHORT_SHA1_NB_DIGITS = 7
-
-APPDATA_USER_MULTIGIT = pathlib.Path(os.environ['USERPROFILE']) / 'AppData/Local/MultiGit/'
 
 # This is filled when initializing the application
 PATH_LOG_NORMAL: Optional[pathlib.Path]

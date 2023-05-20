@@ -14,7 +14,7 @@
 #     limitations under the License.
 #
 
-
+import os
 import platform
 import sys, logging, datetime, tempfile, pathlib
 import logging.handlers
@@ -104,13 +104,15 @@ def init_logging(debug_activated: bool = False, run_from_tests: bool = False) ->
     path_log_debug: Optional[pathlib.Path]
     path_log_git_cmd: Optional[pathlib.Path]
 
+    APPDATA_USER_MULTIGIT = pathlib.Path(os.environ['USERPROFILE']) / 'AppData/Local/MultiGit/'
+
     # Make sure we are actually logging to a file which can be written
     try:
-        if not mg_const.APPDATA_USER_MULTIGIT.exists():
-            mg_const.APPDATA_USER_MULTIGIT.mkdir(parents=True)
-        path_log_normal = mg_const.APPDATA_USER_MULTIGIT / fname_log_normal
-        path_log_debug = mg_const.APPDATA_USER_MULTIGIT / fname_log_debug
-        path_log_git_cmd = mg_const.APPDATA_USER_MULTIGIT / fname_log_git_cmd
+        if not APPDATA_USER_MULTIGIT.exists():
+            APPDATA_USER_MULTIGIT.mkdir(parents=True)
+        path_log_normal = APPDATA_USER_MULTIGIT / fname_log_normal
+        path_log_debug = APPDATA_USER_MULTIGIT / fname_log_debug
+        path_log_git_cmd = APPDATA_USER_MULTIGIT / fname_log_git_cmd
 
         if not is_writeable(path_log_normal) and is_writeable(path_log_debug):
             raise PermissionError('Can not create log file in location %s' % path_log_normal)
