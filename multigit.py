@@ -86,11 +86,10 @@ def is_writeable(fname: pathlib.Path) -> bool:
     except PermissionError:
         return False
 
-def init_logging(debug_activated: bool = False, run_from_tests: bool = False) -> None:
-    '''run_from_tests: when activated, a different logging filename is used
-    debug_activated: when True, a lot more informaiton is written to a debug log file.
-                     The feature is activated when the tool is launched with --debug
-    '''
+
+def configure_logpath(debug_activated: bool = False, run_from_tests: bool = False) -> None:
+    '''Creates the log path in mg_const according to platform and ability to write to directory'''
+
     if run_from_tests:
         fname_log_normal = 'log_tests_multigit.log'
         fname_log_debug = 'log_tests_multigit_debug.log'
@@ -134,6 +133,14 @@ def init_logging(debug_activated: bool = False, run_from_tests: bool = False) ->
     mg_const.PATH_LOG_DEBUG = path_log_debug
     mg_const.PATH_LOG_GIT_CMD = path_log_git_cmd
 
+
+def init_logging(debug_activated: bool = False, run_from_tests: bool = False) -> None:
+    '''run_from_tests: when activated, a different logging filename is used
+    debug_activated: when True, a lot more informaiton is written to a debug log file.
+                     The feature is activated when the tool is launched with --debug
+        '''
+    configure_logpath(debug_activated, run_from_tests)
+
     formatter = logging.Formatter('%(asctime)s %(name)15s:%(levelname)7s %(message)s')
     formatter.default_time_format = '%H:%M:%S'
 
@@ -158,24 +165,24 @@ def init_logging(debug_activated: bool = False, run_from_tests: bool = False) ->
         logger.setLevel(logging.INFO)
 
 
-    if path_log_normal:
-        fhandler_info = ConcurrentRotatingFileHandler(str(path_log_normal), encoding='utf8', maxBytes=10_000_000, backupCount=5)
+    if mg_const.PATH_LOG_NORMAL:
+        fhandler_info = ConcurrentRotatingFileHandler(str(mg_const.PATH_LOG_NORMAL), encoding='utf8', maxBytes=10_000_000, backupCount=5)
         fhandler_info.setLevel( logging.INFO )
         fhandler_info.setFormatter(formatter)
         logger.addHandler(fhandler_info)
         # ensure that git_cmd records are not propagated to root handlers
         fhandler_info.addFilter(lambda record: int(record.name != mg_const.LOGGER_GIT_CMD))
 
-    if (path_log_debug and debug_activated):
-        fhandler_dbg = ConcurrentRotatingFileHandler(str(path_log_debug), encoding='utf8', maxBytes=10_000_000, backupCount=5)
+    if (mg_const.PATH_LOG_DEBUG and debug_activated):
+        fhandler_dbg = ConcurrentRotatingFileHandler(str(mg_const.PATH_LOG_DEBUG), encoding='utf8', maxBytes=10_000_000, backupCount=5)
         fhandler_dbg.setLevel( logging.DEBUG )
         fhandler_dbg.setFormatter(formatter)
         logger.addHandler(fhandler_dbg)
         # ensure that git_cmd records are not propagated to root handlers
         fhandler_dbg.addFilter(lambda record: int(record.name != mg_const.LOGGER_GIT_CMD))
 
-    if path_log_git_cmd:
-        fhandler_git_cmd = ConcurrentRotatingFileHandler(str(path_log_git_cmd), encoding='utf8', maxBytes=10_000_000, backupCount=5)
+    if mg_const.PATH_LOG_GIT_CMD:
+        fhandler_git_cmd = ConcurrentRotatingFileHandler(str(mg_const.PATH_LOG_GIT_CMD), encoding='utf8', maxBytes=10_000_000, backupCount=5)
         fhandler_git_cmd.setLevel( logging.DEBUG )
         fhandler_git_cmd.setFormatter(logging.Formatter('%(asctime)s %(message)s'))
         logger_git_cmd = logging.getLogger(mg_const.LOGGER_GIT_CMD)

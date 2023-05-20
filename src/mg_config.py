@@ -86,7 +86,7 @@ def get_config_instance() -> 'MgConfig':
         DEFAULT_CONFIG_PATH = Path(os.environ['USERPROFILE']) / 'AppData/Local/MultiGit/multigit.config'
 
     if __CONFIG_INSTANCE is None:
-        __CONFIG_INSTANCE = MgConfig(DEFAULT_CONFIG_PATH)
+        __CONFIG_INSTANCE = MgConfig(str(DEFAULT_CONFIG_PATH))
         __CONFIG_INSTANCE.load()
     return __CONFIG_INSTANCE
 
@@ -94,7 +94,7 @@ def get_config_instance() -> 'MgConfig':
 class MgConfig:
     '''MultiGit configuration management'''
 
-    def __init__(self, config_path: Optional[str] = None):
+    def __init__(self, config_path: str):
         '''Set the configuration filename.
         '''
         self.config_dict: Dict[str, Any] = {}
