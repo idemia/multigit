@@ -15,13 +15,13 @@
 #
 
 
-import os, ast
+from typing import List, TypeVar, Sequence, Optional, Any, Dict
+
+import os, ast, sys
 from pathlib import Path
 from pprint import pformat
 import logging, traceback
 import datetime, shutil
-
-from typing import List, TypeVar, Sequence, Optional, Any, Dict
 
 from PySide2.QtCore import Qt
 from PySide2.QtWidgets import QMessageBox, QApplication
@@ -66,8 +66,6 @@ CONFIG_VIEW_COL_URL = 'CONFIG_VIEW_COL_URL'
 CONFIG_CLONE_USERNAME = 'CONFIG_CONFIG_CLONE_USERNAME'
 CONFIG_FETCH_ON_STARTUP = 'CONFIG_FETCH_ON_STARTUP'
 
-DEFAULT_CONFIG_PATH = Path(os.environ['USERPROFILE']) / 'AppData/Local/MultiGit/multigit.config'
-
 DEFAULT_CHECK_UPDATE_FREQUENCY = 30 # check every month
 
 # Format is: 0xAARRGGBB with AA = alpha, RR = red, GG = green, BB = blue
@@ -81,9 +79,14 @@ __CONFIG_INSTANCE = None
 
 
 def get_config_instance() -> 'MgConfig':
+    '''Return an instance of the configuration of Multigit, with the default configuration path'''
     global __CONFIG_INSTANCE
+
+    if sys.platform == 'win32':
+        DEFAULT_CONFIG_PATH = Path(os.environ['USERPROFILE']) / 'AppData/Local/MultiGit/multigit.config'
+
     if __CONFIG_INSTANCE is None:
-        __CONFIG_INSTANCE = MgConfig()
+        __CONFIG_INSTANCE = MgConfig(DEFAULT_CONFIG_PATH)
         __CONFIG_INSTANCE.load()
     return __CONFIG_INSTANCE
 
@@ -91,14 +94,12 @@ def get_config_instance() -> 'MgConfig':
 class MgConfig:
     '''MultiGit configuration management'''
 
-    def __init__(self, fname: Optional[str] = None):
+    def __init__(self, config_path: Optional[str] = None):
         '''Set the configuration filename.
-
-        If no filename is provided, the default configuration %USERPROFILE%/AppData/Local/MultiGit is used.
         '''
         self.config_dict: Dict[str, Any] = {}
         self.lru_dict: Dict[str, LRUList] = {}
-        self.config_path = Path(fname) if fname else DEFAULT_CONFIG_PATH
+        self.config_path = Path(config_path)
         self.do_not_save = False
 
     def load(self) -> None:
