@@ -24,7 +24,7 @@ from PySide2.QtGui import QIcon, QPixmap, QTransform
 from PySide2.QtWidgets import QAction, QMenu, QWidget
 
 from src.mg_const import SHORT_SHA1_NB_DIGITS
-from src.mg_tools import shouldShowSublimeMerge, shouldShowTortoiseGit, shouldShowSourceTree
+from src.mg_tools import shouldShowSublimeMerge, shouldShowTortoiseGit, shouldShowSourceTree, shouldShowGitBash
 from src.mg_repo_info import MgRepoInfo
 
 logger = logging.getLogger('mg_actions')
@@ -318,6 +318,7 @@ class MgActions(QObject):
         showTortoiseGit = shouldShowTortoiseGit()
         showSourceTree = shouldShowSourceTree()
         showSublimeMerge = shouldShowSublimeMerge()
+        showGitBash = shouldShowGitBash()
 
         # fix menu actions
         self.actionSourceTree.setVisible(showSourceTree)
@@ -328,6 +329,8 @@ class MgActions(QObject):
             self.actionConfigureGitProgram.setVisible(False)
         else:
             self.actionConfigureGitProgram.setVisible(True)
+
+        self.actionGitBash.setVisible(showGitBash)
 
 
     def setupDynamicMenuCopy(self, repoInfo: MgRepoInfo) -> None:

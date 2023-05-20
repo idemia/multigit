@@ -15,16 +15,16 @@
 #
 
 
-import functools, logging, pathlib, subprocess
-from typing import Sequence, Union, Optional, Callable, Tuple, Any
+from typing import Sequence, Union, Optional, Callable, Tuple, Any, List
+
+import functools, logging, pathlib, subprocess, sys, os
 
 from PySide2.QtCore import QObject, QProcess, Signal
 from PySide2.QtWidgets import QMessageBox, QApplication
 
 from src import mg_config
 from src.mg_utils import hasGitAuthFailureMsg
-from src.mg_const import GIT_PATH_CANDIDATES, TORTOISE_GIT_PATH_CANDIDATES, SOURCETREE_PATH_CANDIDATES, SUBLIMEMERGE_PATH_CANDIDATES, \
-    MAX_GIT_DBG_OUT_CHAR, GITBASH_PATH_CANDIDATES, LOGGER_GIT_CMD
+from src.mg_const import MAX_GIT_DBG_OUT_CHAR, LOGGER_GIT_CMD
 from src.mg_auth_failure_mgr import MgAuthFailureMgr
 
 logger = logging.getLogger('mg_tools')
@@ -47,7 +47,7 @@ def find_prog_exec(path_candidates: Sequence[Union[str, pathlib.Path]]) -> str:
             pathlib.Path(os.environ["ProgramFiles"])/"Git"/"bin"/ "git.exe",
         ]
 
-        find_git_exec( path_candidates )
+        find_prog_exec( path_candidates )
     '''
     dbg('find_prog_exec()')
     for possible_path in path_candidates:
@@ -67,6 +67,20 @@ def find_prog_exec(path_candidates: Sequence[Union[str, pathlib.Path]]) -> str:
 #       Git Stuff
 #######################################################
 
+if sys.platform == 'win32':
+    GIT_PATH_CANDIDATES: List[pathlib.Path] = [
+        pathlib.Path(os.environ["ProgramFiles(x86)"])/"Git"/"bin"/ "git.exe",
+        pathlib.Path(os.environ["ProgramFiles(x86)"])/"Git"/"cmd"/ "git.exe",
+        pathlib.Path(os.environ["PROGRAMW6432"])/"Git"/"bin"/ "git.exe",
+        pathlib.Path(os.environ["PROGRAMW6432"])/"Git"/"cmd"/ "git.exe",
+    ]
+else:
+    GIT_PATH_CANDIDATES: List[pathlib.Path] = [
+        pathlib.Path('/usr/bin/git'),
+        pathlib.Path('/usr/local/bin/git'),
+    ]
+GIT_EXEC = 'git.exe'
+
 # this caches the function result, so the function is called only once
 @functools.lru_cache(maxsize=1)
 def autodetect_git_exec() -> str:
@@ -74,7 +88,7 @@ def autodetect_git_exec() -> str:
     Returns an empty string when nothing found.
     '''
     try:
-        cmd = 'git.exe'
+        cmd = 'git'
         exit_code, output = RunProcess().exec_blocking([cmd, '--version'], allow_errors=True)
         # Git is on the path, use it
         if exit_code == 0:
@@ -117,6 +131,16 @@ def git_exec(*args: str, gitdir: Union[str, pathlib.Path] = '', allow_errors: bo
 #######################################################
 #       TortoiseGit Stuff
 #######################################################
+
+if sys.platform == 'win32':
+    TORTOISE_GIT_PATH_CANDIDATES: List[pathlib.Path] = [
+        pathlib.Path(os.environ["ProgramFiles(x86)"])/"TortoiseGit"/"bin"/ "TortoiseGitProc.exe",
+        pathlib.Path(os.environ["PROGRAMW6432"])/"TortoiseGit"/"bin"/ "TortoiseGitProc.exe",
+    ]
+else:
+    # tortoise git only exists on Windows
+    TORTOISE_GIT_PATH_CANDIDATES: List[pathlib.Path] = []
+
 
 @functools.lru_cache(maxsize=1)
 def autodetect_tortoise_git_exec() -> str:
@@ -178,6 +202,16 @@ def shouldShowTortoiseGit() -> bool:
 #       SourceTree stuff
 #######################################################
 
+if sys.platform == 'win32':
+    SOURCETREE_PATH_CANDIDATES: List[pathlib.Path] = [
+        pathlib.Path(os.environ["ProgramFiles(x86)"])/"Atlassian"/"SourceTree"/ "SourceTree.exe",
+    ]
+else:
+    # sourcetree is not available on linux
+    # when port to macos is done, this should be adjusted
+    SOURCETREE_PATH_CANDIDATES: List[pathlib.Path] = [
+    ]
+
 @functools.lru_cache(maxsize=1)
 def autodetect_sourcetree_exec() -> str:
     '''Autodetect the SourceTree executable location according to a few heuristics and return the result.
@@ -215,9 +249,23 @@ def sourcetree_exec(*args: str, callback: Optional[Callable[[], Any]] = None) ->
     rp.exec_async(cmdline=cmdline, cb_done=cb_git_done)
 
 
+def shouldShowSourceTree() -> bool:
+    '''Return whether to show sourcetree menu'''
+    return bool(mg_config.get_config_instance().get(mg_config.CONFIG_SOURCETREE_ACTIVATED))
+
+
 #######################################################
 #       SublimeMerge stuff
 #######################################################
+
+if sys.platform == 'win32':
+    SUBLIMEMERGE_PATH_CANDIDATES: List[pathlib.Path] = [
+        pathlib.Path(os.environ["PROGRAMW6432"])/"Sublime Merge"/"sublime_merge.exe",
+    ]
+else:
+    SUBLIMEMERGE_PATH_CANDIDATES: List[pathlib.Path] = [
+        pathlib.Path('/opt/sublime_merge/sublime_merge'),
+   ]
 
 @functools.lru_cache(maxsize=1)
 def autodetect_sublimemerge_exec() -> str:
@@ -257,14 +305,23 @@ def sublimemerge_exec(*args: str, callback: Optional[Callable[[], Any]] = None) 
     rp.exec_async(cmdline=cmdline, cb_done=cb_git_done)
 
 
-def shouldShowSourceTree() -> bool:
-    '''Return whether to show sourcetree menu'''
-    return bool(mg_config.get_config_instance().get(mg_config.CONFIG_SOURCETREE_ACTIVATED))
+def shouldShowSublimeMerge() -> bool:
+    return bool(mg_config.get_config_instance().get(mg_config.CONFIG_SUBLIMEMERGE_ACTIVATED))
+
 
 
 #######################################################
 #       GitBash stuff
 #######################################################
+
+if sys.platform == 'win32':
+    # Git bash is very specific to Windows
+    GITBASH_PATH_CANDIDATES: List[pathlib.Path] = [
+        pathlib.Path(os.environ["PROGRAMW6432"])/"Git"/"git-bash.exe",
+        pathlib.Path(os.environ["ProgramFiles(x86)"]) /"Git"/"git-bash.exe",
+    ]
+else:
+    GITBASH_PATH_CANDIDATES: List[pathlib.Path] = []
 
 @functools.lru_cache(maxsize=1)
 def autodetect_gitbash_exec() -> str:
@@ -317,8 +374,10 @@ def gitbash_exec(gitdir: str, callback: Optional[Callable[[], Any]] = None) -> N
     rp.exec_async(cmdline=cmdline, cb_done=cb_done, working_dir=gitdir)
 
 
-def shouldShowSublimeMerge() -> bool:
-    return bool(mg_config.get_config_instance().get(mg_config.CONFIG_SUBLIMEMERGE_ACTIVATED))
+def shouldShowGitBash() -> bool:
+    if sys.platform == 'win32':
+        return True
+    return False
 
 
 #######################################################

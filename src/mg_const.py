@@ -39,30 +39,6 @@ COL_TITLES = ['', 'Git Repo Path', 'Head', 'Status', 'Last Remote Synchro', 'SHA
 
 SHORT_SHA1_NB_DIGITS = 7
 
-GIT_PATH_CANDIDATES: List[pathlib.Path] = [
-    pathlib.Path(os.environ["ProgramFiles(x86)"])/"Git"/"bin"/ "git.exe",
-    pathlib.Path(os.environ["ProgramFiles(x86)"])/"Git"/"cmd"/ "git.exe",
-    pathlib.Path(os.environ["PROGRAMW6432"])/"Git"/"bin"/ "git.exe",
-    pathlib.Path(os.environ["PROGRAMW6432"])/"Git"/"cmd"/ "git.exe",
-    ]
-GIT_EXEC = 'git.exe'
-
-TORTOISE_GIT_PATH_CANDIDATES: List[pathlib.Path] = [
-    pathlib.Path(os.environ["ProgramFiles(x86)"])/"TortoiseGit"/"bin"/ "TortoiseGitProc.exe",
-    pathlib.Path(os.environ["PROGRAMW6432"])/"TortoiseGit"/"bin"/ "TortoiseGitProc.exe",
-]
-SOURCETREE_PATH_CANDIDATES: List[pathlib.Path] = [
-    pathlib.Path(os.environ["ProgramFiles(x86)"])/"Atlassian"/"SourceTree"/ "SourceTree.exe",
-]
-
-SUBLIMEMERGE_PATH_CANDIDATES: List[pathlib.Path] = [
-    pathlib.Path(os.environ["PROGRAMW6432"])/"Sublime Merge"/"sublime_merge.exe",
-]
-
-GITBASH_PATH_CANDIDATES: List[pathlib.Path] = [
-    pathlib.Path(os.environ["PROGRAMW6432"])/"Git"/"git-bash.exe",
-    pathlib.Path(os.environ["ProgramFiles(x86)"]) /"Git"/"git-bash.exe",
-]
 APPDATA_USER_MULTIGIT = pathlib.Path(os.environ['USERPROFILE']) / 'AppData/Local/MultiGit/'
 
 # This is filled when initializing the application
