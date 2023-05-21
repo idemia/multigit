@@ -83,10 +83,19 @@ def get_config_instance() -> 'MgConfig':
     global __CONFIG_INSTANCE
 
     if sys.platform == 'win32':
-        DEFAULT_CONFIG_PATH = Path(os.environ['USERPROFILE']) / 'AppData/Local/MultiGit/multigit.config'
+        default_config_path = Path(os.environ['USERPROFILE']) / 'AppData/Local/MultiGit/multigit.config'
+    else:
+        # See https://specifications.freedesktop.org/basedir-spec/basedir-spec-latest.html
+        xdg_config_home: str
+        if os.environ.get('XDG_CONFIG_HOME', ''):
+            xdg_config_home = os.environ['XDG_CONFIG_HOME']
+        else:
+            xdg_config_home = os.path.expanduser('~/.config')
+
+        default_config_path = Path(xdg_config_home) / 'Multigit/multigit.config'
 
     if __CONFIG_INSTANCE is None:
-        __CONFIG_INSTANCE = MgConfig(str(DEFAULT_CONFIG_PATH))
+        __CONFIG_INSTANCE = MgConfig(str(default_config_path))
         __CONFIG_INSTANCE.load()
     return __CONFIG_INSTANCE
 
