@@ -354,7 +354,7 @@ def shouldShowGitBash() -> bool:
 #       Open directory
 #######################################################
 
-class ExecOpenDirectory(ExecTool):
+class ExecExplorer(ExecTool):
     SUPPORTED_PLATFORMS = ['win32', 'linux']
 
     # no path candidates, it should be on the execution path

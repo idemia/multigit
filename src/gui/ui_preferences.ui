@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>636</width>
-    <height>704</height>
+    <width>924</width>
+    <height>682</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -17,7 +17,7 @@
    <item>
     <widget class="QTabWidget" name="tabWidget">
      <property name="currentIndex">
-      <number>0</number>
+      <number>1</number>
      </property>
      <widget class="QWidget" name="tab_ui">
       <attribute name="title">
@@ -454,9 +454,9 @@
       <attribute name="title">
        <string>External Programs</string>
       </attribute>
-      <layout class="QVBoxLayout" name="verticalLayout_3">
-       <item>
-        <widget class="QGroupBox" name="groupBox">
+      <layout class="QGridLayout" name="gridLayout_7">
+       <item row="0" column="0">
+        <widget class="QGroupBox" name="groupBoxGit">
          <property name="font">
           <font>
            <weight>75</weight>
@@ -593,8 +593,152 @@
          </layout>
         </widget>
        </item>
-       <item>
-        <widget class="QGroupBox" name="groupBox_2">
+       <item row="0" column="1">
+        <widget class="QGroupBox" name="groupBoxExplorer">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="font">
+          <font>
+           <weight>75</weight>
+           <bold>true</bold>
+          </font>
+         </property>
+         <property name="title">
+          <string>File Explorer</string>
+         </property>
+         <property name="flat">
+          <bool>false</bool>
+         </property>
+         <property name="checkable">
+          <bool>false</bool>
+         </property>
+         <layout class="QGridLayout" name="gridLayout_5">
+          <item row="0" column="0" colspan="3">
+           <widget class="QLabel" name="label_11">
+            <property name="font">
+             <font>
+              <weight>50</weight>
+              <bold>false</bold>
+             </font>
+            </property>
+            <property name="text">
+             <string>Choose File Explorer program to open directories :</string>
+            </property>
+            <property name="buddy">
+             <cstring>radioTGitAutoDetect</cstring>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="0">
+           <widget class="QRadioButton" name="radioExplorerAutoDetect">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+              <horstretch>1</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="font">
+             <font>
+              <weight>50</weight>
+              <bold>false</bold>
+             </font>
+            </property>
+            <property name="text">
+             <string>Auto-detected</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="1">
+           <widget class="QLineEdit" name="lineEditExplorerAutoDetect">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="font">
+             <font>
+              <weight>50</weight>
+              <bold>false</bold>
+             </font>
+            </property>
+            <property name="readOnly">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="0">
+           <widget class="QRadioButton" name="radioExplorerManual">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+              <horstretch>1</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="font">
+             <font>
+              <weight>50</weight>
+              <bold>false</bold>
+             </font>
+            </property>
+            <property name="text">
+             <string>Manual path</string>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="1">
+           <widget class="QLineEdit" name="lineEditExplorerManual">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+              <horstretch>10</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="font">
+             <font>
+              <weight>50</weight>
+              <bold>false</bold>
+             </font>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="2">
+           <widget class="QPushButton" name="pushButtonExplorerManualBrowse">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+              <horstretch>1</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="minimumSize">
+             <size>
+              <width>24</width>
+              <height>0</height>
+             </size>
+            </property>
+            <property name="font">
+             <font>
+              <weight>50</weight>
+              <bold>false</bold>
+             </font>
+            </property>
+            <property name="text">
+             <string>...</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item row="1" column="0">
+        <widget class="QGroupBox" name="groupBoxTGit">
          <property name="sizePolicy">
           <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
            <horstretch>0</horstretch>
@@ -617,14 +761,8 @@
           <bool>false</bool>
          </property>
          <layout class="QGridLayout" name="gridLayout_2">
-          <item row="6" column="0">
-           <widget class="QRadioButton" name="radioTGitManual">
-            <property name="sizePolicy">
-             <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
-              <horstretch>1</horstretch>
-              <verstretch>0</verstretch>
-             </sizepolicy>
-            </property>
+          <item row="0" column="0" colspan="2">
+           <widget class="QCheckBox" name="checkBoxTortoiseGit">
             <property name="font">
              <font>
               <weight>50</weight>
@@ -632,11 +770,34 @@
              </font>
             </property>
             <property name="text">
-             <string>Manual path</string>
+             <string>Activate TortoiseGit in the Git Program menu</string>
             </property>
            </widget>
           </item>
-          <item row="5" column="0">
+          <item row="1" column="0">
+           <widget class="QLabel" name="label_9">
+            <property name="text">
+             <string/>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="0" colspan="3">
+           <widget class="QLabel" name="label_2">
+            <property name="font">
+             <font>
+              <weight>50</weight>
+              <bold>false</bold>
+             </font>
+            </property>
+            <property name="text">
+             <string>Choose TortoiseGitProc.exe executable location :</string>
+            </property>
+            <property name="buddy">
+             <cstring>radioTGitAutoDetect</cstring>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="0">
            <widget class="QRadioButton" name="radioTGitAutoDetect">
             <property name="sizePolicy">
              <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
@@ -655,8 +816,36 @@
             </property>
            </widget>
           </item>
+          <item row="3" column="1">
+           <widget class="QLineEdit" name="lineEditTGitAutoDetect">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="font">
+             <font>
+              <weight>50</weight>
+              <bold>false</bold>
+             </font>
+            </property>
+            <property name="readOnly">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
           <item row="4" column="0">
-           <widget class="QLabel" name="label_2">
+           <widget class="QRadioButton" name="radioTGitManual">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+              <horstretch>1</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
             <property name="font">
              <font>
               <weight>50</weight>
@@ -664,21 +853,11 @@
              </font>
             </property>
             <property name="text">
-             <string>Choose TortoiseGitProc.exe executable location :</string>
-            </property>
-            <property name="buddy">
-             <cstring>radioTGitAutoDetect</cstring>
+             <string>Manual path</string>
             </property>
            </widget>
           </item>
-          <item row="3" column="0">
-           <widget class="QLabel" name="label_9">
-            <property name="text">
-             <string/>
-            </property>
-           </widget>
-          </item>
-          <item row="6" column="1">
+          <item row="4" column="1">
            <widget class="QLineEdit" name="lineEditTGitManual">
             <property name="sizePolicy">
              <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
@@ -694,7 +873,7 @@
             </property>
            </widget>
           </item>
-          <item row="6" column="2">
+          <item row="4" column="2">
            <widget class="QPushButton" name="pushButtonTGitManualBrowse">
             <property name="sizePolicy">
              <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
@@ -719,8 +898,90 @@
             </property>
            </widget>
           </item>
-          <item row="5" column="1">
-           <widget class="QLineEdit" name="lineEditTGitAutoDetect">
+         </layout>
+        </widget>
+       </item>
+       <item row="1" column="1">
+        <widget class="QGroupBox" name="groupBoxGitBash">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="font">
+          <font>
+           <weight>75</weight>
+           <bold>true</bold>
+          </font>
+         </property>
+         <property name="title">
+          <string>Git Bash</string>
+         </property>
+         <property name="flat">
+          <bool>false</bool>
+         </property>
+         <property name="checkable">
+          <bool>false</bool>
+         </property>
+         <layout class="QGridLayout" name="gridLayout_6">
+          <item row="0" column="0" colspan="2">
+           <widget class="QCheckBox" name="checkBoxGitBash">
+            <property name="font">
+             <font>
+              <weight>50</weight>
+              <bold>false</bold>
+             </font>
+            </property>
+            <property name="text">
+             <string>Activate Git Bash in the Git menu</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="0">
+           <widget class="QLabel" name="label_14">
+            <property name="text">
+             <string/>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="0" colspan="2">
+           <widget class="QLabel" name="label_13">
+            <property name="font">
+             <font>
+              <weight>50</weight>
+              <bold>false</bold>
+             </font>
+            </property>
+            <property name="text">
+             <string>Choose git-bash.exe executable location :</string>
+            </property>
+            <property name="buddy">
+             <cstring>radioTGitAutoDetect</cstring>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="0">
+           <widget class="QRadioButton" name="radioGitBashAutoDetect">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+              <horstretch>1</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="font">
+             <font>
+              <weight>50</weight>
+              <bold>false</bold>
+             </font>
+            </property>
+            <property name="text">
+             <string>Auto-detected</string>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="1">
+           <widget class="QLineEdit" name="lineEditGitBashAutoDetect">
             <property name="enabled">
              <bool>false</bool>
             </property>
@@ -741,8 +1002,14 @@
             </property>
            </widget>
           </item>
-          <item row="2" column="0">
-           <widget class="QCheckBox" name="checkBoxTortoiseGit">
+          <item row="4" column="0">
+           <widget class="QRadioButton" name="radioGitBashManual">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+              <horstretch>1</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
             <property name="font">
              <font>
               <weight>50</weight>
@@ -750,15 +1017,56 @@
              </font>
             </property>
             <property name="text">
-             <string>Activate TortoiseGit in the Git Program menu</string>
+             <string>Manual path</string>
+            </property>
+           </widget>
+          </item>
+          <item row="4" column="1">
+           <widget class="QLineEdit" name="lineEditGitBashManual">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+              <horstretch>10</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="font">
+             <font>
+              <weight>50</weight>
+              <bold>false</bold>
+             </font>
+            </property>
+           </widget>
+          </item>
+          <item row="4" column="2">
+           <widget class="QPushButton" name="pushButtonGitBashManualBrowse">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+              <horstretch>1</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="minimumSize">
+             <size>
+              <width>24</width>
+              <height>0</height>
+             </size>
+            </property>
+            <property name="font">
+             <font>
+              <weight>50</weight>
+              <bold>false</bold>
+             </font>
+            </property>
+            <property name="text">
+             <string>...</string>
             </property>
            </widget>
           </item>
          </layout>
         </widget>
        </item>
-       <item>
-        <widget class="QGroupBox" name="groupBox_3">
+       <item row="2" column="0">
+        <widget class="QGroupBox" name="groupBoxSourceTree">
          <property name="sizePolicy">
           <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
            <horstretch>0</horstretch>
@@ -780,12 +1088,48 @@
          <property name="checkable">
           <bool>false</bool>
          </property>
-         <layout class="QGridLayout" name="gridLayout_4_2">
-          <item row="6" column="1">
-           <widget class="QLineEdit" name="lineEditSourcetreeManual">
+         <layout class="QGridLayout" name="gridLayout_8">
+          <item row="0" column="0" colspan="2">
+           <widget class="QCheckBox" name="checkBoxSourceTree">
+            <property name="font">
+             <font>
+              <weight>50</weight>
+              <bold>false</bold>
+             </font>
+            </property>
+            <property name="text">
+             <string>Activate SourceTree in the Git Program menu</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="0">
+           <widget class="QLabel" name="label_7">
+            <property name="text">
+             <string/>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="0" colspan="3">
+           <widget class="QLabel" name="label_4">
+            <property name="font">
+             <font>
+              <weight>50</weight>
+              <bold>false</bold>
+             </font>
+            </property>
+            <property name="text">
+             <string>Choose SourceTree.exe executable location :</string>
+            </property>
+            <property name="buddy">
+             <cstring>radioSourcetreeAutoDetect</cstring>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="0">
+           <widget class="QRadioButton" name="radioSourcetreeAutoDetect">
             <property name="sizePolicy">
-             <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-              <horstretch>10</horstretch>
+             <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+              <horstretch>1</horstretch>
               <verstretch>0</verstretch>
              </sizepolicy>
             </property>
@@ -795,9 +1139,34 @@
               <bold>false</bold>
              </font>
             </property>
+            <property name="text">
+             <string>Auto-detected</string>
+            </property>
            </widget>
           </item>
-          <item row="6" column="0">
+          <item row="3" column="1">
+           <widget class="QLineEdit" name="lineEditSourcetreeAutoDetect">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="font">
+             <font>
+              <weight>50</weight>
+              <bold>false</bold>
+             </font>
+            </property>
+            <property name="readOnly">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item row="4" column="0">
            <widget class="QRadioButton" name="radioSourcetreeManual">
             <property name="sizePolicy">
              <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
@@ -816,7 +1185,23 @@
             </property>
            </widget>
           </item>
-          <item row="6" column="2">
+          <item row="4" column="1">
+           <widget class="QLineEdit" name="lineEditSourcetreeManual">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+              <horstretch>10</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="font">
+             <font>
+              <weight>50</weight>
+              <bold>false</bold>
+             </font>
+            </property>
+           </widget>
+          </item>
+          <item row="4" column="2">
            <widget class="QPushButton" name="pushButtonSourcetreeManualBrowse">
             <property name="sizePolicy">
              <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
@@ -841,88 +1226,14 @@
             </property>
            </widget>
           </item>
-          <item row="5" column="0">
-           <widget class="QRadioButton" name="radioSourcetreeAutoDetect">
-            <property name="sizePolicy">
-             <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
-              <horstretch>1</horstretch>
-              <verstretch>0</verstretch>
-             </sizepolicy>
-            </property>
-            <property name="font">
-             <font>
-              <weight>50</weight>
-              <bold>false</bold>
-             </font>
-            </property>
-            <property name="text">
-             <string>Auto-detected</string>
-            </property>
-           </widget>
-          </item>
-          <item row="4" column="0">
-           <widget class="QLabel" name="label_4">
-            <property name="font">
-             <font>
-              <weight>50</weight>
-              <bold>false</bold>
-             </font>
-            </property>
-            <property name="text">
-             <string>Choose SourceTree.exe executable location :</string>
-            </property>
-            <property name="buddy">
-             <cstring>radioSourcetreeAutoDetect</cstring>
-            </property>
-           </widget>
-          </item>
-          <item row="5" column="1">
-           <widget class="QLineEdit" name="lineEditSourcetreeAutoDetect">
-            <property name="enabled">
-             <bool>false</bool>
-            </property>
-            <property name="sizePolicy">
-             <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-              <horstretch>0</horstretch>
-              <verstretch>0</verstretch>
-             </sizepolicy>
-            </property>
-            <property name="font">
-             <font>
-              <weight>50</weight>
-              <bold>false</bold>
-             </font>
-            </property>
-            <property name="readOnly">
-             <bool>true</bool>
-            </property>
-           </widget>
-          </item>
-          <item row="2" column="0">
-           <widget class="QCheckBox" name="checkBoxSourceTree">
-            <property name="font">
-             <font>
-              <weight>50</weight>
-              <bold>false</bold>
-             </font>
-            </property>
-            <property name="text">
-             <string>Activate SourceTree in the Git Program menu</string>
-            </property>
-           </widget>
-          </item>
-          <item row="3" column="0">
-           <widget class="QLabel" name="label_7">
-            <property name="text">
-             <string/>
-            </property>
-           </widget>
-          </item>
          </layout>
         </widget>
        </item>
-       <item>
-        <widget class="QGroupBox" name="groupBox_4">
+       <item row="2" column="1">
+        <widget class="QWidget" name="widget_4" native="true"/>
+       </item>
+       <item row="3" column="0">
+        <widget class="QGroupBox" name="groupBoxSublimemerge">
          <property name="sizePolicy">
           <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
            <horstretch>0</horstretch>
@@ -945,20 +1256,8 @@
           <bool>false</bool>
          </property>
          <layout class="QGridLayout" name="gridLayout_4">
-          <item row="4" column="2">
-           <widget class="QPushButton" name="pushButtonSublimemergeManualBrowse">
-            <property name="sizePolicy">
-             <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-              <horstretch>1</horstretch>
-              <verstretch>0</verstretch>
-             </sizepolicy>
-            </property>
-            <property name="minimumSize">
-             <size>
-              <width>24</width>
-              <height>0</height>
-             </size>
-            </property>
+          <item row="0" column="0" colspan="2">
+           <widget class="QCheckBox" name="checkBoxSublimeMerge">
             <property name="font">
              <font>
               <weight>50</weight>
@@ -966,7 +1265,30 @@
              </font>
             </property>
             <property name="text">
-             <string>...</string>
+             <string>Activate SublimeMerge  in the Git Program menu</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="0">
+           <widget class="QLabel" name="label_8">
+            <property name="text">
+             <string/>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="0" colspan="2">
+           <widget class="QLabel" name="label_4_2">
+            <property name="font">
+             <font>
+              <weight>50</weight>
+              <bold>false</bold>
+             </font>
+            </property>
+            <property name="text">
+             <string>Choose sublime_merge.exe executable location :</string>
+            </property>
+            <property name="buddy">
+             <cstring>radioSublimemergeAutoDetect</cstring>
             </property>
            </widget>
           </item>
@@ -986,25 +1308,6 @@
             </property>
             <property name="text">
              <string>Auto-detected</string>
-            </property>
-           </widget>
-          </item>
-          <item row="4" column="0">
-           <widget class="QRadioButton" name="radioSublimemergeManual">
-            <property name="sizePolicy">
-             <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
-              <horstretch>1</horstretch>
-              <verstretch>0</verstretch>
-             </sizepolicy>
-            </property>
-            <property name="font">
-             <font>
-              <weight>50</weight>
-              <bold>false</bold>
-             </font>
-            </property>
-            <property name="text">
-             <string>Manual path</string>
             </property>
            </widget>
           </item>
@@ -1030,6 +1333,25 @@
             </property>
            </widget>
           </item>
+          <item row="4" column="0">
+           <widget class="QRadioButton" name="radioSublimemergeManual">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+              <horstretch>1</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="font">
+             <font>
+              <weight>50</weight>
+              <bold>false</bold>
+             </font>
+            </property>
+            <property name="text">
+             <string>Manual path</string>
+            </property>
+           </widget>
+          </item>
           <item row="4" column="1">
            <widget class="QLineEdit" name="lineEditSublimemergeManual">
             <property name="sizePolicy">
@@ -1046,15 +1368,20 @@
             </property>
            </widget>
           </item>
-          <item row="1" column="0">
-           <widget class="QLabel" name="label_8">
-            <property name="text">
-             <string/>
+          <item row="4" column="2">
+           <widget class="QPushButton" name="pushButtonSublimemergeManualBrowse">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+              <horstretch>1</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
             </property>
-           </widget>
-          </item>
-          <item row="2" column="0">
-           <widget class="QLabel" name="label_4_2">
+            <property name="minimumSize">
+             <size>
+              <width>24</width>
+              <height>0</height>
+             </size>
+            </property>
             <property name="font">
              <font>
               <weight>50</weight>
@@ -1062,30 +1389,17 @@
              </font>
             </property>
             <property name="text">
-             <string>Choose sublime_merge.exe executable location :</string>
-            </property>
-            <property name="buddy">
-             <cstring>radioSublimemergeAutoDetect</cstring>
-            </property>
-           </widget>
-          </item>
-          <item row="0" column="0">
-           <widget class="QCheckBox" name="checkBoxSublimeMerge">
-            <property name="font">
-             <font>
-              <weight>50</weight>
-              <bold>false</bold>
-             </font>
-            </property>
-            <property name="text">
-             <string>Activate SublimeMerge  in the Git Program menu</string>
+             <string>...</string>
             </property>
            </widget>
           </item>
          </layout>
         </widget>
        </item>
-       <item>
+       <item row="3" column="1">
+        <widget class="QWidget" name="widget_5" native="true"/>
+       </item>
+       <item row="4" column="0">
         <spacer name="verticalSpacer">
          <property name="orientation">
           <enum>Qt::Vertical</enum>
@@ -1094,6 +1408,19 @@
           <size>
            <width>20</width>
            <height>16</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item row="4" column="1">
+        <spacer name="verticalSpacer_3">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>20</width>
+           <height>38</height>
           </size>
          </property>
         </spacer>
@@ -1115,7 +1442,6 @@
   </layout>
  </widget>
  <tabstops>
-  <tabstop>tabWidget</tabstop>
   <tabstop>comboBoxDoubleClickAction</tabstop>
   <tabstop>pushButtonColorBranch</tabstop>
   <tabstop>pushButtonColorTag</tabstop>
@@ -1161,8 +1487,8 @@
      <y>126</y>
     </hint>
     <hint type="destinationlabel">
-     <x>603</x>
-     <y>129</y>
+     <x>447</x>
+     <y>130</y>
     </hint>
    </hints>
   </connection>
@@ -1173,12 +1499,12 @@
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>130</x>
-     <y>274</y>
+     <x>122</x>
+     <y>276</y>
     </hint>
     <hint type="destinationlabel">
-     <x>603</x>
-     <y>277</y>
+     <x>447</x>
+     <y>279</y>
     </hint>
    </hints>
   </connection>
@@ -1193,8 +1519,8 @@
      <y>126</y>
     </hint>
     <hint type="destinationlabel">
-     <x>415</x>
-     <y>129</y>
+     <x>413</x>
+     <y>130</y>
     </hint>
    </hints>
   </connection>
@@ -1205,12 +1531,12 @@
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>141</x>
-     <y>274</y>
+     <x>122</x>
+     <y>276</y>
     </hint>
     <hint type="destinationlabel">
-     <x>567</x>
-     <y>277</y>
+     <x>413</x>
+     <y>279</y>
     </hint>
    </hints>
   </connection>
@@ -1221,12 +1547,12 @@
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>133</x>
-     <y>422</y>
+     <x>122</x>
+     <y>424</y>
     </hint>
     <hint type="destinationlabel">
-     <x>568</x>
-     <y>425</y>
+     <x>413</x>
+     <y>427</y>
     </hint>
    </hints>
   </connection>
@@ -1241,8 +1567,8 @@
      <y>422</y>
     </hint>
     <hint type="destinationlabel">
-     <x>603</x>
-     <y>425</y>
+     <x>447</x>
+     <y>427</y>
     </hint>
    </hints>
   </connection>
@@ -1253,12 +1579,12 @@
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>133</x>
-     <y>570</y>
+     <x>122</x>
+     <y>573</y>
     </hint>
     <hint type="destinationlabel">
-     <x>569</x>
-     <y>573</y>
+     <x>413</x>
+     <y>576</y>
     </hint>
    </hints>
   </connection>
@@ -1273,8 +1599,8 @@
      <y>570</y>
     </hint>
     <hint type="destinationlabel">
-     <x>603</x>
-     <y>573</y>
+     <x>447</x>
+     <y>576</y>
     </hint>
    </hints>
   </connection>
@@ -1285,8 +1611,8 @@
    <slot>accept()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>626</x>
-     <y>632</y>
+     <x>635</x>
+     <y>672</y>
     </hint>
     <hint type="destinationlabel">
      <x>630</x>
@@ -1301,8 +1627,8 @@
    <slot>reject()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>626</x>
-     <y>632</y>
+     <x>635</x>
+     <y>672</y>
     </hint>
     <hint type="destinationlabel">
      <x>630</x>
@@ -1337,40 +1663,8 @@
      <y>333</y>
     </hint>
     <hint type="destinationlabel">
-     <x>221</x>
-     <y>422</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>checkBoxSourceTree</sender>
-   <signal>toggled(bool)</signal>
-   <receiver>lineEditSourcetreeManual</receiver>
-   <slot>setEnabled(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>200</x>
-     <y>333</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>568</x>
-     <y>425</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>checkBoxSourceTree</sender>
-   <signal>toggled(bool)</signal>
-   <receiver>pushButtonSourcetreeManualBrowse</receiver>
-   <slot>setEnabled(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>184</x>
-     <y>333</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>603</x>
-     <y>425</y>
+     <x>122</x>
+     <y>424</y>
     </hint>
    </hints>
   </connection>
@@ -1401,8 +1695,8 @@
      <y>481</y>
     </hint>
     <hint type="destinationlabel">
-     <x>100</x>
-     <y>371</y>
+     <x>121</x>
+     <y>521</y>
     </hint>
    </hints>
   </connection>
@@ -1433,39 +1727,7 @@
      <y>481</y>
     </hint>
     <hint type="destinationlabel">
-     <x>149</x>
-     <y>570</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>checkBoxSublimeMerge</sender>
-   <signal>toggled(bool)</signal>
-   <receiver>lineEditSublimemergeManual</receiver>
-   <slot>setEnabled(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>180</x>
-     <y>481</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>569</x>
-     <y>573</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>checkBoxSublimeMerge</sender>
-   <signal>toggled(bool)</signal>
-   <receiver>pushButtonSublimemergeManualBrowse</receiver>
-   <slot>setEnabled(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>246</x>
-     <y>481</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>603</x>
+     <x>122</x>
      <y>573</y>
     </hint>
    </hints>
@@ -1513,40 +1775,8 @@
      <y>185</y>
     </hint>
     <hint type="destinationlabel">
-     <x>156</x>
-     <y>274</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>checkBoxTortoiseGit</sender>
-   <signal>toggled(bool)</signal>
-   <receiver>lineEditTGitManual</receiver>
-   <slot>setEnabled(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>189</x>
-     <y>185</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>567</x>
-     <y>277</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>checkBoxTortoiseGit</sender>
-   <signal>toggled(bool)</signal>
-   <receiver>pushButtonTGitManualBrowse</receiver>
-   <slot>setEnabled(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>222</x>
-     <y>185</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>603</x>
-     <y>277</y>
+     <x>122</x>
+     <y>276</y>
     </hint>
    </hints>
   </connection>
@@ -1557,12 +1787,12 @@
    <slot>setDisabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>70</x>
-     <y>208</y>
+     <x>91</x>
+     <y>217</y>
     </hint>
     <hint type="destinationlabel">
-     <x>158</x>
-     <y>238</y>
+     <x>172</x>
+     <y>244</y>
     </hint>
    </hints>
   </connection>
@@ -1573,12 +1803,124 @@
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>46</x>
-     <y>231</y>
+     <x>68</x>
+     <y>242</y>
     </hint>
     <hint type="destinationlabel">
-     <x>169</x>
-     <y>237</y>
+     <x>172</x>
+     <y>244</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>radioExplorerManual</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>lineEditExplorerManual</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>518</x>
+     <y>118</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>643</x>
+     <y>125</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>radioExplorerManual</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>pushButtonExplorerManualBrowse</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>484</x>
+     <y>116</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>880</x>
+     <y>124</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>radioGitBashManual</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>lineEditGitBashManual</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>514</x>
+     <y>270</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>613</x>
+     <y>263</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>radioGitBashManual</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>pushButtonGitBashManualBrowse</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>488</x>
+     <y>269</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>879</x>
+     <y>271</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>checkBoxGitBash</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>radioGitBashAutoDetect</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>509</x>
+     <y>179</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>517</x>
+     <y>240</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>checkBoxGitBash</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>radioGitBashManual</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>649</x>
+     <y>182</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>492</x>
+     <y>270</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>checkBoxGitBash</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>label_13</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>753</x>
+     <y>174</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>633</x>
+     <y>219</y>
     </hint>
    </hints>
   </connection>

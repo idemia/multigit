@@ -17,7 +17,7 @@ class Ui_Preferences(object):
     def setupUi(self, Preferences: QDialog) -> None:
         if not Preferences.objectName():
             Preferences.setObjectName(u"Preferences")
-        Preferences.resize(636, 704)
+        Preferences.resize(924, 682)
         self.verticalLayout = QVBoxLayout(Preferences)
         self.verticalLayout.setObjectName(u"verticalLayout")
         self.tabWidget = QTabWidget(Preferences)
@@ -223,16 +223,16 @@ class Ui_Preferences(object):
         self.tabWidget.addTab(self.tab_ui, "")
         self.tab_extprogs = QWidget()
         self.tab_extprogs.setObjectName(u"tab_extprogs")
-        self.verticalLayout_3 = QVBoxLayout(self.tab_extprogs)
-        self.verticalLayout_3.setObjectName(u"verticalLayout_3")
-        self.groupBox = QGroupBox(self.tab_extprogs)
-        self.groupBox.setObjectName(u"groupBox")
-        self.groupBox.setFont(font)
-        self.groupBox.setFlat(False)
-        self.groupBox.setCheckable(False)
-        self.gridLayout = QGridLayout(self.groupBox)
+        self.gridLayout_7 = QGridLayout(self.tab_extprogs)
+        self.gridLayout_7.setObjectName(u"gridLayout_7")
+        self.groupBoxGit = QGroupBox(self.tab_extprogs)
+        self.groupBoxGit.setObjectName(u"groupBoxGit")
+        self.groupBoxGit.setFont(font)
+        self.groupBoxGit.setFlat(False)
+        self.groupBoxGit.setCheckable(False)
+        self.gridLayout = QGridLayout(self.groupBoxGit)
         self.gridLayout.setObjectName(u"gridLayout")
-        self.radioGitManual = QRadioButton(self.groupBox)
+        self.radioGitManual = QRadioButton(self.groupBoxGit)
         self.radioGitManual.setObjectName(u"radioGitManual")
         sizePolicy3 = QSizePolicy(QSizePolicy.Minimum, QSizePolicy.Fixed)
         sizePolicy3.setHorizontalStretch(1)
@@ -243,7 +243,7 @@ class Ui_Preferences(object):
 
         self.gridLayout.addWidget(self.radioGitManual, 2, 0, 1, 1)
 
-        self.radioGitAutoDetect = QRadioButton(self.groupBox)
+        self.radioGitAutoDetect = QRadioButton(self.groupBoxGit)
         self.radioGitAutoDetect.setObjectName(u"radioGitAutoDetect")
         sizePolicy4 = QSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
         sizePolicy4.setHorizontalStretch(1)
@@ -254,7 +254,7 @@ class Ui_Preferences(object):
 
         self.gridLayout.addWidget(self.radioGitAutoDetect, 1, 0, 1, 1)
 
-        self.lineEditGitManual = QLineEdit(self.groupBox)
+        self.lineEditGitManual = QLineEdit(self.groupBoxGit)
         self.lineEditGitManual.setObjectName(u"lineEditGitManual")
         sizePolicy5 = QSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
         sizePolicy5.setHorizontalStretch(10)
@@ -265,13 +265,13 @@ class Ui_Preferences(object):
 
         self.gridLayout.addWidget(self.lineEditGitManual, 2, 1, 1, 1)
 
-        self.label = QLabel(self.groupBox)
+        self.label = QLabel(self.groupBoxGit)
         self.label.setObjectName(u"label")
         self.label.setFont(font1)
 
         self.gridLayout.addWidget(self.label, 0, 0, 1, 3)
 
-        self.lineEditGitAutoDetect = QLineEdit(self.groupBox)
+        self.lineEditGitAutoDetect = QLineEdit(self.groupBoxGit)
         self.lineEditGitAutoDetect.setObjectName(u"lineEditGitAutoDetect")
         self.lineEditGitAutoDetect.setEnabled(False)
         sizePolicy5.setHeightForWidth(self.lineEditGitAutoDetect.sizePolicy().hasHeightForWidth())
@@ -281,7 +281,7 @@ class Ui_Preferences(object):
 
         self.gridLayout.addWidget(self.lineEditGitAutoDetect, 1, 1, 1, 1)
 
-        self.pushButtonGitManualBrowse = QPushButton(self.groupBox)
+        self.pushButtonGitManualBrowse = QPushButton(self.groupBoxGit)
         self.pushButtonGitManualBrowse.setObjectName(u"pushButtonGitManualBrowse")
         sizePolicy4.setHeightForWidth(self.pushButtonGitManualBrowse.sizePolicy().hasHeightForWidth())
         self.pushButtonGitManualBrowse.setSizePolicy(sizePolicy4)
@@ -291,132 +291,251 @@ class Ui_Preferences(object):
         self.gridLayout.addWidget(self.pushButtonGitManualBrowse, 2, 2, 1, 1)
 
 
-        self.verticalLayout_3.addWidget(self.groupBox)
+        self.gridLayout_7.addWidget(self.groupBoxGit, 0, 0, 1, 1)
 
-        self.groupBox_2 = QGroupBox(self.tab_extprogs)
-        self.groupBox_2.setObjectName(u"groupBox_2")
-        sizePolicy.setHeightForWidth(self.groupBox_2.sizePolicy().hasHeightForWidth())
-        self.groupBox_2.setSizePolicy(sizePolicy)
-        self.groupBox_2.setFont(font)
-        self.groupBox_2.setFlat(False)
-        self.groupBox_2.setCheckable(False)
-        self.gridLayout_2 = QGridLayout(self.groupBox_2)
+        self.groupBoxExplorer = QGroupBox(self.tab_extprogs)
+        self.groupBoxExplorer.setObjectName(u"groupBoxExplorer")
+        sizePolicy.setHeightForWidth(self.groupBoxExplorer.sizePolicy().hasHeightForWidth())
+        self.groupBoxExplorer.setSizePolicy(sizePolicy)
+        self.groupBoxExplorer.setFont(font)
+        self.groupBoxExplorer.setFlat(False)
+        self.groupBoxExplorer.setCheckable(False)
+        self.gridLayout_5 = QGridLayout(self.groupBoxExplorer)
+        self.gridLayout_5.setObjectName(u"gridLayout_5")
+        self.label_11 = QLabel(self.groupBoxExplorer)
+        self.label_11.setObjectName(u"label_11")
+        self.label_11.setFont(font1)
+
+        self.gridLayout_5.addWidget(self.label_11, 0, 0, 1, 3)
+
+        self.radioExplorerAutoDetect = QRadioButton(self.groupBoxExplorer)
+        self.radioExplorerAutoDetect.setObjectName(u"radioExplorerAutoDetect")
+        sizePolicy3.setHeightForWidth(self.radioExplorerAutoDetect.sizePolicy().hasHeightForWidth())
+        self.radioExplorerAutoDetect.setSizePolicy(sizePolicy3)
+        self.radioExplorerAutoDetect.setFont(font1)
+
+        self.gridLayout_5.addWidget(self.radioExplorerAutoDetect, 1, 0, 1, 1)
+
+        self.lineEditExplorerAutoDetect = QLineEdit(self.groupBoxExplorer)
+        self.lineEditExplorerAutoDetect.setObjectName(u"lineEditExplorerAutoDetect")
+        self.lineEditExplorerAutoDetect.setEnabled(False)
+        sizePolicy6 = QSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+        sizePolicy6.setHorizontalStretch(0)
+        sizePolicy6.setVerticalStretch(0)
+        sizePolicy6.setHeightForWidth(self.lineEditExplorerAutoDetect.sizePolicy().hasHeightForWidth())
+        self.lineEditExplorerAutoDetect.setSizePolicy(sizePolicy6)
+        self.lineEditExplorerAutoDetect.setFont(font1)
+        self.lineEditExplorerAutoDetect.setReadOnly(True)
+
+        self.gridLayout_5.addWidget(self.lineEditExplorerAutoDetect, 1, 1, 1, 1)
+
+        self.radioExplorerManual = QRadioButton(self.groupBoxExplorer)
+        self.radioExplorerManual.setObjectName(u"radioExplorerManual")
+        sizePolicy3.setHeightForWidth(self.radioExplorerManual.sizePolicy().hasHeightForWidth())
+        self.radioExplorerManual.setSizePolicy(sizePolicy3)
+        self.radioExplorerManual.setFont(font1)
+
+        self.gridLayout_5.addWidget(self.radioExplorerManual, 2, 0, 1, 1)
+
+        self.lineEditExplorerManual = QLineEdit(self.groupBoxExplorer)
+        self.lineEditExplorerManual.setObjectName(u"lineEditExplorerManual")
+        sizePolicy5.setHeightForWidth(self.lineEditExplorerManual.sizePolicy().hasHeightForWidth())
+        self.lineEditExplorerManual.setSizePolicy(sizePolicy5)
+        self.lineEditExplorerManual.setFont(font1)
+
+        self.gridLayout_5.addWidget(self.lineEditExplorerManual, 2, 1, 1, 1)
+
+        self.pushButtonExplorerManualBrowse = QPushButton(self.groupBoxExplorer)
+        self.pushButtonExplorerManualBrowse.setObjectName(u"pushButtonExplorerManualBrowse")
+        sizePolicy4.setHeightForWidth(self.pushButtonExplorerManualBrowse.sizePolicy().hasHeightForWidth())
+        self.pushButtonExplorerManualBrowse.setSizePolicy(sizePolicy4)
+        self.pushButtonExplorerManualBrowse.setMinimumSize(QSize(24, 0))
+        self.pushButtonExplorerManualBrowse.setFont(font1)
+
+        self.gridLayout_5.addWidget(self.pushButtonExplorerManualBrowse, 2, 2, 1, 1)
+
+
+        self.gridLayout_7.addWidget(self.groupBoxExplorer, 0, 1, 1, 1)
+
+        self.groupBoxTGit = QGroupBox(self.tab_extprogs)
+        self.groupBoxTGit.setObjectName(u"groupBoxTGit")
+        sizePolicy.setHeightForWidth(self.groupBoxTGit.sizePolicy().hasHeightForWidth())
+        self.groupBoxTGit.setSizePolicy(sizePolicy)
+        self.groupBoxTGit.setFont(font)
+        self.groupBoxTGit.setFlat(False)
+        self.groupBoxTGit.setCheckable(False)
+        self.gridLayout_2 = QGridLayout(self.groupBoxTGit)
         self.gridLayout_2.setObjectName(u"gridLayout_2")
-        self.radioTGitManual = QRadioButton(self.groupBox_2)
-        self.radioTGitManual.setObjectName(u"radioTGitManual")
-        sizePolicy3.setHeightForWidth(self.radioTGitManual.sizePolicy().hasHeightForWidth())
-        self.radioTGitManual.setSizePolicy(sizePolicy3)
-        self.radioTGitManual.setFont(font1)
+        self.checkBoxTortoiseGit = QCheckBox(self.groupBoxTGit)
+        self.checkBoxTortoiseGit.setObjectName(u"checkBoxTortoiseGit")
+        self.checkBoxTortoiseGit.setFont(font1)
 
-        self.gridLayout_2.addWidget(self.radioTGitManual, 6, 0, 1, 1)
+        self.gridLayout_2.addWidget(self.checkBoxTortoiseGit, 0, 0, 1, 2)
 
-        self.radioTGitAutoDetect = QRadioButton(self.groupBox_2)
+        self.label_9 = QLabel(self.groupBoxTGit)
+        self.label_9.setObjectName(u"label_9")
+
+        self.gridLayout_2.addWidget(self.label_9, 1, 0, 1, 1)
+
+        self.label_2 = QLabel(self.groupBoxTGit)
+        self.label_2.setObjectName(u"label_2")
+        self.label_2.setFont(font1)
+
+        self.gridLayout_2.addWidget(self.label_2, 2, 0, 1, 3)
+
+        self.radioTGitAutoDetect = QRadioButton(self.groupBoxTGit)
         self.radioTGitAutoDetect.setObjectName(u"radioTGitAutoDetect")
         sizePolicy3.setHeightForWidth(self.radioTGitAutoDetect.sizePolicy().hasHeightForWidth())
         self.radioTGitAutoDetect.setSizePolicy(sizePolicy3)
         self.radioTGitAutoDetect.setFont(font1)
 
-        self.gridLayout_2.addWidget(self.radioTGitAutoDetect, 5, 0, 1, 1)
+        self.gridLayout_2.addWidget(self.radioTGitAutoDetect, 3, 0, 1, 1)
 
-        self.label_2 = QLabel(self.groupBox_2)
-        self.label_2.setObjectName(u"label_2")
-        self.label_2.setFont(font1)
+        self.lineEditTGitAutoDetect = QLineEdit(self.groupBoxTGit)
+        self.lineEditTGitAutoDetect.setObjectName(u"lineEditTGitAutoDetect")
+        self.lineEditTGitAutoDetect.setEnabled(False)
+        sizePolicy6.setHeightForWidth(self.lineEditTGitAutoDetect.sizePolicy().hasHeightForWidth())
+        self.lineEditTGitAutoDetect.setSizePolicy(sizePolicy6)
+        self.lineEditTGitAutoDetect.setFont(font1)
+        self.lineEditTGitAutoDetect.setReadOnly(True)
 
-        self.gridLayout_2.addWidget(self.label_2, 4, 0, 1, 1)
+        self.gridLayout_2.addWidget(self.lineEditTGitAutoDetect, 3, 1, 1, 1)
 
-        self.label_9 = QLabel(self.groupBox_2)
-        self.label_9.setObjectName(u"label_9")
+        self.radioTGitManual = QRadioButton(self.groupBoxTGit)
+        self.radioTGitManual.setObjectName(u"radioTGitManual")
+        sizePolicy3.setHeightForWidth(self.radioTGitManual.sizePolicy().hasHeightForWidth())
+        self.radioTGitManual.setSizePolicy(sizePolicy3)
+        self.radioTGitManual.setFont(font1)
 
-        self.gridLayout_2.addWidget(self.label_9, 3, 0, 1, 1)
+        self.gridLayout_2.addWidget(self.radioTGitManual, 4, 0, 1, 1)
 
-        self.lineEditTGitManual = QLineEdit(self.groupBox_2)
+        self.lineEditTGitManual = QLineEdit(self.groupBoxTGit)
         self.lineEditTGitManual.setObjectName(u"lineEditTGitManual")
         sizePolicy5.setHeightForWidth(self.lineEditTGitManual.sizePolicy().hasHeightForWidth())
         self.lineEditTGitManual.setSizePolicy(sizePolicy5)
         self.lineEditTGitManual.setFont(font1)
 
-        self.gridLayout_2.addWidget(self.lineEditTGitManual, 6, 1, 1, 1)
+        self.gridLayout_2.addWidget(self.lineEditTGitManual, 4, 1, 1, 1)
 
-        self.pushButtonTGitManualBrowse = QPushButton(self.groupBox_2)
+        self.pushButtonTGitManualBrowse = QPushButton(self.groupBoxTGit)
         self.pushButtonTGitManualBrowse.setObjectName(u"pushButtonTGitManualBrowse")
         sizePolicy4.setHeightForWidth(self.pushButtonTGitManualBrowse.sizePolicy().hasHeightForWidth())
         self.pushButtonTGitManualBrowse.setSizePolicy(sizePolicy4)
         self.pushButtonTGitManualBrowse.setMinimumSize(QSize(24, 0))
         self.pushButtonTGitManualBrowse.setFont(font1)
 
-        self.gridLayout_2.addWidget(self.pushButtonTGitManualBrowse, 6, 2, 1, 1)
-
-        self.lineEditTGitAutoDetect = QLineEdit(self.groupBox_2)
-        self.lineEditTGitAutoDetect.setObjectName(u"lineEditTGitAutoDetect")
-        self.lineEditTGitAutoDetect.setEnabled(False)
-        sizePolicy6 = QSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
-        sizePolicy6.setHorizontalStretch(0)
-        sizePolicy6.setVerticalStretch(0)
-        sizePolicy6.setHeightForWidth(self.lineEditTGitAutoDetect.sizePolicy().hasHeightForWidth())
-        self.lineEditTGitAutoDetect.setSizePolicy(sizePolicy6)
-        self.lineEditTGitAutoDetect.setFont(font1)
-        self.lineEditTGitAutoDetect.setReadOnly(True)
-
-        self.gridLayout_2.addWidget(self.lineEditTGitAutoDetect, 5, 1, 1, 1)
-
-        self.checkBoxTortoiseGit = QCheckBox(self.groupBox_2)
-        self.checkBoxTortoiseGit.setObjectName(u"checkBoxTortoiseGit")
-        self.checkBoxTortoiseGit.setFont(font1)
-
-        self.gridLayout_2.addWidget(self.checkBoxTortoiseGit, 2, 0, 1, 1)
+        self.gridLayout_2.addWidget(self.pushButtonTGitManualBrowse, 4, 2, 1, 1)
 
 
-        self.verticalLayout_3.addWidget(self.groupBox_2)
+        self.gridLayout_7.addWidget(self.groupBoxTGit, 1, 0, 1, 1)
 
-        self.groupBox_3 = QGroupBox(self.tab_extprogs)
-        self.groupBox_3.setObjectName(u"groupBox_3")
-        sizePolicy.setHeightForWidth(self.groupBox_3.sizePolicy().hasHeightForWidth())
-        self.groupBox_3.setSizePolicy(sizePolicy)
-        self.groupBox_3.setFont(font)
-        self.groupBox_3.setFlat(False)
-        self.groupBox_3.setCheckable(False)
-        self.gridLayout_4_2 = QGridLayout(self.groupBox_3)
-        self.gridLayout_4_2.setObjectName(u"gridLayout_4_2")
-        self.lineEditSourcetreeManual = QLineEdit(self.groupBox_3)
-        self.lineEditSourcetreeManual.setObjectName(u"lineEditSourcetreeManual")
-        sizePolicy5.setHeightForWidth(self.lineEditSourcetreeManual.sizePolicy().hasHeightForWidth())
-        self.lineEditSourcetreeManual.setSizePolicy(sizePolicy5)
-        self.lineEditSourcetreeManual.setFont(font1)
+        self.groupBoxGitBash = QGroupBox(self.tab_extprogs)
+        self.groupBoxGitBash.setObjectName(u"groupBoxGitBash")
+        sizePolicy.setHeightForWidth(self.groupBoxGitBash.sizePolicy().hasHeightForWidth())
+        self.groupBoxGitBash.setSizePolicy(sizePolicy)
+        self.groupBoxGitBash.setFont(font)
+        self.groupBoxGitBash.setFlat(False)
+        self.groupBoxGitBash.setCheckable(False)
+        self.gridLayout_6 = QGridLayout(self.groupBoxGitBash)
+        self.gridLayout_6.setObjectName(u"gridLayout_6")
+        self.checkBoxGitBash = QCheckBox(self.groupBoxGitBash)
+        self.checkBoxGitBash.setObjectName(u"checkBoxGitBash")
+        self.checkBoxGitBash.setFont(font1)
 
-        self.gridLayout_4_2.addWidget(self.lineEditSourcetreeManual, 6, 1, 1, 1)
+        self.gridLayout_6.addWidget(self.checkBoxGitBash, 0, 0, 1, 2)
 
-        self.radioSourcetreeManual = QRadioButton(self.groupBox_3)
-        self.radioSourcetreeManual.setObjectName(u"radioSourcetreeManual")
-        sizePolicy3.setHeightForWidth(self.radioSourcetreeManual.sizePolicy().hasHeightForWidth())
-        self.radioSourcetreeManual.setSizePolicy(sizePolicy3)
-        self.radioSourcetreeManual.setFont(font1)
+        self.label_14 = QLabel(self.groupBoxGitBash)
+        self.label_14.setObjectName(u"label_14")
 
-        self.gridLayout_4_2.addWidget(self.radioSourcetreeManual, 6, 0, 1, 1)
+        self.gridLayout_6.addWidget(self.label_14, 1, 0, 1, 1)
 
-        self.pushButtonSourcetreeManualBrowse = QPushButton(self.groupBox_3)
-        self.pushButtonSourcetreeManualBrowse.setObjectName(u"pushButtonSourcetreeManualBrowse")
-        sizePolicy4.setHeightForWidth(self.pushButtonSourcetreeManualBrowse.sizePolicy().hasHeightForWidth())
-        self.pushButtonSourcetreeManualBrowse.setSizePolicy(sizePolicy4)
-        self.pushButtonSourcetreeManualBrowse.setMinimumSize(QSize(24, 0))
-        self.pushButtonSourcetreeManualBrowse.setFont(font1)
+        self.label_13 = QLabel(self.groupBoxGitBash)
+        self.label_13.setObjectName(u"label_13")
+        self.label_13.setFont(font1)
 
-        self.gridLayout_4_2.addWidget(self.pushButtonSourcetreeManualBrowse, 6, 2, 1, 1)
+        self.gridLayout_6.addWidget(self.label_13, 2, 0, 1, 2)
 
-        self.radioSourcetreeAutoDetect = QRadioButton(self.groupBox_3)
+        self.radioGitBashAutoDetect = QRadioButton(self.groupBoxGitBash)
+        self.radioGitBashAutoDetect.setObjectName(u"radioGitBashAutoDetect")
+        sizePolicy3.setHeightForWidth(self.radioGitBashAutoDetect.sizePolicy().hasHeightForWidth())
+        self.radioGitBashAutoDetect.setSizePolicy(sizePolicy3)
+        self.radioGitBashAutoDetect.setFont(font1)
+
+        self.gridLayout_6.addWidget(self.radioGitBashAutoDetect, 3, 0, 1, 1)
+
+        self.lineEditGitBashAutoDetect = QLineEdit(self.groupBoxGitBash)
+        self.lineEditGitBashAutoDetect.setObjectName(u"lineEditGitBashAutoDetect")
+        self.lineEditGitBashAutoDetect.setEnabled(False)
+        sizePolicy6.setHeightForWidth(self.lineEditGitBashAutoDetect.sizePolicy().hasHeightForWidth())
+        self.lineEditGitBashAutoDetect.setSizePolicy(sizePolicy6)
+        self.lineEditGitBashAutoDetect.setFont(font1)
+        self.lineEditGitBashAutoDetect.setReadOnly(True)
+
+        self.gridLayout_6.addWidget(self.lineEditGitBashAutoDetect, 3, 1, 1, 1)
+
+        self.radioGitBashManual = QRadioButton(self.groupBoxGitBash)
+        self.radioGitBashManual.setObjectName(u"radioGitBashManual")
+        sizePolicy3.setHeightForWidth(self.radioGitBashManual.sizePolicy().hasHeightForWidth())
+        self.radioGitBashManual.setSizePolicy(sizePolicy3)
+        self.radioGitBashManual.setFont(font1)
+
+        self.gridLayout_6.addWidget(self.radioGitBashManual, 4, 0, 1, 1)
+
+        self.lineEditGitBashManual = QLineEdit(self.groupBoxGitBash)
+        self.lineEditGitBashManual.setObjectName(u"lineEditGitBashManual")
+        sizePolicy5.setHeightForWidth(self.lineEditGitBashManual.sizePolicy().hasHeightForWidth())
+        self.lineEditGitBashManual.setSizePolicy(sizePolicy5)
+        self.lineEditGitBashManual.setFont(font1)
+
+        self.gridLayout_6.addWidget(self.lineEditGitBashManual, 4, 1, 1, 1)
+
+        self.pushButtonGitBashManualBrowse = QPushButton(self.groupBoxGitBash)
+        self.pushButtonGitBashManualBrowse.setObjectName(u"pushButtonGitBashManualBrowse")
+        sizePolicy4.setHeightForWidth(self.pushButtonGitBashManualBrowse.sizePolicy().hasHeightForWidth())
+        self.pushButtonGitBashManualBrowse.setSizePolicy(sizePolicy4)
+        self.pushButtonGitBashManualBrowse.setMinimumSize(QSize(24, 0))
+        self.pushButtonGitBashManualBrowse.setFont(font1)
+
+        self.gridLayout_6.addWidget(self.pushButtonGitBashManualBrowse, 4, 2, 1, 1)
+
+
+        self.gridLayout_7.addWidget(self.groupBoxGitBash, 1, 1, 1, 1)
+
+        self.groupBoxSourceTree = QGroupBox(self.tab_extprogs)
+        self.groupBoxSourceTree.setObjectName(u"groupBoxSourceTree")
+        sizePolicy.setHeightForWidth(self.groupBoxSourceTree.sizePolicy().hasHeightForWidth())
+        self.groupBoxSourceTree.setSizePolicy(sizePolicy)
+        self.groupBoxSourceTree.setFont(font)
+        self.groupBoxSourceTree.setFlat(False)
+        self.groupBoxSourceTree.setCheckable(False)
+        self.gridLayout_8 = QGridLayout(self.groupBoxSourceTree)
+        self.gridLayout_8.setObjectName(u"gridLayout_8")
+        self.checkBoxSourceTree = QCheckBox(self.groupBoxSourceTree)
+        self.checkBoxSourceTree.setObjectName(u"checkBoxSourceTree")
+        self.checkBoxSourceTree.setFont(font1)
+
+        self.gridLayout_8.addWidget(self.checkBoxSourceTree, 0, 0, 1, 2)
+
+        self.label_7 = QLabel(self.groupBoxSourceTree)
+        self.label_7.setObjectName(u"label_7")
+
+        self.gridLayout_8.addWidget(self.label_7, 1, 0, 1, 1)
+
+        self.label_4 = QLabel(self.groupBoxSourceTree)
+        self.label_4.setObjectName(u"label_4")
+        self.label_4.setFont(font1)
+
+        self.gridLayout_8.addWidget(self.label_4, 2, 0, 1, 3)
+
+        self.radioSourcetreeAutoDetect = QRadioButton(self.groupBoxSourceTree)
         self.radioSourcetreeAutoDetect.setObjectName(u"radioSourcetreeAutoDetect")
         sizePolicy3.setHeightForWidth(self.radioSourcetreeAutoDetect.sizePolicy().hasHeightForWidth())
         self.radioSourcetreeAutoDetect.setSizePolicy(sizePolicy3)
         self.radioSourcetreeAutoDetect.setFont(font1)
 
-        self.gridLayout_4_2.addWidget(self.radioSourcetreeAutoDetect, 5, 0, 1, 1)
+        self.gridLayout_8.addWidget(self.radioSourcetreeAutoDetect, 3, 0, 1, 1)
 
-        self.label_4 = QLabel(self.groupBox_3)
-        self.label_4.setObjectName(u"label_4")
-        self.label_4.setFont(font1)
-
-        self.gridLayout_4_2.addWidget(self.label_4, 4, 0, 1, 1)
-
-        self.lineEditSourcetreeAutoDetect = QLineEdit(self.groupBox_3)
+        self.lineEditSourcetreeAutoDetect = QLineEdit(self.groupBoxSourceTree)
         self.lineEditSourcetreeAutoDetect.setObjectName(u"lineEditSourcetreeAutoDetect")
         self.lineEditSourcetreeAutoDetect.setEnabled(False)
         sizePolicy6.setHeightForWidth(self.lineEditSourcetreeAutoDetect.sizePolicy().hasHeightForWidth())
@@ -424,41 +543,68 @@ class Ui_Preferences(object):
         self.lineEditSourcetreeAutoDetect.setFont(font1)
         self.lineEditSourcetreeAutoDetect.setReadOnly(True)
 
-        self.gridLayout_4_2.addWidget(self.lineEditSourcetreeAutoDetect, 5, 1, 1, 1)
+        self.gridLayout_8.addWidget(self.lineEditSourcetreeAutoDetect, 3, 1, 1, 1)
 
-        self.checkBoxSourceTree = QCheckBox(self.groupBox_3)
-        self.checkBoxSourceTree.setObjectName(u"checkBoxSourceTree")
-        self.checkBoxSourceTree.setFont(font1)
+        self.radioSourcetreeManual = QRadioButton(self.groupBoxSourceTree)
+        self.radioSourcetreeManual.setObjectName(u"radioSourcetreeManual")
+        sizePolicy3.setHeightForWidth(self.radioSourcetreeManual.sizePolicy().hasHeightForWidth())
+        self.radioSourcetreeManual.setSizePolicy(sizePolicy3)
+        self.radioSourcetreeManual.setFont(font1)
 
-        self.gridLayout_4_2.addWidget(self.checkBoxSourceTree, 2, 0, 1, 1)
+        self.gridLayout_8.addWidget(self.radioSourcetreeManual, 4, 0, 1, 1)
 
-        self.label_7 = QLabel(self.groupBox_3)
-        self.label_7.setObjectName(u"label_7")
+        self.lineEditSourcetreeManual = QLineEdit(self.groupBoxSourceTree)
+        self.lineEditSourcetreeManual.setObjectName(u"lineEditSourcetreeManual")
+        sizePolicy5.setHeightForWidth(self.lineEditSourcetreeManual.sizePolicy().hasHeightForWidth())
+        self.lineEditSourcetreeManual.setSizePolicy(sizePolicy5)
+        self.lineEditSourcetreeManual.setFont(font1)
 
-        self.gridLayout_4_2.addWidget(self.label_7, 3, 0, 1, 1)
+        self.gridLayout_8.addWidget(self.lineEditSourcetreeManual, 4, 1, 1, 1)
+
+        self.pushButtonSourcetreeManualBrowse = QPushButton(self.groupBoxSourceTree)
+        self.pushButtonSourcetreeManualBrowse.setObjectName(u"pushButtonSourcetreeManualBrowse")
+        sizePolicy4.setHeightForWidth(self.pushButtonSourcetreeManualBrowse.sizePolicy().hasHeightForWidth())
+        self.pushButtonSourcetreeManualBrowse.setSizePolicy(sizePolicy4)
+        self.pushButtonSourcetreeManualBrowse.setMinimumSize(QSize(24, 0))
+        self.pushButtonSourcetreeManualBrowse.setFont(font1)
+
+        self.gridLayout_8.addWidget(self.pushButtonSourcetreeManualBrowse, 4, 2, 1, 1)
 
 
-        self.verticalLayout_3.addWidget(self.groupBox_3)
+        self.gridLayout_7.addWidget(self.groupBoxSourceTree, 2, 0, 1, 1)
 
-        self.groupBox_4 = QGroupBox(self.tab_extprogs)
-        self.groupBox_4.setObjectName(u"groupBox_4")
-        sizePolicy.setHeightForWidth(self.groupBox_4.sizePolicy().hasHeightForWidth())
-        self.groupBox_4.setSizePolicy(sizePolicy)
-        self.groupBox_4.setFont(font)
-        self.groupBox_4.setFlat(False)
-        self.groupBox_4.setCheckable(False)
-        self.gridLayout_4 = QGridLayout(self.groupBox_4)
+        self.widget_4 = QWidget(self.tab_extprogs)
+        self.widget_4.setObjectName(u"widget_4")
+
+        self.gridLayout_7.addWidget(self.widget_4, 2, 1, 1, 1)
+
+        self.groupBoxSublimemerge = QGroupBox(self.tab_extprogs)
+        self.groupBoxSublimemerge.setObjectName(u"groupBoxSublimemerge")
+        sizePolicy.setHeightForWidth(self.groupBoxSublimemerge.sizePolicy().hasHeightForWidth())
+        self.groupBoxSublimemerge.setSizePolicy(sizePolicy)
+        self.groupBoxSublimemerge.setFont(font)
+        self.groupBoxSublimemerge.setFlat(False)
+        self.groupBoxSublimemerge.setCheckable(False)
+        self.gridLayout_4 = QGridLayout(self.groupBoxSublimemerge)
         self.gridLayout_4.setObjectName(u"gridLayout_4")
-        self.pushButtonSublimemergeManualBrowse = QPushButton(self.groupBox_4)
-        self.pushButtonSublimemergeManualBrowse.setObjectName(u"pushButtonSublimemergeManualBrowse")
-        sizePolicy4.setHeightForWidth(self.pushButtonSublimemergeManualBrowse.sizePolicy().hasHeightForWidth())
-        self.pushButtonSublimemergeManualBrowse.setSizePolicy(sizePolicy4)
-        self.pushButtonSublimemergeManualBrowse.setMinimumSize(QSize(24, 0))
-        self.pushButtonSublimemergeManualBrowse.setFont(font1)
+        self.checkBoxSublimeMerge = QCheckBox(self.groupBoxSublimemerge)
+        self.checkBoxSublimeMerge.setObjectName(u"checkBoxSublimeMerge")
+        self.checkBoxSublimeMerge.setFont(font1)
 
-        self.gridLayout_4.addWidget(self.pushButtonSublimemergeManualBrowse, 4, 2, 1, 1)
+        self.gridLayout_4.addWidget(self.checkBoxSublimeMerge, 0, 0, 1, 2)
 
-        self.radioSublimemergeAutoDetect = QRadioButton(self.groupBox_4)
+        self.label_8 = QLabel(self.groupBoxSublimemerge)
+        self.label_8.setObjectName(u"label_8")
+
+        self.gridLayout_4.addWidget(self.label_8, 1, 0, 1, 1)
+
+        self.label_4_2 = QLabel(self.groupBoxSublimemerge)
+        self.label_4_2.setObjectName(u"label_4_2")
+        self.label_4_2.setFont(font1)
+
+        self.gridLayout_4.addWidget(self.label_4_2, 2, 0, 1, 2)
+
+        self.radioSublimemergeAutoDetect = QRadioButton(self.groupBoxSublimemerge)
         self.radioSublimemergeAutoDetect.setObjectName(u"radioSublimemergeAutoDetect")
         sizePolicy3.setHeightForWidth(self.radioSublimemergeAutoDetect.sizePolicy().hasHeightForWidth())
         self.radioSublimemergeAutoDetect.setSizePolicy(sizePolicy3)
@@ -466,15 +612,7 @@ class Ui_Preferences(object):
 
         self.gridLayout_4.addWidget(self.radioSublimemergeAutoDetect, 3, 0, 1, 1)
 
-        self.radioSublimemergeManual = QRadioButton(self.groupBox_4)
-        self.radioSublimemergeManual.setObjectName(u"radioSublimemergeManual")
-        sizePolicy3.setHeightForWidth(self.radioSublimemergeManual.sizePolicy().hasHeightForWidth())
-        self.radioSublimemergeManual.setSizePolicy(sizePolicy3)
-        self.radioSublimemergeManual.setFont(font1)
-
-        self.gridLayout_4.addWidget(self.radioSublimemergeManual, 4, 0, 1, 1)
-
-        self.lineEditSublimemergeAutoDetect = QLineEdit(self.groupBox_4)
+        self.lineEditSublimemergeAutoDetect = QLineEdit(self.groupBoxSublimemerge)
         self.lineEditSublimemergeAutoDetect.setObjectName(u"lineEditSublimemergeAutoDetect")
         self.lineEditSublimemergeAutoDetect.setEnabled(False)
         sizePolicy6.setHeightForWidth(self.lineEditSublimemergeAutoDetect.sizePolicy().hasHeightForWidth())
@@ -484,7 +622,15 @@ class Ui_Preferences(object):
 
         self.gridLayout_4.addWidget(self.lineEditSublimemergeAutoDetect, 3, 1, 1, 1)
 
-        self.lineEditSublimemergeManual = QLineEdit(self.groupBox_4)
+        self.radioSublimemergeManual = QRadioButton(self.groupBoxSublimemerge)
+        self.radioSublimemergeManual.setObjectName(u"radioSublimemergeManual")
+        sizePolicy3.setHeightForWidth(self.radioSublimemergeManual.sizePolicy().hasHeightForWidth())
+        self.radioSublimemergeManual.setSizePolicy(sizePolicy3)
+        self.radioSublimemergeManual.setFont(font1)
+
+        self.gridLayout_4.addWidget(self.radioSublimemergeManual, 4, 0, 1, 1)
+
+        self.lineEditSublimemergeManual = QLineEdit(self.groupBoxSublimemerge)
         self.lineEditSublimemergeManual.setObjectName(u"lineEditSublimemergeManual")
         sizePolicy5.setHeightForWidth(self.lineEditSublimemergeManual.sizePolicy().hasHeightForWidth())
         self.lineEditSublimemergeManual.setSizePolicy(sizePolicy5)
@@ -492,29 +638,30 @@ class Ui_Preferences(object):
 
         self.gridLayout_4.addWidget(self.lineEditSublimemergeManual, 4, 1, 1, 1)
 
-        self.label_8 = QLabel(self.groupBox_4)
-        self.label_8.setObjectName(u"label_8")
+        self.pushButtonSublimemergeManualBrowse = QPushButton(self.groupBoxSublimemerge)
+        self.pushButtonSublimemergeManualBrowse.setObjectName(u"pushButtonSublimemergeManualBrowse")
+        sizePolicy4.setHeightForWidth(self.pushButtonSublimemergeManualBrowse.sizePolicy().hasHeightForWidth())
+        self.pushButtonSublimemergeManualBrowse.setSizePolicy(sizePolicy4)
+        self.pushButtonSublimemergeManualBrowse.setMinimumSize(QSize(24, 0))
+        self.pushButtonSublimemergeManualBrowse.setFont(font1)
 
-        self.gridLayout_4.addWidget(self.label_8, 1, 0, 1, 1)
-
-        self.label_4_2 = QLabel(self.groupBox_4)
-        self.label_4_2.setObjectName(u"label_4_2")
-        self.label_4_2.setFont(font1)
-
-        self.gridLayout_4.addWidget(self.label_4_2, 2, 0, 1, 1)
-
-        self.checkBoxSublimeMerge = QCheckBox(self.groupBox_4)
-        self.checkBoxSublimeMerge.setObjectName(u"checkBoxSublimeMerge")
-        self.checkBoxSublimeMerge.setFont(font1)
-
-        self.gridLayout_4.addWidget(self.checkBoxSublimeMerge, 0, 0, 1, 1)
+        self.gridLayout_4.addWidget(self.pushButtonSublimemergeManualBrowse, 4, 2, 1, 1)
 
 
-        self.verticalLayout_3.addWidget(self.groupBox_4)
+        self.gridLayout_7.addWidget(self.groupBoxSublimemerge, 3, 0, 1, 1)
+
+        self.widget_5 = QWidget(self.tab_extprogs)
+        self.widget_5.setObjectName(u"widget_5")
+
+        self.gridLayout_7.addWidget(self.widget_5, 3, 1, 1, 1)
 
         self.verticalSpacer = QSpacerItem(20, 16, QSizePolicy.Minimum, QSizePolicy.Expanding)
 
-        self.verticalLayout_3.addItem(self.verticalSpacer)
+        self.gridLayout_7.addItem(self.verticalSpacer, 4, 0, 1, 1)
+
+        self.verticalSpacer_3 = QSpacerItem(20, 38, QSizePolicy.Minimum, QSizePolicy.Expanding)
+
+        self.gridLayout_7.addItem(self.verticalSpacer_3, 4, 1, 1, 1)
 
         self.tabWidget.addTab(self.tab_extprogs, "")
 
@@ -529,11 +676,12 @@ class Ui_Preferences(object):
 
 #if QT_CONFIG(shortcut)
         self.label.setBuddy(self.radioGitAutoDetect)
+        self.label_11.setBuddy(self.radioTGitAutoDetect)
         self.label_2.setBuddy(self.radioTGitAutoDetect)
+        self.label_13.setBuddy(self.radioTGitAutoDetect)
         self.label_4.setBuddy(self.radioSourcetreeAutoDetect)
         self.label_4_2.setBuddy(self.radioSublimemergeAutoDetect)
 #endif // QT_CONFIG(shortcut)
-        QWidget.setTabOrder(self.tabWidget, self.comboBoxDoubleClickAction)
         QWidget.setTabOrder(self.comboBoxDoubleClickAction, self.pushButtonColorBranch)
         QWidget.setTabOrder(self.pushButtonColorBranch, self.pushButtonColorTag)
         QWidget.setTabOrder(self.pushButtonColorTag, self.radioButtonGitProcUnlimited)
@@ -578,23 +726,24 @@ class Ui_Preferences(object):
         self.buttonBox.rejected.connect(Preferences.reject)
         self.checkBoxSourceTree.toggled.connect(self.radioSourcetreeAutoDetect.setEnabled)
         self.checkBoxSourceTree.toggled.connect(self.radioSourcetreeManual.setEnabled)
-        self.checkBoxSourceTree.toggled.connect(self.lineEditSourcetreeManual.setEnabled)
-        self.checkBoxSourceTree.toggled.connect(self.pushButtonSourcetreeManualBrowse.setEnabled)
         self.checkBoxSourceTree.toggled.connect(self.label_4.setEnabled)
         self.checkBoxSublimeMerge.toggled.connect(self.label_4_2.setEnabled)
         self.checkBoxSublimeMerge.toggled.connect(self.radioSublimemergeAutoDetect.setEnabled)
         self.checkBoxSublimeMerge.toggled.connect(self.radioSublimemergeManual.setEnabled)
-        self.checkBoxSublimeMerge.toggled.connect(self.lineEditSublimemergeManual.setEnabled)
-        self.checkBoxSublimeMerge.toggled.connect(self.pushButtonSublimemergeManualBrowse.setEnabled)
         self.checkBoxTortoiseGit.toggled.connect(self.label_2.setEnabled)
         self.checkBoxTortoiseGit.toggled.connect(self.radioTGitAutoDetect.setEnabled)
         self.checkBoxTortoiseGit.toggled.connect(self.radioTGitManual.setEnabled)
-        self.checkBoxTortoiseGit.toggled.connect(self.lineEditTGitManual.setEnabled)
-        self.checkBoxTortoiseGit.toggled.connect(self.pushButtonTGitManualBrowse.setEnabled)
         self.radioButtonGitProcUnlimited.toggled.connect(self.spinBoxLimitValue.setDisabled)
         self.radioButtonGitProcLimit.toggled.connect(self.spinBoxLimitValue.setEnabled)
+        self.radioExplorerManual.toggled.connect(self.lineEditExplorerManual.setEnabled)
+        self.radioExplorerManual.toggled.connect(self.pushButtonExplorerManualBrowse.setEnabled)
+        self.radioGitBashManual.toggled.connect(self.lineEditGitBashManual.setEnabled)
+        self.radioGitBashManual.toggled.connect(self.pushButtonGitBashManualBrowse.setEnabled)
+        self.checkBoxGitBash.toggled.connect(self.radioGitBashAutoDetect.setEnabled)
+        self.checkBoxGitBash.toggled.connect(self.radioGitBashManual.setEnabled)
+        self.checkBoxGitBash.toggled.connect(self.label_13.setEnabled)
 
-        self.tabWidget.setCurrentIndex(0)
+        self.tabWidget.setCurrentIndex(1)
 
 
         QMetaObject.connectSlotsByName(Preferences)
@@ -637,32 +786,44 @@ class Ui_Preferences(object):
         self.groupBox_8.setTitle(QCoreApplication.translate("Preferences", u"Startup behavior", None))
         self.checkBoxFetchOnStartup.setText(QCoreApplication.translate("Preferences", u"Fetch all repositories when starting Multigit", None))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_ui), QCoreApplication.translate("Preferences", u"Behavior", None))
-        self.groupBox.setTitle(QCoreApplication.translate("Preferences", u"Git executable", None))
+        self.groupBoxGit.setTitle(QCoreApplication.translate("Preferences", u"Git executable", None))
         self.radioGitManual.setText(QCoreApplication.translate("Preferences", u"Manual path", None))
         self.radioGitAutoDetect.setText(QCoreApplication.translate("Preferences", u"Auto-detected", None))
         self.label.setText(QCoreApplication.translate("Preferences", u"Choose git.exe executable location :", None))
         self.pushButtonGitManualBrowse.setText(QCoreApplication.translate("Preferences", u"...", None))
-        self.groupBox_2.setTitle(QCoreApplication.translate("Preferences", u"TortoiseGit", None))
-        self.radioTGitManual.setText(QCoreApplication.translate("Preferences", u"Manual path", None))
-        self.radioTGitAutoDetect.setText(QCoreApplication.translate("Preferences", u"Auto-detected", None))
-        self.label_2.setText(QCoreApplication.translate("Preferences", u"Choose TortoiseGitProc.exe executable location :", None))
-        self.label_9.setText("")
-        self.pushButtonTGitManualBrowse.setText(QCoreApplication.translate("Preferences", u"...", None))
+        self.groupBoxExplorer.setTitle(QCoreApplication.translate("Preferences", u"File Explorer", None))
+        self.label_11.setText(QCoreApplication.translate("Preferences", u"Choose File Explorer program to open directories :", None))
+        self.radioExplorerAutoDetect.setText(QCoreApplication.translate("Preferences", u"Auto-detected", None))
+        self.radioExplorerManual.setText(QCoreApplication.translate("Preferences", u"Manual path", None))
+        self.pushButtonExplorerManualBrowse.setText(QCoreApplication.translate("Preferences", u"...", None))
+        self.groupBoxTGit.setTitle(QCoreApplication.translate("Preferences", u"TortoiseGit", None))
         self.checkBoxTortoiseGit.setText(QCoreApplication.translate("Preferences", u"Activate TortoiseGit in the Git Program menu", None))
-        self.groupBox_3.setTitle(QCoreApplication.translate("Preferences", u"SourceTree", None))
-        self.radioSourcetreeManual.setText(QCoreApplication.translate("Preferences", u"Manual path", None))
-        self.pushButtonSourcetreeManualBrowse.setText(QCoreApplication.translate("Preferences", u"...", None))
-        self.radioSourcetreeAutoDetect.setText(QCoreApplication.translate("Preferences", u"Auto-detected", None))
-        self.label_4.setText(QCoreApplication.translate("Preferences", u"Choose SourceTree.exe executable location :", None))
+        self.label_9.setText("")
+        self.label_2.setText(QCoreApplication.translate("Preferences", u"Choose TortoiseGitProc.exe executable location :", None))
+        self.radioTGitAutoDetect.setText(QCoreApplication.translate("Preferences", u"Auto-detected", None))
+        self.radioTGitManual.setText(QCoreApplication.translate("Preferences", u"Manual path", None))
+        self.pushButtonTGitManualBrowse.setText(QCoreApplication.translate("Preferences", u"...", None))
+        self.groupBoxGitBash.setTitle(QCoreApplication.translate("Preferences", u"Git Bash", None))
+        self.checkBoxGitBash.setText(QCoreApplication.translate("Preferences", u"Activate Git Bash in the Git menu", None))
+        self.label_14.setText("")
+        self.label_13.setText(QCoreApplication.translate("Preferences", u"Choose git-bash.exe executable location :", None))
+        self.radioGitBashAutoDetect.setText(QCoreApplication.translate("Preferences", u"Auto-detected", None))
+        self.radioGitBashManual.setText(QCoreApplication.translate("Preferences", u"Manual path", None))
+        self.pushButtonGitBashManualBrowse.setText(QCoreApplication.translate("Preferences", u"...", None))
+        self.groupBoxSourceTree.setTitle(QCoreApplication.translate("Preferences", u"SourceTree", None))
         self.checkBoxSourceTree.setText(QCoreApplication.translate("Preferences", u"Activate SourceTree in the Git Program menu", None))
         self.label_7.setText("")
-        self.groupBox_4.setTitle(QCoreApplication.translate("Preferences", u"SublimeMerge", None))
-        self.pushButtonSublimemergeManualBrowse.setText(QCoreApplication.translate("Preferences", u"...", None))
-        self.radioSublimemergeAutoDetect.setText(QCoreApplication.translate("Preferences", u"Auto-detected", None))
-        self.radioSublimemergeManual.setText(QCoreApplication.translate("Preferences", u"Manual path", None))
+        self.label_4.setText(QCoreApplication.translate("Preferences", u"Choose SourceTree.exe executable location :", None))
+        self.radioSourcetreeAutoDetect.setText(QCoreApplication.translate("Preferences", u"Auto-detected", None))
+        self.radioSourcetreeManual.setText(QCoreApplication.translate("Preferences", u"Manual path", None))
+        self.pushButtonSourcetreeManualBrowse.setText(QCoreApplication.translate("Preferences", u"...", None))
+        self.groupBoxSublimemerge.setTitle(QCoreApplication.translate("Preferences", u"SublimeMerge", None))
+        self.checkBoxSublimeMerge.setText(QCoreApplication.translate("Preferences", u"Activate SublimeMerge  in the Git Program menu", None))
         self.label_8.setText("")
         self.label_4_2.setText(QCoreApplication.translate("Preferences", u"Choose sublime_merge.exe executable location :", None))
-        self.checkBoxSublimeMerge.setText(QCoreApplication.translate("Preferences", u"Activate SublimeMerge  in the Git Program menu", None))
+        self.radioSublimemergeAutoDetect.setText(QCoreApplication.translate("Preferences", u"Auto-detected", None))
+        self.radioSublimemergeManual.setText(QCoreApplication.translate("Preferences", u"Manual path", None))
+        self.pushButtonSublimemergeManualBrowse.setText(QCoreApplication.translate("Preferences", u"...", None))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_extprogs), QCoreApplication.translate("Preferences", u"External Programs", None))
     # retranslateUi
 
