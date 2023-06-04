@@ -24,7 +24,7 @@ from PySide2.QtCore import Qt, QPoint
 
 from src.mg_const import COL_UPDATE, COL_REPO_NAME, COL_NB, COL_TITLES, COL_SHA1, DoubleClickActions, COL_URL
 from src import mg_config as mgc
-from src.mg_tools import tortoisegit_exec, gitbash_exec, sourcetree_exec, sublimemerge_exec
+from src.mg_tools import ExecTortoiseGit, ExecGitBash, ExecSourceTree, ExecSublimeMerge
 from src.mg_repo_info import MgRepoInfo
 from src.mg_repo_tree_item import MgRepoTreeItem
 from src.mg_exec_window import MgExecWindow
@@ -566,7 +566,7 @@ class MgRepoTree(QTreeWidget):
             for item in self.selectedRepoItems():
                 repo = item.repoInfo
                 # after git bash, we also want to refresh the URL
-                gitbash_exec(repo.fullpath, callback=repo.deepRefresh)
+                ExecGitBash.exec_non_blocking([repo.fullpath], callback=repo.deepRefresh)
         except FileNotFoundError:
             # Git Bash was not located
             QMessageBox.warning(self, 'Unable to execute Git Bash', 'Warning: could not locate the git-bash.exe program.\n' +
@@ -613,7 +613,7 @@ class MgRepoTree(QTreeWidget):
             for item in items:
                 repo = item.repoInfo
                 # put the path parameter in a separate argument, see: https://gitlab.com/tortoisegit/tortoisegit/-/issues/3518
-                tortoisegit_exec('/path', repo.fullpath, '/command:%s' % cmd, callback=repo.refresh)
+                ExecTortoiseGit.exec_non_blocking(['/path', repo.fullpath, '/command:%s' % cmd], callback=repo.refresh)
         except FileNotFoundError:
             # TortoiseGit was not located
             QMessageBox.warning(self, 'Unable to execute TortoiseGit', 'Warning: could not locate the TortoiseGitProc.exe program.\n' +
@@ -687,7 +687,7 @@ class MgRepoTree(QTreeWidget):
             for item in self.selectedRepoItems():
                 repo = item.repoInfo
                 # run sourcetree
-                sourcetree_exec('-t', str(repo.fullpath), callback=repo.refresh)
+                ExecSourceTree.exec_non_blocking(['-t', str(repo.fullpath)], callback=repo.refresh)
         except FileNotFoundError:
             # TortoiseGit was not located
             QMessageBox.warning(self, 'Unable to execute SourceTree', 'Warning: could not locate the SourceTree.exe program.\n' +
@@ -704,7 +704,7 @@ class MgRepoTree(QTreeWidget):
         try:
             for item in self.selectedRepoItems():
                 repo = item.repoInfo
-                sublimemerge_exec(str(repo.fullpath), callback=repo.refresh)
+                ExecSublimeMerge.exec_non_blocking([str(repo.fullpath)], callback=repo.refresh)
         except FileNotFoundError:
             # TortoiseGit was not located
             QMessageBox.warning(self, 'Unable to execute SublimeMerge', 'Warning: could not locate the SublimeMerge.exe program.\n' +

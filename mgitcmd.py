@@ -21,7 +21,7 @@ from typing import Union, List, Optional
 
 from src import mg_const as mgc
 from src.mg_json_mgit_parser import ProjectStructure
-from src.mg_tools import get_git_exec, RunProcess
+from src.mg_tools import RunProcess, ExecGit
 
 HELP='''
 mgitcmd clone path_to_mgit_file.mgit [--dest path_to_dir] [--shallow] 
@@ -87,7 +87,7 @@ def cmd_clone(fname: str, dest_dir: Optional[str], shallow: bool) -> None:
         print('Aborting')
         sys.exit(-1)
 
-    prog_git = get_git_exec()
+    prog_git = ExecGit.get_executable()
     if prog_git is None or len(prog_git) == 0:
         print('Can not find git with executable!')
         print('Please put it on the path or define git location in the Multigit settings.')

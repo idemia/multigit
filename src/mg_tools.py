@@ -17,7 +17,8 @@
 
 from typing import Sequence, Union, Optional, Callable, Tuple, Any, List
 
-import functools, logging, pathlib, subprocess, sys, os
+import functools, logging, subprocess, sys, os
+from pathlib import Path
 
 from PySide2.QtCore import QObject, QProcess, Signal
 from PySide2.QtWidgets import QMessageBox, QApplication
@@ -29,6 +30,7 @@ from src.mg_auth_failure_mgr import MgAuthFailureMgr
 
 logger = logging.getLogger('mg_tools')
 dbg = logger.debug
+warn = logger.warning
 log_git_cmd = logging.getLogger(LOGGER_GIT_CMD).info
 
 GIT_EXIT_CODE_SEGFAULT_OF_GIT_WITH_STACKTRACE = -1
@@ -36,156 +38,232 @@ GIT_EXIT_CODE_SEGFAULT_OF_GIT_NO_STACKTRACE = -2
 GIT_EXIT_CODE_COULD_NOT_START_PROCESS = -3
 GIT_EXIT_CODE_STOPPED_BECAUSE_AUTH_FAILURE = -4
 
-def find_prog_exec(path_candidates: Sequence[Union[str, pathlib.Path]]) -> str:
-    '''Scans locations path_candidates to see if the expected program exists. Return this location if found or an empty string.
 
-    The path_candidates list must include the full path to the program, including the program name itself.
+class ExecTool:
+    # List of platform (as returned by sys.platform()) where we can run this tool
+    SUPPORTED_PLATFORMS: List[str]
 
-    Example:
-        path_candidates: List[pathlib.Path] = [
-            pathlib.Path(os.environ["ProgramFiles(x86)"])/"Git"/"bin"/ "git.exe",
-            pathlib.Path(os.environ["ProgramFiles"])/"Git"/"bin"/ "git.exe",
-        ]
+    WIN32_PATH_CANDIDATES: List[Path]
+    LINUX_PATH_CANDIDATES: List[Path]
 
-        find_prog_exec( path_candidates )
-    '''
-    dbg('find_prog_exec()')
-    for possible_path in path_candidates:
-        dbg('Looking at: {}'.format(possible_path))
-        if not pathlib.Path(possible_path).exists():
-            continue
-        candidate = str(possible_path)
-        # ok, we have it !
-        dbg('Found program at: {}'.format(candidate))
-        return candidate
+    EXEC_NAME_LINUX: str
+    EXEC_NAME_WIN32: str
 
-    # could not find the wanted program
-    return ''
+    # if not None, this is a command which we can run to detect the program. Typically, this is ['--version']
+    INNOCUOUS_COMMAND: Optional[List[str]] = None
+
+    # name of the configuration entry to store auto-detection behavior
+    CONFIG_ENTRY_AUTODETECT: str
+
+    # name of the configuration entry to store the manual path to the program
+    CONFIG_ENTRY_MANUAL_PATH: str
+
+    SESSION_CACHE = {
+    }
+
+
+    @classmethod
+    def platform_supported(cls) -> bool:
+        '''Return whether the current platform is supported'''
+        return sys.platform in cls.SUPPORTED_PLATFORMS
+
+
+    @classmethod
+    def autodetect_executable(cls) -> str:
+        '''Autodetect the executable location according to a few heuristics and return the result.
+        Returns an empty string when nothing found.
+        '''
+        if not cls.platform_supported():
+            return ''
+
+        # check if we have it in cache
+        if cls in cls.SESSION_CACHE:
+            return cls.SESSION_CACHE[cls]
+
+        if cls.INNOCUOUS_COMMAND:
+            # first, try on the command-line
+            try:
+                exit_code, output = RunProcess().exec_blocking([cls.get_exec_name()] + cls.INNOCUOUS_COMMAND, allow_errors=True)
+                if exit_code == 0:
+                    # program is on the path, use it
+                    cls.SESSION_CACHE[cls] = cls.get_exec_name()
+                    return cls.get_exec_name()
+            except FileNotFoundError:
+                # program is not on the path
+                pass
+
+
+        # Look in some standards locations
+        if sys.platform == 'win32':
+            path_candidates = cls.WIN32_PATH_CANDIDATES
+        elif sys.platform == 'linux':
+            path_candidates = cls.LINUX_PATH_CANDIDATES
+        else:
+            raise ValueError('Unsupported platform')
+
+        cmd = cls.find_prog_exec(path_candidates)
+
+        # put it in cash for next time
+        if cmd:
+            cls.SESSION_CACHE[cls] = cmd
+
+        # return the result even if we could not find anything
+        return cmd
+
+
+    @classmethod
+    def get_executable(cls) -> str:
+        '''Check if the configuration `autodetect` is True or None and in this case,
+        auto-detects the program location. Else, simply return the value defined in `config_entry_manual_path`
+        '''
+        if not cls.platform_supported():
+            return ''
+
+        config = mg_config.get_config_instance()
+        if config[cls.CONFIG_ENTRY_AUTODETECT] in (None, True):
+            result = cls.autodetect_executable()
+        else:
+            result = config[cls.CONFIG_ENTRY_MANUAL_PATH]
+        return result
+
+
+    @classmethod
+    def get_exec_name(cls) -> str:
+        if sys.platform == 'win32':
+            return cls.EXEC_NAME_WIN32
+        elif sys.platform == 'linux':
+            return cls.EXEC_NAME_LINUX
+        else:
+            raise ValueError('Platform not supported: ', sys.platform)
+
+
+    @classmethod
+    def find_prog_exec(cls, path_candidates: Sequence[Union[str, Path]]) -> str:
+        '''Scans locations path_candidates to see if the expected program exists. Return the program at this location if found or an empty string.
+
+        The path_candidates are a list of directory location where one can find exec_name
+
+        Example:
+            path_candidates: List[Path] = [
+                Path(os.environ["ProgramFiles(x86)"])/"Git"/"bin",
+                Path(os.environ["ProgramFiles"])/"Git"/"bin",
+            ]
+
+            find_prog_exec( path_candidates )
+        '''
+        print('>>>> find_prog_exec()', cls)
+        exec_name = cls.get_exec_name()
+        for possible_path in path_candidates:
+            candidate_path = Path(possible_path) / exec_name
+            dbg('Looking at: {}'.format(str(candidate_path)))
+            if not candidate_path.exists():
+                continue
+            # ok, we have it !
+            dbg('Found program at: {}'.format(str(candidate_path)))
+            return str(candidate_path)
+
+        # could not find the wanted program
+        return ''
+
+
+    @classmethod
+    def exec_non_blocking(cls, cmd_args: List[str], workdir: str = '', callback: Optional[Callable[[], Any]] = None) -> None:
+        '''Run the program with the arguments listed in cmd_args, in the working directory.
+        Raises an exception if the command did not return with 0 status.
+        '''
+        prog_to_run = cls.get_executable()
+        if prog_to_run == '':
+            raise FileNotFoundError(f'Could not locate {cls.get_exec_name()}')
+
+        cb_done = None
+        if callback is not None:
+            def cb_done(_exit_code: int, _output: str) -> None:
+                assert callback
+                callback()
+
+        rp = RunProcess()
+        cmdline = [prog_to_run] + cmd_args
+        rp.exec_async(cmdline=cmdline, cb_done=cb_done, working_dir=workdir)
+
+
+    @classmethod
+    def exec_blocking(cls, cmd_args: Sequence[str], workdir: str = '', allow_errors: bool = False) -> str:
+        '''Run the program with the arguments listed in cmd_args, in the working directory.
+        Raises an exception if the command did not return with 0 status.
+        '''
+        prog_to_run = cls.get_executable()
+        if prog_to_run == '':
+            raise FileNotFoundError(f'Could not locate {cls.get_exec_name()}')
+
+        cmdline = [prog_to_run] + list(cmd_args)
+        exitCode, output = RunProcess().exec_blocking(cmdline, allow_errors=allow_errors, working_dir=workdir)
+        if exitCode != 0 and not allow_errors:
+            raise subprocess.CalledProcessError(cmd=cmdline, returncode=exitCode, output=output)
+        return output
+
 
 
 #######################################################
 #       Git Stuff
 #######################################################
 
-if sys.platform == 'win32':
-    GIT_PATH_CANDIDATES: List[pathlib.Path] = [
-        pathlib.Path(os.environ["ProgramFiles(x86)"])/"Git"/"bin"/ "git.exe",
-        pathlib.Path(os.environ["ProgramFiles(x86)"])/"Git"/"cmd"/ "git.exe",
-        pathlib.Path(os.environ["PROGRAMW6432"])/"Git"/"bin"/ "git.exe",
-        pathlib.Path(os.environ["PROGRAMW6432"])/"Git"/"cmd"/ "git.exe",
+class ExecGit(ExecTool):
+    SUPPORTED_PLATFORMS = ['win32', 'linux']
+
+    WIN32_PATH_CANDIDATES: List[Path] = [
+        Path(os.environ.get("ProgramFiles(x86)", '')) / "Git" / "bin",
+        Path(os.environ.get("ProgramFiles(x86)", '')) / "Git" / "cmd",
+        Path(os.environ.get("PROGRAMW6432", '')) / "Git" / "bin",
+        Path(os.environ.get("PROGRAMW6432", '')) / "Git" / "cmd",
     ]
-else:
-    GIT_PATH_CANDIDATES: List[pathlib.Path] = [
-        pathlib.Path('/usr/bin/git'),
-        pathlib.Path('/usr/local/bin/git'),
+
+    LINUX_PATH_CANDIDATES = [
+        Path('/usr/bin'),
+        Path('/usr/local/bin'),
     ]
-GIT_EXEC = 'git.exe'
 
-# this caches the function result, so the function is called only once
-@functools.lru_cache(maxsize=1)
-def autodetect_git_exec() -> str:
-    '''Autodetect the git executable location according to a few heuristics and return the result.
-    Returns an empty string when nothing found.
-    '''
-    try:
-        cmd = 'git'
-        exit_code, output = RunProcess().exec_blocking([cmd, '--version'], allow_errors=True)
-        # Git is on the path, use it
-        if exit_code == 0:
-            return cmd
-    except FileNotFoundError:
-        # Git is not on the default path, no big deal
-        pass
+    EXEC_NAME_LINUX = 'git'
+    EXEC_NAME_WIN32 = 'git.exe'
 
-    # Look for git in some standards locations
-    cmd = find_prog_exec(GIT_PATH_CANDIDATES)
-    # return the result even if we could not find anything
-    return cmd
+    INNOCUOUS_COMMAND = ['--version']
+
+    CONFIG_ENTRY_AUTODETECT = mg_config.CONFIG_GIT_AUTODETECT
+    CONFIG_ENTRY_MANUAL_PATH = mg_config.CONFIG_GIT_MANUAL_PATH
 
 
-def get_git_exec() -> str:
-    '''Find git executable according to configuration'''
-    config = mg_config.get_config_instance()
-    if config[mg_config.CONFIG_GIT_AUTODETECT] in (None, True):
-        result = autodetect_git_exec()
-    else:
-        result = config[mg_config.CONFIG_GIT_MANUAL_PATH]
-    return result
-
-def git_exec(*args: str, gitdir: Union[str, pathlib.Path] = '', allow_errors: bool = False) -> str:
+def git_exec(*args: str, gitdir: Union[str, Path] = '', allow_errors: bool = False) -> str:
     '''Run git with the arguments passed in *args and return the stdout of the command.
     Raises an exception if the command did not return with 0 status.
     '''
-    prog_git = get_git_exec()
-    if prog_git is None or len(prog_git) == 0:
-        raise FileNotFoundError('Can not execute git with empty executable!')
     if gitdir:
         args = tuple([ '-C', str(gitdir) ] + list(args))
-    cmdline = [prog_git] + list(args)
-    exitCode, output = RunProcess().exec_blocking(cmdline, allow_errors=allow_errors)
-    if exitCode != 0 and not allow_errors:
-        raise subprocess.CalledProcessError(cmd=[prog_git]+list(args), returncode=exitCode, output=output)
-    return output
+
+    return ExecGit.exec_blocking(args, '', allow_errors)
 
 
 #######################################################
 #       TortoiseGit Stuff
 #######################################################
 
-if sys.platform == 'win32':
-    TORTOISE_GIT_PATH_CANDIDATES: List[pathlib.Path] = [
-        pathlib.Path(os.environ["ProgramFiles(x86)"])/"TortoiseGit"/"bin"/ "TortoiseGitProc.exe",
-        pathlib.Path(os.environ["PROGRAMW6432"])/"TortoiseGit"/"bin"/ "TortoiseGitProc.exe",
+class ExecTortoiseGit(ExecTool):
+    SUPPORTED_PLATFORMS = ['win32']
+
+    WIN32_PATH_CANDIDATES = [
+        Path(os.environ.get("ProgramFiles(x86)", ''))/"TortoiseGit"/"bin",
+        Path(os.environ.get("PROGRAMW6432", ''))/"TortoiseGit"/"bin",
     ]
-else:
-    # tortoise git only exists on Windows
-    TORTOISE_GIT_PATH_CANDIDATES: List[pathlib.Path] = []
 
+    EXEC_NAME_WIN32 = "TortoiseGitProc.exe"
 
-@functools.lru_cache(maxsize=1)
-def autodetect_tortoise_git_exec() -> str:
-    '''Autodetect the TotoiseGitProc executable location according to a few heuristics and return the result.
-    Returns an empty string when nothing found.
-    '''
-    # Look in some standards locations
-    cmd = find_prog_exec(TORTOISE_GIT_PATH_CANDIDATES)
-    # return the result even if we could not find anything
-    return cmd
-
-def get_tortoisegit_exec() -> str:
-    '''Find TortoiseGitProc executable according to configuration'''
-    config = mg_config.get_config_instance()
-    if config[mg_config.CONFIG_TORTOISEGIT_AUTODETECT] in (None, True):
-        result = autodetect_tortoise_git_exec()
-    else:
-        result = config[mg_config.CONFIG_TORTOISEGIT_MANUAL_PATH]
-    return result
-
-def tortoisegit_exec(*args: str, callback: Optional[Callable[[], Any]] = None) -> None:
-    '''Run TortoiseGitProc with the arguments passed in *args.
-    Raises an exception if the command did not return with 0 status.
-    '''
-    prog_tortoisegit = get_tortoisegit_exec()
-    if prog_tortoisegit == '':
-        raise FileNotFoundError('Could not locate TortoiseGitProc.exe')
-    cb_tgit_done: Optional[Callable[[int, str], None]]
-    if callback is not None:
-        def cb_tgit_done(_git_exit_code: int, _git_output: str) -> None:
-            assert callback
-            callback()
-    else:
-        cb_tgit_done = None
-    rp = RunProcess()
-    cmdline = [prog_tortoisegit] + list(args)
-    # some TortoiseGit commands return -1 on Cancel
-    rp.exec_async(cmdline=cmdline, cb_done=cb_tgit_done, allow_errors=True)
+    CONFIG_ENTRY_AUTODETECT = mg_config.CONFIG_TORTOISEGIT_AUTODETECT
+    CONFIG_ENTRY_MANUAL_PATH = mg_config.CONFIG_TORTOISEGIT_MANUAL_PATH
 
 
 def shouldShowTortoiseGit() -> bool:
     '''Return whether to show the TortoiseGit menu according to configuration'''
     if mg_config.get_config_instance().get(mg_config.CONFIG_TORTOISEGIT_ACTIVATED) is None:
         # configuration entry does not exist, this is our first run
-        if get_tortoisegit_exec() == '':
+        if ExecTortoiseGit.get_executable():
             # tortoise git is not configured and not autodetected
             showTortoiseGit = False
         else:
@@ -202,51 +280,17 @@ def shouldShowTortoiseGit() -> bool:
 #       SourceTree stuff
 #######################################################
 
-if sys.platform == 'win32':
-    SOURCETREE_PATH_CANDIDATES: List[pathlib.Path] = [
-        pathlib.Path(os.environ["ProgramFiles(x86)"])/"Atlassian"/"SourceTree"/ "SourceTree.exe",
-    ]
-else:
-    # sourcetree is not available on linux
-    # when port to macos is done, this should be adjusted
-    SOURCETREE_PATH_CANDIDATES: List[pathlib.Path] = [
+class ExecSourceTree(ExecTool):
+    SUPPORTED_PLATFORMS = ['win32']
+
+    WIN32_PATH_CANDIDATES = [
+        Path(os.environ.get("ProgramFiles(x86)", '')) / "Atlassian" / "SourceTree",
     ]
 
-@functools.lru_cache(maxsize=1)
-def autodetect_sourcetree_exec() -> str:
-    '''Autodetect the SourceTree executable location according to a few heuristics and return the result.
-    Returns an empty string when nothing found.
-    '''
+    EXEC_NAME_WIN32 = "SourceTree.exe"
 
-    # Look in some standards locations
-    cmd = find_prog_exec(SOURCETREE_PATH_CANDIDATES)
-    # return the result even if we could not find anything
-    return cmd
-
-def get_sourcetree_exec() -> str:
-    '''Find SourceTree executable according to configuration'''
-    config = mg_config.get_config_instance()
-    if config[mg_config.CONFIG_SOURCETREE_AUTODETECT] in (None, True):
-        result = autodetect_sourcetree_exec()
-    else:
-        result = config[mg_config.CONFIG_SOURCETREE_MANUAL_PATH]
-    return result
-
-def sourcetree_exec(*args: str, callback: Optional[Callable[[], Any]] = None) -> None:
-    '''Run SourceTree the arguments passed in *args.
-    Raises an exception if the command did not return with 0 status.
-    '''
-    prog_sourcetree = get_sourcetree_exec()
-    if prog_sourcetree == '':
-        raise FileNotFoundError('Could not locate SourceTree.exe')
-    cb_git_done = None
-    if callback is not None:
-        def cb_git_done(_git_exit_code: int, _git_output: str) -> None:
-            assert callback
-            callback()
-    rp = RunProcess()
-    cmdline = [prog_sourcetree] + list(args)
-    rp.exec_async(cmdline=cmdline, cb_done=cb_git_done)
+    CONFIG_ENTRY_AUTODETECT = mg_config.CONFIG_SOURCETREE_AUTODETECT
+    CONFIG_ENTRY_MANUAL_PATH = mg_config.CONFIG_SOURCETREE_MANUAL_PATH
 
 
 def shouldShowSourceTree() -> bool:
@@ -258,51 +302,21 @@ def shouldShowSourceTree() -> bool:
 #       SublimeMerge stuff
 #######################################################
 
-if sys.platform == 'win32':
-    SUBLIMEMERGE_PATH_CANDIDATES: List[pathlib.Path] = [
-        pathlib.Path(os.environ["PROGRAMW6432"])/"Sublime Merge"/"sublime_merge.exe",
+class ExecSublimeMerge(ExecTool):
+    SUPPORTED_PLATFORMS = ['win32', 'linux']
+
+    WIN32_PATH_CANDIDATES = [
+        Path(os.environ.get("PROGRAMW6432", '')) / "Sublime Merge",
     ]
-else:
-    SUBLIMEMERGE_PATH_CANDIDATES: List[pathlib.Path] = [
-        pathlib.Path('/opt/sublime_merge/sublime_merge'),
-   ]
+    LINUX_PATH_CANDIDATES = [
+        Path('/opt/sublime_merge'),
+    ]
 
-@functools.lru_cache(maxsize=1)
-def autodetect_sublimemerge_exec() -> str:
-    '''Autodetect the SublimeMerge executable location according to a few heuristics and return the result.
-    Returns an empty string when nothing found.
-    '''
+    EXEC_NAME_WIN32 = "sublime_merge.exe"
+    EXEC_NAME_LINUX = "sublime_merge"
 
-    # Look in some standards locations
-    cmd = find_prog_exec(SUBLIMEMERGE_PATH_CANDIDATES)
-    # return the result even if we could not find anything
-    return cmd
-
-def get_sublimemerge_exec() -> str:
-    '''Find SublimeMerge executable according to configuration'''
-    config = mg_config.get_config_instance()
-    if config[mg_config.CONFIG_SUBLIMEMERGE_AUTODETECT] in (None, True):
-        result = autodetect_sublimemerge_exec()
-    else:
-        result = config[mg_config.CONFIG_SUBLIMEMERGE_MANUAL_PATH]
-    return result
-
-def sublimemerge_exec(*args: str, callback: Optional[Callable[[], Any]] = None) -> None:
-    '''Run SublimeMerge the arguments passed in *args.
-    Raises an exception if the command did not return with 0 status.
-    Call optional callback if provided when the operation is done
-    '''
-    prog_sublimemerge = get_sublimemerge_exec()
-    if prog_sublimemerge == '':
-        raise FileNotFoundError('Could not locate SublimeMerge.exe')
-    cb_git_done = None
-    if callback is not None:
-        def cb_git_done(_git_exit_code: int, _git_output: str) -> None:
-            assert callback
-            callback()
-    rp = RunProcess()
-    cmdline = [prog_sublimemerge] + list(args)
-    rp.exec_async(cmdline=cmdline, cb_done=cb_git_done)
+    CONFIG_ENTRY_AUTODETECT = mg_config.CONFIG_SUBLIMEMERGE_AUTODETECT
+    CONFIG_ENTRY_MANUAL_PATH = mg_config.CONFIG_SUBLIMEMERGE_MANUAL_PATH
 
 
 def shouldShowSublimeMerge() -> bool:
@@ -314,70 +328,47 @@ def shouldShowSublimeMerge() -> bool:
 #       GitBash stuff
 #######################################################
 
-if sys.platform == 'win32':
-    # Git bash is very specific to Windows
-    GITBASH_PATH_CANDIDATES: List[pathlib.Path] = [
-        pathlib.Path(os.environ["PROGRAMW6432"])/"Git"/"git-bash.exe",
-        pathlib.Path(os.environ["ProgramFiles(x86)"]) /"Git"/"git-bash.exe",
+class ExecGitBash(ExecTool):
+    SUPPORTED_PLATFORMS = ['win32']
+
+    WIN32_PATH_CANDIDATES = [
+        Path(os.environ.get("PROGRAMW6432", '')) / "Git",
+        Path(os.environ.get("ProgramFiles(x86)", '')) / "Git",
     ]
-else:
-    GITBASH_PATH_CANDIDATES: List[pathlib.Path] = []
 
-@functools.lru_cache(maxsize=1)
-def autodetect_gitbash_exec() -> str:
-    '''Autodetect the git-bash executable location according to a few heuristics and return the result.
-    Returns an empty string when nothing found.
-    '''
-    # Look in some standards locations
-    cmd = find_prog_exec(GITBASH_PATH_CANDIDATES)
+    INNOCUOUS_COMMAND = ['--version']
 
-    if cmd == '':
-        # git-bash was not found, try directly in the command-line
-        try:
-            try_cmd = 'git-bash.exe'
-            _, output = RunProcess().exec_blocking([try_cmd, '--version'], allow_errors=True)
-            # Git-bash is on the path, use it
-            return try_cmd
-        except FileNotFoundError:
-            # Git is not on the default path, no big deal
-            pass
+    EXEC_NAME_WIN32 = "git-bash.exe"
 
-    # return the result even if we could not find anything
-    return cmd
-
-def get_gitbash_exec() -> str:
-    '''Find git-bash executable according to configuration'''
-    config = mg_config.get_config_instance()
-    if config[mg_config.CONFIG_GITBASH_AUTODETECT] in (None, True):
-        result = autodetect_gitbash_exec()
-    else:
-        result = config[mg_config.CONFIG_GITBASH_MANUAL_PATH]
-    return result
-
-
-def gitbash_exec(gitdir: str, callback: Optional[Callable[[], Any]] = None) -> None:
-    '''Run git-bash on the directory passed in argument.
-    Raises an exception if the command did not return with 0 status.
-    '''
-    prog_gitbash = get_gitbash_exec()
-    if prog_gitbash == '':
-        raise FileNotFoundError('Could not locate SourceTree.exe')
-
-    cb_done = None
-    if callback is not None:
-        def cb_done(_git_exit_code: int, _git_output: str) -> None:
-            assert callback
-            callback()
-
-    rp = RunProcess()
-    cmdline = [prog_gitbash]
-    rp.exec_async(cmdline=cmdline, cb_done=cb_done, working_dir=gitdir)
+    CONFIG_ENTRY_AUTODETECT = mg_config.CONFIG_GITBASH_AUTODETECT
+    CONFIG_ENTRY_MANUAL_PATH = mg_config.CONFIG_GITBASH_MANUAL_PATH
 
 
 def shouldShowGitBash() -> bool:
     if sys.platform == 'win32':
         return True
     return False
+
+
+#######################################################
+#       Open directory
+#######################################################
+
+class ExecOpenDirectory(ExecTool):
+    SUPPORTED_PLATFORMS = ['win32', 'linux']
+
+    # no path candidates, it should be on the execution path
+    WIN32_PATH_CANDIDATES = []
+    LINUX_PATH_CANDIDATES = []
+
+    EXEC_NAME_LINUX = 'explorer.exe'
+    EXEC_NAME_WIN32 = 'xdg-open'
+
+    # name of the configuration entry to store auto-detection behavior
+    CONFIG_ENTRY_AUTODETECT = ''
+
+    # name of the configuration entry to store the manual path to the program
+    CONFIG_ENTRY_MANUAL_PATH = ''
 
 
 #######################################################
@@ -466,7 +457,7 @@ class RunProcess(QObject):
         self.allow_errors = allow_errors
 
         self.last_exit_code = 0
-        self.process.setProcessChannelMode(QProcess.MergedChannels)
+        self.process.setProcessChannelMode(QProcess.ProcessChannelMode.MergedChannels)
 
         if self.emit_output:
             # noinspection PyUnresolvedReferences
@@ -503,7 +494,7 @@ class RunProcess(QObject):
             self.last_exit_code = GIT_EXIT_CODE_STOPPED_BECAUSE_AUTH_FAILURE
             self.partial_stdout = 'Stopped before execution because too many authentication failures.'
             dbg('Execution canceled because of too many authentication failures: {}'.format(self.nice_cmdline()))
-            cmd_out = self.process_finished(self.last_exit_code, QProcess.NormalExit)
+            cmd_out = self.process_finished(self.last_exit_code, QProcess.ExitStatus.NormalExit)
             return self.last_exit_code, cmd_out
 
         assert self.process
@@ -512,7 +503,7 @@ class RunProcess(QObject):
 
         if self.process.state() not in (QProcess.Starting, QProcess.Running):
             # could not start the process...
-            cmd_out = self.process_finished(GIT_EXIT_CODE_COULD_NOT_START_PROCESS, QProcess.FailedToStart)
+            cmd_out = self.process_finished(GIT_EXIT_CODE_COULD_NOT_START_PROCESS, QProcess.ExitStatus.CrashExit)
         else:
             finished = self.process.waitForFinished(-1)
             if not finished:
@@ -560,7 +551,7 @@ class RunProcess(QObject):
             self.partial_stdout = 'Stopped before execution because too many authentication failures.'
             dbg('Execution canceled because of too many authentication failures: {}'.format(self.nice_cmdline()))
             QApplication.processEvents()
-            self.process_finished(self.last_exit_code, QProcess.NormalExit)
+            self.process_finished(self.last_exit_code, QProcess.ExitStatus.NormalExit)
             return
 
         # noinspection PyUnresolvedReferences

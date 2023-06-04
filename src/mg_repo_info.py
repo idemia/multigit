@@ -24,7 +24,7 @@ from PySide2.QtWidgets import QMessageBox
 
 from src.mg_const import MSG_NO_COMMIT, MSG_REMOTE_TOPUSH_TOPULL, MSG_REMOTE_SYNCHRO_OK, MSG_REMOTE_TOPULL, \
     MSG_REMOTE_TOPUSH, MSG_REMOTE_BRANCH_GONE, MSG_LOCAL_BRANCH, SHORT_SHA1_NB_DIGITS, MSG_EMPTY_REPO
-from src.mg_tools import RunProcess, get_git_exec
+from src.mg_tools import RunProcess, ExecGit
 from src.mg_utils import anonymise_git_url
 
 logger = logging.getLogger('mg_repo_info')
@@ -1153,7 +1153,7 @@ class MgRepoInfo(QObject):
 
         May raise subprocess.CalledProcessError() if git does not exit with 0
         '''
-        prog_git = get_git_exec()
+        prog_git = ExecGit.get_executable()
         if prog_git is None or len(prog_git) == 0:
             raise FileNotFoundError('Can not execute git with empty executable!')
         git_cmd = [prog_git, '-C', self.fullpath] + list(args)
@@ -1171,7 +1171,7 @@ class MgRepoInfo(QObject):
         if allow_errors is False, a message box is displayed if git returns an exit code different than 0. If you
         have your own handling of git errors, set allow_errors to True.
         '''
-        prog_git = get_git_exec()
+        prog_git = ExecGit.get_executable()
         if prog_git is None or len(prog_git) == 0:
             raise FileNotFoundError('Can not execute git with empty executable!')
         git_cmd = [prog_git, '-C', self.fullpath] + list(args)

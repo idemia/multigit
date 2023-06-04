@@ -31,7 +31,7 @@ from PySide2.QtCore import Qt
 if TYPE_CHECKING:
     from src.mg_repo_tree import MgRepoTree
 from src.gui.ui_preferences import Ui_Preferences
-from src.mg_tools import autodetect_git_exec, autodetect_tortoise_git_exec, autodetect_sourcetree_exec, autodetect_sublimemerge_exec
+from src.mg_tools import ExecGit, ExecTortoiseGit, ExecSourceTree, ExecSublimeMerge, ExecGitBash, ExecOpenDirectory
 from src.mg_const import DoubleClickActions
 import src.mg_config as mgc
 
@@ -102,7 +102,7 @@ def runDialogEditSettings(parent: QWidget, tabPage: Union[Literal[0], Literal[1]
     git_auto_detect = (True if config[mgc.CONFIG_GIT_AUTODETECT] is None
                              else config[mgc.CONFIG_GIT_AUTODETECT])
     ui_pref.radioGitAutoDetect.setChecked(git_auto_detect)
-    ui_pref.lineEditGitAutoDetect.setText(autodetect_git_exec())
+    ui_pref.lineEditGitAutoDetect.setText(ExecGit.autodetect_executable())
     ui_pref.radioGitManual.setChecked(not git_auto_detect)
     ui_pref.lineEditGitManual.setText(config[mgc.CONFIG_GIT_MANUAL_PATH] or '')
     ui_pref.lineEditGitManual.setEnabled(not git_auto_detect)
@@ -116,7 +116,7 @@ def runDialogEditSettings(parent: QWidget, tabPage: Union[Literal[0], Literal[1]
     ui_pref.checkBoxTortoiseGit.setChecked(mgc.get_config_instance().get(mgc.CONFIG_TORTOISEGIT_ACTIVATED))
     tgit_auto_detect = True if config[mgc.CONFIG_TORTOISEGIT_AUTODETECT] is None else config[mgc.CONFIG_TORTOISEGIT_AUTODETECT]
     ui_pref.radioTGitAutoDetect.setChecked(tgit_auto_detect)
-    ui_pref.lineEditTGitAutoDetect.setText(autodetect_tortoise_git_exec())
+    ui_pref.lineEditTGitAutoDetect.setText(ExecTortoiseGit.autodetect_executable())
     ui_pref.radioTGitManual.setChecked(not tgit_auto_detect)
     ui_pref.lineEditTGitManual.setText(config[mgc.CONFIG_TORTOISEGIT_MANUAL_PATH] or '')
     ui_pref.lineEditTGitManual.setEnabled(not tgit_auto_detect)
@@ -130,7 +130,7 @@ def runDialogEditSettings(parent: QWidget, tabPage: Union[Literal[0], Literal[1]
     ui_pref.checkBoxSourceTree.setChecked(bool(mgc.get_config_instance().get(mgc.CONFIG_SOURCETREE_ACTIVATED)))
     stree_auto_detect = True if config[mgc.CONFIG_SOURCETREE_AUTODETECT] is None else config[mgc.CONFIG_SOURCETREE_AUTODETECT]
     ui_pref.radioSourcetreeAutoDetect.setChecked(stree_auto_detect)
-    ui_pref.lineEditSourcetreeAutoDetect.setText(autodetect_sourcetree_exec())
+    ui_pref.lineEditSourcetreeAutoDetect.setText(ExecSourceTree.autodetect_executable())
     ui_pref.radioSourcetreeManual.setChecked(not stree_auto_detect)
     ui_pref.lineEditSourcetreeManual.setText(config[mgc.CONFIG_SOURCETREE_MANUAL_PATH] or '')
     ui_pref.lineEditSourcetreeManual.setEnabled(not stree_auto_detect)
@@ -144,7 +144,7 @@ def runDialogEditSettings(parent: QWidget, tabPage: Union[Literal[0], Literal[1]
     ui_pref.checkBoxSublimeMerge.setChecked(bool(mgc.get_config_instance().get(mgc.CONFIG_SUBLIMEMERGE_ACTIVATED)))
     smerge_auto_detect = True if config[mgc.CONFIG_SUBLIMEMERGE_AUTODETECT] is None else config[mgc.CONFIG_SUBLIMEMERGE_AUTODETECT]
     ui_pref.radioSublimemergeAutoDetect.setChecked(smerge_auto_detect)
-    ui_pref.lineEditSublimemergeAutoDetect.setText(autodetect_sublimemerge_exec())
+    ui_pref.lineEditSublimemergeAutoDetect.setText(ExecSublimeMerge.autodetect_executable())
     ui_pref.radioSublimemergeManual.setChecked(not smerge_auto_detect)
     ui_pref.lineEditSublimemergeManual.setText(config[mgc.CONFIG_SUBLIMEMERGE_MANUAL_PATH] or '')
     ui_pref.lineEditSublimemergeManual.setEnabled(not smerge_auto_detect)
