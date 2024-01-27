@@ -34,6 +34,11 @@ Status
 Multigit is developed, tested and packaged for Windows. Testing and release on Linux is on the way.
 
 
+Testing
+-------
+
+To run the tests, launch pytest from the main directory.
+
 License
 -------
 Multigit is released under the Apache 2.0 license.
