@@ -24,7 +24,7 @@ from PySide2.QtGui import QIcon, QPixmap, QTransform
 from PySide2.QtWidgets import QAction, QMenu, QWidget
 
 from src.mg_const import SHORT_SHA1_NB_DIGITS
-from src.mg_tools import shouldShowSublimeMerge, shouldShowTortoiseGit, shouldShowSourceTree, shouldShowGitBash
+from src.mg_tools import ExecSublimeMerge, ExecTortoiseGit, ExecSourceTree, ExecGitBash
 from src.mg_repo_info import MgRepoInfo
 
 logger = logging.getLogger('mg_actions')
@@ -315,10 +315,10 @@ class MgActions(QObject):
 
     def enableAvailableScm(self) -> None:
         '''Adjust Git Programs menu and RMB menu'''
-        showTortoiseGit = shouldShowTortoiseGit()
-        showSourceTree = shouldShowSourceTree()
-        showSublimeMerge = shouldShowSublimeMerge()
-        showGitBash = shouldShowGitBash()
+        showTortoiseGit = ExecTortoiseGit.shouldShow()
+        showSourceTree = ExecSourceTree.shouldShow()
+        showSublimeMerge = ExecSublimeMerge.shouldShow()
+        showGitBash = ExecGitBash.shouldShow()
 
         # fix menu actions
         self.actionSourceTree.setVisible(showSourceTree)

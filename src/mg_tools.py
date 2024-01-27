@@ -58,6 +58,9 @@ class ExecTool:
     # name of the configuration entry to store the manual path to the program
     CONFIG_ENTRY_MANUAL_PATH: str
 
+    # name of the configuration entry to store if the program is activated or not
+    CONFIG_ENTRY_ACTIVATED: str
+
     SESSION_CACHE: Dict[Type['ExecTool'], str] = {
     }
 
@@ -168,6 +171,26 @@ class ExecTool:
 
 
     @classmethod
+    def shouldShow(cls) -> bool:
+        '''Return whether to show the program in menu:
+        - for first run, we show if the program is autodetected on the computer
+        - for non first run, we show according to config
+        '''
+        if mg_config.get_config_instance().get(cls.CONFIG_ENTRY_ACTIVATED) is None:
+            # configuration entry does not exist, this is our first run
+            if cls.get_executable():
+                # program is not configured and but is autodetected
+                showProgram = True
+            else:
+                # program is not configured and not autodetected
+                showProgram = False
+            mg_config.get_config_instance()[cls.CONFIG_ENTRY_ACTIVATED] = showProgram
+        else:
+            showProgram = mg_config.get_config_instance().get(cls.CONFIG_ENTRY_ACTIVATED)
+        return showProgram
+
+
+    @classmethod
     def exec_non_blocking(cls, cmd_args: List[str], workdir: str = '', callback: Optional[Callable[[], Any]] = None) -> None:
         '''Run the program with the arguments listed in cmd_args, in the working directory.
         Raises an exception if the command did not return with 0 status.
@@ -212,6 +235,8 @@ class ExecGit(ExecTool):
     SUPPORTED_PLATFORMS = ['win32', 'linux']
 
     WIN32_PATH_CANDIDATES: List[Path] = [
+        Path(os.environ.get("ProgramFiles", '')) / "Git" / "bin",
+        Path(os.environ.get("ProgramFiles", '')) / "Git" / "cmd",
         Path(os.environ.get("ProgramFiles(x86)", '')) / "Git" / "bin",
         Path(os.environ.get("ProgramFiles(x86)", '')) / "Git" / "cmd",
         Path(os.environ.get("PROGRAMW6432", '')) / "Git" / "bin",
@@ -258,6 +283,7 @@ class ExecTortoiseGit(ExecTool):
 
     CONFIG_ENTRY_AUTODETECT = mg_config.CONFIG_TORTOISEGIT_AUTODETECT
     CONFIG_ENTRY_MANUAL_PATH = mg_config.CONFIG_TORTOISEGIT_MANUAL_PATH
+    CONFIG_ENTRY_ACTIVATED = mg_config.CONFIG_TORTOISEGIT_ACTIVATED
 
 
 def shouldShowTortoiseGit() -> bool:
@@ -292,11 +318,7 @@ class ExecSourceTree(ExecTool):
 
     CONFIG_ENTRY_AUTODETECT = mg_config.CONFIG_SOURCETREE_AUTODETECT
     CONFIG_ENTRY_MANUAL_PATH = mg_config.CONFIG_SOURCETREE_MANUAL_PATH
-
-
-def shouldShowSourceTree() -> bool:
-    '''Return whether to show sourcetree menu'''
-    return bool(mg_config.get_config_instance().get(mg_config.CONFIG_SOURCETREE_ACTIVATED))
+    CONFIG_ENTRY_ACTIVATED = mg_config.CONFIG_SOURCETREE_ACTIVATED
 
 
 #######################################################
@@ -318,11 +340,7 @@ class ExecSublimeMerge(ExecTool):
 
     CONFIG_ENTRY_AUTODETECT = mg_config.CONFIG_SUBLIMEMERGE_AUTODETECT
     CONFIG_ENTRY_MANUAL_PATH = mg_config.CONFIG_SUBLIMEMERGE_MANUAL_PATH
-
-
-def shouldShowSublimeMerge() -> bool:
-    return bool(mg_config.get_config_instance().get(mg_config.CONFIG_SUBLIMEMERGE_ACTIVATED))
-
+    CONFIG_ENTRY_ACTIVATED = mg_config.CONFIG_SUBLIMEMERGE_ACTIVATED
 
 
 #######################################################
@@ -333,8 +351,9 @@ class ExecGitBash(ExecTool):
     SUPPORTED_PLATFORMS = ['win32']
 
     WIN32_PATH_CANDIDATES = [
-        Path(os.environ.get("PROGRAMW6432", '')) / "Git",
+        Path(os.environ.get("ProgramFiles", '')) / "Git",
         Path(os.environ.get("ProgramFiles(x86)", '')) / "Git",
+        Path(os.environ.get("PROGRAMW6432", '')) / "Git",
     ]
 
     INNOCUOUS_COMMAND = ['--version']
@@ -343,12 +362,7 @@ class ExecGitBash(ExecTool):
 
     CONFIG_ENTRY_AUTODETECT = mg_config.CONFIG_GITBASH_AUTODETECT
     CONFIG_ENTRY_MANUAL_PATH = mg_config.CONFIG_GITBASH_MANUAL_PATH
-
-
-def shouldShowGitBash() -> bool:
-    if sys.platform == 'win32':
-        return True
-    return False
+    CONFIG_ENTRY_ACTIVATED = mg_config.CONFIG_GITBASH_ACTIVATED
 
 
 #######################################################
@@ -359,17 +373,19 @@ class ExecExplorer(ExecTool):
     SUPPORTED_PLATFORMS = ['win32', 'linux']
 
     # no path candidates, it should be on the execution path
-    WIN32_PATH_CANDIDATES = []
+    WIN32_PATH_CANDIDATES = [
+        Path(os.environ.get("SystemRoot", '')),
+    ]
     LINUX_PATH_CANDIDATES = []
 
-    EXEC_NAME_LINUX = 'explorer.exe'
-    EXEC_NAME_WIN32 = 'xdg-open'
+    EXEC_NAME_WIN32 = 'explorer.exe'
+    EXEC_NAME_LINUX = 'xdg-open'
 
     # name of the configuration entry to store auto-detection behavior
-    CONFIG_ENTRY_AUTODETECT = ''
+    CONFIG_ENTRY_AUTODETECT = mg_config.CONFIG_EXPLORER_AUTODETECT
 
     # name of the configuration entry to store the manual path to the program
-    CONFIG_ENTRY_MANUAL_PATH = ''
+    CONFIG_ENTRY_MANUAL_PATH = mg_config.CONFIG_EXPLORER_MANUAL_PATH
 
 
 #######################################################

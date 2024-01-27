@@ -126,6 +126,7 @@ class MgDialogSettings(QDialog):
             self.ui.lineEditSublimemergeManual.setText(config[mgc.CONFIG_SUBLIMEMERGE_MANUAL_PATH] or '')
             self.ui.lineEditSublimemergeManual.setEnabled(not smerge_auto_detect)
             self.ui.pushButtonSublimemergeManualBrowse.setEnabled(not smerge_auto_detect)
+            self.enableSublimeIfActivated()
         else:
             self.ui.groupBoxSublimemerge.setVisible(False)
 
@@ -213,7 +214,7 @@ class MgDialogSettings(QDialog):
     def slotEditPrefBrowseForExplorer(self) -> None:
         '''Browse for explorer program executable and set the result in the ui dialog'''
         current_st_exe = str(self.ui.lineEditExplorerManual.text())
-        result, _ = QFileDialog.getOpenFileName(self, "Select a directory explorer program", current_st_exe, "")
+        result, _ = QFileDialog.getOpenFileName(self, "Select a directory explorer program", current_st_exe, "*.exe")
         if result:
             self.ui.lineEditExplorerManual.setText(result)
 
@@ -251,7 +252,7 @@ class MgDialogSettings(QDialog):
     def enableGitBashIfActivated(self) -> None:
         enable_gitbash_stuff = self.ui.checkBoxGitBash.isChecked() 
         self.ui.radioGitBashManual.setEnabled(enable_gitbash_stuff)
-        self.ui.radioGitAutoDetect.setEnabled(enable_gitbash_stuff)
+        self.ui.radioGitBashAutoDetect.setEnabled(enable_gitbash_stuff)
 
         enable_manual_widgets = enable_gitbash_stuff and self.ui.radioGitBashManual.isChecked()
         self.ui.lineEditGitBashManual.setEnabled( enable_manual_widgets )
