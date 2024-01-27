@@ -166,14 +166,14 @@ class MgDialogSettings(QDialog):
     def slotSetColorBranch(self) -> None:
         color = QColorDialog.getColor(self.colorBranch)
         if color.isValid():
-            self.self.colorBranch.setNamedColor(color.name())
-            self.updateColorButtons(self)
+            self.colorBranch.setNamedColor(color.name())
+            self.updateColorButtons()
 
     def slotSetColorTag(self) -> None:
         color = QColorDialog.getColor(self.colorTag)
         if color.isValid():
             self.colorTag.setNamedColor(color.name())
-            self.updateColorButtons(self)
+            self.updateColorButtons()
 
 
     ### Second tab stuff
