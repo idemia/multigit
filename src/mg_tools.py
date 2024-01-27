@@ -15,7 +15,7 @@
 #
 
 
-from typing import Sequence, Union, Optional, Callable, Tuple, Any, List
+from typing import Sequence, Union, Optional, Callable, Tuple, Any, List, Dict, Type
 
 import functools, logging, subprocess, sys, os
 from pathlib import Path
@@ -58,7 +58,7 @@ class ExecTool:
     # name of the configuration entry to store the manual path to the program
     CONFIG_ENTRY_MANUAL_PATH: str
 
-    SESSION_CACHE = {
+    SESSION_CACHE: Dict[Type['ExecTool'], str] = {
     }
 
 
@@ -151,8 +151,9 @@ class ExecTool:
 
             find_prog_exec( path_candidates )
         '''
-        print('>>>> find_prog_exec()', cls)
+        dbg(f'find_prog_exec({cls}, {path_candidates})')
         exec_name = cls.get_exec_name()
+        dbg(f'find_prog_exec() - exec_name={exec_name}')
         for possible_path in path_candidates:
             candidate_path = Path(possible_path) / exec_name
             dbg('Looking at: {}'.format(str(candidate_path)))
