@@ -1155,7 +1155,9 @@ class MgRepoInfo(QObject):
         '''
         prog_git = ExecGit.get_executable()
         if prog_git is None or len(prog_git) == 0:
-            raise FileNotFoundError('Can not execute git with empty executable!')
+            QMessageBox.warning(None, 'Could not locate git.exe', 'Warning: could not locate the git.exe program\n' +
+                                'MultiGit needs git to work.\nPlease configure the location in the preference dialog.\n')
+            return ''
         git_cmd = [prog_git, '-C', self.fullpath] + list(args)
         git_exit_code, cmd_out = RunProcess().exec_blocking(git_cmd)
         return cmd_out
@@ -1173,7 +1175,9 @@ class MgRepoInfo(QObject):
         '''
         prog_git = ExecGit.get_executable()
         if prog_git is None or len(prog_git) == 0:
-            raise FileNotFoundError('Can not execute git with empty executable!')
+            QMessageBox.warning(None, 'Could not locate git.exe', 'Warning: could not locate the git.exe program\n' +
+                                'MultiGit needs git to work.\nPlease configure the location in the preference dialog.\n')
+            return
         git_cmd = [prog_git, '-C', self.fullpath] + list(args)
 
         cb_process_done = None
