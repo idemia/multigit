@@ -87,7 +87,7 @@ class MgDialogSettings(QDialog):
 
         if ExecTortoiseGit.platform_supported():
             self.ui.checkBoxTortoiseGit.toggled.connect(self.enableTGitIfAcivated)
-            self.ui.checkBoxTortoiseGit.setChecked(mgc.get_config_instance().get(mgc.CONFIG_TORTOISEGIT_ACTIVATED))
+            self.ui.checkBoxTortoiseGit.setChecked(ExecTortoiseGit.shouldShow())
             tgit_auto_detect = True if config[mgc.CONFIG_TORTOISEGIT_AUTODETECT] is None else config[mgc.CONFIG_TORTOISEGIT_AUTODETECT]
             self.ui.radioTGitAutoDetect.setChecked(tgit_auto_detect)
             self.ui.lineEditTGitAutoDetect.setText(ExecTortoiseGit.autodetect_executable())
@@ -103,7 +103,7 @@ class MgDialogSettings(QDialog):
 
         if ExecSourceTree.platform_supported():
             self.ui.checkBoxSourceTree.toggled.connect(self.enableSTreeIfActivated)
-            self.ui.checkBoxSourceTree.setChecked(bool(mgc.get_config_instance().get(mgc.CONFIG_SOURCETREE_ACTIVATED)))
+            self.ui.checkBoxSourceTree.setChecked(ExecSourceTree.shouldShow())
             stree_auto_detect = True if config[mgc.CONFIG_SOURCETREE_AUTODETECT] is None else config[mgc.CONFIG_SOURCETREE_AUTODETECT]
             self.ui.radioSourcetreeAutoDetect.setChecked(stree_auto_detect)
             self.ui.lineEditSourcetreeAutoDetect.setText(ExecSourceTree.autodetect_executable())
@@ -119,7 +119,7 @@ class MgDialogSettings(QDialog):
 
         if ExecSublimeMerge.platform_supported():
             self.ui.checkBoxSublimeMerge.toggled.connect(self.enableSublimeIfActivated)
-            self.ui.checkBoxSublimeMerge.setChecked(bool(mgc.get_config_instance().get(mgc.CONFIG_SUBLIMEMERGE_ACTIVATED)))
+            self.ui.checkBoxSublimeMerge.setChecked(ExecSublimeMerge.shouldShow())
             smerge_auto_detect = True if config[mgc.CONFIG_SUBLIMEMERGE_AUTODETECT] is None else config[mgc.CONFIG_SUBLIMEMERGE_AUTODETECT]
             self.ui.radioSublimemergeAutoDetect.setChecked(smerge_auto_detect)
             self.ui.lineEditSublimemergeAutoDetect.setText(ExecSublimeMerge.autodetect_executable())
@@ -134,7 +134,7 @@ class MgDialogSettings(QDialog):
 
         if ExecGitBash.platform_supported():
             self.ui.checkBoxGitBash.toggled.connect(self.enableGitBashIfActivated)
-            self.ui.checkBoxGitBash.setChecked(bool(mgc.get_config_instance().get(mgc.CONFIG_GITBASH_ACTIVATED)))
+            self.ui.checkBoxGitBash.setChecked(ExecGitBash.shouldShow())
             gitbash_auto_detect = True if config[mgc.CONFIG_GITBASH_AUTODETECT] is None else config[mgc.CONFIG_GITBASH_AUTODETECT]
             self.ui.radioGitBashAutoDetect.setChecked(gitbash_auto_detect)
             self.ui.lineEditGitBashAutoDetect.setText(ExecGitBash.autodetect_executable())
@@ -150,7 +150,7 @@ class MgDialogSettings(QDialog):
 
         if ExecGitGui.platform_supported():
             self.ui.checkBoxGitGui.toggled.connect(self.enableGitGuiIfActivated)
-            self.ui.checkBoxGitGui.setChecked(bool(mgc.get_config_instance().get(mgc.CONFIG_GITGUI_ACTIVATED)))
+            self.ui.checkBoxGitGui.setChecked(ExecGitGui.shouldShow())
             gitgui_auto_detect = True if config[mgc.CONFIG_GITGUI_AUTODETECT] is None else config[mgc.CONFIG_GITGUI_AUTODETECT]
             self.ui.radioGitGuiAutoDetect.setChecked(gitgui_auto_detect)
             self.ui.lineEditGitGuiAutoDetect.setText(ExecGitGui.autodetect_executable())
@@ -166,7 +166,7 @@ class MgDialogSettings(QDialog):
 
         if ExecGitK.platform_supported():
             self.ui.checkBoxGitK.toggled.connect(self.enableGitKIfActivated)
-            self.ui.checkBoxGitK.setChecked(bool(mgc.get_config_instance().get(mgc.CONFIG_GITK_ACTIVATED)))
+            self.ui.checkBoxGitK.setChecked(ExecGitK.shouldShow())
             gitk_auto_detect = True if config[mgc.CONFIG_GITK_AUTODETECT] is None else config[mgc.CONFIG_GITK_AUTODETECT]
             self.ui.radioGitKAutoDetect.setChecked(gitk_auto_detect)
             self.ui.lineEditGitKAutoDetect.setText(ExecGitK.autodetect_executable())

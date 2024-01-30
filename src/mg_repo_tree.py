@@ -24,7 +24,7 @@ from PySide2.QtCore import Qt, QPoint
 
 from src.mg_const import COL_UPDATE, COL_REPO_NAME, COL_NB, COL_TITLES, COL_SHA1, DoubleClickActions, COL_URL
 from src import mg_config as mgc
-from src.mg_tools import ExecTortoiseGit, ExecGitBash, ExecSourceTree, ExecSublimeMerge
+from src.mg_tools import ExecTortoiseGit, ExecGitBash, ExecSourceTree, ExecSublimeMerge, ExecGitGui, ExecGitK, ExecGit
 from src.mg_repo_info import MgRepoInfo
 from src.mg_repo_tree_item import MgRepoTreeItem
 from src.mg_exec_window import MgExecWindow
@@ -167,6 +167,8 @@ class MgRepoTree(QTreeWidget):
         # Menu Git programs
         self.mgActions.actionSourceTree.triggered.connect(self.slotSourcetree)
         self.mgActions.actionSublimeMerge.triggered.connect(self.slotSublimemerge)
+        self.mgActions.actionGitGui.triggered.connect(self.slotGitGui)
+        self.mgActions.actionGitK.triggered.connect(self.slotGitK)
 
         self.mgActions.actionTGitShowLog  .triggered.connect(self.slotTGitShowLog)
         self.mgActions.actionTGitCommit   .triggered.connect(self.slotTGitCommit)
@@ -695,6 +697,23 @@ class MgRepoTree(QTreeWidget):
             self.mgActions.actionSourceTree.setEnabled(False)
 
 
+    def slotGitGui(self) -> None:
+        '''Run git Gui on the current repos'''
+        dbg('slotGitGui')
+        if not self.confirmIfNoOrTooManySelectedItems('Git GUI'):
+            return
+
+        try:
+            for item in self.selectedRepoItems():
+                repo = item.repoInfo
+                # allow errors needed because git-gui never returns 0
+                ExecGitGui.exec_non_blocking([], workdir=str(repo.fullpath), allow_errors=True, callback=repo.refresh)
+        except FileNotFoundError:
+            QMessageBox.warning(self, 'Unable to execute Git GUI', 'Warning: could not locate the git-gui.exe program.\n' +
+                                'Can not execute any git-gui command..\nPlease configure the location in the settings dialog.\n')
+            self.mgActions.actionGitGui.setEnabled(False)
+
+
     def slotSublimemerge(self) -> None:
         '''Run SublimeMewrge on the current repos'''
         dbg('slotSublimemerge')
@@ -709,6 +728,23 @@ class MgRepoTree(QTreeWidget):
             # TortoiseGit was not located
             QMessageBox.warning(self, 'Unable to execute SublimeMerge', 'Warning: could not locate the SublimeMerge.exe program.\n' +
                                 'Can not execute any SublimeMerge command..\nPlease configure the location in the settings dialog.\n')
+            self.mgActions.actionSublimeMerge.setEnabled(False)
+
+
+    def slotGitK(self) -> None:
+        '''Run GitK on the current repos'''
+        dbg('slotGitK')
+        if not self.confirmIfNoOrTooManySelectedItems('GitK'):
+            return
+
+        try:
+            for item in self.selectedRepoItems():
+                repo = item.repoInfo
+                # ExecGitK.exec_non_blocking([], workdir=str(repo.fullpath), callback=repo.refresh)
+                ExecGitK.exec_non_blocking([], workdir=str(repo.fullpath), allow_errors=True,callback=repo.refresh)
+        except FileNotFoundError:
+            QMessageBox.warning(self, 'Unable to execute GitK', 'Warning: could not locate the gitk.exe program.\n' +
+                                'Can not execute any GitK command..\nPlease configure the location in the settings dialog.\n')
             self.mgActions.actionSublimeMerge.setEnabled(False)
 
 

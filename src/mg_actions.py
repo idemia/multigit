@@ -24,7 +24,7 @@ from PySide2.QtGui import QIcon, QPixmap, QTransform
 from PySide2.QtWidgets import QAction, QMenu, QWidget
 
 from src.mg_const import SHORT_SHA1_NB_DIGITS
-from src.mg_tools import ExecSublimeMerge, ExecTortoiseGit, ExecSourceTree, ExecGitBash
+from src.mg_tools import ExecSublimeMerge, ExecTortoiseGit, ExecSourceTree, ExecGitBash, ExecGitGui, ExecGitK
 from src.mg_repo_info import MgRepoInfo
 
 logger = logging.getLogger('mg_actions')
@@ -186,6 +186,16 @@ class MgActions(QObject):
         self.actionSourceTree.setIcon(QIcon(":/img/sourcetree.ico"))
         self.actionSourceTree.setToolTip('Open a SourceTree tab for each repository')
 
+        self.actionGitGui = QAction(self)
+        self.actionGitGui.setText("Run Git GUI")
+        # self.actionGitGui.setIcon(QIcon(":/img/sourcetree.ico"))
+        self.actionGitGui.setToolTip('Open a git GUI tab for each repository')
+
+        self.actionGitK = QAction(self)
+        self.actionGitK.setText("Run GitK")
+        # self.actionGitK.setIcon(QIcon(":/img/sourcetree.ico"))
+        self.actionGitK.setToolTip('Open a GitK tab for each repository')
+
         ######## TortoiseGit actions ##########
 
         self.actionTGitShowLog = QAction(self)
@@ -291,6 +301,8 @@ class MgActions(QObject):
         '''Install more actions in the GitPrograms menu'''
         menuGitPrograms.addAction(self.actionSourceTree)
         menuGitPrograms.addAction(self.actionSublimeMerge)
+        menuGitPrograms.addAction(self.actionGitGui)
+        menuGitPrograms.addAction(self.actionGitK)
         self.menuTGit = menuGitPrograms.addMenu("Tortoise Git")
         self.menuTGit.setIcon(QIcon(":/img/tgit_tortoise.ico"))
         self.setupMenuTortoiseGit(self.menuTGit)
@@ -319,18 +331,21 @@ class MgActions(QObject):
         showSourceTree = ExecSourceTree.shouldShow()
         showSublimeMerge = ExecSublimeMerge.shouldShow()
         showGitBash = ExecGitBash.shouldShow()
+        showGitGui = ExecGitGui.shouldShow()
+        showGitK = ExecGitK.shouldShow()
 
         # fix menu actions
         self.actionSourceTree.setVisible(showSourceTree)
         self.actionSublimeMerge.setVisible(showSublimeMerge)
+        self.actionGitBash.setVisible(showGitBash)
+        self.actionGitGui.setVisible(showGitGui)
+        self.actionGitK.setVisible(showGitK)
         self.menuTGit.menuAction().setVisible(showTortoiseGit)
 
-        if showTortoiseGit or showSourceTree or showSublimeMerge:
+        if showTortoiseGit or showSourceTree or showSublimeMerge or showGitGui or showGitK:
             self.actionConfigureGitProgram.setVisible(False)
         else:
             self.actionConfigureGitProgram.setVisible(True)
-
-        self.actionGitBash.setVisible(showGitBash)
 
 
     def setupDynamicMenuCopy(self, repoInfo: MgRepoInfo) -> None:

@@ -191,9 +191,9 @@ class ExecTool:
 
 
     @classmethod
-    def exec_non_blocking(cls, cmd_args: List[str], workdir: str = '', callback: Optional[Callable[[], Any]] = None) -> None:
+    def exec_non_blocking(cls, cmd_args: List[str], workdir: str = '', allow_errors: bool = False, callback: Optional[Callable[[], Any]] = None) -> None:
         '''Run the program with the arguments listed in cmd_args, in the working directory.
-        Raises an exception if the command did not return with 0 status.
+        Raises an exception if the command did not return with 0 status and allow_errors is False.
         '''
         prog_to_run = cls.get_executable()
         if prog_to_run == '':
@@ -207,7 +207,7 @@ class ExecTool:
 
         rp = RunProcess()
         cmdline = [prog_to_run] + cmd_args
-        rp.exec_async(cmdline=cmdline, cb_done=cb_done, working_dir=workdir)
+        rp.exec_async(cmdline=cmdline, cb_done=cb_done, working_dir=workdir, allow_errors=allow_errors)
 
 
     @classmethod
@@ -574,7 +574,8 @@ class RunProcess(QObject):
 
     def exec_async(self, cmdline: Sequence[str],
                    cb_done: Optional[Callable[[int, str], Any]],
-                   force_blocking: bool = False, allow_errors: bool = False,
+                   force_blocking: bool = False,
+                   allow_errors: bool = False,
                    working_dir: str = '',
                    emit_output: bool = False) -> None:
         '''Execute a git command asynchronously and calls cb_git_done() when the command completes.

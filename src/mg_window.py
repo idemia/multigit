@@ -230,6 +230,8 @@ class MgMainWindow(QMainWindow, Ui_MainWindow):
         # Menu Git programs
         self.mgActions.actionSourceTree.triggered.connect(self.dispatchToActiveTreeOfMultigitTab('slotSourcetree'))
         self.mgActions.actionSublimeMerge.triggered.connect(self.dispatchToActiveTreeOfMultigitTab('slotSublimemerge'))
+        self.mgActions.actionGitGui.triggered.connect(self.dispatchToActiveTreeOfMultigitTab('slotGitGui'))
+        self.mgActions.actionGitK.triggered.connect(self.dispatchToActiveTreeOfMultigitTab('slotGitK'))
 
         self.mgActions.actionTGitShowLog  .triggered.connect(self.dispatchToActiveTreeOfMultigitTab('slotTGitShowLog'))
         self.mgActions.actionTGitCommit   .triggered.connect(self.dispatchToActiveTreeOfMultigitTab('slotTGitCommit'))
