@@ -568,7 +568,7 @@ class MgRepoTree(QTreeWidget):
             for item in self.selectedRepoItems():
                 repo = item.repoInfo
                 # after git bash, we also want to refresh the URL
-                ExecGitBash.exec_non_blocking([repo.fullpath], callback=repo.deepRefresh)
+                ExecGitBash.exec_non_blocking([], workdir=repo.fullpath, callback=repo.deepRefresh)
         except FileNotFoundError:
             # Git Bash was not located
             QMessageBox.warning(self, 'Unable to execute Git Bash', 'Warning: could not locate the git-bash.exe program.\n' +
