@@ -24,7 +24,7 @@ from PySide2.QtCore import Qt, QPoint
 
 from src.mg_const import COL_UPDATE, COL_REPO_NAME, COL_NB, COL_TITLES, COL_SHA1, DoubleClickActions, COL_URL
 from src import mg_config as mgc
-from src.mg_tools import ExecTortoiseGit, ExecGitBash, ExecSourceTree, ExecSublimeMerge, ExecGitGui, ExecGitK, ExecGit
+from src.mg_tools import ExecTortoiseGit, ExecGitBash, ExecSourceTree, ExecSublimeMerge, ExecGit, ExecGitK
 from src.mg_repo_info import MgRepoInfo
 from src.mg_repo_tree_item import MgRepoTreeItem
 from src.mg_exec_window import MgExecWindow
@@ -707,7 +707,7 @@ class MgRepoTree(QTreeWidget):
             for item in self.selectedRepoItems():
                 repo = item.repoInfo
                 # allow errors needed because git-gui never returns 0
-                ExecGitGui.exec_non_blocking([], workdir=str(repo.fullpath), allow_errors=True, callback=repo.refresh)
+                ExecGit.exec_non_blocking(['gui'], workdir=str(repo.fullpath), allow_errors=True, callback=repo.refresh)
         except FileNotFoundError:
             QMessageBox.warning(self, 'Unable to execute Git GUI', 'Warning: could not locate the git-gui.exe program.\n' +
                                 'Can not execute any git-gui command..\nPlease configure the location in the settings dialog.\n')

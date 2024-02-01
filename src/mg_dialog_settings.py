@@ -77,6 +77,7 @@ class MgDialogSettings(QDialog):
         ### Second tab stuff
         git_auto_detect = (True if config[mgc.CONFIG_GIT_AUTODETECT] is None
                            else config[mgc.CONFIG_GIT_AUTODETECT])
+        self.ui.labelExecGitChoose.setText(f'Choose {ExecGit.get_exec_name()} executable location')
         self.ui.radioGitAutoDetect.setChecked(git_auto_detect)
         self.ui.lineEditGitAutoDetect.setText(ExecGit.autodetect_executable())
         self.ui.radioGitManual.setChecked(not git_auto_detect)
@@ -118,6 +119,7 @@ class MgDialogSettings(QDialog):
 
 
         if ExecSublimeMerge.platform_supported():
+            self.ui.labelExecSublimemergeChoose.setText(f'Choose {ExecSublimeMerge.get_exec_name()} executable location')
             self.ui.checkBoxSublimeMerge.toggled.connect(self.enableSublimeIfActivated)
             self.ui.checkBoxSublimeMerge.setChecked(ExecSublimeMerge.shouldShow())
             smerge_auto_detect = True if config[mgc.CONFIG_SUBLIMEMERGE_AUTODETECT] is None else config[mgc.CONFIG_SUBLIMEMERGE_AUTODETECT]
@@ -127,6 +129,7 @@ class MgDialogSettings(QDialog):
             self.ui.lineEditSublimemergeManual.setText(config[mgc.CONFIG_SUBLIMEMERGE_MANUAL_PATH] or '')
             self.ui.lineEditSublimemergeManual.setEnabled(not smerge_auto_detect)
             self.ui.pushButtonSublimemergeManualBrowse.setEnabled(not smerge_auto_detect)
+            self.ui.pushButtonSublimemergeManualBrowse.clicked.connect(self.slotEditPrefBrowseForSublime)
             self.enableSublimeIfActivated()
         else:
             self.ui.groupBoxSublimemerge.setVisible(False)
@@ -149,22 +152,13 @@ class MgDialogSettings(QDialog):
 
 
         if ExecGitGui.platform_supported():
-            self.ui.checkBoxGitGui.toggled.connect(self.enableGitGuiIfActivated)
             self.ui.checkBoxGitGui.setChecked(ExecGitGui.shouldShow())
-            gitgui_auto_detect = True if config[mgc.CONFIG_GITGUI_AUTODETECT] is None else config[mgc.CONFIG_GITGUI_AUTODETECT]
-            self.ui.radioGitGuiAutoDetect.setChecked(gitgui_auto_detect)
-            self.ui.lineEditGitGuiAutoDetect.setText(ExecGitGui.autodetect_executable())
-            self.ui.radioGitGuiManual.setChecked(not gitgui_auto_detect)
-            self.ui.lineEditGitGuiManual.setText(config[mgc.CONFIG_GITGUI_MANUAL_PATH] or '')
-            self.ui.lineEditGitGuiManual.setEnabled(not gitgui_auto_detect)
-            self.ui.pushButtonGitGuiManualBrowse.setEnabled(not gitgui_auto_detect)
-            self.ui.pushButtonGitGuiManualBrowse.clicked.connect(self.slotEditPrefBrowseForGitGui)
-            self.enableGitGuiIfActivated()
         else:
-            self.ui.groupBoxGitBash.setVisible(False)
+            self.ui.groupBoxGitGui.setVisible(False)
 
 
         if ExecGitK.platform_supported():
+            self.ui.labelExecGitkChoose.setText(f'Choose {ExecGitK.get_exec_name()} executable location')
             self.ui.checkBoxGitK.toggled.connect(self.enableGitKIfActivated)
             self.ui.checkBoxGitK.setChecked(ExecGitK.shouldShow())
             gitk_auto_detect = True if config[mgc.CONFIG_GITK_AUTODETECT] is None else config[mgc.CONFIG_GITK_AUTODETECT]
@@ -216,7 +210,7 @@ class MgDialogSettings(QDialog):
     def slotEditPrefBrowseForGit(self) -> None:
         '''Browse for git executable and set the result in the ui dialog'''
         current_git_exe = str(self.ui.lineEditGitManual.text())
-        result, _ = QFileDialog.getOpenFileName(self, "Select Git Executable", current_git_exe, "git.exe")
+        result, _ = QFileDialog.getOpenFileName(self, "Select Git Executable", current_git_exe, ExecGit.get_exec_name())
         if result:
             self.ui.lineEditGitManual.setText(result)
 
@@ -237,6 +231,14 @@ class MgDialogSettings(QDialog):
             self.ui.lineEditSourcetreeManual.setText(result)
 
 
+    def slotEditPrefBrowseForSublime(self) -> None:
+        '''Browse for SublimeMerge executable and set the result in the ui dialog'''
+        current_exe = str(self.ui.lineEditSublimemergeManual.text())
+        result, _ = QFileDialog.getOpenFileName(self, "Select SublimeMerge Executable", current_exe, ExecSublimeMerge.get_exec_name())
+        if result:
+            self.ui.lineEditSublimemergeManual.setText(result)
+
+
     def slotEditPrefBrowseForGitBash(self) -> None:
         '''Browse for git-bash executable and set the result in the ui dialog'''
         current_exe = str(self.ui.lineEditGitBashManual.text())
@@ -245,18 +247,10 @@ class MgDialogSettings(QDialog):
             self.ui.lineEditGitBashManual.setText(result)
 
 
-    def slotEditPrefBrowseForGitGui(self) -> None:
-        '''Browse for git-gui executable and set the result in the ui dialog'''
-        current_exe = str(self.ui.lineEditGitGuiManual.text())
-        result, _ = QFileDialog.getOpenFileName(self, "Select git-gui Executable", current_exe, "git-gui.exe")
-        if result:
-            self.ui.lineEditGitGuiManual.setText(result)
-
-
     def slotEditPrefBrowseForGitK(self) -> None:
         '''Browse for gitk executable and set the result in the ui dialog'''
         current_exe = str(self.ui.lineEditGitKManual.text())
-        result, _ = QFileDialog.getOpenFileName(self, "Select gitk Executable", current_exe, "gitk.exe")
+        result, _ = QFileDialog.getOpenFileName(self, "Select gitk Executable", current_exe, ExecGitK.get_exec_name())
         if result:
             self.ui.lineEditGitKManual.setText(result)
 
@@ -309,14 +303,6 @@ class MgDialogSettings(QDialog):
         self.ui.pushButtonGitBashManualBrowse.setEnabled( enable_manual_widgets )
 
 
-    def enableGitGuiIfActivated(self) -> None:
-        enable_stuff = self.ui.checkBoxGitGui.isChecked() 
-        self.ui.radioGitGuiManual.setEnabled(enable_stuff)
-        self.ui.radioGitGuiAutoDetect.setEnabled(enable_stuff)
-
-        enable_manual_widgets = enable_stuff and self.ui.radioGitGuiManual.isChecked()
-        self.ui.lineEditGitGuiManual.setEnabled( enable_manual_widgets )
-        self.ui.pushButtonGitGuiManualBrowse.setEnabled( enable_manual_widgets )
 
 
     def enableGitKIfActivated(self) -> None:
