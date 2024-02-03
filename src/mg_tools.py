@@ -275,8 +275,9 @@ class ExecTortoiseGit(ExecTool):
     SUPPORTED_PLATFORMS = ['win32']
 
     WIN32_PATH_CANDIDATES = [
-        Path(os.environ.get("ProgramFiles(x86)", ''))/"TortoiseGit"/"bin",
-        Path(os.environ.get("PROGRAMW6432", ''))/"TortoiseGit"/"bin",
+        Path(os.environ.get("ProgramFiles(x86)", '')) / "TortoiseGit"/"bin",
+        Path(os.environ.get("PROGRAMW6432", '')) / "TortoiseGit"/"bin",
+        Path(os.environ.get("ProgramFiles", '')) / "TortoiseGit"/"bin",
     ]
 
     EXEC_NAME_WIN32 = "TortoiseGitProc.exe"
@@ -295,6 +296,8 @@ class ExecSourceTree(ExecTool):
 
     WIN32_PATH_CANDIDATES = [
         Path(os.environ.get("ProgramFiles(x86)", '')) / "Atlassian" / "SourceTree",
+        Path(os.environ.get("PROGRAMW6432", '')) / "Atlassian" / "SourceTree",
+        Path(os.environ.get("ProgramFiles", '')) / "Atlassian" / "SourceTree",
     ]
 
     EXEC_NAME_WIN32 = "SourceTree.exe"
@@ -312,6 +315,7 @@ class ExecSublimeMerge(ExecTool):
     SUPPORTED_PLATFORMS = ['win32', 'linux']
 
     WIN32_PATH_CANDIDATES = [
+        Path(os.environ.get("ProgramFiles", '')) / "Sublime Merge",
         Path(os.environ.get("PROGRAMW6432", '')) / "Sublime Merge",
     ]
     LINUX_PATH_CANDIDATES = [
