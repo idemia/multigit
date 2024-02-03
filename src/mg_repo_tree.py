@@ -24,7 +24,7 @@ from PySide2.QtCore import Qt, QPoint
 
 from src.mg_const import COL_UPDATE, COL_REPO_NAME, COL_NB, COL_TITLES, COL_SHA1, DoubleClickActions, COL_URL
 from src import mg_config as mgc
-from src.mg_tools import ExecTortoiseGit, ExecGitBash, ExecSourceTree, ExecSublimeMerge, ExecGit, ExecGitK
+from src.mg_tools import ExecTortoiseGit, ExecGitBash, ExecSourceTree, ExecSublimeMerge, ExecGit, ExecGitK, ExecExplorer
 from src.mg_repo_info import MgRepoInfo
 from src.mg_repo_tree_item import MgRepoTreeItem
 from src.mg_exec_window import MgExecWindow
@@ -402,10 +402,11 @@ class MgRepoTree(QTreeWidget):
         if not self.confirmIfNoOrTooManySelectedItems('Explorer'):
             return
 
+        if not ExecExplorer.checkFound():
+            return
+
         for it in self.selectedRepoItems():
-            cmdline = ['explorer', it.repoInfo.fullpath]
-            dbg('Executing: %s' % str(cmdline))
-            subprocess.Popen(cmdline)
+            ExecExplorer.exec_non_blocking([it.repoInfo.fullpath])
 
 
     ##########################################################################

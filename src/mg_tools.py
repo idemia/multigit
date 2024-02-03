@@ -414,6 +414,30 @@ class ExecExplorer(ExecTool):
     # name of the configuration entry to store the manual path to the program
     CONFIG_ENTRY_MANUAL_PATH = mg_config.CONFIG_EXPLORER_MANUAL_PATH
 
+    @classmethod
+    def checkFound(cls) -> bool:
+        '''If the explorer program is not found, display an error dialog and return False.
+
+        Else, simply return True
+        '''
+        if cls.get_executable() == '':
+            QMessageBox.warning(None, 'Could not find the explorer program',
+                                'Could not find a program to open directories. Please choose one in the File/Settings dialog.')
+            return False
+
+        return True
+
+    @classmethod
+    def exec_non_blocking(cls, cmd_args: List[str], workdir: str = '', allow_errors: Optional[bool] = None, callback: Optional[Callable[[], Any]] = None) -> None:
+        '''Same as default exec_non_blocking but defaults to allow_errors for Windows'''
+        if allow_errors == None:
+            if sys.platform == 'win32':
+                # on Windows, launching the explorer returns -1
+                allow_errors = True
+            else:
+                allow_errors = False
+        return super().exec_non_blocking(cmd_args, workdir, allow_errors, callback)
+
 
 #######################################################
 #       GitProcess class

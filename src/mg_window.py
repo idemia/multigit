@@ -35,7 +35,7 @@ from src.mg_plugin_mgr import pluginMgrInstance
 from src.mg_multigit_widget import MgMultigitWidget
 from src.mg_repo_tree_item import MgRepoTreeItem
 from src.mg_repo_tree import MgRepoTree
-from src.mg_tools import git_exec
+from src.mg_tools import git_exec, ExecExplorer
 from src.mg_dialog_settings import runDialogEditSettings
 from src.mg_exec_window import MgExecWindow
 from src import mg_config as mgc
@@ -459,7 +459,10 @@ class MgMainWindow(QMainWindow, Ui_MainWindow):
         path_log_file = mg_const.PATH_LOG_NORMAL or mg_const.PATH_LOG_DEBUG
         assert path_log_file is not None
         path_log_dir = str(path_log_file.parent)
-        subprocess.Popen(['explorer', path_log_dir])
+
+        if not ExecExplorer.checkFound():
+            return
+        ExecExplorer.exec_non_blocking([path_log_dir])
 
 
     ##########################################################################
