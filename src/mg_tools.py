@@ -270,16 +270,6 @@ class ExecGit(ExecTool):
         return True
 
 
-def git_exec(*args: str, gitdir: Union[str, Path] = '', allow_errors: bool = False) -> str:
-    '''Run git with the arguments passed in *args and return the stdout of the command.
-    Raises an exception if the command did not return with 0 status.
-    '''
-    if gitdir:
-        args = tuple([ '-C', str(gitdir) ] + list(args))
-
-    return ExecGit.exec_blocking(args, '', allow_errors)
-
-
 #######################################################
 #       TortoiseGit Stuff
 #######################################################
@@ -436,10 +426,10 @@ class ExecExplorer(ExecTool):
         if allow_errors == None:
             if sys.platform == 'win32':
                 # on Windows, launching the explorer returns -1
-                allow_errors = True
+                override_allow_errors = True
             else:
-                allow_errors = False
-        return super().exec_non_blocking(cmd_args, workdir, allow_errors, callback)
+                override_allow_errors = False
+        return super().exec_non_blocking(cmd_args, workdir, override_allow_errors, callback)
 
 
 #######################################################
