@@ -353,8 +353,6 @@ def runDialogEditSettings(parent: QWidget, tabPage: Union[Literal[0], Literal[1]
     config[mgc.CONFIG_GITBASH_AUTODETECT] = dlg.ui.radioGitBashAutoDetect.isChecked()
     config[mgc.CONFIG_GITBASH_MANUAL_PATH] = dlg.ui.lineEditGitBashManual.text()
     config[mgc.CONFIG_GITGUI_ACTIVATED] = dlg.ui.checkBoxGitGui.isChecked()
-    config[mgc.CONFIG_GITGUI_AUTODETECT] = dlg.ui.radioGitGuiAutoDetect.isChecked()
-    config[mgc.CONFIG_GITGUI_MANUAL_PATH] = dlg.ui.lineEditGitGuiManual.text()
     config[mgc.CONFIG_GITK_ACTIVATED] = dlg.ui.checkBoxGitK.isChecked()
     config[mgc.CONFIG_GITK_AUTODETECT] = dlg.ui.radioGitKAutoDetect.isChecked()
     config[mgc.CONFIG_GITK_MANUAL_PATH] = dlg.ui.lineEditGitKManual.text()
