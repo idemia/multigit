@@ -286,23 +286,6 @@ class ExecTortoiseGit(ExecTool):
     CONFIG_ENTRY_ACTIVATED = mg_config.CONFIG_TORTOISEGIT_ACTIVATED
 
 
-def shouldShowTortoiseGit() -> bool:
-    '''Return whether to show the TortoiseGit menu according to configuration'''
-    if mg_config.get_config_instance().get(mg_config.CONFIG_TORTOISEGIT_ACTIVATED) is None:
-        # configuration entry does not exist, this is our first run
-        if ExecTortoiseGit.get_executable():
-            # tortoise git is not configured and not autodetected
-            showTortoiseGit = False
-        else:
-            # tortoise git is not configured and but is autodetected
-            # since this is our default tool, always show it when detected
-            showTortoiseGit = True
-        mg_config.get_config_instance()[mg_config.CONFIG_TORTOISEGIT_ACTIVATED] = showTortoiseGit
-    else:
-        showTortoiseGit = mg_config.get_config_instance().get(mg_config.CONFIG_TORTOISEGIT_ACTIVATED)
-    return showTortoiseGit
-
-
 #######################################################
 #       SourceTree stuff
 #######################################################
