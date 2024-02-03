@@ -35,7 +35,7 @@ from src.mg_plugin_mgr import pluginMgrInstance
 from src.mg_multigit_widget import MgMultigitWidget
 from src.mg_repo_tree_item import MgRepoTreeItem
 from src.mg_repo_tree import MgRepoTree
-from src.mg_tools import git_exec, ExecExplorer
+from src.mg_tools import ExecExplorer, ExecGit
 from src.mg_dialog_settings import runDialogEditSettings
 from src.mg_exec_window import MgExecWindow
 from src import mg_config as mgc
@@ -287,18 +287,7 @@ class MgMainWindow(QMainWindow, Ui_MainWindow):
 
     def checkGitOkAndOpenDefaultRepo(self) -> None:
         '''Check performed on first launch of the UI, to verify that Git is working.'''
-        try:
-            git_exec('--version', allow_errors=True)
-            self.gitIsOk = True
-            # git OK
-
-        except (ValueError, FileNotFoundError):
-            QMessageBox.warning(self, 'Could not locate git.exe', 'Warning: could not locate the git.exe program\n' +
-                                'MultiGit needs git to work.\nPlease configure the location in the preference dialog.\n')
-            self.slotEditSettingsGitProgram()
-        except subprocess.CalledProcessError as exc:
-            QMessageBox.warning(self, 'Could not execute git.exe', 'Error: could not execute git.exe\n{}'.format(exc) +
-                                '\nMultiGit needs git to work.\nPlease configure the location in the preference dialog.\n')
+        if not ExecGit.checkFound():
             self.slotEditSettingsGitProgram()
 
         # Open repositories passed as arguments

@@ -256,6 +256,19 @@ class ExecGit(ExecTool):
     CONFIG_ENTRY_AUTODETECT = mg_config.CONFIG_GIT_AUTODETECT
     CONFIG_ENTRY_MANUAL_PATH = mg_config.CONFIG_GIT_MANUAL_PATH
 
+    @classmethod
+    def checkFound(cls) -> bool:
+        '''If the explorer program is not found, display an error dialog and return False.
+
+        Else, simply return True
+        '''
+        if cls.get_executable() == '':
+            QMessageBox.warning(None, 'Could not execute git', 'Error: could not execute git\n'
+                                '\nMultiGit needs git to work.\nPlease configure the location in the preference dialog.\n')
+            return False
+
+        return True
+
 
 def git_exec(*args: str, gitdir: Union[str, Path] = '', allow_errors: bool = False) -> str:
     '''Run git with the arguments passed in *args and return the stdout of the command.

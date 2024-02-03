@@ -1153,14 +1153,11 @@ class MgRepoInfo(QObject):
 
         May raise subprocess.CalledProcessError() if git does not exit with 0
         '''
-        prog_git = ExecGit.get_executable()
-        if prog_git is None or len(prog_git) == 0:
-            QMessageBox.warning(None, 'Could not locate git.exe', 'Warning: could not locate the git.exe program\n' +
-                                'MultiGit needs git to work.\nPlease configure the location in the preference dialog.\n')
+        if not ExecGit.checkFound():
             return ''
-        git_cmd = [prog_git, '-C', self.fullpath] + list(args)
-        git_exit_code, cmd_out = RunProcess().exec_blocking(git_cmd)
-        return cmd_out
+
+        git_cmd = ['-C', self.fullpath] + list(args)
+        return ExecGit.exec_blocking(git_cmd)
 
 
     def git_exec_async_here(self, args: Sequence[str], cb_git_done: Optional[Callable[[str, int, str], Any]],
@@ -1173,12 +1170,10 @@ class MgRepoInfo(QObject):
         if allow_errors is False, a message box is displayed if git returns an exit code different than 0. If you
         have your own handling of git errors, set allow_errors to True.
         '''
-        prog_git = ExecGit.get_executable()
-        if prog_git is None or len(prog_git) == 0:
-            QMessageBox.warning(None, 'Could not locate git.exe', 'Warning: could not locate the git.exe program\n' +
-                                'MultiGit needs git to work.\nPlease configure the location in the preference dialog.\n')
+        if not ExecGit.checkFound():
             return
-        git_cmd = [prog_git, '-C', self.fullpath] + list(args)
+
+        git_cmd = [ExecGit.get_executable(), '-C', self.fullpath] + list(args)
 
         cb_process_done = None
         if cb_git_done:
