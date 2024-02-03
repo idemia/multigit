@@ -23,7 +23,7 @@ import os
 
 from multigit import init_logging
 import src.mg_tools
-from src.mg_tools import git_exec
+from src.mg_tools import ExecGit
 from src.mg_const import MSG_EMPTY_REPO, MSG_NO_COMMIT, MSG_LOCAL_BRANCH, MSG_REMOTE_SYNCHRO_OK, SHORT_SHA1_NB_DIGITS
 from src.mg_repo_info import MgRepoInfo, MultiRepo
 
@@ -43,6 +43,17 @@ RepoInfoTuple = collections.namedtuple('RepoInfoTuple',
                    ["name", "head", "branch", "tag", "remote_branch", "status", "fullpath",
                     "last_commit", "remote_synchro", "tags", "branches_local", "branches_remote"],
                        defaults=["", "", "", "", "", "", "", "", "", None, (), ()])
+
+
+def git_exec(*args: str, gitdir: Union[str, pathlib.Path] = '', allow_errors: bool = False) -> str:
+    '''Run git with the arguments passed in *args and return the stdout of the command.
+    Raises an exception if the command did not return with 0 status.
+    '''
+    if gitdir:
+        args = tuple([ '-C', str(gitdir) ] + list(args))
+
+    return ExecGit.exec_blocking(args, '', allow_errors)
+
 
 def rmtree_failsafe(p: Union[str, pathlib.Path]) -> None:
     # print('rmtree_failsafe(%s)' % p)
