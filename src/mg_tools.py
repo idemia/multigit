@@ -365,6 +365,12 @@ class ExecGitGui(ExecTool):
     CONFIG_ENTRY_ACTIVATED = mg_config.CONFIG_GITGUI_ACTIVATED
 
 
+    @classmethod
+    def shouldShow(cls) -> bool:
+        '''Overtide to avoid autoddtection mechanism'''
+        return True
+
+
 #######################################################
 #       Gitk stuff
 #######################################################
