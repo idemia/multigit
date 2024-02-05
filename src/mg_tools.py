@@ -368,7 +368,12 @@ class ExecGitGui(ExecTool):
         Path(os.environ.get("PROGRAMW6432", '')) / "Git" / "cmd",
         ]
 
+    LINUX_PATH_CANDIDATES = [
+        Path('/usr/lib/git-core'),  # Ubuntu
+    ]
+
     EXEC_NAME_WIN32 = "git-gui.exe"
+    EXEC_NAME_LINUX = "git-gui"
 
     CONFIG_ENTRY_AUTODETECT = mg_config.CONFIG_GITGUI_AUTODETECT
     CONFIG_ENTRY_MANUAL_PATH = mg_config.CONFIG_GITGUI_MANUAL_PATH
@@ -388,7 +393,12 @@ class ExecGitK(ExecTool):
         Path(os.environ.get("PROGRAMW6432", '')) / "Git" / "cmd",
     ]
 
+    LINUX_PATH_CANDIDATES = [
+        Path('/usr/bin'),  # Ubuntu
+    ]
+
     EXEC_NAME_WIN32 = "gitk.exe"
+    EXEC_NAME_LINUX = "gitk"
 
     CONFIG_ENTRY_AUTODETECT = mg_config.CONFIG_GITK_AUTODETECT
     CONFIG_ENTRY_MANUAL_PATH = mg_config.CONFIG_GITK_MANUAL_PATH
