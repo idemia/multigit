@@ -152,7 +152,17 @@ class MgDialogSettings(QDialog):
 
 
         if ExecGitGui.platform_supported():
+            self.ui.checkBoxGitGui.toggled.connect(self.enableGitGuiIfActivated)
             self.ui.checkBoxGitGui.setChecked(ExecGitGui.shouldShow())
+            gitgui_auto_detect = True if config[mgc.CONFIG_GITGUI_AUTODETECT] is None else config[mgc.CONFIG_GITGUI_AUTODETECT]
+            self.ui.radioGitGuiAutoDetect.setChecked(gitgui_auto_detect)
+            self.ui.lineEditGitGuiAutoDetect.setText(ExecGitGui.autodetect_executable())
+            self.ui.radioGitGuiManual.setChecked(not gitgui_auto_detect)
+            self.ui.lineEditGitGuiManual.setText(config[mgc.CONFIG_GITGUI_MANUAL_PATH] or '')
+            self.ui.lineEditGitGuiManual.setEnabled(not gitgui_auto_detect)
+            self.ui.pushButtonGitGuiManualBrowse.setEnabled(not gitgui_auto_detect)
+            self.ui.pushButtonGitGuiManualBrowse.clicked.connect(self.slotEditPrefBrowseForGitGui)
+            self.enableGitGuiIfActivated()
         else:
             self.ui.groupBoxGitGui.setVisible(False)
 
@@ -247,6 +257,14 @@ class MgDialogSettings(QDialog):
             self.ui.lineEditGitBashManual.setText(result)
 
 
+    def slotEditPrefBrowseForGitGui(self) -> None:
+        '''Browse for git-gui executable and set the result in the ui dialog'''
+        current_exe = str(self.ui.lineEditGitGuiManual.text())
+        result, _ = QFileDialog.getOpenFileName(self, "Select git-gui Executable", current_exe, "git-gui.exe")
+        if result:
+            self.ui.lineEditGitGuiManual.setText(result)
+
+
     def slotEditPrefBrowseForGitK(self) -> None:
         '''Browse for gitk executable and set the result in the ui dialog'''
         current_exe = str(self.ui.lineEditGitKManual.text())
@@ -303,6 +321,14 @@ class MgDialogSettings(QDialog):
         self.ui.pushButtonGitBashManualBrowse.setEnabled( enable_manual_widgets )
 
 
+    def enableGitGuiIfActivated(self) -> None:
+        enable_stuff = self.ui.checkBoxGitGui.isChecked() 
+        self.ui.radioGitGuiManual.setEnabled(enable_stuff)
+        self.ui.radioGitGuiAutoDetect.setEnabled(enable_stuff)
+
+        enable_manual_widgets = enable_stuff and self.ui.radioGitGuiManual.isChecked()
+        self.ui.lineEditGitGuiManual.setEnabled( enable_manual_widgets )
+        self.ui.pushButtonGitGuiManualBrowse.setEnabled( enable_manual_widgets )
 
 
     def enableGitKIfActivated(self) -> None:
@@ -353,6 +379,8 @@ def runDialogEditSettings(parent: QWidget, tabPage: Union[Literal[0], Literal[1]
     config[mgc.CONFIG_GITBASH_AUTODETECT] = dlg.ui.radioGitBashAutoDetect.isChecked()
     config[mgc.CONFIG_GITBASH_MANUAL_PATH] = dlg.ui.lineEditGitBashManual.text()
     config[mgc.CONFIG_GITGUI_ACTIVATED] = dlg.ui.checkBoxGitGui.isChecked()
+    config[mgc.CONFIG_GITGUI_AUTODETECT] = dlg.ui.radioGitGuiAutoDetect.isChecked()
+    config[mgc.CONFIG_GITGUI_MANUAL_PATH] = dlg.ui.lineEditGitGuiManual.text()
     config[mgc.CONFIG_GITK_ACTIVATED] = dlg.ui.checkBoxGitK.isChecked()
     config[mgc.CONFIG_GITK_AUTODETECT] = dlg.ui.radioGitKAutoDetect.isChecked()
     config[mgc.CONFIG_GITK_MANUAL_PATH] = dlg.ui.lineEditGitKManual.text()

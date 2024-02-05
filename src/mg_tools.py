@@ -362,13 +362,17 @@ class ExecGitBash(ExecTool):
 class ExecGitGui(ExecTool):
     SUPPORTED_PLATFORMS = ['win32', 'linux']
 
+    WIN32_PATH_CANDIDATES = [
+        Path(os.environ.get("ProgramFiles", '')) / "Git" / "cmd",
+        Path(os.environ.get("ProgramFiles(x86)", '')) / "Git" / "cmd",
+        Path(os.environ.get("PROGRAMW6432", '')) / "Git" / "cmd",
+        ]
+
+    EXEC_NAME_WIN32 = "git-gui.exe"
+
+    CONFIG_ENTRY_AUTODETECT = mg_config.CONFIG_GITGUI_AUTODETECT
+    CONFIG_ENTRY_MANUAL_PATH = mg_config.CONFIG_GITGUI_MANUAL_PATH
     CONFIG_ENTRY_ACTIVATED = mg_config.CONFIG_GITGUI_ACTIVATED
-
-
-    @classmethod
-    def shouldShow(cls) -> bool:
-        '''Overtide to avoid autoddtection mechanism'''
-        return True
 
 
 #######################################################
