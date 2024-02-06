@@ -416,7 +416,9 @@ class ExecExplorer(ExecTool):
     WIN32_PATH_CANDIDATES = [
         Path(os.environ.get("SystemRoot", '')),
     ]
-    LINUX_PATH_CANDIDATES = []
+    LINUX_PATH_CANDIDATES = [
+        Path("/usr/bin"),
+    ]
 
     EXEC_NAME_WIN32 = 'explorer.exe'
     EXEC_NAME_LINUX = 'xdg-open'
