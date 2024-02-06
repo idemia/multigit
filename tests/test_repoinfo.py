@@ -20,6 +20,7 @@ import unittest, tempfile, datetime, collections, pathlib, os, stat, shutil
 from logging import warning
 
 import os
+import os.path
 
 from multigit import init_logging
 import src.mg_tools
@@ -53,6 +54,15 @@ def git_exec(*args: str, gitdir: Union[str, pathlib.Path] = '', allow_errors: bo
         args = tuple([ '-C', str(gitdir) ] + list(args))
 
     return ExecGit.exec_blocking(args, '', allow_errors)
+
+
+GIT_SUPPORTS_SETTING_BRANCH_NAME = False
+DEFAULT_BRANCH_NAME='master'
+
+git_version = git_exec('--version').split(' ')[2]
+if git_version >= '2.28':
+    GIT_SUPPORTS_SETTING_BRANCH_NAME = True
+    DEFAULT_BRANCH_NAME='main'
 
 
 def rmtree_failsafe(p: Union[str, pathlib.Path]) -> None:
@@ -103,7 +113,11 @@ def to_named_tuple(ric: MgRepoInfo) -> RepoInfoTuple:
 
 def git_init_repo(repo: str) -> None:
     '''Init the repository and creates commit config'''
-    git_exec('init', '-b', 'main', repo)
+    if GIT_SUPPORTS_SETTING_BRANCH_NAME:
+        branch_args = ['-b', 'main']
+    else:
+        branch_args = []
+    git_exec(*(['init'] + branch_args + [repo]))
     git_set_commit_author(repo)
 
 
@@ -223,11 +237,11 @@ class TestRepoInfo(unittest.TestCase):
         self.assertEqual(ri.branches_local, [])
         self.assertEqual(ri.branches_filled, False)
 
-        ri.cb_fill_branches_done('toto', 0, '''
+        ri.cb_fill_branches_done('toto', 0, f'''
   dev
   feat/f-1
 * feat/f-2
-  main
+  {DEFAULT_BRANCH_NAME}
   remotes/origin/HEAD -> origin/fix/toto
   remotes/origin/b2
   remotes/origin/dev
@@ -235,7 +249,7 @@ class TestRepoInfo(unittest.TestCase):
   remotes/origin/feat/GF_2
         
 ''')
-        self.assertEqual(ri.branches_local, ['dev', 'feat/f-1', 'feat/f-2', 'main'])
+        self.assertEqual(ri.branches_local, ['dev', 'feat/f-1', 'feat/f-2', DEFAULT_BRANCH_NAME])
         self.assertEqual(ri.branches_remote, [
             'origin/b2',
             'origin/dev',
@@ -246,10 +260,10 @@ class TestRepoInfo(unittest.TestCase):
 
         # when head is detached, we have an extra line of information
         ri = MgRepoInfo('toto', '.', '.')
-        ri.cb_fill_branches_done('toto', 0, ''' * (HEAD detached at tag1)
-  main
+        ri.cb_fill_branches_done('toto', 0, f''' * (HEAD detached at tag1)
+  {DEFAULT_BRANCH_NAME}
 ''')
-        self.assertEqual(ri.branches_local, ['main'])
+        self.assertEqual(ri.branches_local, [DEFAULT_BRANCH_NAME])
         self.assertEqual(ri.branches_remote, [])
 
 
@@ -291,7 +305,7 @@ class TestRepoInfo(unittest.TestCase):
 
         if LONG_TESTS:
             # checkout main, add 3rd commit, checkout tag1
-            git_exec('checkout', 'main')
+            git_exec('checkout', DEFAULT_BRANCH_NAME)
             _sha1 = add_content(self.dir1, 'tata')
 
             self.run_clone_test_on_origin_main_more_commits(self.dir1, self.dir3)
@@ -307,7 +321,7 @@ class TestRepoInfo(unittest.TestCase):
             self.run_clone_test_on_tag(self.dir1, 'tag1', self.dir4, tag_sha1)
 
         # checkout main, tag the file twice, checkout one tag
-        git_exec('checkout', 'main')
+        git_exec('checkout', DEFAULT_BRANCH_NAME)
         _sha1 = add_content(self.dir1, 'tata')
         git_exec('tag', 'tag2')
         git_exec('tag', 'tag3')
@@ -316,7 +330,7 @@ class TestRepoInfo(unittest.TestCase):
 
         # checkout main, add 4th commit, add 5th commit
         # checkout 4th commit
-        git_exec('checkout', 'main')
+        git_exec('checkout', DEFAULT_BRANCH_NAME)
         sha1_4 = add_content(self.dir1, 'titi')
         sha1_5 = add_content(self.dir1, 'titi')
         git_exec('checkout', sha1_5)
@@ -337,16 +351,16 @@ class TestRepoInfo(unittest.TestCase):
         self.run_test_on_other_branch(self.dir1, 'branch1', sha1)
 
         # merge main into branch1
-        git_exec('merge', 'main')
+        git_exec('merge', DEFAULT_BRANCH_NAME)
         self.run_test_on_other_branch_merged_main(self.dir1, 'branch1')
 
         # create branch2, fill it with content, merge it to main and delete it
         git_exec('checkout', '-b', 'branch2')
         add_content(self.dir1, 'toto')
-        git_exec('checkout', 'main')
+        git_exec('checkout', DEFAULT_BRANCH_NAME)
         git_exec('merge', 'branch2')
         git_exec('branch', '-d', 'branch2')
-        self.run_test_on_main_after_branch2_deleted(self.dir1, 'main')
+        self.run_test_on_main_after_branch2_deleted(self.dir1, DEFAULT_BRANCH_NAME)
 
 
     def run_test_on_empty_git(self, dir1):
@@ -432,8 +446,8 @@ class TestRepoInfo(unittest.TestCase):
         ric = MgRepoInfo(n, fp)
         self.assertEqual(to_named_tuple(ric.refresh()),
              RepoInfoTuple(name=n,
-                           head='branch main',
-                           branch='main',
+                           head=f'branch {DEFAULT_BRANCH_NAME}',
+                           branch=DEFAULT_BRANCH_NAME,
                            remote_synchro = MSG_LOCAL_BRANCH,
                            fullpath=fp,
                            status='OK',
@@ -450,7 +464,7 @@ class TestRepoInfo(unittest.TestCase):
         ric.ensure_branches_filled()
         self.assertEqual(ric.branches_filled, True)
         self.assertEqual(ric.branches_remote, [])
-        self.assertEqual(ric.branches_local, ['main'])
+        self.assertEqual(ric.branches_local, [DEFAULT_BRANCH_NAME])
 
 
     def run_test_on_main_modified_files(self, dir1, _sha1: str):
@@ -459,7 +473,7 @@ class TestRepoInfo(unittest.TestCase):
 
         ric = MgRepoInfo(n, fp)
         self.assertEqual(to_named_tuple(ric.refresh()),
-                         RepoInfoTuple(name=n, head='branch main', branch='main',
+                         RepoInfoTuple(name=n, head=f'branch {DEFAULT_BRANCH_NAME}', branch=DEFAULT_BRANCH_NAME,
                                        remote_synchro = MSG_LOCAL_BRANCH, fullpath=fp,
                                        status='OK',
                                        ))
@@ -468,7 +482,7 @@ class TestRepoInfo(unittest.TestCase):
             f.write(generate_content())
 
         self.assertEqual(to_named_tuple(ric.refresh()),
-                         RepoInfoTuple(name=n, head='branch main', branch='main',
+                         RepoInfoTuple(name=n, head=f'branch {DEFAULT_BRANCH_NAME}', branch=DEFAULT_BRANCH_NAME,
                                        remote_synchro=MSG_LOCAL_BRANCH, fullpath=fp,
                                        status='1 modified file'
                                        ))
@@ -478,14 +492,14 @@ class TestRepoInfo(unittest.TestCase):
         git_exec('add', 'file3', gitdir=p)
 
         self.assertEqual(to_named_tuple(ric.refresh()),
-                         RepoInfoTuple(name=n, head='branch main', branch='main',
+                         RepoInfoTuple(name=n, head=f'branch {DEFAULT_BRANCH_NAME}', branch=DEFAULT_BRANCH_NAME,
                                        remote_synchro=MSG_LOCAL_BRANCH, fullpath=fp,
                                        status='2 modified files'
                                        ))
 
         (p/'file2').unlink()
         self.assertEqual(to_named_tuple(ric.refresh()),
-                         RepoInfoTuple(name=n, head='branch main', branch='main',
+                         RepoInfoTuple(name=n, head=f'branch {DEFAULT_BRANCH_NAME}', branch=DEFAULT_BRANCH_NAME,
                                        remote_synchro=MSG_LOCAL_BRANCH, fullpath=fp,
                                        status='3 modified files'
                                        ))
@@ -493,7 +507,7 @@ class TestRepoInfo(unittest.TestCase):
         git_exec('add', 'file1', gitdir=p)
         git_exec('rm', 'file2', gitdir=p)
         self.assertEqual(to_named_tuple(ric.refresh()),
-                         RepoInfoTuple(name=n, head='branch main', branch='main',
+                         RepoInfoTuple(name=n, head=f'branch {DEFAULT_BRANCH_NAME}', branch=DEFAULT_BRANCH_NAME,
                                        remote_synchro=MSG_LOCAL_BRANCH, fullpath=fp,
                                        status='3 modified files'
                                        ))
@@ -501,7 +515,7 @@ class TestRepoInfo(unittest.TestCase):
         git_commit(fp, 'check on modified files done')
 
         self.assertEqual(to_named_tuple(ric.refresh()),
-                         RepoInfoTuple(name=n, head='branch main', branch='main',
+                         RepoInfoTuple(name=n, head=f'branch {DEFAULT_BRANCH_NAME}', branch=DEFAULT_BRANCH_NAME,
                                        remote_synchro = MSG_LOCAL_BRANCH, fullpath=fp,
                                        status='OK',
                                        ))
@@ -513,8 +527,8 @@ class TestRepoInfo(unittest.TestCase):
         ric = MgRepoInfo(n, fp)
         self.assertEqual(to_named_tuple(ric.refresh()),
                          RepoInfoTuple(name=n,
-                                       head='branch main',
-                                       branch='main',
+                                       head=f'branch {DEFAULT_BRANCH_NAME}',
+                                       branch=DEFAULT_BRANCH_NAME,
                                        remote_synchro = MSG_LOCAL_BRANCH,
                                        fullpath=fp,
                                        status='OK',
@@ -528,7 +542,7 @@ class TestRepoInfo(unittest.TestCase):
         ric.ensure_branches_filled()
         self.assertEqual(ric.branches_filled, True)
         self.assertEqual(ric.branches_remote, [])
-        self.assertEqual(ric.branches_local, ['main'])
+        self.assertEqual(ric.branches_local, [DEFAULT_BRANCH_NAME])
 
 
 
@@ -556,7 +570,7 @@ class TestRepoInfo(unittest.TestCase):
         ric.ensure_branches_filled()
         self.assertEqual(ric.branches_filled, True)
         self.assertEqual(ric.branches_remote, [])
-        self.assertEqual(ric.branches_local, ['main'])
+        self.assertEqual(ric.branches_local, [DEFAULT_BRANCH_NAME])
 
 
 
@@ -583,7 +597,7 @@ class TestRepoInfo(unittest.TestCase):
         ric.ensure_branches_filled()
         self.assertEqual(ric.branches_filled, True)
         self.assertEqual(ric.branches_remote, [])
-        self.assertEqual(ric.branches_local, ['main'])
+        self.assertEqual(ric.branches_local, [DEFAULT_BRANCH_NAME])
 
 
 
@@ -612,7 +626,7 @@ class TestRepoInfo(unittest.TestCase):
         ric.ensure_branches_filled()
         self.assertEqual(ric.branches_filled, True)
         self.assertEqual(ric.branches_remote, [])
-        self.assertEqual(ric.branches_local, ['main'])
+        self.assertEqual(ric.branches_local, [DEFAULT_BRANCH_NAME])
 
 
 
@@ -637,7 +651,7 @@ class TestRepoInfo(unittest.TestCase):
 
         ric.ensure_branches_filled()
         self.assertEqual(ric.branches_filled, True)
-        self.assertEqual(ric.branches_local, ['main'])
+        self.assertEqual(ric.branches_local, [DEFAULT_BRANCH_NAME])
         self.assertEqual(ric.branches_remote, [])
 
 
@@ -664,7 +678,7 @@ class TestRepoInfo(unittest.TestCase):
         ric.ensure_branches_filled()
         self.assertEqual(ric.branches_filled, True)
         self.assertEqual(ric.branches_remote, [])
-        self.assertEqual(ric.branches_local, ['branch1', 'main'])
+        self.assertEqual(ric.branches_local, ['branch1', DEFAULT_BRANCH_NAME])
 
 
 
@@ -690,7 +704,7 @@ class TestRepoInfo(unittest.TestCase):
         ric.ensure_branches_filled()
         self.assertEqual(ric.branches_filled, True)
         self.assertEqual(ric.branches_remote, [])
-        self.assertEqual(ric.branches_local, ['branch1', 'main'])
+        self.assertEqual(ric.branches_local, ['branch1', DEFAULT_BRANCH_NAME])
 
 
     def run_test_on_main_after_branch2_deleted(self, dir1, branch):
@@ -715,7 +729,7 @@ class TestRepoInfo(unittest.TestCase):
         ric.ensure_branches_filled()
         self.assertEqual(ric.branches_filled, True)
         self.assertEqual(ric.branches_remote, [])
-        self.assertEqual(ric.branches_local, ['branch1', 'main'])
+        self.assertEqual(ric.branches_local, ['branch1', DEFAULT_BRANCH_NAME])
 
 
 
@@ -768,7 +782,7 @@ class TestRepoInfo(unittest.TestCase):
         repo_list = mr.find_git_repos()
         self.assertEqual(set(repo_list), {
             'strange_dir[with_bracket]', 
-            'strange_dir[with_bracket]\\strange_subdir[with_bracket]'
+            os.path.join('strange_dir[with_bracket]', 'strange_subdir[with_bracket]')
         })
 
         os.chdir(strange_dir1)
@@ -841,20 +855,20 @@ class TestRepoInfo(unittest.TestCase):
         git_exec('pull', gitdir=dir3)
         self.assertEqual(to_named_tuple(ric.refresh()),
                          RepoInfoTuple(name=n,
-                                       head='branch main',
-                                       branch='main',
+                                       head=f'branch {DEFAULT_BRANCH_NAME}',
+                                       branch=DEFAULT_BRANCH_NAME,
                                        fullpath=fp,
                                        status='OK',
                                        remote_synchro=MSG_REMOTE_SYNCHRO_OK,
-                                       remote_branch='origin/main',
+                                       remote_branch=f'origin/{DEFAULT_BRANCH_NAME}',
                                        last_commit='',
                                        tags=None,
                                        ))
 
         ric.ensure_branches_filled()
         self.assertEqual(ric.branches_filled, True)
-        self.assertEqual(ric.branches_local, ['main'])
-        self.assertEqual(ric.branches_remote, ['origin/main'])
+        self.assertEqual(ric.branches_local, [DEFAULT_BRANCH_NAME])
+        self.assertEqual(ric.branches_remote, [f'origin/{DEFAULT_BRANCH_NAME}'])
 
 
 
@@ -867,24 +881,24 @@ class TestRepoInfo(unittest.TestCase):
         ric = MgRepoInfo(n, fp)
         self.assertEqual(to_named_tuple(ric.refresh()),
                          RepoInfoTuple(name=n,
-                                       head='branch main',
-                                       branch='main',
+                                       head=f'branch {DEFAULT_BRANCH_NAME}',
+                                       branch=DEFAULT_BRANCH_NAME,
                                        fullpath=fp,
                                        status='OK',
                                        remote_synchro=MSG_REMOTE_SYNCHRO_OK,
-                                       remote_branch='origin/main',
+                                       remote_branch=f'origin/{DEFAULT_BRANCH_NAME}',
                                        last_commit='',
                                        tags=None,
                                        ))
         git_exec('fetch', gitdir=dir3)
         self.assertEqual(to_named_tuple(ric.refresh()),
                          RepoInfoTuple(name=n,
-                                       head='branch main',
-                                       branch='main',
+                                       head=f'branch {DEFAULT_BRANCH_NAME}',
+                                       branch=DEFAULT_BRANCH_NAME,
                                        fullpath=fp,
                                        status='OK',
                                        remote_synchro='2 to pull',
-                                       remote_branch='origin/main',
+                                       remote_branch=f'origin/{DEFAULT_BRANCH_NAME}',
                                        last_commit='',
                                        tags=None,
                                        ))
@@ -893,20 +907,20 @@ class TestRepoInfo(unittest.TestCase):
         git_commit(fp, 'add blabla', allow_errors=True) # when creating the commit, git returns 1 because the branches are diverging
         self.assertEqual(to_named_tuple(ric.refresh()),
                          RepoInfoTuple(name=n,
-                                       head='branch main',
-                                       branch='main',
+                                       head=f'branch {DEFAULT_BRANCH_NAME}',
+                                       branch=DEFAULT_BRANCH_NAME,
                                        fullpath=fp,
                                        status='OK',
                                        remote_synchro='1 to push, 2 to pull',
-                                       remote_branch='origin/main',
+                                       remote_branch=f'origin/{DEFAULT_BRANCH_NAME}',
                                        last_commit='',
                                        tags=None,
                                        ))
 
         ric.ensure_branches_filled()
         self.assertEqual(ric.branches_filled, True)
-        self.assertEqual(ric.branches_local, ['main'])
-        self.assertEqual(ric.branches_remote, ['origin/main'])
+        self.assertEqual(ric.branches_local, [DEFAULT_BRANCH_NAME])
+        self.assertEqual(ric.branches_remote, [f'origin/{DEFAULT_BRANCH_NAME}'])
 
 
 
@@ -953,5 +967,5 @@ class TestRepoInfo(unittest.TestCase):
 
         ric.ensure_branches_filled()
         self.assertEqual(ric.branches_filled, True)
-        self.assertEqual(ric.branches_remote, ['origin/main'])
+        self.assertEqual(ric.branches_remote, [f'origin/{DEFAULT_BRANCH_NAME}'])
         self.assertEqual(ric.branches_local, [])
