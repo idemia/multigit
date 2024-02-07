@@ -59,8 +59,8 @@ def git_exec(*args: str, gitdir: Union[str, pathlib.Path] = '', allow_errors: bo
 GIT_SUPPORTS_SETTING_BRANCH_NAME = False
 DEFAULT_BRANCH_NAME='master'
 
-git_version = git_exec('--version').split(' ')[2]
-if git_version >= '2.28':
+GIT_VERSION = git_exec('--version').split(' ')[2]
+if GIT_VERSION >= '2.28':
     GIT_SUPPORTS_SETTING_BRANCH_NAME = True
     DEFAULT_BRANCH_NAME='main'
 
@@ -318,7 +318,11 @@ class TestRepoInfo(unittest.TestCase):
 
             self.dir4 = pathlib.Path(self.gitdir) / 'dir4'
             self.dir4.mkdir()
-            self.run_clone_test_on_tag(self.dir1, 'tag1', self.dir4, tag_sha1)
+
+            if GIT_VERSION >= '2.26':
+                # we know that this specific behavior does not work with git 2.25
+                # 2.26 is taken as an arbitrary limit
+                self.run_clone_test_on_tag(self.dir1, 'tag1', self.dir4, tag_sha1)
 
         # checkout main, tag the file twice, checkout one tag
         git_exec('checkout', DEFAULT_BRANCH_NAME)
