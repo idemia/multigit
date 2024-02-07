@@ -135,7 +135,6 @@ def git_commit(repo: str, msg: str, allow_errors: bool = False) -> str:
 
 def add_content(repo: Union[str, pathlib.Path], fname: str, content: str = '') -> str:
     '''create or append to a file and commit it. Return the sha1 of the commit'''
-    olddir = os.getcwd()
     os.chdir(repo)
     if not content:
         content = generate_content()
@@ -146,7 +145,6 @@ def add_content(repo: Union[str, pathlib.Path], fname: str, content: str = '') -
         f.write(content)
     git_exec('add', fname)
     sha1 = git_commit('.', '"extend %s"' % fname)
-    os.chdir(olddir)
     return sha1
 
 
@@ -207,10 +205,12 @@ class TestRepoInfo(unittest.TestCase):
     @classmethod
     def setUpClass(cls: 'TestRepoInfo') -> None:
         cls.tempdir_setUp()
+        cls.init_dir = os.getcwd()
 
     @classmethod
     def tearDownClass(cls: 'TestRepoInfo') -> None:
         cls.tempdir_tearDown()
+        os.chdir(cls.init_dir)
 
     @classmethod
     def tempdir_setUp(cls: 'TestRepoInfo') -> None:
@@ -766,6 +766,7 @@ class TestRepoInfo(unittest.TestCase):
         self.assertEqual(rm_repo,    [mr.repo_dict['removed']])
 
         rmtree_failsafe(self.dir2)
+
 
     def test_find_git_repos_with_strange_names(self) -> None:
         strange_dir1 = pathlib.Path(self.gitdir) / 'strange_dir[with_bracket]'
