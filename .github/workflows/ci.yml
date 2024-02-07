@@ -10,7 +10,7 @@ on:
 jobs:
   test-windows-python:
 
-    runs-on: windows-latest
+    runs-on: windows-latest, ubuntu-20.04
     strategy:
       fail-fast: false
       matrix:
