@@ -135,6 +135,7 @@ def git_commit(repo: str, msg: str, allow_errors: bool = False) -> str:
 
 def add_content(repo: Union[str, pathlib.Path], fname: str, content: str = '') -> str:
     '''create or append to a file and commit it. Return the sha1 of the commit'''
+    olddir = os.getcwd()
     os.chdir(repo)
     if not content:
         content = generate_content()
@@ -145,6 +146,7 @@ def add_content(repo: Union[str, pathlib.Path], fname: str, content: str = '') -
         f.write(content)
     git_exec('add', fname)
     sha1 = git_commit('.', '"extend %s"' % fname)
+    os.chdir(olddir)
     return sha1
 
 
