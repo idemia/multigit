@@ -181,7 +181,7 @@ def init_logging(debug_activated: bool = False, run_from_tests: bool = False) ->
         fhandler_info.setFormatter(formatter)
         logger.addHandler(fhandler_info)
         # ensure that git_cmd records are not propagated to root handlers
-        fhandler_info.addFilter(lambda record: int(record.name != mg_const.LOGGER_GIT_CMD))
+        fhandler_info.addFilter(lambda record: record.name != mg_const.LOGGER_GIT_CMD)
 
     if (mg_const.PATH_LOG_DEBUG and debug_activated):
         fhandler_dbg = ConcurrentRotatingFileHandler(str(mg_const.PATH_LOG_DEBUG), encoding='utf8', maxBytes=10_000_000, backupCount=5)
@@ -189,7 +189,7 @@ def init_logging(debug_activated: bool = False, run_from_tests: bool = False) ->
         fhandler_dbg.setFormatter(formatter)
         logger.addHandler(fhandler_dbg)
         # ensure that git_cmd records are not propagated to root handlers
-        fhandler_dbg.addFilter(lambda record: int(record.name != mg_const.LOGGER_GIT_CMD))
+        fhandler_dbg.addFilter(lambda record: record.name != mg_const.LOGGER_GIT_CMD)
 
     if mg_const.PATH_LOG_GIT_CMD:
         fhandler_git_cmd = ConcurrentRotatingFileHandler(str(mg_const.PATH_LOG_GIT_CMD), encoding='utf8', maxBytes=10_000_000, backupCount=5)

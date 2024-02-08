@@ -202,7 +202,6 @@ class ExecTool:
         cb_done = None
         if callback is not None:
             def cb_done(_exit_code: int, _output: str) -> None:
-                assert callback
                 callback()
 
         rp = RunProcess()

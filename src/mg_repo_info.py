@@ -615,8 +615,7 @@ class MgRepoInfo(QObject):
             local_cb_last_commit: Optional[Callable[[str, str], None]]
             if cb_commit_sha1:
                 def local_cb_last_commit(_repoName: str, _lastCommit: str) -> None:
-                    # see https://github.com/python/mypy/issues/10993 for why type: ignore is necessary
-                    cb_commit_sha1(self.commit_sha1 or '')  # type: ignore
+                    cb_commit_sha1(self.commit_sha1 or '')
             else:
                 local_cb_last_commit = None
 
@@ -644,8 +643,7 @@ class MgRepoInfo(QObject):
         if cb_url:
             def local_cb_fill_git_remote_done(repo_name: str, git_exit_code: int, remote_out: str) -> None:
                 self.cb_fill_git_remote_done(repo_name, git_exit_code, remote_out)
-                # necessary to make mypy happy, see https://github.com/python/mypy/issues/10993
-                cb_url(self.url or '')  # type: ignore
+                cb_url(self.url or '')
         else:
             local_cb_fill_git_remote_done = self.cb_fill_git_remote_done
 
@@ -1179,7 +1177,6 @@ class MgRepoInfo(QObject):
         if cb_git_done:
             # adapt the callback by including the repo name
             def cb_process_done(git_exit_code: int, git_output: str) -> None:
-                assert cb_git_done  # to help mypy not raise an error
                 cb_git_done(self.name, git_exit_code, git_output)
 
         # our pool process does not handle force blocking, launch directly
