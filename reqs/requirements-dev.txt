@@ -9,7 +9,7 @@ mypy
 pyside2-stubs
 
 # running tests
-pytest
+pytest<8
 
 # packaging under Windows
 pyinstaller
