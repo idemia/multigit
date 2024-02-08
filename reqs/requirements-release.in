@@ -1,7 +1,0 @@
-# Use me by typing:
-#    pip-compile requirements-release.in
-
-
-# for running multigit
-pyside2
-concurrent-log-handler
