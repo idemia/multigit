@@ -1,6 +1,9 @@
 
 name: Continuous Integration
 
+env:
+  QT_QPA_PLATFORM: "offscreen"
+
 on:
   push:
     branches: [ main ]

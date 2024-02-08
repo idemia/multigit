@@ -32,7 +32,7 @@ class TestGitSwitchBranchUtils(unittest.TestCase):
             self.app = QApplication.instance()
             return
 
-        self.app = QApplication(['-platform', 'offscreenXXX'])
+        self.app = QApplication([])
 
     def tearDown(self):
         self.app = None
