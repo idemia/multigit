@@ -32,7 +32,7 @@ jobs:
 
       - name: Install dependencies
         run: |
-          python -m pip install -r requirements-dev.txt
+          python -m pip install -r reqs/requirements-dev.txt
           pip list
 
       - name: run tests
@@ -53,7 +53,7 @@ jobs:
 
     - name: Install dependencies
       run: |
-        python -m pip install -r requirements-dev.txt
+        python -m pip install -r reqs/requirements-dev.txt
         pip list
 
     - name: run tests
