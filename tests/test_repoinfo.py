@@ -321,10 +321,7 @@ class TestRepoInfo(unittest.TestCase):
             self.dir4 = pathlib.Path(self.gitdir) / 'dir4'
             self.dir4.mkdir()
 
-            if GIT_VERSION >= '2.26':
-                # we know that this specific behavior does not work with git 2.25
-                # 2.26 is taken as an arbitrary limit
-                self.run_clone_test_on_tag(self.dir1, 'tag1', self.dir4, tag_sha1)
+            self.run_clone_test_on_tag(self.dir1, 'tag1', self.dir4, tag_sha1)
 
         # checkout main, tag the file twice, checkout one tag
         git_exec('checkout', DEFAULT_BRANCH_NAME)
