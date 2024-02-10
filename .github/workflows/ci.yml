@@ -81,7 +81,7 @@ jobs:
     - name: run type checking
 
       # mypy of Python 3.7 does not support everything we use
-      if: false
+      if: ${{ matrix.python-version <= '3.8' }}
       run: |
         echo "python = ${{ matrix.python-version }}"
         mypy .
