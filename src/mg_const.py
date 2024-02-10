@@ -48,6 +48,8 @@ LOGGER_GIT_CMD = 'git_cmd'
 
 GIT_AUTH_FAILURE_MARKER='fatal: Authentication failed'
 
+DISPLAY_FETCH_ON_STARTUP_COUNTDOWN_INIT = 5
+
 ############################################
 #   UI Messages
 ############################################

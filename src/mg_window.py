@@ -39,7 +39,7 @@ from src.mg_tools import ExecExplorer, ExecGit
 from src.mg_dialog_settings import runDialogEditSettings
 from src.mg_exec_window import MgExecWindow
 from src import mg_config as mgc
-from src.mg_const import VERSION
+from src.mg_const import VERSION, DISPLAY_FETCH_ON_STARTUP_COUNTDOWN_INIT
 
 
 logger = logging.getLogger('mg_main_window')
@@ -309,13 +309,26 @@ class MgMainWindow(QMainWindow, Ui_MainWindow):
                 self.tabRepos.setTabText(idx, tabName)
 
         fetchReposOnStartup = self.config[mgc.CONFIG_FETCH_ON_STARTUP]
-        if fetchReposOnStartup is None:
+        if fetchReposOnStartup is None or self.config[mgc.CONFIG_DISPLAY_FETCH_ON_STARTUP_COUNTDOWN] is None:
+            self.config[mgc.CONFIG_FETCH_ON_STARTUP] = False
+            self.config[mgc.CONFIG_DISPLAY_FETCH_ON_STARTUP_COUNTDOWN] = DISPLAY_FETCH_ON_STARTUP_COUNTDOWN_INIT
+            self.config.save()
+        else:
+            try:
+                val = self.config[mgc.CONFIG_DISPLAY_FETCH_ON_STARTUP_COUNTDOWN]
+                if val >= 0:
+                    val -= 1
+                    self.config[mgc.CONFIG_DISPLAY_FETCH_ON_STARTUP_COUNTDOWN] = val
+            except TypeError:
+                # invalid config value, reset it
+                self.config[mgc.CONFIG_DISPLAY_FETCH_ON_STARTUP_COUNTDOWN] = DISPLAY_FETCH_ON_STARTUP_COUNTDOWN_INIT
+
+        if self.config[mgc.CONFIG_DISPLAY_FETCH_ON_STARTUP_COUNTDOWN] == 0:
             answer = QMessageBox.question(self, 'Activate fetch on startup ?', 'Multigit can fetch all your repositories when you launch it. '
-                                 'Do you want to activate this setting ?\n\nNote that you can change it later in the settings dialog.\n')
+                                 'Do you want to activate this behavior ?\n\nNote that you can change it later in the settings dialog.\n')
             fetchReposOnStartup = (answer == QMessageBox.Yes)
             self.config[mgc.CONFIG_FETCH_ON_STARTUP] = fetchReposOnStartup
             self.config.save()
-
 
         if fetchReposOnStartup:
             QTimer.singleShot(1000, self.slotFetchAllReposOnAllTabs)

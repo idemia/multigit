@@ -28,9 +28,9 @@ import src.mg_config as mgc
 def showWhatisnewIfAppropriate() -> None:
     '''Show the 'What is new' dialog if it was never shown for the current version of MultiGit'''
     last_shown = mgc.get_config_instance()[mgc.CONFIG_LAST_SHOWN_WHATISNEW]
-    if last_shown is None or last_shown < VERSION:
-        mgc.get_config_instance()[mgc.CONFIG_LAST_SHOWN_WHATISNEW] = VERSION
+    if last_shown is not None and last_shown < VERSION:
         showWhatIsNew()
+    mgc.get_config_instance()[mgc.CONFIG_LAST_SHOWN_WHATISNEW] = VERSION
 
 
 def showWhatIsNew(parent: Optional[QWidget] = None) -> None:
