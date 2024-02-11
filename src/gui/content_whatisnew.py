@@ -1,14 +1,21 @@
-# Generated from CHANGELOG.md on 2023-04-27 11:43:14.099807
+# Generated from CHANGELOG.md on 2024-02-11 22:29:50.576769
 
 
 content_html = '''
 <h1 align="center">MultiGit</h1>
 
-<p><em>by Phlipppe Fremy <a href="&#x6d;&#x61;&#105;&#108;&#x74;&#x6f;&#58;&#x70;&#x68;&#105;&#x6c;&#105;&#112;&#112;&#x65;&#x2e;f&#x72;&#x65;&#109;&#121;&#64;&#105;&#100;&#101;&#x6d;&#x69;&#x61;&#x2e;&#99;&#x6f;&#109;">&#x70;&#x68;&#105;&#x6c;&#105;&#112;&#112;&#x65;&#x2e;f&#x72;&#x65;&#109;&#121;&#64;&#105;&#100;&#101;&#x6d;&#x69;&#x61;&#x2e;&#99;&#x6f;&#109;</a></em></p>
+<p><em>by Phlipppe Fremy <a href="&#x6d;&#97;&#105;&#108;to&#58;&#112;&#x68;&#105;&#108;&#x69;&#x70;&#x70;&#x65;.&#102;&#114;&#x65;&#109;&#x79;&#64;&#x69;d&#x65;&#x6d;&#105;&#97;&#x2e;&#x63;&#x6f;&#109;">&#112;&#x68;&#105;&#108;&#x69;&#x70;&#x70;&#x65;.&#102;&#114;&#x65;&#109;&#x79;&#64;&#x69;d&#x65;&#x6d;&#105;&#97;&#x2e;&#x63;&#x6f;&#109;</a></em></p>
 
 <h2>Introduction</h2>
 
 <p>Multigit help users to manage many Git repositories simultaneously.</p>
+
+<h2>Version 1.6.1 (2024-XX-XX)</h2>
+
+<ul>
+<li>Porting to Linux</li>
+<li>Add support for <code><span style="background-color:#f5f5f5;">gitk</span></code> and <code><span style="background-color:#f5f5f5;">git gui</span></code></li>
+</ul>
 
 <h2>Version 1.6.0 (2023-04-14)</h2>
 
