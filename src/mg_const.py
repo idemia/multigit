@@ -77,12 +77,13 @@ try:
 except ImportError:
     pyqt_version_info = ''
 
-MSG_ABOUT_MULTIGIT = """MultiGit v%s
+MSG_ABOUT_MULTIGIT = """MultiGit OpenSource v%s
 
 MultiGit manages multiple Git Repositories with one interface.
 
-MultiGit is developed by Philippe Fremy <philippe.fremy@idemia.com> and Florent Oulieres <florent.oulieres@idemia.com>
-Please contact us for any requests or bugs.
+MultiGit is developed by Philippe Fremy <philippe.fremy@idemia.com> .
+
+Please use Github repository page for any feedback: https://github.com/idemia/multigit/
 
 MultiGit is based on the following software:
 * Python v%s

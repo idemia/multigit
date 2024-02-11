@@ -16,15 +16,19 @@
 
 from typing import Optional
 
+import platform
+
 from PySide2.QtWidgets import QDialog, QWidget
 from PySide2.QtCore import Qt
+from PySide2.QtCore import qVersion
+
 
 from src.gui.ui_about import Ui_dialogAbout
 from src.gui.ui_about_license import Ui_FullLicenseInfoDialog
 from src.gui.content_full_license_info import content_html
 from src.mg_const import VERSION
 
-VERSION_MARKER = '[version]'
+MULTIGIT_VERSION_MARKER = '[version]'
 
 class MgAboutDialog(QDialog):
 
@@ -39,8 +43,15 @@ class MgAboutDialog(QDialog):
         self.ui.pushButtonOk.clicked.connect(self.close)
         self.ui.pushButtonFullLicense.clicked.connect(self.showFullLicenseInfo)
         htmlContent = self.ui.textBrowserContent.toHtml()
-        if VERSION_MARKER in htmlContent:
-            self.ui.textBrowserContent.setHtml(htmlContent.replace(VERSION_MARKER, VERSION))
+        if MULTIGIT_VERSION_MARKER in htmlContent:
+            htmlContent = htmlContent.replace(MULTIGIT_VERSION_MARKER, VERSION)
+
+        htmlContent = htmlContent.replace('Python 3.8', f'Python {platform.python_version()}')
+        htmlContent = htmlContent.replace('Qt for Python 5.15', f'Qt for Python {qVersion()}')
+
+        self.ui.textBrowserContent.setHtml(htmlContent.replace(MULTIGIT_VERSION_MARKER, VERSION))
+
+
 
 
 

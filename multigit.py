@@ -53,7 +53,7 @@ def handle_exception(type_: Type[BaseException], value: BaseException, traceback
         QMessageBox.critical(None, 'Fatal error',
 '''A fatal error occured:
 %s\n
-Please report the problem to philippe.fremy@idemia.com and florent.oulieres@idemia.com
+Please report the problem on opening an issue on https://github.com/idemia/multigit/ .
 Please include the file log_multigit_debug.log which you can find in the menu About / Show Multigit log files .
 ''' % exc_msg )
 
