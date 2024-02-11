@@ -103,31 +103,26 @@ MSG_GIT_EXEC_1_OK = 'Successful execution of git %s'
 MSG_GIT_SOME_FAILED = 'Failed execution of git %s, %d errors out of %d'
 
 
-class DoubleClickActions(enum.Enum):
-    '''All possible actions for double-click on a repo. Some actions are intentionally not
-    included in this list because they are too invasive to be put on a double-click:
-    * git revert, git tag, git delete branch, git push tags
-    * tortoise git revert, tortoise git tag
-    '''
-
-    GitCommit          = 'Git Commit'
-    GitCreateBranch    = 'Git Create Branch'
-    GitSwitchBranch    = 'Git Switch Branch'
-    GitPush            = 'Git Push'
-    GitPull            = 'Git Pull'
-    GitFetch           = 'Git Fetch'
-
-    TortoiseGitShowLog = 'TortoiseGit ShowLog'
-    TortoiseGitCommit  = 'TortoiseGit Commit'
-    TortoiseGitSwitch  = 'TortoiseGit Switch'
-    TortoiseGitBranch  = 'TortoiseGit Branch'
-    TortoiseGitPush    = 'TortoiseGit Push'
-    TortoiseGitPull    = 'TortoiseGit Pull'
-    TortoiseGitFetch   = 'TortoiseGit Fetch'
-    TortoiseGitDiff    = 'TortoiseGit Diff'
-
-    RunSourceTree      = 'Run SourceTree'
-    RunSublimeMerge    = 'Run SublimeMerge'
-    RepositoryProperties = 'Repository Properties'
-    ShowInExplorer     = 'Show in Explorer'
-    DoNothing          = 'Do nothing'
+### All possible double-click actions
+DBC_GITCOMMIT          = 'Git Commit'
+DBC_GITCREATEBRANCH    = 'Git Create Branch'
+DBC_GITSWITCHBRANCH    = 'Git Switch Branch'
+DBC_GITPUSH            = 'Git Push'
+DBC_GITPULL            = 'Git Pull'
+DBC_GITFETCH           = 'Git Fetch'
+DBC_REPOSITORYPROPERTIES = 'Repository Properties'
+DBC_SHOWINEXPLORER     = 'Show in Explorer'
+DBC_DONOTHING          = 'Do nothing'
+DBC_TORTOISEGITSHOWLOG = 'TortoiseGit ShowLog'
+DBC_TORTOISEGITSWITCH  = 'TortoiseGit Switch'
+DBC_TORTOISEGITBRANCH  = 'TortoiseGit Branch'
+DBC_TORTOISEGITCOMMIT  = 'TortoiseGit Commit'
+DBC_TORTOISEGITDIFF    = 'TortoiseGit Diff'
+DBC_TORTOISEGITPUSH    = 'TortoiseGit Push'
+DBC_TORTOISEGITPULL    = 'TortoiseGit Pull'
+DBC_TORTOISEGITFETCH   = 'TortoiseGit Fetch'
+DBC_RUNSOURCETREE      = 'Run SourceTree'
+DBC_RUNSUBLIMEMERGE    = 'Run SublimeMerge'
+DBC_RUNGITGUI          = 'Run Git Gui'
+DBC_RUNGITK            = 'Run GitK'
+DBC_RUNGITBASH         = 'Run git-bash'

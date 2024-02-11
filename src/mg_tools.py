@@ -25,13 +25,13 @@ from PySide2.QtWidgets import QMessageBox, QApplication
 
 from src import mg_config
 from src.mg_utils import hasGitAuthFailureMsg
-from src.mg_const import MAX_GIT_DBG_OUT_CHAR, LOGGER_GIT_CMD
+import src.mg_const as mg_const
 from src.mg_auth_failure_mgr import MgAuthFailureMgr
 
 logger = logging.getLogger('mg_tools')
 dbg = logger.debug
 warn = logger.warning
-log_git_cmd = logging.getLogger(LOGGER_GIT_CMD).info
+log_git_cmd = logging.getLogger(mg_const.LOGGER_GIT_CMD).info
 
 GIT_EXIT_CODE_SEGFAULT_OF_GIT_WITH_STACKTRACE = -1
 GIT_EXIT_CODE_SEGFAULT_OF_GIT_NO_STACKTRACE = -2
@@ -60,6 +60,8 @@ class ExecTool:
 
     # name of the configuration entry to store if the program is activated or not
     CONFIG_ENTRY_ACTIVATED: str
+
+    DOUBLE_CLICK_ACTIONS: List[str] = []
 
     SESSION_CACHE: Dict[Type['ExecTool'], str] = {
     }
@@ -225,6 +227,15 @@ class ExecTool:
         return output
 
 
+    @classmethod
+    def doubleClickActions(cls) -> List[str]:
+        '''Return the double click actions provided by this tool on the current platform'''
+        if not cls.platform_supported() or not cls.shouldShow():
+            return []
+
+        return cls.DOUBLE_CLICK_ACTIONS
+
+
 
 #######################################################
 #       Git Stuff
@@ -288,6 +299,18 @@ class ExecTortoiseGit(ExecTool):
     CONFIG_ENTRY_MANUAL_PATH = mg_config.CONFIG_TORTOISEGIT_MANUAL_PATH
     CONFIG_ENTRY_ACTIVATED = mg_config.CONFIG_TORTOISEGIT_ACTIVATED
 
+    DOUBLE_CLICK_ACTIONS = [
+        mg_const.DBC_TORTOISEGITSHOWLOG,
+        mg_const.DBC_TORTOISEGITCOMMIT,
+        mg_const.DBC_TORTOISEGITSWITCH,
+        mg_const.DBC_TORTOISEGITBRANCH,
+        mg_const.DBC_TORTOISEGITPUSH,
+        mg_const.DBC_TORTOISEGITPULL,
+        mg_const.DBC_TORTOISEGITFETCH,
+        mg_const.DBC_TORTOISEGITDIFF,
+    ]
+
+
 
 #######################################################
 #       SourceTree stuff
@@ -307,6 +330,11 @@ class ExecSourceTree(ExecTool):
     CONFIG_ENTRY_AUTODETECT = mg_config.CONFIG_SOURCETREE_AUTODETECT
     CONFIG_ENTRY_MANUAL_PATH = mg_config.CONFIG_SOURCETREE_MANUAL_PATH
     CONFIG_ENTRY_ACTIVATED = mg_config.CONFIG_SOURCETREE_ACTIVATED
+
+    DOUBLE_CLICK_ACTIONS = [
+        mg_const.DBC_RUNSOURCETREE,
+    ]
+
 
 
 #######################################################
@@ -331,6 +359,9 @@ class ExecSublimeMerge(ExecTool):
     CONFIG_ENTRY_MANUAL_PATH = mg_config.CONFIG_SUBLIMEMERGE_MANUAL_PATH
     CONFIG_ENTRY_ACTIVATED = mg_config.CONFIG_SUBLIMEMERGE_ACTIVATED
 
+    DOUBLE_CLICK_ACTIONS = [
+        mg_const.DBC_RUNSUBLIMEMERGE,
+    ]
 
 #######################################################
 #       GitBash stuff
@@ -353,6 +384,9 @@ class ExecGitBash(ExecTool):
     CONFIG_ENTRY_MANUAL_PATH = mg_config.CONFIG_GITBASH_MANUAL_PATH
     CONFIG_ENTRY_ACTIVATED = mg_config.CONFIG_GITBASH_ACTIVATED
 
+    DOUBLE_CLICK_ACTIONS = [
+        mg_const.DBC_RUNGITBASH,
+    ]
 
 #######################################################
 #       GitGui stuff
@@ -378,6 +412,9 @@ class ExecGitGui(ExecTool):
     CONFIG_ENTRY_MANUAL_PATH = mg_config.CONFIG_GITGUI_MANUAL_PATH
     CONFIG_ENTRY_ACTIVATED = mg_config.CONFIG_GITGUI_ACTIVATED
 
+    DOUBLE_CLICK_ACTIONS = [
+        mg_const.DBC_RUNGITGUI,
+    ]
 
 #######################################################
 #       Gitk stuff
@@ -403,6 +440,9 @@ class ExecGitK(ExecTool):
     CONFIG_ENTRY_MANUAL_PATH = mg_config.CONFIG_GITK_MANUAL_PATH
     CONFIG_ENTRY_ACTIVATED = mg_config.CONFIG_GITK_ACTIVATED
 
+    DOUBLE_CLICK_ACTIONS = [
+        mg_const.DBC_RUNGITK,
+    ]
 
 #######################################################
 #       Open directory
@@ -655,8 +695,8 @@ class RunProcess(QObject):
         btext = bytes(self.process.readAllStandardOutput())
         cmd_out = self.partial_stdout + btext.decode('utf8', errors='replace').replace('\r', '\n')
         self.partial_stdout = ''
-        cmd_out_dbg = cmd_out if len(cmd_out) < MAX_GIT_DBG_OUT_CHAR else \
-            cmd_out[:MAX_GIT_DBG_OUT_CHAR] + '\n<output truncated to {} characters>'.format(MAX_GIT_DBG_OUT_CHAR)
+        cmd_out_dbg = cmd_out if len(cmd_out) < mg_const.MAX_GIT_DBG_OUT_CHAR else \
+            cmd_out[:mg_const.MAX_GIT_DBG_OUT_CHAR] + '\n<output truncated to {} characters>'.format(mg_const.MAX_GIT_DBG_OUT_CHAR)
         logger.debug('stdout: {}'.format(cmd_out_dbg))
 
         log_git_cmd(self.nice_cmdline())

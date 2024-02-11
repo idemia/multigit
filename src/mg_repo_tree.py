@@ -22,7 +22,7 @@ from PySide2.QtWidgets import QTreeWidget, QMenu, QAction, QApplication, QMessag
 from PySide2.QtGui import QIcon
 from PySide2.QtCore import Qt, QPoint
 
-from src.mg_const import COL_UPDATE, COL_REPO_NAME, COL_NB, COL_TITLES, COL_SHA1, DoubleClickActions, COL_URL
+import src.mg_const as mg_const
 from src import mg_config as mgc
 from src.mg_tools import ExecTortoiseGit, ExecGitBash, ExecSourceTree, ExecSublimeMerge, ExecGit, ExecGitK, ExecExplorer
 from src.mg_repo_info import MgRepoInfo
@@ -68,12 +68,12 @@ class MgRepoTree(QTreeWidget):
         # the column for the refresh icon
         self.headerItem().setText(0, '')
         self.header().setFont(f)
-        self.sortByColumn(COL_REPO_NAME, Qt.AscendingOrder)
-        self.setColumnWidth(COL_UPDATE, 40)
+        self.sortByColumn(mg_const.COL_REPO_NAME, Qt.AscendingOrder)
+        self.setColumnWidth(mg_const.COL_UPDATE, 40)
 
-        if self.columnCount() < COL_NB:
-            self.setColumnCount(COL_NB)
-            self.setHeaderLabels(COL_TITLES)
+        if self.columnCount() < mg_const.COL_NB:
+            self.setColumnCount(mg_const.COL_NB)
+            self.setHeaderLabels(mg_const.COL_TITLES)
             self.setSelectionMode(QAbstractItemView.ExtendedSelection)
             self.setAllColumnsShowFocus(True)
             self.header().setSortIndicatorShown(True)
@@ -110,7 +110,7 @@ class MgRepoTree(QTreeWidget):
 
     def slotViewColSha1Changed(self, showColSha1: bool) -> None:
         '''Called when menu item View->Columns->Sha1 changes value'''
-        self.setColumnHidden(COL_SHA1, not showColSha1)
+        self.setColumnHidden(mg_const.COL_SHA1, not showColSha1)
         if showColSha1:
             # ensure that sha1 information is fetched from all repos
             for repoItem in self.allRepoItems():
@@ -119,7 +119,7 @@ class MgRepoTree(QTreeWidget):
 
     def slotViewColUrlChanged(self, showColUrl: bool) -> None:
         '''Called when menu item View->Columns->Url changes value'''
-        self.setColumnHidden(COL_URL, not showColUrl)
+        self.setColumnHidden(mg_const.COL_URL, not showColUrl)
         if showColUrl:
             # ensure that URL information is fetched from all repos
             for repoItem in self.allRepoItems():
@@ -200,7 +200,7 @@ class MgRepoTree(QTreeWidget):
         '''Remove all the items related to the listed repositories'''
         for repoInfo in deletedRepo:
             for itemIdx in range(self.topLevelItemCount()):
-                if self.topLevelItem(itemIdx).text(COL_REPO_NAME) == repoInfo.name:     # type: ignore # topLevelItem(itemIdx) exists and is not None
+                if self.topLevelItem(itemIdx).text(mg_const.COL_REPO_NAME) == repoInfo.name:     # type: ignore # topLevelItem(itemIdx) exists and is not None
                     self.takeTopLevelItem(itemIdx)
                     break  # we only have one such item per repo, no need to continue searching
             else:
@@ -321,28 +321,34 @@ class MgRepoTree(QTreeWidget):
         '''Called when user double-clicked or presses enter on an item. Call user-defined action'''
         dbg('slotItemActivated()')
 
+        # Make sure you don't forget any action!
         actionToPerform = {
-            DoubleClickActions.GitCommit.value           : self.slotGitCommit,
-            DoubleClickActions.GitCreateBranch.value     : self.slotGitCreateBranch,
-            DoubleClickActions.GitSwitchBranch.value     : self.slotGitSwitchBranch,
-            DoubleClickActions.GitPush.value             : self.slotGitPush,
-            DoubleClickActions.GitPull.value             : self.slotGitPull,
-            DoubleClickActions.GitFetch.value            : self.slotGitFetch,
+            mg_const.DBC_GITCOMMIT: self.slotGitCommit,
+            mg_const.DBC_GITCREATEBRANCH     : self.slotGitCreateBranch,
+            mg_const.DBC_GITSWITCHBRANCH     : self.slotGitSwitchBranch,
+            mg_const.DBC_GITPUSH             : self.slotGitPush,
+            mg_const.DBC_GITPULL             : self.slotGitPull,
+            mg_const.DBC_GITFETCH            : self.slotGitFetch,
+            mg_const.DBC_REPOSITORYPROPERTIES: self.slotGitProperties,
+            mg_const.DBC_SHOWINEXPLORER      : self.slotShowInExplorer,
 
-            DoubleClickActions.TortoiseGitShowLog.value  : self.slotTGitShowLog,
-            DoubleClickActions.TortoiseGitSwitch.value   : self.slotTGitSwitch,
-            DoubleClickActions.TortoiseGitBranch.value   : self.slotTGitBranch,
-            DoubleClickActions.TortoiseGitCommit.value   : self.slotTGitCommit,
-            DoubleClickActions.TortoiseGitDiff.value     : self.slotTGitDiff,
-            DoubleClickActions.TortoiseGitPush.value     : self.slotTGitPush,
-            DoubleClickActions.TortoiseGitPull.value     : self.slotTGitPull,
-            DoubleClickActions.TortoiseGitFetch.value    : self.slotTGitFetch,
+            mg_const.DBC_DONOTHING           : (lambda : None),
 
-            DoubleClickActions.RunSourceTree.value       : self.slotSourcetree,
-            DoubleClickActions.RunSublimeMerge.value     : self.slotSublimemerge,
-            DoubleClickActions.RepositoryProperties.value: self.slotGitProperties,
-            DoubleClickActions.ShowInExplorer.value      : self.slotShowInExplorer,
-            DoubleClickActions.DoNothing.value           : lambda: None,
+            mg_const.DBC_TORTOISEGITSHOWLOG  : self.slotTGitShowLog,
+            mg_const.DBC_TORTOISEGITSWITCH   : self.slotTGitSwitch,
+            mg_const.DBC_TORTOISEGITBRANCH   : self.slotTGitBranch,
+            mg_const.DBC_TORTOISEGITCOMMIT   : self.slotTGitCommit,
+            mg_const.DBC_TORTOISEGITDIFF     : self.slotTGitDiff,
+            mg_const.DBC_TORTOISEGITPUSH     : self.slotTGitPush,
+            mg_const.DBC_TORTOISEGITPULL     : self.slotTGitPull,
+            mg_const.DBC_TORTOISEGITFETCH    : self.slotTGitFetch,
+
+            mg_const.DBC_RUNSOURCETREE       : self.slotSourcetree,
+            mg_const.DBC_RUNSUBLIMEMERGE     : self.slotSublimemerge,
+            mg_const.DBC_RUNGITGUI           : self.slotGitGui,
+            mg_const.DBC_RUNGITK             : self.slotGitK,
+            mg_const.DBC_RUNGITBASH          : self.slotGitBash,
+
         } # type: Dict[str, Callable[[], None]]
 
         if mgc.get_config_instance()[mgc.CONFIG_DOUBLE_CLICK_ACTION] in actionToPerform:

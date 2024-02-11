@@ -28,7 +28,7 @@ if TYPE_CHECKING:
 from src.gui.ui_preferences import Ui_Preferences
 from src.mg_tools import ExecGit, ExecTortoiseGit, ExecSourceTree, ExecSublimeMerge, ExecGitBash, ExecExplorer, \
     ExecGitGui, ExecGitK
-from src.mg_const import DoubleClickActions
+import src.mg_const as mg_const
 import src.mg_config as mgc
 
 
@@ -57,8 +57,28 @@ class MgDialogSettings(QDialog):
         self.updateColorButtons()
 
         self.ui.comboBoxDoubleClickAction.clear()
-        for action in DoubleClickActions:
-            self.ui.comboBoxDoubleClickAction.addItem(action.value)
+        universalDoubleClickActions = [
+            mg_const.DBC_DONOTHING,
+            mg_const.DBC_GITCOMMIT,
+            mg_const.DBC_GITCREATEBRANCH,
+            mg_const.DBC_GITSWITCHBRANCH,
+            mg_const.DBC_GITPUSH,
+            mg_const.DBC_GITPULL,
+            mg_const.DBC_GITFETCH,
+            mg_const.DBC_REPOSITORYPROPERTIES,
+            mg_const.DBC_SHOWINEXPLORER,
+        ]
+
+        doubleClickActions = universalDoubleClickActions
+        doubleClickActions.extend( ExecTortoiseGit.doubleClickActions() )
+        doubleClickActions.extend( ExecSourceTree.doubleClickActions() )
+        doubleClickActions.extend( ExecSublimeMerge.doubleClickActions() )
+        doubleClickActions.extend( ExecGitK.doubleClickActions() )
+        doubleClickActions.extend( ExecGitGui.doubleClickActions() )
+        doubleClickActions.extend( ExecGitBash.doubleClickActions() )
+
+        for action in doubleClickActions:
+            self.ui.comboBoxDoubleClickAction.addItem(action)
         double_click_action = config[mgc.CONFIG_DOUBLE_CLICK_ACTION] or ''
         self.ui.comboBoxDoubleClickAction.setCurrentText(double_click_action)
 
