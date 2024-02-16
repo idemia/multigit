@@ -13,8 +13,7 @@
 #     See the License for the specific language governing permissions and
 #     limitations under the License.
 #
-
-
+import sys
 from typing import TYPE_CHECKING, Union
 # still needed while we support Python 3.7
 from typing_extensions import Literal
@@ -248,7 +247,7 @@ class MgDialogSettings(QDialog):
     def slotEditPrefBrowseForTortoiseGit(self) -> None:
         '''Browse for TortoiseGitProc executable and set the result in the ui dialog'''
         current_tgit_exe = str(self.ui.lineEditTGitManual.text())
-        result, _ = QFileDialog.getOpenFileName(self, "Select the TortoiseGitProc Executable", current_tgit_exe, "TortoiseGitProc.exe")
+        result, _ = QFileDialog.getOpenFileName(self, "Select the TortoiseGitProc Executable", current_tgit_exe, ExecTortoiseGit.get_exec_name())
         if result:
             self.ui.lineEditTGitManual.setText(result)
 
@@ -256,7 +255,7 @@ class MgDialogSettings(QDialog):
     def slotEditPrefBrowseForSourcetree(self) -> None:
         '''Browse for Sourcetree executable and set the result in the ui dialog'''
         current_st_exe = str(self.ui.lineEditSourcetreeManual.text())
-        result, _ = QFileDialog.getOpenFileName(self, "Select Sourcetree Executable", current_st_exe, "SourceTree.exe")
+        result, _ = QFileDialog.getOpenFileName(self, "Select Sourcetree Executable", current_st_exe, ExecSourceTree.get_exec_name())
         if result:
             self.ui.lineEditSourcetreeManual.setText(result)
 
@@ -272,7 +271,7 @@ class MgDialogSettings(QDialog):
     def slotEditPrefBrowseForGitBash(self) -> None:
         '''Browse for git-bash executable and set the result in the ui dialog'''
         current_exe = str(self.ui.lineEditGitBashManual.text())
-        result, _ = QFileDialog.getOpenFileName(self, "Select git-bash Executable", current_exe, "git-bash.exe")
+        result, _ = QFileDialog.getOpenFileName(self, "Select git-bash Executable", current_exe, ExecGitBash.get_exec_name())
         if result:
             self.ui.lineEditGitBashManual.setText(result)
 
@@ -280,7 +279,7 @@ class MgDialogSettings(QDialog):
     def slotEditPrefBrowseForGitGui(self) -> None:
         '''Browse for git-gui executable and set the result in the ui dialog'''
         current_exe = str(self.ui.lineEditGitGuiManual.text())
-        result, _ = QFileDialog.getOpenFileName(self, "Select git-gui Executable", current_exe, "git-gui.exe")
+        result, _ = QFileDialog.getOpenFileName(self, "Select git-gui Executable", current_exe, ExecGitGui.get_exec_name())
         if result:
             self.ui.lineEditGitGuiManual.setText(result)
 
@@ -296,7 +295,10 @@ class MgDialogSettings(QDialog):
     def slotEditPrefBrowseForExplorer(self) -> None:
         '''Browse for explorer program executable and set the result in the ui dialog'''
         current_st_exe = str(self.ui.lineEditExplorerManual.text())
-        result, _ = QFileDialog.getOpenFileName(self, "Select a directory explorer program", current_st_exe, "*.exe")
+        pattern = ''
+        if sys.platform == 'win32':
+            pattern = '.exe'
+        result, _ = QFileDialog.getOpenFileName(self, "Select a directory explorer program", current_st_exe, pattern)
         if result:
             self.ui.lineEditExplorerManual.setText(result)
 
