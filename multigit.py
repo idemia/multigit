@@ -208,7 +208,7 @@ def init_logging(debug_activated: bool = False, run_from_tests: bool = False) ->
     shandler_err.setFormatter(formatter)
 
 
-if __name__ == '__main__':
+def main() -> None:
     if '--version' in sys.argv:
         print('Multigit v%s' % mg_const.VERSION)
         print('Based on:')
@@ -237,3 +237,8 @@ if __name__ == '__main__':
     logging.info( 'Using Python v%s and Qt for Python %s' % (platform.python_version(), qt_version))
     main_gui()
     logging.info( 'Exit.' )
+
+
+if __name__ == '__main__':
+    main()
+
