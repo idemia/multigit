@@ -14,9 +14,7 @@
 #     limitations under the License.
 #
 import sys
-from typing import TYPE_CHECKING, Union
-# still needed while we support Python 3.7
-from typing_extensions import Literal
+from typing import TYPE_CHECKING, Union, Literal
 
 from PySide2.QtWidgets import QFileDialog, QDialog, QColorDialog, QWidget
 from PySide2.QtGui import QColor
