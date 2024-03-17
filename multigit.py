@@ -27,6 +27,12 @@ from concurrent_log_handler import ConcurrentRotatingFileHandler
 from PySide2.QtWidgets import QApplication, QMessageBox
 from PySide2 import QtGui
 
+if __package__:
+    # when running inside a package, src/* is not on the path, only multigit_gx is.
+    # we must add it explicitely
+    path = os.path.dirname(__file__)
+    sys.path.insert(0, path)
+
 import src.multigit_resources_rc        # uses side-effects to make resources available
 from src.mg_window import MgMainWindow
 from src import mg_const

@@ -56,22 +56,25 @@ dev = [
 ]
 
 [project.scripts]
-mgitcmd = "mgitcmd:main"
+mgitcmd = "multigit_gx.mgitcmd:main"
 
 [project.gui-scripts]
-multigit = "multigit:main"
+multigit = "multigit_gx.multigit:main"
 
 
 [tool.hatch.version]
 path = "src/mg_const.py"
 
 [tool.hatch.build.targets.wheel]
-include = [
+packages = [
     'multigit.py',
     'mgitcmd.py',
     'src',
 ]
 exclude = [ '*.ui', 'generate_ui.bat' ]
+
+[tool.hatch.build.targets.wheel.sources]
+"" = "multigit_gx"
 
 [tool.hatch.build.targets.sdist]
 packages = [
