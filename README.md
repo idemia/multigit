@@ -6,7 +6,7 @@ Multigit
 
 *by Philippe Fremy at IDEMIA (philippe.fremy at idemia.com)*
 
-Multigit is a graphical tool designed to simplify working with multiple git repositories at the same time.
+Multigit is a graphical tool designed to simplify working with projects composed of multiple git repositories.
 
 Typically, it lets you:
 * fetch or pull on all repositories at the same time

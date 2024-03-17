@@ -177,7 +177,7 @@ class Ui_dialogAbout(object):
 "<p style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:10pt;\"><br"
                         " /></p>\n"
 "<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:10pt;\">Most icons are provided by freely </span><a href=\"https://icons8.com\"><span style=\" font-size:10pt; text-decoration: underline; color:#0000ff;\">Icons8</span></a></p>\n"
-"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:10pt;\">Icons from the softwares Git, TortoiseGit, SourceTree, SublimeMerge are used to represent activation the respected software. Icons remain the properties of their copyright owner. IDEMIA logo is copyrighted to IDEMIA and can not be used without IDEMIA's approval (see licensing for details).</span></p></body></html>", None))
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:10pt;\">Icons from the softwares Git, TortoiseGit, SourceTree, SublimeMerge are used to represent activation of the related software. Icons remain the properties of their copyright owner. IDEMIA logo is copyrighted to IDEMIA and can not be used without IDEMIA's approval (see licensing for details).</span></p></body></html>", None))
         self.pushButtonFullLicense.setText(QCoreApplication.translate("dialogAbout", u"Full Licensing Information", None))
         self.pushButtonOk.setText(QCoreApplication.translate("dialogAbout", u"Ok", None))
     # retranslateUi
