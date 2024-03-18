@@ -19,7 +19,7 @@ jobs:
       matrix:
         include:
           # oldest supported version of python
-          - python-version: "3.7"
+          - python-version: "3.8"
 
           # limit python version to 3.10 due to Pyside2
           # not supported at the moment, fix that later
@@ -52,7 +52,7 @@ jobs:
       matrix:
         include:
           # oldest supported version of python
-          - python-version: "3.7"
+          - python-version: "3.8"
 
           # limit python version to 3.10 due to Pyside2
           # not supported at the moment, fix that later
