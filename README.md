@@ -6,10 +6,15 @@ Multigit
 
 *by Philippe Fremy at IDEMIA (philippe.fremy at idemia.com)*
 
-Multigit is a graphical tool designed to simplify working with projects composed of multiple git repositories.
+Multigit is a graphical tool for working with projects composed of multiple git repositories.
+
+If you think that *submodules*, *subtree* or *Google repo* are not for you, you are probably at the
+right place.
+
+*Note: on PyPi, Multigit is registered as multigit_gx because there is another multigit software*
 
 Typically, it lets you:
-* fetch or pull on all repositories at the same time
+* fetch or pull on many repositories at the same time
 * identify visually which repositories are modified or need an update (push or pull)
 * create a new branch in a subset of repositories
 * switch to a branch existing only in some repositories (but you don't remember which one)
@@ -76,6 +81,10 @@ the workflow and requires learning a new set of commands.
 
 So, Multigit was born. Internally at IDEMIA, people love it for how it made their life simpler in environments
 with 40 git repositories, without a learning curve for a new tool. Just use your git knowledge.
+
+Since the development of Multigit, other tool with similar functionality have emerged (some of them also named
+Multigit). However, from my last inspection, they are all command-line tools. Multigit is the only one providing
+a graphical interface.
 
 
 
