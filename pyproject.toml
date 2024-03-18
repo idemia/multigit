@@ -1,0 +1,131 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "multigit-gx"
+dynamic = ["version"]
+description = 'Multigit is a graphical tool designed to simplify working with projects composed of multiple git repositories.'
+readme = "README.md"
+requires-python = ">=3.8"
+license = "Apache-2.0"
+license-files.paths = ['LICENSE.txt', 'FULL_LICENSING_INFORMATION.md']
+keywords = ["git", "frontend"]
+authors = [
+  { name = "Philippe Fremy", email = "philippe.fremy@idemia.com" },
+]
+
+urls.Documentation = "https://github.com/idemia/multigit#readme"
+urls.Issues = "https://github.com/idemia/multigit/issues"
+urls.Source = "https://github.com/idemia/multigit"
+
+classifiers = [
+  "Intended Audience :: Developers",
+  "Topic :: Software Development :: Version Control :: Git",
+  "Topic :: Software Development :: User Interfaces",
+  "Development Status :: 5 - Production/Stable",
+  "Environment :: Win32 (MS Windows)",
+  "Environment :: X11 Applications :: Qt",
+]
+
+dependencies = [
+    "pyside2",
+    "concurrent-log-handler",
+]
+
+[project.optional-dependencies]
+dev = [
+    # for avoiding problems
+    "pyyaml==5.3.1",
+
+    # type verification
+    "mypy",
+    "pyside2-stubs",
+
+    # running tests
+    "pytest<8",
+
+    # packaging under Windows
+    "pyinstaller; platform_system == 'Windows'",
+
+    # generating what's new
+    "markdown2",
+
+    # verifying multigit file format
+    "jsonschema-cli",
+]
+
+[project.scripts]
+mgitcmd = "multigit_gx.mgitcmd:main"
+
+[project.gui-scripts]
+multigit = "multigit_gx.multigit:main"
+
+
+[tool.hatch.version]
+path = "src/mg_const.py"
+
+[tool.hatch.build.targets.wheel]
+packages = [
+    'multigit.py',
+    'mgitcmd.py',
+    'src',
+]
+exclude = [ '*.ui', 'generate_ui.bat' ]
+
+[tool.hatch.build.targets.wheel.sources]
+"" = "multigit_gx"
+
+[tool.hatch.build.targets.sdist]
+packages = [
+    'multigit.py',
+    'mgitcmd.py',
+    'src',
+    'tests',
+]
+
+[tool.hatch.envs.default]
+dependencies = [
+  "coverage[toml]>=6.5",
+  "pytest",
+]
+[tool.hatch.envs.default.scripts]
+test = "pytest {args:tests}"
+test-cov = "coverage run -m pytest {args:tests}"
+cov-report = [
+  "- coverage combine",
+  "coverage report",
+]
+cov = [
+  "test-cov",
+  "cov-report",
+]
+
+[[tool.hatch.envs.all.matrix]]
+python = ["3.7", "3.8", "3.9", "3.10"]
+
+[tool.hatch.envs.types]
+dependencies = [
+  "mypy>=1.0.0",
+]
+[tool.hatch.envs.types.scripts]
+check = "mypy --install-types --non-interactive {args:src/multigit_gx tests}"
+
+[tool.coverage.run]
+source_pkgs = ["multigit_gx", "tests"]
+branch = true
+parallel = true
+omit = [
+  "src/multigit_gx/__about__.py",
+]
+
+[tool.coverage.paths]
+multigit_gx = ["src/multigit_gx", "*/multigit-gx/src/multigit_gx"]
+tests = ["tests", "*/multigit-gx/tests"]
+
+[tool.coverage.report]
+exclude_lines = [
+  "no cov",
+  "if __name__ == .__main__.:",
+  "if TYPE_CHECKING:",
+]

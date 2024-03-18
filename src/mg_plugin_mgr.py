@@ -57,7 +57,7 @@ class MgPluginManager:
 pluginMgrInstance = MgPluginManager()
 
 try:
-    from idemia import idemia_plugin        # type: ignore[import]
+    from idemia import idemia_plugin        # type: ignore[import-not-found]
     pluginMgrInstance.registerIdemiaPlugin(idemia_plugin.MgIdemiaPlugin())
 except ImportError as exc:
     if not 'idemia' in str(exc):

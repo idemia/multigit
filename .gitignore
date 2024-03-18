@@ -5,6 +5,7 @@ Setup/
 .idea
 __pycache__
 .env*
+env*
 release/
 examples/
 /images/incoming

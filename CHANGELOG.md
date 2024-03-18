@@ -8,6 +8,12 @@ Introduction
 
 Multigit help users to manage many Git repositories simultaneously.
 
+Version 1.6.1 (2024-XX-XX)
+-------------
+* Porting to Linux
+* Add support for `gitk` and `git gui`
+
+
 Version 1.6.0 (2023-04-14)
 -------------
 First official release to the open source world!

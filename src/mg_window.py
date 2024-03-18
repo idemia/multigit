@@ -15,9 +15,8 @@
 #
 
 
-from typing import cast, List, Optional, Callable, Any, Union
+from typing import cast, List, Optional, Callable, Any, Union, Literal
 import subprocess, functools, logging, pathlib
-from typing_extensions import Literal
 
 from PySide2.QtWidgets import QMainWindow, QFileDialog, QMessageBox, QAction, QApplication, QLineEdit, QTabBar
 from PySide2.QtCore import QTimer, Qt, QSignalMapper
@@ -35,11 +34,11 @@ from src.mg_plugin_mgr import pluginMgrInstance
 from src.mg_multigit_widget import MgMultigitWidget
 from src.mg_repo_tree_item import MgRepoTreeItem
 from src.mg_repo_tree import MgRepoTree
-from src.mg_tools import git_exec
+from src.mg_tools import ExecExplorer, ExecGit
 from src.mg_dialog_settings import runDialogEditSettings
 from src.mg_exec_window import MgExecWindow
 from src import mg_config as mgc
-from src.mg_const import VERSION
+from src.mg_const import VERSION, DISPLAY_FETCH_ON_STARTUP_COUNTDOWN_INIT
 
 
 logger = logging.getLogger('mg_main_window')
@@ -230,6 +229,8 @@ class MgMainWindow(QMainWindow, Ui_MainWindow):
         # Menu Git programs
         self.mgActions.actionSourceTree.triggered.connect(self.dispatchToActiveTreeOfMultigitTab('slotSourcetree'))
         self.mgActions.actionSublimeMerge.triggered.connect(self.dispatchToActiveTreeOfMultigitTab('slotSublimemerge'))
+        self.mgActions.actionGitGui.triggered.connect(self.dispatchToActiveTreeOfMultigitTab('slotGitGui'))
+        self.mgActions.actionGitK.triggered.connect(self.dispatchToActiveTreeOfMultigitTab('slotGitK'))
 
         self.mgActions.actionTGitShowLog  .triggered.connect(self.dispatchToActiveTreeOfMultigitTab('slotTGitShowLog'))
         self.mgActions.actionTGitCommit   .triggered.connect(self.dispatchToActiveTreeOfMultigitTab('slotTGitCommit'))
@@ -285,18 +286,7 @@ class MgMainWindow(QMainWindow, Ui_MainWindow):
 
     def checkGitOkAndOpenDefaultRepo(self) -> None:
         '''Check performed on first launch of the UI, to verify that Git is working.'''
-        try:
-            git_exec('--version', allow_errors=True)
-            self.gitIsOk = True
-            # git OK
-
-        except (ValueError, FileNotFoundError):
-            QMessageBox.warning(self, 'Could not locate git.exe', 'Warning: could not locate the git.exe program\n' +
-                                'MultiGit needs git to work.\nPlease configure the location in the preference dialog.\n')
-            self.slotEditSettingsGitProgram()
-        except subprocess.CalledProcessError as exc:
-            QMessageBox.warning(self, 'Could not execute git.exe', 'Error: could not execute git.exe\n{}'.format(exc) +
-                                '\nMultiGit needs git to work.\nPlease configure the location in the preference dialog.\n')
+        if not ExecGit.checkFound():
             self.slotEditSettingsGitProgram()
 
         # Open repositories passed as arguments
@@ -318,13 +308,26 @@ class MgMainWindow(QMainWindow, Ui_MainWindow):
                 self.tabRepos.setTabText(idx, tabName)
 
         fetchReposOnStartup = self.config[mgc.CONFIG_FETCH_ON_STARTUP]
-        if fetchReposOnStartup is None:
+        if fetchReposOnStartup is None or self.config[mgc.CONFIG_DISPLAY_FETCH_ON_STARTUP_COUNTDOWN] is None:
+            self.config[mgc.CONFIG_FETCH_ON_STARTUP] = False
+            self.config[mgc.CONFIG_DISPLAY_FETCH_ON_STARTUP_COUNTDOWN] = DISPLAY_FETCH_ON_STARTUP_COUNTDOWN_INIT
+            self.config.save()
+        else:
+            try:
+                val = self.config[mgc.CONFIG_DISPLAY_FETCH_ON_STARTUP_COUNTDOWN]
+                if val >= 0:
+                    val -= 1
+                    self.config[mgc.CONFIG_DISPLAY_FETCH_ON_STARTUP_COUNTDOWN] = val
+            except TypeError:
+                # invalid config value, reset it
+                self.config[mgc.CONFIG_DISPLAY_FETCH_ON_STARTUP_COUNTDOWN] = DISPLAY_FETCH_ON_STARTUP_COUNTDOWN_INIT
+
+        if self.config[mgc.CONFIG_DISPLAY_FETCH_ON_STARTUP_COUNTDOWN] == 0:
             answer = QMessageBox.question(self, 'Activate fetch on startup ?', 'Multigit can fetch all your repositories when you launch it. '
-                                 'Do you want to activate this setting ?\n\nNote that you can change it later in the settings dialog.\n')
+                                 'Do you want to activate this behavior ?\n\nNote that you can change it later in the settings dialog.\n')
             fetchReposOnStartup = (answer == QMessageBox.Yes)
             self.config[mgc.CONFIG_FETCH_ON_STARTUP] = fetchReposOnStartup
             self.config.save()
-
 
         if fetchReposOnStartup:
             QTimer.singleShot(1000, self.slotFetchAllReposOnAllTabs)
@@ -457,7 +460,10 @@ class MgMainWindow(QMainWindow, Ui_MainWindow):
         path_log_file = mg_const.PATH_LOG_NORMAL or mg_const.PATH_LOG_DEBUG
         assert path_log_file is not None
         path_log_dir = str(path_log_file.parent)
-        subprocess.Popen(['explorer', path_log_dir])
+
+        if not ExecExplorer.checkFound():
+            return
+        ExecExplorer.exec_non_blocking([path_log_dir])
 
 
     ##########################################################################

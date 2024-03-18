@@ -15,14 +15,15 @@
 #
 
 
-from typing import List, Optional
-import pathlib, os, platform, enum
+from typing import Optional
+
+import pathlib, platform, enum
 
 ############################################
 #   Product Constants
 ############################################
 
-VERSION = '1.6.0'
+VERSION = '1.6.1'
 
 MAX_DIFF_LINES = 1000
 MAX_GIT_DBG_OUT_CHAR = 5000
@@ -39,32 +40,6 @@ COL_TITLES = ['', 'Git Repo Path', 'Head', 'Status', 'Last Remote Synchro', 'SHA
 
 SHORT_SHA1_NB_DIGITS = 7
 
-GIT_PATH_CANDIDATES: List[pathlib.Path] = [
-    pathlib.Path(os.environ["ProgramFiles(x86)"])/"Git"/"bin"/ "git.exe",
-    pathlib.Path(os.environ["ProgramFiles(x86)"])/"Git"/"cmd"/ "git.exe",
-    pathlib.Path(os.environ["PROGRAMW6432"])/"Git"/"bin"/ "git.exe",
-    pathlib.Path(os.environ["PROGRAMW6432"])/"Git"/"cmd"/ "git.exe",
-    ]
-GIT_EXEC = 'git.exe'
-
-TORTOISE_GIT_PATH_CANDIDATES: List[pathlib.Path] = [
-    pathlib.Path(os.environ["ProgramFiles(x86)"])/"TortoiseGit"/"bin"/ "TortoiseGitProc.exe",
-    pathlib.Path(os.environ["PROGRAMW6432"])/"TortoiseGit"/"bin"/ "TortoiseGitProc.exe",
-]
-SOURCETREE_PATH_CANDIDATES: List[pathlib.Path] = [
-    pathlib.Path(os.environ["ProgramFiles(x86)"])/"Atlassian"/"SourceTree"/ "SourceTree.exe",
-]
-
-SUBLIMEMERGE_PATH_CANDIDATES: List[pathlib.Path] = [
-    pathlib.Path(os.environ["PROGRAMW6432"])/"Sublime Merge"/"sublime_merge.exe",
-]
-
-GITBASH_PATH_CANDIDATES: List[pathlib.Path] = [
-    pathlib.Path(os.environ["PROGRAMW6432"])/"Git"/"git-bash.exe",
-    pathlib.Path(os.environ["ProgramFiles(x86)"]) /"Git"/"git-bash.exe",
-]
-APPDATA_USER_MULTIGIT = pathlib.Path(os.environ['USERPROFILE']) / 'AppData/Local/MultiGit/'
-
 # This is filled when initializing the application
 PATH_LOG_NORMAL: Optional[pathlib.Path]
 PATH_LOG_DEBUG: Optional[pathlib.Path]
@@ -72,6 +47,8 @@ PATH_LOG_GIT_CMD: Optional[pathlib.Path]
 LOGGER_GIT_CMD = 'git_cmd'
 
 GIT_AUTH_FAILURE_MARKER='fatal: Authentication failed'
+
+DISPLAY_FETCH_ON_STARTUP_COUNTDOWN_INIT = 5
 
 ############################################
 #   UI Messages
@@ -100,12 +77,13 @@ try:
 except ImportError:
     pyqt_version_info = ''
 
-MSG_ABOUT_MULTIGIT = """MultiGit v%s
+MSG_ABOUT_MULTIGIT = """MultiGit OpenSource v%s
 
 MultiGit manages multiple Git Repositories with one interface.
 
-MultiGit is developed by Philippe Fremy <philippe.fremy@idemia.com> and Florent Oulieres <florent.oulieres@idemia.com>
-Please contact us for any requests or bugs.
+MultiGit is developed by Philippe Fremy <philippe.fremy@idemia.com> .
+
+Please use Github repository page for any feedback: https://github.com/idemia/multigit/
 
 MultiGit is based on the following software:
 * Python v%s
@@ -125,31 +103,26 @@ MSG_GIT_EXEC_1_OK = 'Successful execution of git %s'
 MSG_GIT_SOME_FAILED = 'Failed execution of git %s, %d errors out of %d'
 
 
-class DoubleClickActions(enum.Enum):
-    '''All possible actions for double-click on a repo. Some actions are intentionally not
-    included in this list because they are too invasive to be put on a double-click:
-    * git revert, git tag, git delete branch, git push tags
-    * tortoise git revert, tortoise git tag
-    '''
-
-    GitCommit          = 'Git Commit'
-    GitCreateBranch    = 'Git Create Branch'
-    GitSwitchBranch    = 'Git Switch Branch'
-    GitPush            = 'Git Push'
-    GitPull            = 'Git Pull'
-    GitFetch           = 'Git Fetch'
-
-    TortoiseGitShowLog = 'TortoiseGit ShowLog'
-    TortoiseGitCommit  = 'TortoiseGit Commit'
-    TortoiseGitSwitch  = 'TortoiseGit Switch'
-    TortoiseGitBranch  = 'TortoiseGit Branch'
-    TortoiseGitPush    = 'TortoiseGit Push'
-    TortoiseGitPull    = 'TortoiseGit Pull'
-    TortoiseGitFetch   = 'TortoiseGit Fetch'
-    TortoiseGitDiff    = 'TortoiseGit Diff'
-
-    RunSourceTree      = 'Run SourceTree'
-    RunSublimeMerge    = 'Run SublimeMerge'
-    RepositoryProperties = 'Repository Properties'
-    ShowInExplorer     = 'Show in Explorer'
-    DoNothing          = 'Do nothing'
+### All possible double-click actions
+DBC_GITCOMMIT          = 'Git Commit'
+DBC_GITCREATEBRANCH    = 'Git Create Branch'
+DBC_GITSWITCHBRANCH    = 'Git Switch Branch'
+DBC_GITPUSH            = 'Git Push'
+DBC_GITPULL            = 'Git Pull'
+DBC_GITFETCH           = 'Git Fetch'
+DBC_REPOSITORYPROPERTIES = 'Repository Properties'
+DBC_SHOWINEXPLORER     = 'Show in Explorer'
+DBC_DONOTHING          = 'Do nothing'
+DBC_TORTOISEGITSHOWLOG = 'TortoiseGit ShowLog'
+DBC_TORTOISEGITSWITCH  = 'TortoiseGit Switch'
+DBC_TORTOISEGITBRANCH  = 'TortoiseGit Branch'
+DBC_TORTOISEGITCOMMIT  = 'TortoiseGit Commit'
+DBC_TORTOISEGITDIFF    = 'TortoiseGit Diff'
+DBC_TORTOISEGITPUSH    = 'TortoiseGit Push'
+DBC_TORTOISEGITPULL    = 'TortoiseGit Pull'
+DBC_TORTOISEGITFETCH   = 'TortoiseGit Fetch'
+DBC_RUNSOURCETREE      = 'Run SourceTree'
+DBC_RUNSUBLIMEMERGE    = 'Run SublimeMerge'
+DBC_RUNGITGUI          = 'Run Git Gui'
+DBC_RUNGITK            = 'Run GitK'
+DBC_RUNGITBASH         = 'Run git-bash'

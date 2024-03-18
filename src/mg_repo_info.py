@@ -24,7 +24,7 @@ from PySide2.QtWidgets import QMessageBox
 
 from src.mg_const import MSG_NO_COMMIT, MSG_REMOTE_TOPUSH_TOPULL, MSG_REMOTE_SYNCHRO_OK, MSG_REMOTE_TOPULL, \
     MSG_REMOTE_TOPUSH, MSG_REMOTE_BRANCH_GONE, MSG_LOCAL_BRANCH, SHORT_SHA1_NB_DIGITS, MSG_EMPTY_REPO
-from src.mg_tools import RunProcess, get_git_exec
+from src.mg_tools import RunProcess, ExecGit
 from src.mg_utils import anonymise_git_url
 
 logger = logging.getLogger('mg_repo_info')
@@ -615,8 +615,7 @@ class MgRepoInfo(QObject):
             local_cb_last_commit: Optional[Callable[[str, str], None]]
             if cb_commit_sha1:
                 def local_cb_last_commit(_repoName: str, _lastCommit: str) -> None:
-                    # see https://github.com/python/mypy/issues/10993 for why type: ignore is necessary
-                    cb_commit_sha1(self.commit_sha1 or '')  # type: ignore
+                    cb_commit_sha1(self.commit_sha1 or '')
             else:
                 local_cb_last_commit = None
 
@@ -644,8 +643,7 @@ class MgRepoInfo(QObject):
         if cb_url:
             def local_cb_fill_git_remote_done(repo_name: str, git_exit_code: int, remote_out: str) -> None:
                 self.cb_fill_git_remote_done(repo_name, git_exit_code, remote_out)
-                # necessary to make mypy happy, see https://github.com/python/mypy/issues/10993
-                cb_url(self.url or '')  # type: ignore
+                cb_url(self.url or '')
         else:
             local_cb_fill_git_remote_done = self.cb_fill_git_remote_done
 
@@ -1153,12 +1151,11 @@ class MgRepoInfo(QObject):
 
         May raise subprocess.CalledProcessError() if git does not exit with 0
         '''
-        prog_git = get_git_exec()
-        if prog_git is None or len(prog_git) == 0:
-            raise FileNotFoundError('Can not execute git with empty executable!')
-        git_cmd = [prog_git, '-C', self.fullpath] + list(args)
-        git_exit_code, cmd_out = RunProcess().exec_blocking(git_cmd)
-        return cmd_out
+        if not ExecGit.checkFound():
+            return ''
+
+        git_cmd = ['-C', self.fullpath] + list(args)
+        return ExecGit.exec_blocking(git_cmd)
 
 
     def git_exec_async_here(self, args: Sequence[str], cb_git_done: Optional[Callable[[str, int, str], Any]],
@@ -1171,16 +1168,15 @@ class MgRepoInfo(QObject):
         if allow_errors is False, a message box is displayed if git returns an exit code different than 0. If you
         have your own handling of git errors, set allow_errors to True.
         '''
-        prog_git = get_git_exec()
-        if prog_git is None or len(prog_git) == 0:
-            raise FileNotFoundError('Can not execute git with empty executable!')
-        git_cmd = [prog_git, '-C', self.fullpath] + list(args)
+        if not ExecGit.checkFound():
+            return
+
+        git_cmd = [ExecGit.get_executable(), '-C', self.fullpath] + list(args)
 
         cb_process_done = None
         if cb_git_done:
             # adapt the callback by including the repo name
             def cb_process_done(git_exit_code: int, git_output: str) -> None:
-                assert cb_git_done  # to help mypy not raise an error
                 cb_git_done(self.name, git_exit_code, git_output)
 
         # our pool process does not handle force blocking, launch directly

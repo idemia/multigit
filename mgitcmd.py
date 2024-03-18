@@ -13,35 +13,40 @@
 #     See the License for the specific language governing permissions and
 #     limitations under the License.
 #
-
-
+from typing import Union, List, Optional
+import os, sys
 import argparse, sys, os
 from pathlib import Path
-from typing import Union, List, Optional
+
+if __package__:
+    # when running inside a package, src/* is not on the path, only multigit_gx is.
+    # we must add it explicitely
+    path = os.path.dirname(__file__)
+    sys.path.insert(0, path)
 
 from src import mg_const as mgc
 from src.mg_json_mgit_parser import ProjectStructure
-from src.mg_tools import get_git_exec, RunProcess
+from src.mg_tools import RunProcess, ExecGit
 
-HELP='''
+HELP = '''
 mgitcmd clone path_to_mgit_file.mgit [--dest path_to_dir] [--shallow] 
     Clone a group of repositories according to path_to_mgit_file.mgit
-    
+
     --dest path_to_dir: Clones into the target directory. If not provided,
                         clones into the current directory.
-    
+
     --shalllow: Perform a shallow clone with --depth 1 . Applied only on tags
                 and branches, will not work for HEAD specified as a commit. This
                 speeds up the clone process by downloading less data.
-                
-                
+
+
 mgitcmd --version
     Displays version information and exits.
-  
-    
+
+
 mgitcmd --help
     Display this help
-    
+
 '''
 
 VERSION_LINE = 'Multigit Command-line version v%s' % mgc.VERSION
@@ -57,7 +62,7 @@ def cmd_clone(fname: str, dest_dir: Optional[str], shallow: bool) -> None:
     print('Cloning information:')
     print(project)
 
-    reposToClone =  project.repos[:]
+    reposToClone = project.repos[:]
     reposToClone.sort(key=lambda r: r.destination)
 
     errors = []
@@ -71,7 +76,7 @@ def cmd_clone(fname: str, dest_dir: Optional[str], shallow: bool) -> None:
         clone_cmd = ['clone', repo.url, repo.dest_fullpath]
         tasks.append(clone_cmd)
         if shallow and repo.head_type in ('branch', 'tag'):
-            clone_cmd.extend( ['--branch', repo.head ] )
+            clone_cmd.extend(['--branch', repo.head])
             clone_cmd.extend(['--depth', '1'])
         else:
             # head_type: commit or empty
@@ -87,7 +92,7 @@ def cmd_clone(fname: str, dest_dir: Optional[str], shallow: bool) -> None:
         print('Aborting')
         sys.exit(-1)
 
-    prog_git = get_git_exec()
+    prog_git = ExecGit.get_executable()
     if prog_git is None or len(prog_git) == 0:
         print('Can not find git with executable!')
         print('Please put it on the path or define git location in the Multigit settings.')

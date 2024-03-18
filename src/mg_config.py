@@ -15,13 +15,13 @@
 #
 
 
-import os, ast
+from typing import List, TypeVar, Sequence, Optional, Any, Dict
+
+import os, ast, sys
 from pathlib import Path
 from pprint import pformat
 import logging, traceback
 import datetime, shutil
-
-from typing import List, TypeVar, Sequence, Optional, Any, Dict
 
 from PySide2.QtCore import Qt
 from PySide2.QtWidgets import QMessageBox, QApplication
@@ -45,8 +45,17 @@ CONFIG_SOURCETREE_ACTIVATED = 'CONFIG_SOURCETREE_ACTIVATED'
 CONFIG_SUBLIMEMERGE_AUTODETECT = 'CONFIG_SUBLIMEMERGE_AUTODETECT'
 CONFIG_SUBLIMEMERGE_MANUAL_PATH = 'CONFIG_SUBLIMEMERGE_MANUAL_PATH'
 CONFIG_SUBLIMEMERGE_ACTIVATED = 'CONFIG_SUBLIMEMERGE_ACTIVATED'
+CONFIG_GITGUI_AUTODETECT = 'CONFIG_GITGUI_AUTODETECT'
+CONFIG_GITGUI_MANUAL_PATH = 'CONFIG_GITGUI_MANUAL_PATH'
+CONFIG_GITGUI_ACTIVATED = 'CONFIG_GITGUI_ACTIVATED'
+CONFIG_GITK_AUTODETECT = 'CONFIG_GITK_AUTODETECT'
+CONFIG_GITK_MANUAL_PATH = 'CONFIG_GITK_MANUAL_PATH'
+CONFIG_GITK_ACTIVATED = 'CONFIG_GITK_ACTIVATED'
 CONFIG_GITBASH_AUTODETECT = 'CONFIG_GITBASH_AUTODETECT'
 CONFIG_GITBASH_MANUAL_PATH = 'CONFIG_GITBASH_MANUAL_PATH'
+CONFIG_GITBASH_ACTIVATED = 'CONFIG_GITBASH_ACTIVATED'
+CONFIG_EXPLORER_AUTODETECT = 'CONFIG_EXPLORER_AUTODETECT'
+CONFIG_EXPLORER_MANUAL_PATH = 'CONFIG_EXPLORER_MANUAL_PATH'
 CONFIG_TAG_HISTORY = 'CONFIG_TAG_HISTORY'
 CONFIG_GIT_CMD_HISTORY = 'CONFIG_GIT_CMD_HISTORY'
 CONFIG_GIT_BRANCH_HISTORY = 'CONFIG_GIT_BRANCH_HISTORY'
@@ -65,8 +74,7 @@ CONFIG_VIEW_COL_SHA1 = 'CONFIG_VIEW_COL_SHA1'
 CONFIG_VIEW_COL_URL = 'CONFIG_VIEW_COL_URL'
 CONFIG_CLONE_USERNAME = 'CONFIG_CONFIG_CLONE_USERNAME'
 CONFIG_FETCH_ON_STARTUP = 'CONFIG_FETCH_ON_STARTUP'
-
-DEFAULT_CONFIG_PATH = Path(os.environ['USERPROFILE']) / 'AppData/Local/MultiGit/multigit.config'
+CONFIG_DISPLAY_FETCH_ON_STARTUP_COUNTDOWN = 'CONFIG_DISPLAY_FETCH_ON_STARTUP_COUNTDOWN'
 
 DEFAULT_CHECK_UPDATE_FREQUENCY = 30 # check every month
 
@@ -81,9 +89,23 @@ __CONFIG_INSTANCE = None
 
 
 def get_config_instance() -> 'MgConfig':
+    '''Return an instance of the configuration of Multigit, with the default configuration path'''
     global __CONFIG_INSTANCE
+
+    if sys.platform == 'win32':
+        default_config_path = Path(os.environ['USERPROFILE']) / 'AppData/Local/MultiGit/multigit.config'
+    else:
+        # See https://specifications.freedesktop.org/basedir-spec/basedir-spec-latest.html
+        xdg_config_home: str
+        if os.environ.get('XDG_CONFIG_HOME', ''):
+            xdg_config_home = os.environ['XDG_CONFIG_HOME']
+        else:
+            xdg_config_home = os.path.expanduser('~/.config')
+
+        default_config_path = Path(xdg_config_home) / 'Multigit/multigit.config'
+
     if __CONFIG_INSTANCE is None:
-        __CONFIG_INSTANCE = MgConfig()
+        __CONFIG_INSTANCE = MgConfig(str(default_config_path))
         __CONFIG_INSTANCE.load()
     return __CONFIG_INSTANCE
 
@@ -91,14 +113,12 @@ def get_config_instance() -> 'MgConfig':
 class MgConfig:
     '''MultiGit configuration management'''
 
-    def __init__(self, fname: Optional[str] = None):
+    def __init__(self, config_path: str):
         '''Set the configuration filename.
-
-        If no filename is provided, the default configuration %USERPROFILE%/AppData/Local/MultiGit is used.
         '''
         self.config_dict: Dict[str, Any] = {}
         self.lru_dict: Dict[str, LRUList] = {}
-        self.config_path = Path(fname) if fname else DEFAULT_CONFIG_PATH
+        self.config_path = Path(config_path)
         self.do_not_save = False
 
     def load(self) -> None:

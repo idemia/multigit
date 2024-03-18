@@ -16,9 +16,7 @@
 
 
 import logging
-from typing import TYPE_CHECKING, cast, Type, Union, Optional, List
-if TYPE_CHECKING:
-    from typing_extensions import Protocol
+from typing import TYPE_CHECKING, cast, Type, Union, Optional, List, Protocol
 
 from PySide2.QtWidgets import QMessageBox, QDialog, QTreeWidget, QAbstractItemView, QPushButton, QLabel, QWidget
 from PySide2.QtCore import Qt, Signal

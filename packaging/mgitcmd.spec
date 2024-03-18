@@ -15,32 +15,6 @@
 #     See the License for the specific language governing permissions and
 #     limitations under the License.
 #
-#     Licensed under the Apache License, Version 2.0 (the "License");
-#     you may not use this file except in compliance with the License.
-#     You may obtain a copy of the License at
-#
-#         http://www.apache.org/licenses/LICENSE-2.0
-#
-#     Unless required by applicable law or agreed to in writing, software
-#     distributed under the License is distributed on an "AS IS" BASIS,
-#     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-#     See the License for the specific language governing permissions and
-#     limitations under the License.
-#
-#
-#     Licensed under the Apache License, Version 2.0 (the "License");
-#     you may not use this file except in compliance with the License.
-#     You may obtain a copy of the License at
-#
-#         http://www.apache.org/licenses/LICENSE-2.0
-#
-#     Unless required by applicable law or agreed to in writing, software
-#     distributed under the License is distributed on an "AS IS" BASIS,
-#     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-#     See the License for the specific language governing permissions and
-#     limitations under the License.
-#
-#
 
 import pathlib
 
@@ -58,7 +32,12 @@ def exclude_from_toc(toc: 'TOC', exclude_list: 'List[str]') -> 'TOC':
             print('\t\t\t\tExcluding:', dst)
         else:
             print('Keeping:', dst)
-    return toc - rm_toc
+
+    # this is needed for some versions of pyinstaller
+    if getattr(toc, '__sub__', None):
+        return toc - rm_toc
+    else:
+        return [v for v in toc if v not in rm_toc]
 
 
 block_cipher = None

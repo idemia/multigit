@@ -13,8 +13,7 @@
 #     See the License for the specific language governing permissions and
 #     limitations under the License.
 #
-
-
+import sys
 from typing import TYPE_CHECKING, List, Optional
 import logging, pathlib, json, os, subprocess, time
 
@@ -449,7 +448,8 @@ def runDialogCloneFromMgitFile(window: 'MgMainWindow') -> None:
                 return
 
         # kill tgitcache before anything. If it was running, it would prevent deletion of directories
-        subprocess.call(['taskkill', '/t', '/f', '/im', 'tgitcache.exe'])
+        if sys.platform == 'win32':
+            subprocess.call(['taskkill', '/t', '/f', '/im', 'tgitcache.exe'])
 
         deleteDirList(toDelDir)
 

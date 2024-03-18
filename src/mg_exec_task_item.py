@@ -26,7 +26,7 @@ from PySide2.QtCore import Signal, QObject, Qt
 from PySide2.QtGui import QIcon, QPixmap, QFont
 from PySide2.QtWidgets import QWidget, QPushButton, QLabel, QHBoxLayout, QVBoxLayout, QTreeWidgetItem, QApplication
 
-from src.mg_tools import RunProcess, get_git_exec
+from src.mg_tools import RunProcess, ExecGit
 from src.mg_repo_info import MgRepoInfo
 from src.mg_utils import handle_cr_in_text
 
@@ -202,7 +202,7 @@ class MgExecTaskGit(MgExecTask):
 
 
     def _do_run(self) -> None:
-        prog_git = get_git_exec()
+        prog_git = ExecGit.get_executable()
         if prog_git is None or len(prog_git) == 0:
             raise FileNotFoundError('Can not execute git with empty executable!')
 

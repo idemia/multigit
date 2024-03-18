@@ -151,13 +151,18 @@ files_to_exclude = set([
 def exclude_from_toc(toc: 'TOC', exclude_list: 'List[str]') -> 'TOC':
   '''Remove from the TOC the files listed in exclude_list'''
   rm_toc = []
-  for (dst, src, type) in toc:
+  for (dst, src, toc_type) in toc:
     if dst in exclude_list:
-      rm_toc.append( (dst, src, type) )
+      rm_toc.append( (dst, src, toc_type) )
       print('\t\t\t\tExcluding:', dst)
     else:
       print('Keeping:', dst)
-  return toc - rm_toc
+
+  # this is needed for some versions of pyinstaller
+  if getattr(toc, '__sub__', None):
+      return toc - rm_toc
+  else:
+      return [v for v in toc if v not in rm_toc]
 
 
 

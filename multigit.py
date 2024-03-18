@@ -14,7 +14,7 @@
 #     limitations under the License.
 #
 
-
+import os
 import platform
 import sys, logging, datetime, tempfile, pathlib
 import logging.handlers
@@ -26,6 +26,12 @@ from concurrent_log_handler import ConcurrentRotatingFileHandler
 
 from PySide2.QtWidgets import QApplication, QMessageBox
 from PySide2 import QtGui
+
+if __package__:
+    # when running inside a package, src/* is not on the path, only multigit_gx is.
+    # we must add it explicitely
+    path = os.path.dirname(__file__)
+    sys.path.insert(0, path)
 
 import src.multigit_resources_rc        # uses side-effects to make resources available
 from src.mg_window import MgMainWindow
@@ -53,7 +59,7 @@ def handle_exception(type_: Type[BaseException], value: BaseException, traceback
         QMessageBox.critical(None, 'Fatal error',
 '''A fatal error occured:
 %s\n
-Please report the problem to philippe.fremy@idemia.com and florent.oulieres@idemia.com
+Please report the problem on opening an issue on https://github.com/idemia/multigit/ .
 Please include the file log_multigit_debug.log which you can find in the menu About / Show Multigit log files .
 ''' % exc_msg )
 
@@ -86,11 +92,10 @@ def is_writeable(fname: pathlib.Path) -> bool:
     except PermissionError:
         return False
 
-def init_logging(debug_activated: bool = False, run_from_tests: bool = False) -> None:
-    '''run_from_tests: when activated, a different logging filename is used
-    debug_activated: when True, a lot more informaiton is written to a debug log file.
-                     The feature is activated when the tool is launched with --debug
-    '''
+
+def configure_logpath(debug_activated: bool = False, run_from_tests: bool = False) -> None:
+    '''Creates the log path in mg_const according to platform and ability to write to directory'''
+
     if run_from_tests:
         fname_log_normal = 'log_tests_multigit.log'
         fname_log_debug = 'log_tests_multigit_debug.log'
@@ -104,13 +109,25 @@ def init_logging(debug_activated: bool = False, run_from_tests: bool = False) ->
     path_log_debug: Optional[pathlib.Path]
     path_log_git_cmd: Optional[pathlib.Path]
 
+    if sys.platform == 'win32':
+        multigit_log_dir = pathlib.Path(os.environ['USERPROFILE']) / 'AppData/Local/MultiGit/'
+    else:
+        # See https://specifications.freedesktop.org/basedir-spec/basedir-spec-latest.html
+        xdg_state_home: str
+        if os.environ.get('XDG_STATE_HOME', ''):
+            xdg_state_home = os.environ['XDG_STATE_HOME']
+        else:
+            xdg_state_home = os.path.expanduser('~/.local/state')
+
+        multigit_log_dir = pathlib.Path(xdg_state_home) / 'MultiGit'
+
     # Make sure we are actually logging to a file which can be written
     try:
-        if not mg_const.APPDATA_USER_MULTIGIT.exists():
-            mg_const.APPDATA_USER_MULTIGIT.mkdir(parents=True)
-        path_log_normal = mg_const.APPDATA_USER_MULTIGIT / fname_log_normal
-        path_log_debug = mg_const.APPDATA_USER_MULTIGIT / fname_log_debug
-        path_log_git_cmd = mg_const.APPDATA_USER_MULTIGIT / fname_log_git_cmd
+        if not multigit_log_dir.exists():
+            multigit_log_dir.mkdir(parents=True)
+        path_log_normal = multigit_log_dir / fname_log_normal
+        path_log_debug = multigit_log_dir / fname_log_debug
+        path_log_git_cmd = multigit_log_dir / fname_log_git_cmd
 
         if not is_writeable(path_log_normal) and is_writeable(path_log_debug):
             raise PermissionError('Can not create log file in location %s' % path_log_normal)
@@ -131,6 +148,14 @@ def init_logging(debug_activated: bool = False, run_from_tests: bool = False) ->
     mg_const.PATH_LOG_NORMAL = path_log_normal
     mg_const.PATH_LOG_DEBUG = path_log_debug
     mg_const.PATH_LOG_GIT_CMD = path_log_git_cmd
+
+
+def init_logging(debug_activated: bool = False, run_from_tests: bool = False) -> None:
+    '''run_from_tests: when activated, a different logging filename is used
+    debug_activated: when True, a lot more informaiton is written to a debug log file.
+                     The feature is activated when the tool is launched with --debug
+        '''
+    configure_logpath(debug_activated, run_from_tests)
 
     formatter = logging.Formatter('%(asctime)s %(name)15s:%(levelname)7s %(message)s')
     formatter.default_time_format = '%H:%M:%S'
@@ -156,24 +181,24 @@ def init_logging(debug_activated: bool = False, run_from_tests: bool = False) ->
         logger.setLevel(logging.INFO)
 
 
-    if path_log_normal:
-        fhandler_info = ConcurrentRotatingFileHandler(str(path_log_normal), encoding='utf8', maxBytes=10_000_000, backupCount=5)
+    if mg_const.PATH_LOG_NORMAL:
+        fhandler_info = ConcurrentRotatingFileHandler(str(mg_const.PATH_LOG_NORMAL), encoding='utf8', maxBytes=10_000_000, backupCount=5)
         fhandler_info.setLevel( logging.INFO )
         fhandler_info.setFormatter(formatter)
         logger.addHandler(fhandler_info)
         # ensure that git_cmd records are not propagated to root handlers
-        fhandler_info.addFilter(lambda record: int(record.name != mg_const.LOGGER_GIT_CMD))
+        fhandler_info.addFilter(lambda record: record.name != mg_const.LOGGER_GIT_CMD)
 
-    if (path_log_debug and debug_activated):
-        fhandler_dbg = ConcurrentRotatingFileHandler(str(path_log_debug), encoding='utf8', maxBytes=10_000_000, backupCount=5)
+    if (mg_const.PATH_LOG_DEBUG and debug_activated):
+        fhandler_dbg = ConcurrentRotatingFileHandler(str(mg_const.PATH_LOG_DEBUG), encoding='utf8', maxBytes=10_000_000, backupCount=5)
         fhandler_dbg.setLevel( logging.DEBUG )
         fhandler_dbg.setFormatter(formatter)
         logger.addHandler(fhandler_dbg)
         # ensure that git_cmd records are not propagated to root handlers
-        fhandler_dbg.addFilter(lambda record: int(record.name != mg_const.LOGGER_GIT_CMD))
+        fhandler_dbg.addFilter(lambda record: record.name != mg_const.LOGGER_GIT_CMD)
 
-    if path_log_git_cmd:
-        fhandler_git_cmd = ConcurrentRotatingFileHandler(str(path_log_git_cmd), encoding='utf8', maxBytes=10_000_000, backupCount=5)
+    if mg_const.PATH_LOG_GIT_CMD:
+        fhandler_git_cmd = ConcurrentRotatingFileHandler(str(mg_const.PATH_LOG_GIT_CMD), encoding='utf8', maxBytes=10_000_000, backupCount=5)
         fhandler_git_cmd.setLevel( logging.DEBUG )
         fhandler_git_cmd.setFormatter(logging.Formatter('%(asctime)s %(message)s'))
         logger_git_cmd = logging.getLogger(mg_const.LOGGER_GIT_CMD)
@@ -189,7 +214,7 @@ def init_logging(debug_activated: bool = False, run_from_tests: bool = False) ->
     shandler_err.setFormatter(formatter)
 
 
-if __name__ == '__main__':
+def main() -> None:
     if '--version' in sys.argv:
         print('Multigit v%s' % mg_const.VERSION)
         print('Based on:')
@@ -218,3 +243,8 @@ if __name__ == '__main__':
     logging.info( 'Using Python v%s and Qt for Python %s' % (platform.python_version(), qt_version))
     main_gui()
     logging.info( 'Exit.' )
+
+
+if __name__ == '__main__':
+    main()
+
