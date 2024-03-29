@@ -11,3 +11,8 @@ For a pull request to be accepted, it must pass the Continuous Integtration test
 run mypy and pytest.
 
 
+Testing
+-------
+
+To run the tests, launch pytest from the main directory.
+

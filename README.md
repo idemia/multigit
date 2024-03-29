@@ -24,25 +24,43 @@ Typically, it lets you:
 * and more...
 
 The need arose from my work environment, where
-a project typically consists of 30 to 50 git repositories. In such environment, every simple git operation
+a project typically consists of thirty to fifty git repositories. In such environment, every simple git operation
 becomes a complex task. Thank to Multigit, it becomes simple again. Any git operation like git fetching in the 
-morning is run on all the repositories in one click. 
-When time comes to commit changes and push them, having a graphical interface to
-locate in the blink of an eye which repositories are modified and need a commit has been a life saver.
-
+morning is run on all the repositories in one click. When time comes to commit changes and push them, having a 
+graphical interface to locate in the blink of an eye which repositories are modified and need a commit has been a life saver.
 
 Multigit is developed within my employer IDEMIA. I would like to thank him again for allowing
 me to open source it.
 
+
 Status
 ------
-Multigit is developed, tested and packaged for Windows. Testing and release on Linux is on the way.
+Multigit has been used widely for several years within IDEMIA, it's mature and stable.
+
+Platform support:
+* Windows: rock-stable, primary development platform, used everyday
+* Linux: stable, but small user base so far
+* MacOs X: None yet, contribution welcome.
 
 
-Testing
--------
+Installation
+------------
+Multigit is installation is possible through different formats:
 
-To run the tests, launch pytest from the main directory.
+* Graphical Installer (Windows): just run `setup_multigit-vXXX.exe` and look for Multigit in your Applications
+* Portable Application (Windows): just unzip `multigit_portable-vXXX.zip` and execute `multigit.exe`
+* PyPI package (Windows and Linux): the recommended way is to use `pipx` to install it:
+
+    $ python -m pip install pipx
+    $ pipx install multigit_gx
+  
+    $ # launch it with:
+    $ multigit
+    
+* (future) chocolatey package
+* (future) snap
+
+
 
 License
 -------
@@ -54,19 +72,21 @@ Multigit depends on several other open source projects:
 * Concurrent Log Handler
 * PyInstaller
 
-See the file FULL_LICENSING_INFORMATION.md for details.
+See the file `FULL_LICENSING_INFORMATION.md` for details.
 
 
 Contributions
 -------------
 Contributions are welcome: bug reports, improvements, pull requests. They must be under the Apache 2.0 license.
 
-Multigit is still developed internally at IDEMIA. I will regularly land on the open source version the 
-improvements.
+Multigit is developed both as an open source version and internally at IDEMIA. I will make sure that the Open Source
+versions thrives. The plan is to share improvements done internally at IDEMIA to the Open Source version on a regular
+basis.
 
-See the file CONTRIBUTING.md for details .
+See the file `CONTRIBUTING.md` for details .
 
 If you want to exchange with the author, do not hesitate to contact me: philippe.fremy at idemia.com
+
 
 History and Alternatives
 -------------------------
