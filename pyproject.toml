@@ -77,55 +77,21 @@ exclude = [ '*.ui', 'generate_ui.bat' ]
 "" = "multigit_gx"
 
 [tool.hatch.build.targets.sdist]
-packages = [
-    'multigit.py',
-    'mgitcmd.py',
+include = [
+    '.github',
+    'doc',
+    'example',
+    'images',
+    'packaging',
+    'reqs',
     'src',
     'tests',
+    '.gitignore',
+    '*.md',
+    '*.txt',
+    '*.py',
+    '*.bat',
+    'pyproject.toml',
+    'mypy.ini',
 ]
 
-[tool.hatch.envs.default]
-dependencies = [
-  "coverage[toml]>=6.5",
-  "pytest",
-]
-[tool.hatch.envs.default.scripts]
-test = "pytest {args:tests}"
-test-cov = "coverage run -m pytest {args:tests}"
-cov-report = [
-  "- coverage combine",
-  "coverage report",
-]
-cov = [
-  "test-cov",
-  "cov-report",
-]
-
-[[tool.hatch.envs.all.matrix]]
-python = ["3.7", "3.8", "3.9", "3.10"]
-
-[tool.hatch.envs.types]
-dependencies = [
-  "mypy>=1.0.0",
-]
-[tool.hatch.envs.types.scripts]
-check = "mypy --install-types --non-interactive {args:src/multigit_gx tests}"
-
-[tool.coverage.run]
-source_pkgs = ["multigit_gx", "tests"]
-branch = true
-parallel = true
-omit = [
-  "src/multigit_gx/__about__.py",
-]
-
-[tool.coverage.paths]
-multigit_gx = ["src/multigit_gx", "*/multigit-gx/src/multigit_gx"]
-tests = ["tests", "*/multigit-gx/tests"]
-
-[tool.coverage.report]
-exclude_lines = [
-  "no cov",
-  "if __name__ == .__main__.:",
-  "if TYPE_CHECKING:",
-]
