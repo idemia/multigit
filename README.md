@@ -1,4 +1,4 @@
-[![mypy checked](https://camo.githubusercontent.com/34b3a249cd6502d0a521ab2f42c8830b7cfd03fa/687474703a2f2f7777772e6d7970792d6c616e672e6f72672f7374617469632f6d7970795f62616467652e737667)](http://mypy-lang.org/)
+[![Checked with mypy](https://www.mypy-lang.org/static/mypy_badge.svg)](https://mypy-lang.org/)
 [![Continuous Integration](https://github.com/bluebird75/multigit/actions/workflows/ci.yml/badge.svg)](https://github.com/bluebird75/multigit/actions/workflows/ci.yml)
 
 Multigit
@@ -11,7 +11,7 @@ Multigit is a graphical tool for working with projects composed of multiple git 
 If you think that *submodules*, *subtree* or *Google repo* are not for you, you are probably at the
 right place.
 
-*Note: on PyPi, Multigit is registered as multigit_gx because there is another multigit software*
+*Note: on PyPi, Multigit is registered as multigit_gx because there is already a multigit software*
 
 Typically, it lets you:
 * fetch or pull on many repositories at the same time
@@ -29,8 +29,8 @@ becomes a complex task. Thank to Multigit, it becomes simple again. Any git oper
 morning is run on all the repositories in one click. When time comes to commit changes and push them, having a 
 graphical interface to locate in the blink of an eye which repositories are modified and need a commit has been a life saver.
 
-Multigit is developed within my employer IDEMIA. I would like to thank him again for allowing
-me to open source it.
+Multigit is Open source and developed in Github. It has been developed intially within my employer IDEMIA. I would like 
+to thank them again for allowing me to open source it. 
 
 
 Status
@@ -47,8 +47,8 @@ Installation
 ------------
 Multigit is installation is possible through different formats:
 
-* Graphical Installer (Windows): just run `setup_multigit-vXXX.exe` and look for Multigit in your Applications
-* Portable Application (Windows): just unzip `multigit_portable-vXXX.zip` and execute `multigit.exe`
+* Graphical Installer (Windows): just run `setup_multigit-v1.6.1.exe` and look for Multigit in your Applications
+* Portable Application (Windows): just unzip `multigit_portable-v1.6.1.zip` and execute `multigit.exe`
 * PyPI package (Windows and Linux): the recommended way is to use `pipx` to install it:
 
     $ python -m pip install pipx
