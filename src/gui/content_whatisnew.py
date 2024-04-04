@@ -1,16 +1,16 @@
-# Generated from CHANGELOG.md on 2024-02-11 22:29:50.576769
+# Generated from CHANGELOG.md on 2024-04-04 22:44:21.453504
 
 
 content_html = '''
 <h1 align="center">MultiGit</h1>
 
-<p><em>by Phlipppe Fremy <a href="&#x6d;&#97;&#105;&#108;to&#58;&#112;&#x68;&#105;&#108;&#x69;&#x70;&#x70;&#x65;.&#102;&#114;&#x65;&#109;&#x79;&#64;&#x69;d&#x65;&#x6d;&#105;&#97;&#x2e;&#x63;&#x6f;&#109;">&#112;&#x68;&#105;&#108;&#x69;&#x70;&#x70;&#x65;.&#102;&#114;&#x65;&#109;&#x79;&#64;&#x69;d&#x65;&#x6d;&#105;&#97;&#x2e;&#x63;&#x6f;&#109;</a></em></p>
+<p><em>by Phlipppe Fremy <a href="&#x6d;&#97;&#105;&#x6c;&#x74;&#111;&#58;&#112;&#x68;&#105;&#x6c;&#105;&#112;&#112;&#101;&#x2e;&#102;&#114;&#x65;&#x6d;&#121;&#64;&#x69;&#x64;e&#x6d;&#x69;&#x61;&#x2e;&#x63;&#111;&#x6d;">&#112;&#x68;&#105;&#x6c;&#105;&#112;&#112;&#101;&#x2e;&#102;&#114;&#x65;&#x6d;&#121;&#64;&#x69;&#x64;e&#x6d;&#x69;&#x61;&#x2e;&#x63;&#111;&#x6d;</a></em></p>
 
 <h2>Introduction</h2>
 
 <p>Multigit help users to manage many Git repositories simultaneously.</p>
 
-<h2>Version 1.6.1 (2024-XX-XX)</h2>
+<h2>Version 1.6.1-rc1 (2024-04-04)</h2>
 
 <ul>
 <li>Porting to Linux</li>

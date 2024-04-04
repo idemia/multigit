@@ -1,6 +1,6 @@
 ﻿#define SETUPNAME "Multigit OpenSource"
-#define VERSIONSTR "1.6.0"
-#define VERSION "1.6.0"
+#define VERSIONSTR "1.6.1-rc1"
+#define VERSION "1.6.0.1"
 #define COMPANY "IDEMIA"
 #define NAME "Multigit"
 
@@ -14,22 +14,22 @@ SetupIconFile=images\multigit-logo.ico
 UninstallDisplayIcon=images\multigit-logo.ico
 AppCopyright=Copyright © 2020-2023 {#COMPANY}
 AppID=Multigit
-AppName={#COMPANY} - {#SETUPNAME} {#VERSIONSTR}
-AppVerName={#COMPANY} - {#SETUPNAME} {#VERSIONSTR}    
+AppName={#SETUPNAME}
+AppVerName={#SETUPNAME} {#VERSIONSTR}    
 AppPublisher={#COMPANY}
 AppPublisherURL=http://github.com/idemia/multigit
 AppVersion={#VERSIONSTR}
-DefaultDirName={autopf}\{#COMPANY}\{#SETUPNAME}
-DefaultGroupName={#SETUPNAME}
+DefaultDirName={autopf}\{#SETUPNAME}
+DefaultGroupName=Multigit
 OutputDir=Setup
-OutputBaseFilename={#COMPANY} {#SETUPNAME} {#VERSIONSTR}
+OutputBaseFilename={#SETUPNAME} {#VERSIONSTR}
 
 VersionInfoVersion={#VERSION}
 UninstallRestartComputer=false
 
 UninstallFilesDir={app}\Uninstall
 
-PrivilegesRequired=admin
+PrivilegesRequired=lowest
 PrivilegesRequiredOverridesAllowed=dialog
 UsePreviousPrivileges=yes
 
