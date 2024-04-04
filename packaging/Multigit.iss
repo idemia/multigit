@@ -1,6 +1,6 @@
 ﻿#define SETUPNAME "Multigit OpenSource"
-#define VERSIONSTR "1.6.0"
-#define VERSION "1.6.0"
+#define VERSIONSTR "1.6.1-rc1"
+#define VERSION "1.6.0.1"
 #define COMPANY "IDEMIA"
 #define NAME "Multigit"
 
