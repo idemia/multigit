@@ -1,6 +1,7 @@
 [![Checked with mypy](https://www.mypy-lang.org/static/mypy_badge.svg)](https://mypy-lang.org/)
 [![Continuous Integration](https://github.com/bluebird75/multigit/actions/workflows/ci.yml/badge.svg)](https://github.com/bluebird75/multigit/actions/workflows/ci.yml)
 
+
 Multigit
 ========
 
