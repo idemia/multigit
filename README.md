@@ -2,6 +2,10 @@
 [![Continuous Integration](https://github.com/bluebird75/multigit/actions/workflows/ci.yml/badge.svg)](https://github.com/bluebird75/multigit/actions/workflows/ci.yml)
 
 
+https://github.com/user-attachments/assets/42327500-bc9d-4b52-82fd-b7dc85aff145
+
+
+
 Multigit
 ========
 
