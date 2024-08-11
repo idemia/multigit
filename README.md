@@ -2,9 +2,6 @@
 [![Continuous Integration](https://github.com/bluebird75/multigit/actions/workflows/ci.yml/badge.svg)](https://github.com/bluebird75/multigit/actions/workflows/ci.yml)
 
 
-https://github.com/user-attachments/assets/42327500-bc9d-4b52-82fd-b7dc85aff145
-
-
 
 Multigit
 ========
@@ -16,8 +13,6 @@ Multigit is a graphical tool for working with projects composed of multiple git 
 If you think that *submodules*, *subtree* or *Google repo* are not for you, you are probably at the
 right place.
 
-*Note: on PyPi, Multigit is registered as multigit_gx because there is already a multigit software*
-
 Typically, it lets you:
 * fetch or pull on many repositories at the same time
 * identify visually which repositories are modified or need an update (push or pull)
@@ -27,6 +22,10 @@ Typically, it lets you:
 * launch your preferred git frontend on an interesting repository
 * export your repositories state to a file, for reproducing it on a colleagues computer
 * and more...
+
+
+https://github.com/user-attachments/assets/42327500-bc9d-4b52-82fd-b7dc85aff145
+
 
 The need arose from my work environment, where
 a project typically consists of thirty to fifty git repositories. In such environment, every simple git operation
@@ -50,20 +49,23 @@ Platform support:
 
 Installation
 ------------
-Multigit is installation is possible through different formats:
+Multigit is installation is possible through different formats and on different platforms:
 
-* Graphical Installer (Windows): just run `setup_multigit-v1.6.1.exe` and look for Multigit in your Applications
-* Portable Application (Windows): just unzip `multigit_portable-v1.6.1.zip` and execute `multigit.exe`
-* PyPI package (Windows and Linux): the recommended way is to use `pipx` to install it:
+* Windows / Graphical Installer: just run `setup_multigit-v1.6.1.exe` and look for Multigit in your Applications
+* Windows / Portable Application: just unzip `multigit_portable-v1.6.1.zip` and execute `multigit.exe`
+* Linux / Debian or Ubuntu / PyPI package
+  ** *Note: on PyPi, Multigit is registered as multigit_gx because there is already a multigit software*
+  ** the recommended way is to use `pipx` to install it:
 
-    $ python -m pip install pipx
+```
+    $ sudo apt install python-pipx
     $ pipx install multigit_gx
-  
-    $ # launch it with:
     $ multigit
+```
     
-* (future) chocolatey package
 * (future) snap
+* (future) chocolatey package
+
 
 
 
