@@ -1,0 +1,38 @@
+name: multigit # you probably want to 'snapcraft register <name>'
+base: core22 
+version: '1.6.1-rc1'
+summary: Graphical tool for working with projects composed of multiple git repositories
+description: |
+        Multigit is a graphical tool for working with projects composed of multiple git repositories.
+
+        If you think that *submodules*, *subtree* or *Google repo* are not for you, you are probably at the
+        right place.
+
+        Typically, it lets you:
+        * fetch or pull on many repositories at the same time
+        * identify visually which repositories are modified or need an update (push or pull)
+        * create a new branch in a subset of repositories
+        * switch to a branch existing only in some repositories (but you don't remember which one)
+        * perform a commit on multiple repositories at the same time, and push it
+        * launch your preferred git frontend on an interesting repository
+        * export your repositories state to a file, for reproducing it on a colleagues computer
+        * and more...
+
+
+grade: devel # must be 'stable' to release into candidate/stable channels
+confinement: devmode # use 'strict' once you have the right plugs and slots
+
+parts:
+  multigit:
+    plugin: python
+    source: .
+    python-packages: [ pip, setuptools, wheel ]
+
+apps:
+  multigit:
+    command: bin/multigit
+    extensions:
+      - kde-neon # needed for pulling Qt5
+    plugs:
+      - home # to have access to the filesystem
+
