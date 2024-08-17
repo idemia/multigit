@@ -623,7 +623,8 @@ class RunProcess(QObject):
         dbg('Executing blocking: {}'.format(self.nice_cmdline()))
         self.process.start()
 
-        if self.process.state() not in (QProcess.Starting, QProcess.Running):
+        if (self.process.state() not in (QProcess.Starting, QProcess.Running)
+                or not self.process.waitForStarted(-1)):
             # could not start the process...
             cmd_out = self.process_finished(GIT_EXIT_CODE_COULD_NOT_START_PROCESS, QProcess.ExitStatus.CrashExit)
         else:
