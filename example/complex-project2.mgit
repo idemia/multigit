@@ -1,0 +1,62 @@
+{
+    "description": "sdf",
+    "fileFormatVersion": "1.0",
+    "postCloneCommands": [],
+    "repositories": [
+        {
+            "destination": ".",
+            "head": "main",
+            "head_type": "branch",
+            "url": "https://github.com/bluebird75/multigit-playground.git"
+        },
+        {
+            "destination": "src/extern/component1",
+            "head": "VERSION_1",
+            "head_type": "tag",
+            "url": "https://github.com/bluebird75/multigit-playground.git"
+        },
+        {
+            "destination": "src/extern/component2",
+            "head": "VERSION_2",
+            "head_type": "tag",
+            "url": "https://github.com/bluebird75/multigit-playground.git"
+        },
+        {
+            "destination": "src/extern/component3",
+            "head": "VERSION_3",
+            "head_type": "tag",
+            "url": "https://github.com/bluebird75/multigit-playground.git"
+        },
+        {
+            "destination": "src/modules/module1",
+            "head": "main",
+            "head_type": "branch",
+            "url": "https://github.com/bluebird75/multigit-playground.git"
+        },
+        {
+            "destination": "src/modules/module2",
+            "head": "dev-feature1",
+            "head_type": "branch",
+            "url": "https://github.com/bluebird75/multigit-playground.git"
+        },
+        {
+            "destination": "src/modules/module3",
+            "head": "main",
+            "head_type": "branch",
+            "url": "https://github.com/bluebird75/multigit-playground.git"
+        },
+        {
+            "destination": "src/modules/module4",
+            "head": "dev-feature1",
+            "head_type": "branch",
+            "url": "https://github.com/bluebird75/multigit-playground.git"
+        },
+        {
+            "destination": "src/modules/module5",
+            "head": "dev-feature1",
+            "head_type": "branch",
+            "url": "https://github.com/bluebird75/multigit-playground.git"
+        }
+    ],
+    "variables": {}
+}
