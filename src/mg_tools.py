@@ -39,12 +39,27 @@ GIT_EXIT_CODE_COULD_NOT_START_PROCESS = -3
 GIT_EXIT_CODE_STOPPED_BECAUSE_AUTH_FAILURE = -4
 
 
+def isRunningInsideSnap() -> bool:
+    """Return TTrue if running inside a snap container.
+
+    Used to identify the proper program locations which are different when running inside a snap."""
+    return 'SNAP_EUID' in os.environ
+
+
+def snapRoot() -> Path:
+    '''Return the equivalent of root under snap, used to look for /usr/bin for example'''
+    ret = Path(os.environ.get('SNAP', '/'))
+    return ret
+
+
+
 class ExecTool:
     # List of platform (as returned by sys.platform()) where we can run this tool
     SUPPORTED_PLATFORMS: List[str]
 
-    WIN32_PATH_CANDIDATES: List[Path]
-    LINUX_PATH_CANDIDATES: List[Path]
+    WIN32_PATH_CANDIDATES: List[Path] = []
+    LINUX_PATH_CANDIDATES: List[Path] = []
+    SNAP_LINUX_PATH_CANDIDATES: List[Path] = []
 
     EXEC_NAME_LINUX: str
     EXEC_NAME_WIN32: str
@@ -102,7 +117,10 @@ class ExecTool:
         if sys.platform == 'win32':
             path_candidates = cls.WIN32_PATH_CANDIDATES
         elif sys.platform == 'linux':
-            path_candidates = cls.LINUX_PATH_CANDIDATES
+            if isRunningInsideSnap():
+                path_candidates = cls.SNAP_LINUX_PATH_CANDIDATES
+            else:
+                path_candidates = cls.LINUX_PATH_CANDIDATES
         else:
             raise ValueError('Unsupported platform')
 
@@ -253,6 +271,9 @@ class ExecGit(ExecTool):
         Path(os.environ.get("PROGRAMW6432", '')) / "Git" / "cmd",
     ]
 
+    SNAP_LINUX_PATH_CANDIDATES = [
+        snapRoot() / 'usr/bin'
+    ]
     LINUX_PATH_CANDIDATES = [
         Path('/usr/bin'),
         Path('/usr/local/bin'),

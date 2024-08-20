@@ -26,6 +26,7 @@ parts:
   multigit:
     plugin: python
     source: .
+    stage-packages: [git]
     python-packages: [ pip, setuptools, wheel ]
 
 apps:
@@ -35,4 +36,10 @@ apps:
       - kde-neon # needed for pulling Qt5
     plugs:
       - home # to have access to the filesystem
+      - network # for git cloning, pulling, pushing
+      - network-bind # for git cloning, pulling, pushing
+      - process-control 
+      - network-control
+
+
 
