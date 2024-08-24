@@ -18,7 +18,7 @@
 import unittest, os
 
 from src.mg_utils import htmlize_diff, handle_cr_in_text, set_username_on_git_url, add_suffix_if_missing, extractInt, \
-    hasGitAuthFailureMsg, isGitCommandRequiringAuth
+    hasGitAuthFailureMsg, isGitCommandRequiringAuth, anonymise_git_url
 from src.mg_config import MgConfig
 from src.mg_const import MSG_BIG_DIFF
 from src.mg_repo_info import match_ahead_behind, is_not_sha1, MgRepoInfo
@@ -30,6 +30,31 @@ from src.mg_repo_info import match_ahead_behind, is_not_sha1, MgRepoInfo
 
 
 class TestUtilityFunctions(unittest.TestCase):
+
+    def test_anonymise_git_url(self):
+        test_data = [
+            ("ssh://fremy@some.server.com:29418/some/path/to/repo.git",
+             "ssh://username@some.server.com:29418/some/path/to/repo.git"),
+            ("ssh://some.server.com:29418/some/path/to/repo.git",
+             "ssh://username@some.server.com:29418/some/path/to/repo.git"),
+            ("https://fremy@some.server.com:29418/some/path/to/repo.git",
+             "https://some.server.com:29418/some/path/to/repo.git"),
+            ("https://some.server.com:29418/some/path/to/repo.git",
+             "https://some.server.com:29418/some/path/to/repo.git"),
+            (r"c:\cloned\from\filesystem",
+             r"c:\cloned\from\filesystem",),
+            ("file://C:/work/Multigit/Sandbox/",
+             "file://C:/work/Multigit/Sandbox/"),
+
+            # ssh equivalent, see man git-clone, sections url
+            ('fremy@host.xz:path/to/repo.git/',
+             'username@host.xz:path/to/repo.git/'),
+        ]
+
+        for before, after in test_data:
+            with self.subTest(before) as _:
+                self.assertEqual( anonymise_git_url(before), after)
+
 
     def test_set_username_to_git_url(self):
 
@@ -48,10 +73,12 @@ class TestUtilityFunctions(unittest.TestCase):
                 "http://totoro@some.server.com:29418/some/path/to/repo.git"),
             (r"c:\cloned\from\filesystem",
                 r"c:\cloned\from\filesystem",),
-            (r"c:\cloned\from\filesystem",
-                r"c:\cloned\from\filesystem",),
-            ("file://fremy@C:/work/Multigit/Sandbox/",
-                     "file://C:/work/Multigit/Sandbox/"),
+            (r"cloned\from\filesystem",
+             r"cloned\from\filesystem",),
+            (r"cloned/from/filesystem",
+             r"cloned/from/filesystem",),
+            (r"/cloned/from/filesystem",
+             r"/cloned/from/filesystem",),
             ("file://C:/work/Multigit/Sandbox/",
                  "file://C:/work/Multigit/Sandbox/"),
         ]
