@@ -22,6 +22,19 @@ description: |
 grade: devel # must be 'stable' to release into candidate/stable channels
 confinement: devmode # use 'strict' once you have the right plugs and slots
 
+plugs:
+  gitconfig:
+    interface: personal-files
+    read:
+      - $HOME/.gitconfig         # the old location
+      - $HOME/.config/git/config # the new location (people could change it via XDG_CONFIG_HOME and that isn't supported by snapd yet)
+      - $HOME/.git-credentials
+  etc-gitconfig:
+    interface: system-files
+    read:
+      - /etc/gitconfig
+
+
 parts:
   multigit:
     plugin: python
@@ -29,17 +42,24 @@ parts:
     stage-packages: [git]
     python-packages: [ pip, setuptools, wheel ]
 
+
 apps:
   multigit:
     command: bin/multigit
+    environment:
+      GIT_TEMPLATE_DIR: $SNAP/usr/share/git-core/templates
+      GIT_CONFIG_NOSYSTEM: "true"
+      GIT_EXEC_PATH: $SNAP/usr/lib/git-core
+      GIT_TEXTDOMAINDIR: $SNAP/usr/share/locale
     extensions:
       - kde-neon # needed for pulling Qt5
     plugs:
       - home # to have access to the filesystem
+      - removable-media # so it can access things in /media, etc
+      - gitconfig       # so it can access ~/.gitconfig :-)
+      - etc-gitconfig   # so it can access /etc/gitconfig
+      - ssh-keys
       - network # for git cloning, pulling, pushing
-      - network-bind # for git cloning, pulling, pushing
-      - process-control 
-      - network-control
 
 
 
