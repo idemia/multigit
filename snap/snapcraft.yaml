@@ -20,7 +20,7 @@ description: |
 
 
 grade: devel # must be 'stable' to release into candidate/stable channels
-confinement: devmode # use 'strict' once you have the right plugs and slots
+confinement: classic
 
 plugs:
   gitconfig:
@@ -39,7 +39,7 @@ parts:
   multigit:
     plugin: python
     source: .
-    stage-packages: [git]
+    stage-packages: [git, git-gui, gitk]
     python-packages: [ pip, setuptools, wheel ]
 
 
@@ -51,15 +51,18 @@ apps:
       GIT_CONFIG_NOSYSTEM: "true"
       GIT_EXEC_PATH: $SNAP/usr/lib/git-core
       GIT_TEXTDOMAINDIR: $SNAP/usr/share/locale
-    extensions:
-      - kde-neon # needed for pulling Qt5
+      TCL_LIBRARY: $SNAP/usr/share/tcltk/tcl8.6
+      TK_LIBRARY: $SNAP/usr/share/tcltk/tk8.6
+      TCL8_6_TM_PATH: $SNAP/usr/share/tcltk/tcl8.6/tcl8
+
+
     plugs:
-      - home # to have access to the filesystem
-      - removable-media # so it can access things in /media, etc
+      - home            # to access user projects stored in home
+      - removable-media # to access user projects stored in removable media
       - gitconfig       # so it can access ~/.gitconfig :-)
       - etc-gitconfig   # so it can access /etc/gitconfig
-      - ssh-keys
-      - network # for git cloning, pulling, pushing
+      - ssh-keys        # so that git can authenticate
+      - network         # for git cloning, pulling, pushing
 
 
 
