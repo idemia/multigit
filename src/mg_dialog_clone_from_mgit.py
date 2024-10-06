@@ -74,6 +74,10 @@ class MgDialogCloneFromMgitFile(QDialog):
         self.userFinishedTypingDestDirTimer.timeout.connect(self.updateDestDir)
         self.ui.lineEditDestDir.textEdited.connect(self.slotDestDirTimer)
 
+        self.ui.radioDoNotAlterUrl.clicked.connect(self.slotUsernameUpdated)
+        self.ui.radioForceUsername.clicked.connect(self.slotUsernameUpdated)
+        self.ui.radioStripUsername.clicked.connect(self.slotUsernameUpdated)
+
         self.userFinishedTypingUsernameTimer = QTimer(self)
         self.userFinishedTypingUsernameTimer.setSingleShot(True)
         self.userFinishedTypingUsernameTimer.setInterval(1000)
@@ -81,6 +85,7 @@ class MgDialogCloneFromMgitFile(QDialog):
         self.ui.lineEditUsername.textEdited.connect(self.slotUsernameTimer)
 
         self.proj = ProjectStructure()
+        self.proj_copy: Optional[ProjectStructure] = None
 
         validator = QRegExpValidator(QRegExp(reBranchTagValues))
         self.ui.lineEditUsername.setValidator(validator)
@@ -138,9 +143,26 @@ class MgDialogCloneFromMgitFile(QDialog):
 
     def slotUsernameUpdated(self) -> None:
         '''Called when the timer of username update is triggered or when history of username is used'''
+        dbg('slotUsernameUpdated')
         username = self.ui.lineEditUsername.text()
+
+        # we use the original repository url for performing the transformation, if possible
+        if self.proj_copy is None:
+            proj_src = self.proj
+        else:
+            proj_src = self.proj_copy
+        orig_url_dict = { repo.destination: repo.url for repo in proj_src.repos }
         for repo in self.proj.repos:
-            repo.url = set_username_on_git_url(username, repo.url)
+            orig_url = orig_url_dict[repo.destination]
+            if self.ui.radioDoNotAlterUrl.isChecked():
+                repo.url = orig_url
+            elif self.ui.radioStripUsername.isChecked():
+                repo.url = set_username_on_git_url( '', orig_url )
+            elif self.ui.radioForceUsername.isChecked():
+                repo.url = set_username_on_git_url(username, orig_url)
+            else:
+                raise AssertionError('No radio for url behavior is checked!')
+
         self.updateDisplayOfMultigitFile()
 
 
@@ -203,7 +225,7 @@ class MgDialogCloneFromMgitFile(QDialog):
         '''Parse the json file and udpate the full dialog.
 
         For report_file_errors, open a warning dialog when the file text is empty or the file does not exist.
-        For report_parse_erorrs, open a warning dialog when the multigit file does not parse correctly.
+        For report_parse_errors, open a warning dialog when the multigit file does not parse correctly.
 
         Report parse errors
         in a dilog if report_errors is set to True.
@@ -222,6 +244,7 @@ class MgDialogCloneFromMgitFile(QDialog):
 
         # reset proj so that in case of error, all information displayed is empty
         self.proj = ProjectStructure()
+        self.proj_copy = None
 
         if mgitFile == '':
             if report_file_errors:
@@ -251,6 +274,9 @@ class MgDialogCloneFromMgitFile(QDialog):
             self.updateDisplayOfMultigitFile()
             return False
 
+        self.proj_copy = ProjectStructure()
+        self.proj_copy.fill_from_json_file(mgitFile,
+                                      pathlib.Path(self.ui.lineEditDestDir.text()))
         # this will trigger a redisplay of all repos, no need for explicit call to self.updateDisplayOfMultigitFile()
         self.slotUsernameUpdated()
 
