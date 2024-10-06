@@ -59,7 +59,6 @@ class ExecTool:
 
     WIN32_PATH_CANDIDATES: List[Path] = []
     LINUX_PATH_CANDIDATES: List[Path] = []
-    SNAP_LINUX_PATH_CANDIDATES: List[Path] = []
 
     EXEC_NAME_LINUX: str
     EXEC_NAME_WIN32: str
@@ -118,7 +117,9 @@ class ExecTool:
             path_candidates = cls.WIN32_PATH_CANDIDATES
         elif sys.platform == 'linux':
             if isRunningInsideSnap():
-                path_candidates = cls.SNAP_LINUX_PATH_CANDIDATES
+                # to find the path of a file inside the snap, remove the first '/'
+                # and make the path relative to snap root
+                path_candidates = [ snapRoot() / str(p)[1:] for p in cls.LINUX_PATH_CANDIDATES ]
             else:
                 path_candidates = cls.LINUX_PATH_CANDIDATES
         else:
@@ -271,9 +272,6 @@ class ExecGit(ExecTool):
         Path(os.environ.get("PROGRAMW6432", '')) / "Git" / "cmd",
     ]
 
-    SNAP_LINUX_PATH_CANDIDATES = [
-        snapRoot() / 'usr/bin'
-    ]
     LINUX_PATH_CANDIDATES = [
         Path('/usr/bin'),
         Path('/usr/local/bin'),
