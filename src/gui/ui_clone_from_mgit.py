@@ -20,7 +20,7 @@ class Ui_CloneFromMgitFile(object):
     def setupUi(self, CloneFromMgitFile: QDialog) -> None:
         if not CloneFromMgitFile.objectName():
             CloneFromMgitFile.setObjectName(u"CloneFromMgitFile")
-        CloneFromMgitFile.resize(935, 578)
+        CloneFromMgitFile.resize(935, 692)
         self.gridLayout_3 = QGridLayout(CloneFromMgitFile)
         self.gridLayout_3.setObjectName(u"gridLayout_3")
         self.groupBox = QGroupBox(CloneFromMgitFile)
@@ -131,29 +131,45 @@ class Ui_CloneFromMgitFile(object):
         self.groupBox_4.setFont(font)
         self.verticalLayout = QVBoxLayout(self.groupBox_4)
         self.verticalLayout.setObjectName(u"verticalLayout")
-        self.label_3 = QLabel(self.groupBox_4)
-        self.label_3.setObjectName(u"label_3")
-        self.label_3.setFont(font1)
+        self.radioDoNotAlterUrl = QRadioButton(self.groupBox_4)
+        self.radioDoNotAlterUrl.setObjectName(u"radioDoNotAlterUrl")
+        self.radioDoNotAlterUrl.setFont(font1)
+        self.radioDoNotAlterUrl.setChecked(True)
 
-        self.verticalLayout.addWidget(self.label_3)
+        self.verticalLayout.addWidget(self.radioDoNotAlterUrl)
+
+        self.radioStripUsername = QRadioButton(self.groupBox_4)
+        self.radioStripUsername.setObjectName(u"radioStripUsername")
+        self.radioStripUsername.setFont(font1)
+
+        self.verticalLayout.addWidget(self.radioStripUsername)
 
         self.horizontalLayout_2 = QHBoxLayout()
         self.horizontalLayout_2.setObjectName(u"horizontalLayout_2")
+        self.radioForceUsername = QRadioButton(self.groupBox_4)
+        self.radioForceUsername.setObjectName(u"radioForceUsername")
+        self.radioForceUsername.setFont(font1)
+
+        self.horizontalLayout_2.addWidget(self.radioForceUsername)
+
         self.lineEditUsername = QLineEdit(self.groupBox_4)
         self.lineEditUsername.setObjectName(u"lineEditUsername")
-        sizePolicy.setHeightForWidth(self.lineEditUsername.sizePolicy().hasHeightForWidth())
-        self.lineEditUsername.setSizePolicy(sizePolicy)
+        sizePolicy3 = QSizePolicy(QSizePolicy.Preferred, QSizePolicy.Fixed)
+        sizePolicy3.setHorizontalStretch(10)
+        sizePolicy3.setVerticalStretch(0)
+        sizePolicy3.setHeightForWidth(self.lineEditUsername.sizePolicy().hasHeightForWidth())
+        self.lineEditUsername.setSizePolicy(sizePolicy3)
         self.lineEditUsername.setFont(font1)
 
         self.horizontalLayout_2.addWidget(self.lineEditUsername)
 
         self.historyButtonUsername = MgButtonHistory(self.groupBox_4)
         self.historyButtonUsername.setObjectName(u"historyButtonUsername")
-        sizePolicy3 = QSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
-        sizePolicy3.setHorizontalStretch(0)
-        sizePolicy3.setVerticalStretch(0)
-        sizePolicy3.setHeightForWidth(self.historyButtonUsername.sizePolicy().hasHeightForWidth())
-        self.historyButtonUsername.setSizePolicy(sizePolicy3)
+        sizePolicy4 = QSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
+        sizePolicy4.setHorizontalStretch(0)
+        sizePolicy4.setVerticalStretch(0)
+        sizePolicy4.setHeightForWidth(self.historyButtonUsername.sizePolicy().hasHeightForWidth())
+        self.historyButtonUsername.setSizePolicy(sizePolicy4)
         self.historyButtonUsername.setIcon(icon1)
 
         self.horizontalLayout_2.addWidget(self.historyButtonUsername)
@@ -211,22 +227,22 @@ class Ui_CloneFromMgitFile(object):
         self.horizontalLayout_3.setObjectName(u"horizontalLayout_3")
         self.labelProjDesc = QLabel(self.tabProject)
         self.labelProjDesc.setObjectName(u"labelProjDesc")
-        sizePolicy4 = QSizePolicy(QSizePolicy.Preferred, QSizePolicy.Preferred)
-        sizePolicy4.setHorizontalStretch(0)
-        sizePolicy4.setVerticalStretch(1)
-        sizePolicy4.setHeightForWidth(self.labelProjDesc.sizePolicy().hasHeightForWidth())
-        self.labelProjDesc.setSizePolicy(sizePolicy4)
+        sizePolicy5 = QSizePolicy(QSizePolicy.Preferred, QSizePolicy.Preferred)
+        sizePolicy5.setHorizontalStretch(0)
+        sizePolicy5.setVerticalStretch(1)
+        sizePolicy5.setHeightForWidth(self.labelProjDesc.sizePolicy().hasHeightForWidth())
+        self.labelProjDesc.setSizePolicy(sizePolicy5)
         self.labelProjDesc.setFont(font)
 
         self.horizontalLayout_3.addWidget(self.labelProjDesc)
 
         self.textEditProjectDesc = QTextEdit(self.tabProject)
         self.textEditProjectDesc.setObjectName(u"textEditProjectDesc")
-        sizePolicy5 = QSizePolicy(QSizePolicy.Expanding, QSizePolicy.Preferred)
-        sizePolicy5.setHorizontalStretch(0)
-        sizePolicy5.setVerticalStretch(1)
-        sizePolicy5.setHeightForWidth(self.textEditProjectDesc.sizePolicy().hasHeightForWidth())
-        self.textEditProjectDesc.setSizePolicy(sizePolicy5)
+        sizePolicy6 = QSizePolicy(QSizePolicy.Expanding, QSizePolicy.Preferred)
+        sizePolicy6.setHorizontalStretch(0)
+        sizePolicy6.setVerticalStretch(1)
+        sizePolicy6.setHeightForWidth(self.textEditProjectDesc.sizePolicy().hasHeightForWidth())
+        self.textEditProjectDesc.setSizePolicy(sizePolicy6)
         self.textEditProjectDesc.setMaximumSize(QSize(16777215, 50))
         self.textEditProjectDesc.setReadOnly(True)
 
@@ -295,6 +311,8 @@ class Ui_CloneFromMgitFile(object):
         self.retranslateUi(CloneFromMgitFile)
         self.buttonBox.accepted.connect(CloneFromMgitFile.accept)
         self.buttonBox.rejected.connect(CloneFromMgitFile.reject)
+        self.radioForceUsername.toggled.connect(self.lineEditUsername.setEnabled)
+        self.radioForceUsername.toggled.connect(self.historyButtonUsername.setEnabled)
 
         self.tabWidgetProject.setCurrentIndex(0)
 
@@ -324,8 +342,10 @@ class Ui_CloneFromMgitFile(object):
         self.historyButtonDestDir.setToolTip(QCoreApplication.translate("CloneFromMgitFile", u"Select recent directory", None))
 #endif // QT_CONFIG(tooltip)
         self.historyButtonDestDir.setText("")
-        self.groupBox_4.setTitle(QCoreApplication.translate("CloneFromMgitFile", u"User Name", None))
-        self.label_3.setText(QCoreApplication.translate("CloneFromMgitFile", u"User name in the git URL", None))
+        self.groupBox_4.setTitle(QCoreApplication.translate("CloneFromMgitFile", u"User Name in url", None))
+        self.radioDoNotAlterUrl.setText(QCoreApplication.translate("CloneFromMgitFile", u"Do not alter url", None))
+        self.radioStripUsername.setText(QCoreApplication.translate("CloneFromMgitFile", u"Remove login from url if present", None))
+        self.radioForceUsername.setText(QCoreApplication.translate("CloneFromMgitFile", u"Force login username to :", None))
 #if QT_CONFIG(tooltip)
         self.historyButtonUsername.setToolTip(QCoreApplication.translate("CloneFromMgitFile", u"Select recent user name", None))
 #endif // QT_CONFIG(tooltip)
@@ -339,8 +359,8 @@ class Ui_CloneFromMgitFile(object):
         self.textEditProjectDesc.setHtml(QCoreApplication.translate("CloneFromMgitFile", u"<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
 "<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
 "p, li { white-space: pre-wrap; }\n"
-"</style></head><body style=\" font-family:'MS Shell Dlg 2'; font-size:8.25pt; font-weight:400; font-style:normal;\">\n"
-"<p style=\"-qt-paragraph-type:empty; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><br /></p></body></html>", None))
+"</style></head><body style=\" font-family:'Noto Sans'; font-size:11pt; font-weight:400; font-style:normal;\">\n"
+"<p style=\"-qt-paragraph-type:empty; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:'MS Shell Dlg 2'; font-size:8.25pt;\"><br /></p></body></html>", None))
         ___qtreewidgetitem = self.treeWidgetRepoList.headerItem()
         ___qtreewidgetitem.setText(3, QCoreApplication.translate("CloneFromMgitFile", u"URL", None));
         ___qtreewidgetitem.setText(2, QCoreApplication.translate("CloneFromMgitFile", u"Path", None));

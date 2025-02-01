@@ -126,29 +126,64 @@ def handle_cr_in_text(s: str) -> str:
 
 def anonymise_git_url(url: str) -> str:
     # clear username from url
-    if url:
+    if not url:
+        return url
+
+    if '://' in url:
         if url.startswith('ssh') or url.startswith('git'):
             # for ssh, neutralize username
             url = set_username_on_git_url('username', url or '')
         else:
             # for http, file: and direct clones, strip username
             url = set_username_on_git_url('', url or '')
+    else:
+        # scp-like ssh url syntax, see man git-clone, section url
+        # quote: "the url is recognized if there is no / before the fist colon"
+        # example: user@host.xz:path/to/repo.git/
+        if ':' in url and (url.find('/') == -1 or url.find('/') > url.find(':')):
+            url = set_username_on_git_url('username', url)
+
     return url
 
+
+reWinPath = re.compile('^[a-zA-Z]:\\.*')
 
 def set_username_on_git_url(username: str, url: str) -> str:
     '''Take a git url and add or substitute the username part. Returns the new url.
 
+    When url refers to the filesystem, nothing is done on it
+
     If username is empty, strips the username from the url.
     '''
-    add_user = True
+    if url.lower().startswith('file://'):
+        return url
 
-    try:
+    if '://' in url:
         server_start = url.index('://')+3
-    except ValueError:
-        # when cloning from filesystem, there is no ://
+
+    else:
+        if url.startswith('/'):
+            # linux absolute path
+            return url
+
+        if reWinPath.match(url):
+            # windows absolute path
+            return url
+
+        if not ':' in url:
+            # this can not be a scp like syntax, this is a path
+            return url
+
+        # scp-like ssh url syntax, see man git-clone, section url
+        # quote: "the url is recognized if there is no / before the fist colon"
+        # example: user@host.xz:path/to/repo.git/
+        if url.find('/') < url.find(':'):
+            # this is not a url, this is still a path containing a ':'
+            return url
+
+        # ok, this is a scp-like url
         server_start = 0
-        add_user = False
+
 
     try:
         server_end   = url.index('/', server_start)
@@ -160,7 +195,7 @@ def set_username_on_git_url(username: str, url: str) -> str:
     if '@' in server:
         server = server.split('@', 1)[1]
 
-    if add_user and len(username) and not url.startswith('file://'):
+    if len(username):
         server = username + '@' + server
 
     return url[:server_start] + server + url[server_end:]

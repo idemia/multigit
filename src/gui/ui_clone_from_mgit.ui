@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>935</width>
-    <height>578</height>
+    <height>692</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -227,11 +227,11 @@
       </font>
      </property>
      <property name="title">
-      <string>User Name</string>
+      <string>User Name in url</string>
      </property>
      <layout class="QVBoxLayout" name="verticalLayout">
       <item>
-       <widget class="QLabel" name="label_3">
+       <widget class="QRadioButton" name="radioDoNotAlterUrl">
         <property name="font">
          <font>
           <weight>50</weight>
@@ -239,17 +239,46 @@
          </font>
         </property>
         <property name="text">
-         <string>User name in the git URL</string>
+         <string>Do not alter url</string>
+        </property>
+        <property name="checked">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QRadioButton" name="radioStripUsername">
+        <property name="font">
+         <font>
+          <weight>50</weight>
+          <bold>false</bold>
+         </font>
+        </property>
+        <property name="text">
+         <string>Remove login from url if present</string>
         </property>
        </widget>
       </item>
       <item>
        <layout class="QHBoxLayout" name="horizontalLayout_2">
         <item>
+         <widget class="QRadioButton" name="radioForceUsername">
+          <property name="font">
+           <font>
+            <weight>50</weight>
+            <bold>false</bold>
+           </font>
+          </property>
+          <property name="text">
+           <string>Force login username to :</string>
+          </property>
+         </widget>
+        </item>
+        <item>
          <widget class="QLineEdit" name="lineEditUsername">
           <property name="sizePolicy">
            <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-            <horstretch>0</horstretch>
+            <horstretch>10</horstretch>
             <verstretch>0</verstretch>
            </sizepolicy>
           </property>
@@ -421,8 +450,8 @@
             <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'MS Shell Dlg 2'; font-size:8.25pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Noto Sans'; font-size:11pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:'MS Shell Dlg 2'; font-size:8.25pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
            </property>
           </widget>
          </item>
@@ -550,8 +579,8 @@ p, li { white-space: pre-wrap; }
    <slot>accept()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>611</x>
-     <y>552</y>
+     <x>913</x>
+     <y>670</y>
     </hint>
     <hint type="destinationlabel">
      <x>630</x>
@@ -566,12 +595,44 @@ p, li { white-space: pre-wrap; }
    <slot>reject()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>611</x>
-     <y>552</y>
+     <x>913</x>
+     <y>670</y>
     </hint>
     <hint type="destinationlabel">
      <x>630</x>
      <y>408</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>radioForceUsername</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>lineEditUsername</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>110</x>
+     <y>355</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>261</x>
+     <y>361</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>radioForceUsername</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>historyButtonUsername</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>74</x>
+     <y>358</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>441</x>
+     <y>365</y>
     </hint>
    </hints>
   </connection>

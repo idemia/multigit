@@ -39,12 +39,26 @@ GIT_EXIT_CODE_COULD_NOT_START_PROCESS = -3
 GIT_EXIT_CODE_STOPPED_BECAUSE_AUTH_FAILURE = -4
 
 
+def isRunningInsideSnap() -> bool:
+    """Return TTrue if running inside a snap container.
+
+    Used to identify the proper program locations which are different when running inside a snap."""
+    return 'SNAP_EUID' in os.environ
+
+
+def snapRoot() -> Path:
+    '''Return the equivalent of root under snap, used to look for /usr/bin for example'''
+    ret = Path(os.environ.get('SNAP', '/'))
+    return ret
+
+
+
 class ExecTool:
     # List of platform (as returned by sys.platform()) where we can run this tool
     SUPPORTED_PLATFORMS: List[str]
 
-    WIN32_PATH_CANDIDATES: List[Path]
-    LINUX_PATH_CANDIDATES: List[Path]
+    WIN32_PATH_CANDIDATES: List[Path] = []
+    LINUX_PATH_CANDIDATES: List[Path] = []
 
     EXEC_NAME_LINUX: str
     EXEC_NAME_WIN32: str
@@ -102,7 +116,12 @@ class ExecTool:
         if sys.platform == 'win32':
             path_candidates = cls.WIN32_PATH_CANDIDATES
         elif sys.platform == 'linux':
-            path_candidates = cls.LINUX_PATH_CANDIDATES
+            if isRunningInsideSnap():
+                # to find the path of a file inside the snap, remove the first '/'
+                # and make the path relative to snap root
+                path_candidates = [ snapRoot() / str(p)[1:] for p in cls.LINUX_PATH_CANDIDATES ]
+            else:
+                path_candidates = cls.LINUX_PATH_CANDIDATES
         else:
             raise ValueError('Unsupported platform')
 
@@ -623,7 +642,8 @@ class RunProcess(QObject):
         dbg('Executing blocking: {}'.format(self.nice_cmdline()))
         self.process.start()
 
-        if self.process.state() not in (QProcess.Starting, QProcess.Running):
+        if (self.process.state() not in (QProcess.Starting, QProcess.Running)
+                or not self.process.waitForStarted(-1)):
             # could not start the process...
             cmd_out = self.process_finished(GIT_EXIT_CODE_COULD_NOT_START_PROCESS, QProcess.ExitStatus.CrashExit)
         else:

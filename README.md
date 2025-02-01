@@ -52,9 +52,9 @@ Multigit is installation is possible through different formats and on different 
 
 * Windows / Graphical Installer: just run `setup_multigit-v1.6.1.exe` and look for Multigit in your Applications
 * Windows / Portable Application: just unzip `multigit_portable-v1.6.1.zip` and execute `multigit.exe`
-* Linux / Debian or Ubuntu / PyPI package
-  ** *Note: on PyPi, Multigit is registered as multigit_gx because there is already a multigit software*
-  ** the recommended way is to use `pipx` to install it:
+* Linux / Debian or Ubuntu / PyPI package  
+  *Note: on PyPi, Multigit is registered as multigit_gx because there is already a multigit software* . The recommended way is
+  to use `pipx` to install it:
 
 ```
     $ sudo apt install python-pipx

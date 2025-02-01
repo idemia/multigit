@@ -1,0 +1,71 @@
+{
+    "description": "",
+    "fileFormatVersion": "1.0",
+    "postCloneCommands": [],
+    "repositories": [
+        {
+            "description": "commit on branch main",
+            "destination": ".",
+            "head": "b58e9cb74d9492a3e3126784313485778f2034f7",
+            "head_type": "commit",
+            "url": "https://github.com/bluebird75/multigit-playground.git"
+        },
+        {
+            "description": "commit of tag VERSION_1",
+            "destination": "src/extern/component1",
+            "head": "ec2e13ab3966fbd2401d02e0944a0cb1a67b0c65",
+            "head_type": "commit",
+            "url": "https://github.com/bluebird75/multigit-playground.git"
+        },
+        {
+            "description": "commit of tag VERSION_2",
+            "destination": "src/extern/component2",
+            "head": "5194691648944807a2f31072f482f9ed47e7468c",
+            "head_type": "commit",
+            "url": "https://github.com/bluebird75/multigit-playground.git"
+        },
+        {
+            "description": "commit of tag VERSION_3",
+            "destination": "src/extern/component3",
+            "head": "cb03c8eb36d5d2551240b8617060616ffa8fc558",
+            "head_type": "commit",
+            "url": "https://github.com/bluebird75/multigit-playground.git"
+        },
+        {
+            "description": "commit on branch main",
+            "destination": "src/modules/module1",
+            "head": "b58e9cb74d9492a3e3126784313485778f2034f7",
+            "head_type": "commit",
+            "url": "https://github.com/bluebird75/multigit-playground.git"
+        },
+        {
+            "description": "commit on branch dev-feature1",
+            "destination": "src/modules/module2",
+            "head": "093b384072365f69808d0d54f898e10a39c9dc26",
+            "head_type": "commit",
+            "url": "https://github.com/bluebird75/multigit-playground.git"
+        },
+        {
+            "description": "commit on branch main",
+            "destination": "src/modules/module3",
+            "head": "b58e9cb74d9492a3e3126784313485778f2034f7",
+            "head_type": "commit",
+            "url": "https://github.com/bluebird75/multigit-playground.git"
+        },
+        {
+            "description": "commit on branch dev-feature1",
+            "destination": "src/modules/module4",
+            "head": "093b384072365f69808d0d54f898e10a39c9dc26",
+            "head_type": "commit",
+            "url": "https://github.com/bluebird75/multigit-playground.git"
+        },
+        {
+            "description": "commit on branch dev-feature1",
+            "destination": "src/modules/module5",
+            "head": "093b384072365f69808d0d54f898e10a39c9dc26",
+            "head_type": "commit",
+            "url": "https://github.com/bluebird75/multigit-playground.git"
+        }
+    ],
+    "variables": {}
+}
