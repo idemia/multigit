@@ -245,18 +245,17 @@ class MgConfig:
         return self._lruCreateOrGet(config_key).asList()
 
 
-T = TypeVar('T')
-
-
 class LRUList:
-    def __init__(self, l: Sequence[T], maxSize: int = 20) -> None:
+    _l: List[Any]
+
+    def __init__(self, l: Sequence[Any], maxSize: int = 20) -> None:
         self.maxSize = maxSize
-        self._l: List[T] = []
+        self._l = []
         for v in reversed(l):
             # add them in reverse order, guarantee that no double are presents
             self.setRecent(v)
 
-    def getFirst(self) -> Optional[T]:
+    def getFirst(self) -> Optional[Any]:
         '''Return the first item of the LRU list, without modifying it.
         Returns None if the list is empty.'''
         if len(self._l):
@@ -264,7 +263,7 @@ class LRUList:
         else:
             return None
 
-    def setRecent(self, v: T) -> None:
+    def setRecent(self, v: Any) -> None:
         # normally, there is zero or one copy
         assert (self._l.count(v) < 2)
 
@@ -278,5 +277,5 @@ class LRUList:
         while len(self._l) > self.maxSize:
             self._l.pop()
 
-    def asList(self) -> List[T]:
+    def asList(self) -> List[Any]:
         return self._l[:]
