@@ -15,7 +15,7 @@ pyside2-stubs
 pytest<8
 
 # packaging under Windows
-pyinstaller
+pyinstaller>=5.13.1
 
 # generating what's new
 markdown2
