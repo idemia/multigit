@@ -1,20 +1,24 @@
-# Generated from CHANGELOG.md on 2024-04-04 22:44:21.453504
+# Generated from CHANGELOG.md on 2025-02-01 17:56:53.399206
 
 
 content_html = '''
 <h1 align="center">MultiGit</h1>
 
-<p><em>by Phlipppe Fremy <a href="&#x6d;&#97;&#105;&#x6c;&#x74;&#111;&#58;&#112;&#x68;&#105;&#x6c;&#105;&#112;&#112;&#101;&#x2e;&#102;&#114;&#x65;&#x6d;&#121;&#64;&#x69;&#x64;e&#x6d;&#x69;&#x61;&#x2e;&#x63;&#111;&#x6d;">&#112;&#x68;&#105;&#x6c;&#105;&#112;&#112;&#101;&#x2e;&#102;&#114;&#x65;&#x6d;&#121;&#64;&#x69;&#x64;e&#x6d;&#x69;&#x61;&#x2e;&#x63;&#111;&#x6d;</a></em></p>
+<p><em>by Phlipppe Fremy <a href="m&#x61;&#x69;&#108;&#x74;&#x6f;&#x3a;&#112;&#104;&#105;&#108;&#105;&#x70;&#x70;&#x65;&#46;&#102;&#x72;&#x65;&#x6d;&#x79;&#x40;&#x69;&#100;&#101;&#x6d;&#105;&#97;&#46;&#x63;&#111;&#x6d;">&#112;&#104;&#105;&#108;&#105;&#x70;&#x70;&#x65;&#46;&#102;&#x72;&#x65;&#x6d;&#x79;&#x40;&#x69;&#100;&#101;&#x6d;&#105;&#97;&#46;&#x63;&#111;&#x6d;</a></em></p>
 
 <h2>Introduction</h2>
 
 <p>Multigit help users to manage many Git repositories simultaneously.</p>
 
-<h2>Version 1.6.1-rc1 (2024-04-04)</h2>
+<h2>Version 1.6.1 (2025-02-01)</h2>
+
+<p>Improvements</p>
 
 <ul>
 <li>Porting to Linux</li>
 <li>Add support for <code><span style="background-color:#f5f5f5;">gitk</span></code> and <code><span style="background-color:#f5f5f5;">git gui</span></code></li>
+<li>Add CI for Linux and Windows on Github</li>
+<li>support cloning from url like: <code><span style="background-color:#f5f5f5;">fremy@host.xz:path/to/repo.git/</span></code></li>
 </ul>
 
 <h2>Version 1.6.0 (2023-04-14)</h2>

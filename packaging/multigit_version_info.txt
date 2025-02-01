@@ -31,12 +31,12 @@ VSVersionInfo(
         '040904B0',
         [StringStruct('CompanyName', 'IDEMIA'),
         StringStruct('FileDescription', 'MultiGit OpenSource'),
-        StringStruct('FileVersion', '1.6.0'),
+        StringStruct('FileVersion', '1.6.1'),
         StringStruct('InternalName', 'MultiGit OpenSource'),
-        StringStruct('LegalCopyright', 'Copyright (C) IDEMIA 2023'),
+        StringStruct('LegalCopyright', 'Copyright (C) IDEMIA 2021-2025'),
         StringStruct('OriginalFilename', 'Multigit.exe'),
         StringStruct('ProductName', 'MultiGit OpenSource'),
-        StringStruct('ProductVersion', '1.6.0'),
+        StringStruct('ProductVersion', '1.6.1'),
         StringStruct('Comments', 'Multiple git repositories manager. Developed at IDEMIA by Philippe Fremy')])
       ]), 
     VarFileInfo([VarStruct('Translation', [1033, 1200])])

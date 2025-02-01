@@ -8,10 +8,16 @@ Introduction
 
 Multigit help users to manage many Git repositories simultaneously.
 
-Version 1.6.1-rc1 (2024-04-04)
+Version 1.6.1 (2025-02-01)
 -----------------
+
+Improvements
+
 * Porting to Linux
 * Add support for `gitk` and `git gui`
+* Add CI for Linux and Windows on Github
+* support cloning from url like: `fremy@host.xz:path/to/repo.git/`
+
 
 
 Version 1.6.0 (2023-04-14)
