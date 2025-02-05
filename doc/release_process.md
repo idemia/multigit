@@ -22,6 +22,10 @@
   
 * run: packaging\package_installer.bat
   * This builds a full Windows installer with InnoSetup
+  
+* login to github with idemia account
+  * go to: https://github.com/idemia/multigit/releases
+  * click "Draft new Release"
 
 
 
