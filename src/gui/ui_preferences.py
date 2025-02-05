@@ -3,15 +3,23 @@
 ################################################################################
 ## Form generated from reading UI file 'ui_preferences.ui'
 ##
-## Created by: Qt User Interface Compiler version 5.15.2
+## Created by: Qt User Interface Compiler version 6.8.2
 ##
 ## WARNING! All changes made in this file will be lost when recompiling UI file!
 ################################################################################
 
-from PySide6.QtCore import *
-from PySide6.QtGui import *
-from PySide6.QtWidgets import *
-
+from PySide6.QtCore import (QCoreApplication, QDate, QDateTime, QLocale,
+    QMetaObject, QObject, QPoint, QRect,
+    QSize, QTime, QUrl, Qt)
+from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,
+    QFont, QFontDatabase, QGradient, QIcon,
+    QImage, QKeySequence, QLinearGradient, QPainter,
+    QPalette, QPixmap, QRadialGradient, QTransform)
+from PySide6.QtWidgets import (QAbstractButton, QApplication, QCheckBox, QComboBox,
+    QDialog, QDialogButtonBox, QGridLayout, QGroupBox,
+    QHBoxLayout, QLabel, QLineEdit, QPushButton,
+    QRadioButton, QSizePolicy, QSpacerItem, QSpinBox,
+    QTabWidget, QVBoxLayout, QWidget)
 
 class Ui_Preferences(object):
     def setupUi(self, Preferences: QDialog) -> None:
@@ -28,14 +36,13 @@ class Ui_Preferences(object):
         self.verticalLayout_4.setObjectName(u"verticalLayout_4")
         self.groupBox_5 = QGroupBox(self.tab_ui)
         self.groupBox_5.setObjectName(u"groupBox_5")
-        sizePolicy = QSizePolicy(QSizePolicy.Preferred, QSizePolicy.Expanding)
+        sizePolicy = QSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Expanding)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.groupBox_5.sizePolicy().hasHeightForWidth())
         self.groupBox_5.setSizePolicy(sizePolicy)
         font = QFont()
         font.setBold(True)
-        font.setWeight(75)
         self.groupBox_5.setFont(font)
         self.groupBox_5.setFlat(False)
         self.groupBox_5.setCheckable(False)
@@ -45,14 +52,13 @@ class Ui_Preferences(object):
         self.label_5.setObjectName(u"label_5")
         font1 = QFont()
         font1.setBold(False)
-        font1.setWeight(50)
         self.label_5.setFont(font1)
 
         self.gridLayout_3.addWidget(self.label_5, 1, 0, 1, 1)
 
         self.pushButtonColorBranch = QPushButton(self.groupBox_5)
         self.pushButtonColorBranch.setObjectName(u"pushButtonColorBranch")
-        sizePolicy1 = QSizePolicy(QSizePolicy.Minimum, QSizePolicy.Fixed)
+        sizePolicy1 = QSizePolicy(QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Fixed)
         sizePolicy1.setHorizontalStretch(0)
         sizePolicy1.setVerticalStretch(0)
         sizePolicy1.setHeightForWidth(self.pushButtonColorBranch.sizePolicy().hasHeightForWidth())
@@ -60,7 +66,7 @@ class Ui_Preferences(object):
 
         self.gridLayout_3.addWidget(self.pushButtonColorBranch, 1, 1, 1, 1)
 
-        self.horizontalSpacer_2 = QSpacerItem(254, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
+        self.horizontalSpacer_2 = QSpacerItem(254, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
 
         self.gridLayout_3.addItem(self.horizontalSpacer_2, 2, 2, 1, 1)
 
@@ -81,7 +87,7 @@ class Ui_Preferences(object):
         self.comboBoxDoubleClickAction.addItem("")
         self.comboBoxDoubleClickAction.addItem("")
         self.comboBoxDoubleClickAction.setObjectName(u"comboBoxDoubleClickAction")
-        sizePolicy2 = QSizePolicy(QSizePolicy.MinimumExpanding, QSizePolicy.Fixed)
+        sizePolicy2 = QSizePolicy(QSizePolicy.Policy.MinimumExpanding, QSizePolicy.Policy.Fixed)
         sizePolicy2.setHorizontalStretch(0)
         sizePolicy2.setVerticalStretch(0)
         sizePolicy2.setHeightForWidth(self.comboBoxDoubleClickAction.sizePolicy().hasHeightForWidth())
@@ -101,11 +107,11 @@ class Ui_Preferences(object):
 
         self.gridLayout_3.addWidget(self.label_3, 0, 0, 1, 1)
 
-        self.horizontalSpacer = QSpacerItem(81, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
+        self.horizontalSpacer = QSpacerItem(81, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
 
         self.gridLayout_3.addItem(self.horizontalSpacer, 1, 2, 1, 1)
 
-        self.horizontalSpacer_3 = QSpacerItem(254, 20, QSizePolicy.Preferred, QSizePolicy.Minimum)
+        self.horizontalSpacer_3 = QSpacerItem(254, 20, QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Minimum)
 
         self.gridLayout_3.addItem(self.horizontalSpacer_3, 0, 2, 1, 1)
 
@@ -154,7 +160,7 @@ class Ui_Preferences(object):
 
         self.widget = QWidget(self.groupBox_7)
         self.widget.setObjectName(u"widget")
-        sizePolicy3 = QSizePolicy(QSizePolicy.MinimumExpanding, QSizePolicy.Preferred)
+        sizePolicy3 = QSizePolicy(QSizePolicy.Policy.MinimumExpanding, QSizePolicy.Policy.Preferred)
         sizePolicy3.setHorizontalStretch(0)
         sizePolicy3.setVerticalStretch(0)
         sizePolicy3.setHeightForWidth(self.widget.sizePolicy().hasHeightForWidth())
@@ -194,7 +200,7 @@ class Ui_Preferences(object):
 
         self.horizontalLayout.addWidget(self.comboUpdateFrequency)
 
-        self.horizontalSpacer_4 = QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
+        self.horizontalSpacer_4 = QSpacerItem(40, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
 
         self.horizontalLayout.addItem(self.horizontalSpacer_4)
 
@@ -215,11 +221,11 @@ class Ui_Preferences(object):
 
         self.verticalLayout_4.addWidget(self.groupBox_8)
 
-        self.verticalSpacer_2 = QSpacerItem(20, 17, QSizePolicy.Minimum, QSizePolicy.Expanding)
+        self.verticalSpacer_2 = QSpacerItem(20, 17, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Expanding)
 
         self.verticalLayout_4.addItem(self.verticalSpacer_2)
 
-        self.verticalSpacer_4 = QSpacerItem(20, 18, QSizePolicy.Minimum, QSizePolicy.Expanding)
+        self.verticalSpacer_4 = QSpacerItem(20, 18, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Expanding)
 
         self.verticalLayout_4.addItem(self.verticalSpacer_4)
 
@@ -230,7 +236,7 @@ class Ui_Preferences(object):
         self.gridLayout_10.setObjectName(u"gridLayout_10")
         self.groupBoxSublimemerge = QGroupBox(self.tab_extprogs)
         self.groupBoxSublimemerge.setObjectName(u"groupBoxSublimemerge")
-        sizePolicy4 = QSizePolicy(QSizePolicy.Preferred, QSizePolicy.Preferred)
+        sizePolicy4 = QSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Preferred)
         sizePolicy4.setHorizontalStretch(0)
         sizePolicy4.setVerticalStretch(0)
         sizePolicy4.setHeightForWidth(self.groupBoxSublimemerge.sizePolicy().hasHeightForWidth())
@@ -259,7 +265,7 @@ class Ui_Preferences(object):
 
         self.radioSublimemergeAutoDetect = QRadioButton(self.groupBoxSublimemerge)
         self.radioSublimemergeAutoDetect.setObjectName(u"radioSublimemergeAutoDetect")
-        sizePolicy5 = QSizePolicy(QSizePolicy.Minimum, QSizePolicy.Fixed)
+        sizePolicy5 = QSizePolicy(QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Fixed)
         sizePolicy5.setHorizontalStretch(1)
         sizePolicy5.setVerticalStretch(0)
         sizePolicy5.setHeightForWidth(self.radioSublimemergeAutoDetect.sizePolicy().hasHeightForWidth())
@@ -271,7 +277,7 @@ class Ui_Preferences(object):
         self.lineEditSublimemergeAutoDetect = QLineEdit(self.groupBoxSublimemerge)
         self.lineEditSublimemergeAutoDetect.setObjectName(u"lineEditSublimemergeAutoDetect")
         self.lineEditSublimemergeAutoDetect.setEnabled(False)
-        sizePolicy6 = QSizePolicy(QSizePolicy.Expanding, QSizePolicy.Preferred)
+        sizePolicy6 = QSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Preferred)
         sizePolicy6.setHorizontalStretch(0)
         sizePolicy6.setVerticalStretch(0)
         sizePolicy6.setHeightForWidth(self.lineEditSublimemergeAutoDetect.sizePolicy().hasHeightForWidth())
@@ -291,7 +297,7 @@ class Ui_Preferences(object):
 
         self.lineEditSublimemergeManual = QLineEdit(self.groupBoxSublimemerge)
         self.lineEditSublimemergeManual.setObjectName(u"lineEditSublimemergeManual")
-        sizePolicy7 = QSizePolicy(QSizePolicy.Expanding, QSizePolicy.Preferred)
+        sizePolicy7 = QSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Preferred)
         sizePolicy7.setHorizontalStretch(10)
         sizePolicy7.setVerticalStretch(0)
         sizePolicy7.setHeightForWidth(self.lineEditSublimemergeManual.sizePolicy().hasHeightForWidth())
@@ -302,7 +308,7 @@ class Ui_Preferences(object):
 
         self.pushButtonSublimemergeManualBrowse = QPushButton(self.groupBoxSublimemerge)
         self.pushButtonSublimemergeManualBrowse.setObjectName(u"pushButtonSublimemergeManualBrowse")
-        sizePolicy8 = QSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
+        sizePolicy8 = QSizePolicy(QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Fixed)
         sizePolicy8.setHorizontalStretch(1)
         sizePolicy8.setVerticalStretch(0)
         sizePolicy8.setHeightForWidth(self.pushButtonSublimemergeManualBrowse.sizePolicy().hasHeightForWidth())
@@ -459,7 +465,7 @@ class Ui_Preferences(object):
 
         self.gridLayout_10.addWidget(self.groupBoxGitK, 1, 1, 1, 1)
 
-        self.verticalSpacer_3 = QSpacerItem(20, 38, QSizePolicy.Minimum, QSizePolicy.Expanding)
+        self.verticalSpacer_3 = QSpacerItem(20, 38, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Expanding)
 
         self.gridLayout_10.addItem(self.verticalSpacer_3, 6, 1, 1, 1)
 
@@ -546,7 +552,7 @@ class Ui_Preferences(object):
         self.gridLayout_5.setObjectName(u"gridLayout_5")
         self.label_11 = QLabel(self.groupBoxExplorer)
         self.label_11.setObjectName(u"label_11")
-        sizePolicy9 = QSizePolicy(QSizePolicy.Preferred, QSizePolicy.Fixed)
+        sizePolicy9 = QSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Fixed)
         sizePolicy9.setHorizontalStretch(0)
         sizePolicy9.setVerticalStretch(0)
         sizePolicy9.setHeightForWidth(self.label_11.sizePolicy().hasHeightForWidth())
@@ -601,7 +607,7 @@ class Ui_Preferences(object):
 
         self.gridLayout_10.addWidget(self.groupBoxExplorer, 0, 1, 1, 1)
 
-        self.verticalSpacer = QSpacerItem(20, 16, QSizePolicy.Minimum, QSizePolicy.Expanding)
+        self.verticalSpacer = QSpacerItem(20, 16, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Expanding)
 
         self.gridLayout_10.addItem(self.verticalSpacer, 6, 0, 1, 1)
 

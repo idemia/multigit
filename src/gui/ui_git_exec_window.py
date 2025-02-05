@@ -3,15 +3,22 @@
 ################################################################################
 ## Form generated from reading UI file 'ui_git_exec_window.ui'
 ##
-## Created by: Qt User Interface Compiler version 5.15.2
+## Created by: Qt User Interface Compiler version 6.8.2
 ##
 ## WARNING! All changes made in this file will be lost when recompiling UI file!
 ################################################################################
 
-from PySide6.QtCore import *
-from PySide6.QtGui import *
-from PySide6.QtWidgets import *
-
+from PySide6.QtCore import (QCoreApplication, QDate, QDateTime, QLocale,
+    QMetaObject, QObject, QPoint, QRect,
+    QSize, QTime, QUrl, Qt)
+from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,
+    QFont, QFontDatabase, QGradient, QIcon,
+    QImage, QKeySequence, QLinearGradient, QPainter,
+    QPalette, QPixmap, QRadialGradient, QTransform)
+from PySide6.QtWidgets import (QAbstractButton, QApplication, QDialog, QDialogButtonBox,
+    QHBoxLayout, QHeaderView, QLabel, QProgressBar,
+    QSizePolicy, QTextEdit, QTreeWidget, QTreeWidgetItem,
+    QVBoxLayout, QWidget)
 
 class Ui_GitExecDialog(object):
     def setupUi(self, GitExecDialog: QDialog) -> None:
@@ -26,7 +33,7 @@ class Ui_GitExecDialog(object):
         self.treeGitJobs.setHeaderItem(__qtreewidgetitem)
         QTreeWidgetItem(self.treeGitJobs)
         self.treeGitJobs.setObjectName(u"treeGitJobs")
-        sizePolicy = QSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+        sizePolicy = QSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(3)
         sizePolicy.setHeightForWidth(self.treeGitJobs.sizePolicy().hasHeightForWidth())
@@ -52,14 +59,13 @@ class Ui_GitExecDialog(object):
         self.label.setObjectName(u"label")
         font = QFont()
         font.setBold(True)
-        font.setWeight(75)
         self.label.setFont(font)
 
         self.verticalLayout.addWidget(self.label)
 
         self.textEditSummary = QTextEdit(GitExecDialog)
         self.textEditSummary.setObjectName(u"textEditSummary")
-        sizePolicy1 = QSizePolicy(QSizePolicy.Expanding, QSizePolicy.Minimum)
+        sizePolicy1 = QSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
         sizePolicy1.setHorizontalStretch(0)
         sizePolicy1.setVerticalStretch(0)
         sizePolicy1.setHeightForWidth(self.textEditSummary.sizePolicy().hasHeightForWidth())
@@ -81,7 +87,7 @@ class Ui_GitExecDialog(object):
         font1.setPointSize(10)
         self.buttonBox.setFont(font1)
         self.buttonBox.setOrientation(Qt.Horizontal)
-        self.buttonBox.setStandardButtons(QDialogButtonBox.StandardButton.Discard|QDialogButtonBox.Ok)
+        self.buttonBox.setStandardButtons(QDialogButtonBox.Discard|QDialogButtonBox.Ok)
 
         self.horizontalLayout.addWidget(self.buttonBox)
 

@@ -3,18 +3,25 @@
 ################################################################################
 ## Form generated from reading UI file 'ui_git_run_command.ui'
 ##
-## Created by: Qt User Interface Compiler version 5.15.2
+## Created by: Qt User Interface Compiler version 6.8.2
 ##
 ## WARNING! All changes made in this file will be lost when recompiling UI file!
 ################################################################################
 
-from PySide6.QtCore import *
-from PySide6.QtGui import *
-from PySide6.QtWidgets import *
+from PySide6.QtCore import (QCoreApplication, QDate, QDateTime, QLocale,
+    QMetaObject, QObject, QPoint, QRect,
+    QSize, QTime, QUrl, Qt)
+from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,
+    QFont, QFontDatabase, QGradient, QIcon,
+    QImage, QKeySequence, QLinearGradient, QPainter,
+    QPalette, QPixmap, QRadialGradient, QTransform)
+from PySide6.QtWidgets import (QAbstractButton, QAbstractItemView, QApplication, QDialog,
+    QDialogButtonBox, QGridLayout, QGroupBox, QHBoxLayout,
+    QHeaderView, QLabel, QLineEdit, QPushButton,
+    QSizePolicy, QTreeWidgetItem, QVBoxLayout, QWidget)
 
-from src.mg_repo_tree import MgRepoTree
 from src.mg_button_history import MgButtonHistory
-
+from src.mg_repo_tree import MgRepoTree
 # import multigit_resources_rc
 
 class Ui_GitRunCommand(object):
@@ -29,13 +36,13 @@ class Ui_GitRunCommand(object):
         self.lineEditGitText = QLineEdit(GitRunCommand)
         self.lineEditGitText.setObjectName(u"lineEditGitText")
         self.lineEditGitText.setEnabled(True)
-        sizePolicy = QSizePolicy(QSizePolicy.Preferred, QSizePolicy.Fixed)
+        sizePolicy = QSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Fixed)
         sizePolicy.setHorizontalStretch(1)
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.lineEditGitText.sizePolicy().hasHeightForWidth())
         self.lineEditGitText.setSizePolicy(sizePolicy)
         font = QFont()
-        font.setFamily(u"Consolas")
+        font.setFamilies([u"Consolas"])
         self.lineEditGitText.setFont(font)
         self.lineEditGitText.setAlignment(Qt.AlignCenter)
         self.lineEditGitText.setReadOnly(True)
@@ -44,7 +51,7 @@ class Ui_GitRunCommand(object):
 
         self.lineEditGitCmd = QLineEdit(GitRunCommand)
         self.lineEditGitCmd.setObjectName(u"lineEditGitCmd")
-        sizePolicy1 = QSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
+        sizePolicy1 = QSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
         sizePolicy1.setHorizontalStretch(11)
         sizePolicy1.setVerticalStretch(0)
         sizePolicy1.setHeightForWidth(self.lineEditGitCmd.sizePolicy().hasHeightForWidth())
@@ -61,7 +68,7 @@ class Ui_GitRunCommand(object):
         self.historyButton = MgButtonHistory(GitRunCommand)
         self.historyButton.setObjectName(u"historyButton")
         icon = QIcon()
-        icon.addFile(u":/img/icons8-history-64.png", QSize(), QIcon.Normal, QIcon.Off)
+        icon.addFile(u":/img/icons8-history-64.png", QSize(), QIcon.Mode.Normal, QIcon.State.Off)
         self.historyButton.setIcon(icon)
 
         self.gridLayout.addWidget(self.historyButton, 0, 3, 1, 1)
@@ -83,7 +90,7 @@ class Ui_GitRunCommand(object):
         self.horizontalLayout.setObjectName(u"horizontalLayout")
         self.labelRepoSelected = QLabel(self.groupBox_2)
         self.labelRepoSelected.setObjectName(u"labelRepoSelected")
-        sizePolicy2 = QSizePolicy(QSizePolicy.Preferred, QSizePolicy.Preferred)
+        sizePolicy2 = QSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Preferred)
         sizePolicy2.setHorizontalStretch(1)
         sizePolicy2.setVerticalStretch(0)
         sizePolicy2.setHeightForWidth(self.labelRepoSelected.sizePolicy().hasHeightForWidth())
@@ -94,7 +101,7 @@ class Ui_GitRunCommand(object):
 
         self.pushButtonAdjustRepoList = QPushButton(self.groupBox_2)
         self.pushButtonAdjustRepoList.setObjectName(u"pushButtonAdjustRepoList")
-        sizePolicy3 = QSizePolicy(QSizePolicy.Minimum, QSizePolicy.Fixed)
+        sizePolicy3 = QSizePolicy(QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Fixed)
         sizePolicy3.setHorizontalStretch(1)
         sizePolicy3.setVerticalStretch(0)
         sizePolicy3.setHeightForWidth(self.pushButtonAdjustRepoList.sizePolicy().hasHeightForWidth())

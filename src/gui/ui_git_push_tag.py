@@ -3,17 +3,24 @@
 ################################################################################
 ## Form generated from reading UI file 'ui_git_push_tag.ui'
 ##
-## Created by: Qt User Interface Compiler version 5.15.2
+## Created by: Qt User Interface Compiler version 6.8.2
 ##
 ## WARNING! All changes made in this file will be lost when recompiling UI file!
 ################################################################################
 
-from PySide6.QtCore import *
-from PySide6.QtGui import *
-from PySide6.QtWidgets import *
+from PySide6.QtCore import (QCoreApplication, QDate, QDateTime, QLocale,
+    QMetaObject, QObject, QPoint, QRect,
+    QSize, QTime, QUrl, Qt)
+from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,
+    QFont, QFontDatabase, QGradient, QIcon,
+    QImage, QKeySequence, QLinearGradient, QPainter,
+    QPalette, QPixmap, QRadialGradient, QTransform)
+from PySide6.QtWidgets import (QAbstractButton, QAbstractItemView, QApplication, QComboBox,
+    QDialog, QDialogButtonBox, QGroupBox, QHBoxLayout,
+    QHeaderView, QLabel, QPushButton, QSizePolicy,
+    QTreeWidgetItem, QVBoxLayout, QWidget)
 
 from src.mg_repo_tree import MgRepoTree
-
 
 class Ui_GitPushTag(object):
     def setupUi(self, GitPushTag: QDialog) -> None:
@@ -37,13 +44,13 @@ class Ui_GitPushTag(object):
 
         self.comboBoxTagName = QComboBox(self.groupBox)
         self.comboBoxTagName.setObjectName(u"comboBoxTagName")
-        sizePolicy = QSizePolicy(QSizePolicy.Preferred, QSizePolicy.Fixed)
+        sizePolicy = QSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Fixed)
         sizePolicy.setHorizontalStretch(6)
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.comboBoxTagName.sizePolicy().hasHeightForWidth())
         self.comboBoxTagName.setSizePolicy(sizePolicy)
         font1 = QFont()
-        font1.setFamily(u"Consolas")
+        font1.setFamilies([u"Consolas"])
         font1.setPointSize(8)
         self.comboBoxTagName.setFont(font1)
         self.comboBoxTagName.setEditable(True)
@@ -52,7 +59,7 @@ class Ui_GitPushTag(object):
 
         self.widget_2 = QWidget(self.groupBox)
         self.widget_2.setObjectName(u"widget_2")
-        sizePolicy1 = QSizePolicy(QSizePolicy.Preferred, QSizePolicy.Preferred)
+        sizePolicy1 = QSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Preferred)
         sizePolicy1.setHorizontalStretch(3)
         sizePolicy1.setVerticalStretch(0)
         sizePolicy1.setHeightForWidth(self.widget_2.sizePolicy().hasHeightForWidth())
@@ -62,7 +69,7 @@ class Ui_GitPushTag(object):
 
         self.widget_4 = QWidget(self.groupBox)
         self.widget_4.setObjectName(u"widget_4")
-        sizePolicy2 = QSizePolicy(QSizePolicy.Expanding, QSizePolicy.Preferred)
+        sizePolicy2 = QSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Preferred)
         sizePolicy2.setHorizontalStretch(5)
         sizePolicy2.setVerticalStretch(0)
         sizePolicy2.setHeightForWidth(self.widget_4.sizePolicy().hasHeightForWidth())
@@ -86,7 +93,7 @@ class Ui_GitPushTag(object):
         self.horizontalLayout.setObjectName(u"horizontalLayout")
         self.labelRepoSelected = QLabel(self.groupBox_2)
         self.labelRepoSelected.setObjectName(u"labelRepoSelected")
-        sizePolicy3 = QSizePolicy(QSizePolicy.Preferred, QSizePolicy.Preferred)
+        sizePolicy3 = QSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Preferred)
         sizePolicy3.setHorizontalStretch(1)
         sizePolicy3.setVerticalStretch(0)
         sizePolicy3.setHeightForWidth(self.labelRepoSelected.sizePolicy().hasHeightForWidth())
@@ -97,7 +104,7 @@ class Ui_GitPushTag(object):
 
         self.pushButtonAdjustRepoList = QPushButton(self.groupBox_2)
         self.pushButtonAdjustRepoList.setObjectName(u"pushButtonAdjustRepoList")
-        sizePolicy4 = QSizePolicy(QSizePolicy.Minimum, QSizePolicy.Fixed)
+        sizePolicy4 = QSizePolicy(QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Fixed)
         sizePolicy4.setHorizontalStretch(1)
         sizePolicy4.setVerticalStretch(0)
         sizePolicy4.setHeightForWidth(self.pushButtonAdjustRepoList.sizePolicy().hasHeightForWidth())

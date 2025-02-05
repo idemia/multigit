@@ -3,17 +3,23 @@
 ################################################################################
 ## Form generated from reading UI file 'ui_export_mgit.ui'
 ##
-## Created by: Qt User Interface Compiler version 5.15.2
+## Created by: Qt User Interface Compiler version 6.8.2
 ##
 ## WARNING! All changes made in this file will be lost when recompiling UI file!
 ################################################################################
 
-from PySide6.QtCore import *
-from PySide6.QtGui import *
-from PySide6.QtWidgets import *
+from PySide6.QtCore import (QCoreApplication, QDate, QDateTime, QLocale,
+    QMetaObject, QObject, QPoint, QRect,
+    QSize, QTime, QUrl, Qt)
+from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,
+    QFont, QFontDatabase, QGradient, QIcon,
+    QImage, QKeySequence, QLinearGradient, QPainter,
+    QPalette, QPixmap, QRadialGradient, QTransform)
+from PySide6.QtWidgets import (QApplication, QDialog, QHBoxLayout, QLabel,
+    QLineEdit, QPushButton, QSizePolicy, QSpacerItem,
+    QVBoxLayout, QWidget)
 
 from src.mg_button_history import MgButtonHistory
-
 # import multigit_resources_rc
 
 class Ui_ExportMgit(object):
@@ -27,7 +33,6 @@ class Ui_ExportMgit(object):
         self.label.setObjectName(u"label")
         font = QFont()
         font.setBold(False)
-        font.setWeight(50)
         self.label.setFont(font)
 
         self.verticalLayout.addWidget(self.label)
@@ -36,7 +41,7 @@ class Ui_ExportMgit(object):
         self.horizontalLayout_2.setObjectName(u"horizontalLayout_2")
         self.lineEditMgitFile = QLineEdit(ExportMgit)
         self.lineEditMgitFile.setObjectName(u"lineEditMgitFile")
-        sizePolicy = QSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
+        sizePolicy = QSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
         sizePolicy.setHorizontalStretch(10)
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.lineEditMgitFile.sizePolicy().hasHeightForWidth())
@@ -48,14 +53,14 @@ class Ui_ExportMgit(object):
         self.historyButtonMgitFile = MgButtonHistory(ExportMgit)
         self.historyButtonMgitFile.setObjectName(u"historyButtonMgitFile")
         icon = QIcon()
-        icon.addFile(u":/img/icons8-history-64.png", QSize(), QIcon.Normal, QIcon.Off)
+        icon.addFile(u":/img/icons8-history-64.png", QSize(), QIcon.Mode.Normal, QIcon.State.Off)
         self.historyButtonMgitFile.setIcon(icon)
 
         self.horizontalLayout_2.addWidget(self.historyButtonMgitFile)
 
         self.pushButtonChooseMgitFile = QPushButton(ExportMgit)
         self.pushButtonChooseMgitFile.setObjectName(u"pushButtonChooseMgitFile")
-        sizePolicy1 = QSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
+        sizePolicy1 = QSizePolicy(QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Fixed)
         sizePolicy1.setHorizontalStretch(1)
         sizePolicy1.setVerticalStretch(0)
         sizePolicy1.setHeightForWidth(self.pushButtonChooseMgitFile.sizePolicy().hasHeightForWidth())
@@ -63,7 +68,7 @@ class Ui_ExportMgit(object):
         self.pushButtonChooseMgitFile.setMinimumSize(QSize(24, 0))
         self.pushButtonChooseMgitFile.setFont(font)
         icon1 = QIcon()
-        icon1.addFile(u":/img/icons8-open-folder-64.png", QSize(), QIcon.Normal, QIcon.Off)
+        icon1.addFile(u":/img/icons8-open-folder-64.png", QSize(), QIcon.Mode.Normal, QIcon.State.Off)
         self.pushButtonChooseMgitFile.setIcon(icon1)
 
         self.horizontalLayout_2.addWidget(self.pushButtonChooseMgitFile)
@@ -81,7 +86,7 @@ class Ui_ExportMgit(object):
 
         self.verticalLayout.addWidget(self.lineEditDescMgit)
 
-        self.verticalSpacer = QSpacerItem(20, 48, QSizePolicy.Minimum, QSizePolicy.Expanding)
+        self.verticalSpacer = QSpacerItem(20, 48, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Expanding)
 
         self.verticalLayout.addItem(self.verticalSpacer)
 

@@ -1,34 +1,23 @@
 # -*- coding: utf-8 -*-
 
-#    Copyright (c) 2019-2023 IDEMIA
-#    Author: IDEMIA (Philippe Fremy, Florent Oulieres)
-# 
-#     Licensed under the Apache License, Version 2.0 (the "License");
-#     you may not use this file except in compliance with the License.
-#     You may obtain a copy of the License at
-# 
-#         http://www.apache.org/licenses/LICENSE-2.0
-# 
-#     Unless required by applicable law or agreed to in writing, software
-#     distributed under the License is distributed on an "AS IS" BASIS,
-#     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-#     See the License for the specific language governing permissions and
-#     limitations under the License.
-#
-
-
 ################################################################################
 ## Form generated from reading UI file 'ui_repo_properties.ui'
 ##
-## Created by: Qt User Interface Compiler version 5.15.2
+## Created by: Qt User Interface Compiler version 6.8.2
 ##
 ## WARNING! All changes made in this file will be lost when recompiling UI file!
 ################################################################################
 
-from PySide6.QtCore import *
-from PySide6.QtGui import *
-from PySide6.QtWidgets import *
-
+from PySide6.QtCore import (QCoreApplication, QDate, QDateTime, QLocale,
+    QMetaObject, QObject, QPoint, QRect,
+    QSize, QTime, QUrl, Qt)
+from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,
+    QFont, QFontDatabase, QGradient, QIcon,
+    QImage, QKeySequence, QLinearGradient, QPainter,
+    QPalette, QPixmap, QRadialGradient, QTransform)
+from PySide6.QtWidgets import (QAbstractButton, QApplication, QDialog, QDialogButtonBox,
+    QGridLayout, QLabel, QLineEdit, QPushButton,
+    QSizePolicy, QTextEdit, QWidget)
 
 class Ui_RepoProperties(object):
     def setupUi(self, RepoProperties: QDialog) -> None:
@@ -39,7 +28,7 @@ class Ui_RepoProperties(object):
         self.gridLayout.setObjectName(u"gridLayout")
         self.label = QLabel(RepoProperties)
         self.label.setObjectName(u"label")
-        sizePolicy = QSizePolicy(QSizePolicy.Preferred, QSizePolicy.Preferred)
+        sizePolicy = QSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Preferred)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.label.sizePolicy().hasHeightForWidth())
@@ -148,7 +137,7 @@ class Ui_RepoProperties(object):
 
         self.label_8 = QLabel(RepoProperties)
         self.label_8.setObjectName(u"label_8")
-        sizePolicy1 = QSizePolicy(QSizePolicy.Preferred, QSizePolicy.Preferred)
+        sizePolicy1 = QSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Preferred)
         sizePolicy1.setHorizontalStretch(0)
         sizePolicy1.setVerticalStretch(3)
         sizePolicy1.setHeightForWidth(self.label_8.sizePolicy().hasHeightForWidth())
@@ -159,7 +148,7 @@ class Ui_RepoProperties(object):
 
         self.textEditLastCommit = QTextEdit(RepoProperties)
         self.textEditLastCommit.setObjectName(u"textEditLastCommit")
-        sizePolicy2 = QSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
+        sizePolicy2 = QSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
         sizePolicy2.setHorizontalStretch(0)
         sizePolicy2.setVerticalStretch(3)
         sizePolicy2.setHeightForWidth(self.textEditLastCommit.sizePolicy().hasHeightForWidth())

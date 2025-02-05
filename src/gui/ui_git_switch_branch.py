@@ -3,17 +3,25 @@
 ################################################################################
 ## Form generated from reading UI file 'ui_git_switch_branch.ui'
 ##
-## Created by: Qt User Interface Compiler version 5.15.2
+## Created by: Qt User Interface Compiler version 6.8.2
 ##
 ## WARNING! All changes made in this file will be lost when recompiling UI file!
 ################################################################################
 
-from PySide6.QtCore import *
-from PySide6.QtGui import *
-from PySide6.QtWidgets import *
+from PySide6.QtCore import (QCoreApplication, QDate, QDateTime, QLocale,
+    QMetaObject, QObject, QPoint, QRect,
+    QSize, QTime, QUrl, Qt)
+from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,
+    QFont, QFontDatabase, QGradient, QIcon,
+    QImage, QKeySequence, QLinearGradient, QPainter,
+    QPalette, QPixmap, QRadialGradient, QTransform)
+from PySide6.QtWidgets import (QAbstractButton, QAbstractItemView, QApplication, QCheckBox,
+    QDialog, QDialogButtonBox, QFrame, QGridLayout,
+    QGroupBox, QHBoxLayout, QHeaderView, QLabel,
+    QLineEdit, QPushButton, QSizePolicy, QTreeWidget,
+    QTreeWidgetItem, QVBoxLayout, QWidget)
 
 from src.mg_repo_tree import MgRepoTree
-
 
 class Ui_GitSwitchBranch(object):
     def setupUi(self, GitSwitchBranch: QDialog) -> None:
@@ -31,7 +39,7 @@ class Ui_GitSwitchBranch(object):
 
         self.lineEditBranchTagName = QLineEdit(GitSwitchBranch)
         self.lineEditBranchTagName.setObjectName(u"lineEditBranchTagName")
-        sizePolicy = QSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
+        sizePolicy = QSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
         sizePolicy.setHorizontalStretch(2)
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.lineEditBranchTagName.sizePolicy().hasHeightForWidth())
@@ -44,7 +52,7 @@ class Ui_GitSwitchBranch(object):
 
         self.widget_2 = QWidget(GitSwitchBranch)
         self.widget_2.setObjectName(u"widget_2")
-        sizePolicy1 = QSizePolicy(QSizePolicy.Preferred, QSizePolicy.Preferred)
+        sizePolicy1 = QSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Preferred)
         sizePolicy1.setHorizontalStretch(1)
         sizePolicy1.setVerticalStretch(0)
         sizePolicy1.setHeightForWidth(self.widget_2.sizePolicy().hasHeightForWidth())
@@ -100,7 +108,7 @@ class Ui_GitSwitchBranch(object):
 
         self.lineEditBranchFilter = QLineEdit(self.groupBoxBranchOrTagSelection)
         self.lineEditBranchFilter.setObjectName(u"lineEditBranchFilter")
-        sizePolicy2 = QSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
+        sizePolicy2 = QSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
         sizePolicy2.setHorizontalStretch(9)
         sizePolicy2.setVerticalStretch(0)
         sizePolicy2.setHeightForWidth(self.lineEditBranchFilter.sizePolicy().hasHeightForWidth())
@@ -111,7 +119,7 @@ class Ui_GitSwitchBranch(object):
 
         self.widget = QWidget(self.groupBoxBranchOrTagSelection)
         self.widget.setObjectName(u"widget")
-        sizePolicy3 = QSizePolicy(QSizePolicy.Preferred, QSizePolicy.Preferred)
+        sizePolicy3 = QSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Preferred)
         sizePolicy3.setHorizontalStretch(3)
         sizePolicy3.setVerticalStretch(0)
         sizePolicy3.setHeightForWidth(self.widget.sizePolicy().hasHeightForWidth())
@@ -121,7 +129,7 @@ class Ui_GitSwitchBranch(object):
 
         self.pushButtonGrouping = QPushButton(self.groupBoxBranchOrTagSelection)
         self.pushButtonGrouping.setObjectName(u"pushButtonGrouping")
-        sizePolicy4 = QSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
+        sizePolicy4 = QSizePolicy(QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Fixed)
         sizePolicy4.setHorizontalStretch(0)
         sizePolicy4.setVerticalStretch(0)
         sizePolicy4.setHeightForWidth(self.pushButtonGrouping.sizePolicy().hasHeightForWidth())
@@ -143,7 +151,7 @@ class Ui_GitSwitchBranch(object):
         self.treeWidgetBranches.setObjectName(u"treeWidgetBranches")
         self.treeWidgetBranches.setFont(font1)
         self.treeWidgetBranches.setFrameShape(QFrame.NoFrame)
-        self.treeWidgetBranches.setProperty("showDropIndicator", False)
+        self.treeWidgetBranches.setProperty(u"showDropIndicator", False)
         self.treeWidgetBranches.setAlternatingRowColors(False)
         self.treeWidgetBranches.setSortingEnabled(True)
         self.treeWidgetBranches.header().setVisible(True)
@@ -182,7 +190,7 @@ class Ui_GitSwitchBranch(object):
 
         self.pushButtonAdjustRepoList = QPushButton(self.groupBox_2)
         self.pushButtonAdjustRepoList.setObjectName(u"pushButtonAdjustRepoList")
-        sizePolicy5 = QSizePolicy(QSizePolicy.Minimum, QSizePolicy.Fixed)
+        sizePolicy5 = QSizePolicy(QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Fixed)
         sizePolicy5.setHorizontalStretch(1)
         sizePolicy5.setVerticalStretch(0)
         sizePolicy5.setHeightForWidth(self.pushButtonAdjustRepoList.sizePolicy().hasHeightForWidth())

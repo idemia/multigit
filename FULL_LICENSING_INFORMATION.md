@@ -239,13 +239,13 @@ Python software is licensed under the PSF License Agreement.
        to be bound by the terms and conditions of this License Agreement.
 
 
-PySide2 / Qt5 for Python
+PySide / Qt6 for Python
 -----------------------
 
 See [Qt's detailed licensing information](https://doc.qt.io/qt-5/licenses-used-in-qt.html) for software
-used by Qt5.
+used by Qt6.
 
-Qt/PySide2 is available under LGPLv3.
+Qt/PySide6 is available under LGPLv3.
 
                  GNU LESSER GENERAL PUBLIC LICENSE
                        Version 3, 29 June 2007

@@ -3,15 +3,21 @@
 ################################################################################
 ## Form generated from reading UI file 'ui_about.ui'
 ##
-## Created by: Qt User Interface Compiler version 5.15.2
+## Created by: Qt User Interface Compiler version 6.8.2
 ##
 ## WARNING! All changes made in this file will be lost when recompiling UI file!
 ################################################################################
 
-from PySide6.QtCore import *
-from PySide6.QtGui import *
-from PySide6.QtWidgets import *
-
+from PySide6.QtCore import (QCoreApplication, QDate, QDateTime, QLocale,
+    QMetaObject, QObject, QPoint, QRect,
+    QSize, QTime, QUrl, Qt)
+from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,
+    QFont, QFontDatabase, QGradient, QIcon,
+    QImage, QKeySequence, QLinearGradient, QPainter,
+    QPalette, QPixmap, QRadialGradient, QTransform)
+from PySide6.QtWidgets import (QAbstractScrollArea, QApplication, QDialog, QFrame,
+    QHBoxLayout, QLabel, QPushButton, QSizePolicy,
+    QSpacerItem, QTextBrowser, QVBoxLayout, QWidget)
 # import multigit_resources_rc
 
 class Ui_dialogAbout(object):
@@ -22,8 +28,8 @@ class Ui_dialogAbout(object):
         palette = QPalette()
         brush = QBrush(QColor(255, 255, 255, 255))
         brush.setStyle(Qt.SolidPattern)
-        palette.setBrush(QPalette.ColorRole.Active, QPalette.Base, brush)
-        palette.setBrush(QPalette.ColorRole.Active, QPalette.Window, brush)
+        palette.setBrush(QPalette.Active, QPalette.Base, brush)
+        palette.setBrush(QPalette.Active, QPalette.Window, brush)
         palette.setBrush(QPalette.Inactive, QPalette.Base, brush)
         palette.setBrush(QPalette.Inactive, QPalette.Window, brush)
         palette.setBrush(QPalette.Disabled, QPalette.Base, brush)
@@ -37,7 +43,7 @@ class Ui_dialogAbout(object):
         self.verticalLayout.setObjectName(u"verticalLayout")
         self.label = QLabel(dialogAbout)
         self.label.setObjectName(u"label")
-        sizePolicy = QSizePolicy(QSizePolicy.Fixed, QSizePolicy.Preferred)
+        sizePolicy = QSizePolicy(QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Preferred)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.label.sizePolicy().hasHeightForWidth())
@@ -54,7 +60,7 @@ class Ui_dialogAbout(object):
 
         self.textBrowserTitle = QTextBrowser(dialogAbout)
         self.textBrowserTitle.setObjectName(u"textBrowserTitle")
-        sizePolicy1 = QSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
+        sizePolicy1 = QSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
         sizePolicy1.setHorizontalStretch(0)
         sizePolicy1.setVerticalStretch(0)
         sizePolicy1.setHeightForWidth(self.textBrowserTitle.sizePolicy().hasHeightForWidth())
@@ -74,7 +80,7 @@ class Ui_dialogAbout(object):
 
         self.label_2 = QLabel(dialogAbout)
         self.label_2.setObjectName(u"label_2")
-        sizePolicy2 = QSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
+        sizePolicy2 = QSizePolicy(QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Fixed)
         sizePolicy2.setHorizontalStretch(0)
         sizePolicy2.setVerticalStretch(0)
         sizePolicy2.setHeightForWidth(self.label_2.sizePolicy().hasHeightForWidth())
@@ -88,7 +94,7 @@ class Ui_dialogAbout(object):
 
         self.textBrowserContent = QTextBrowser(dialogAbout)
         self.textBrowserContent.setObjectName(u"textBrowserContent")
-        sizePolicy3 = QSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+        sizePolicy3 = QSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
         sizePolicy3.setHorizontalStretch(0)
         sizePolicy3.setVerticalStretch(0)
         sizePolicy3.setHeightForWidth(self.textBrowserContent.sizePolicy().hasHeightForWidth())
@@ -102,7 +108,7 @@ class Ui_dialogAbout(object):
 
         self.horizontalLayout_2 = QHBoxLayout()
         self.horizontalLayout_2.setObjectName(u"horizontalLayout_2")
-        self.horizontalSpacer_2 = QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
+        self.horizontalSpacer_2 = QSpacerItem(40, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
 
         self.horizontalLayout_2.addItem(self.horizontalSpacer_2)
 
