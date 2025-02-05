@@ -1,4 +1,4 @@
-# Generated from FULL_LICENSING_INFORMATION.md on 2025-02-01 17:56:53.440199
+# Generated from FULL_LICENSING_INFORMATION.md on 2025-02-05 12:33:59.039044
 
 
 content_html = '''
@@ -242,12 +242,12 @@ END OF TERMS AND CONDITIONS
    to be bound by the terms and conditions of this License Agreement.
 </span></code></pre>
 
-<h2>PySide2 / Qt5 for Python</h2>
+<h2>PySide / Qt6 for Python</h2>
 
 <p>See <a href="https://doc.qt.io/qt-5/licenses-used-in-qt.html">Qt's detailed licensing information</a> for software
-used by Qt5.</p>
+used by Qt6.</p>
 
-<p>Qt/PySide2 is available under LGPLv3.</p>
+<p>Qt/PySide6 is available under LGPLv3.</p>
 
 <pre><code><span style="background-color:#f5f5f5;">             GNU LESSER GENERAL PUBLIC LICENSE
                    Version 3, 29 June 2007

@@ -1,14 +1,22 @@
-# Generated from CHANGELOG.md on 2025-02-01 17:56:53.399206
+# Generated from CHANGELOG.md on 2025-02-05 12:33:59.015006
 
 
 content_html = '''
 <h1 align="center">MultiGit</h1>
 
-<p><em>by Phlipppe Fremy <a href="m&#x61;&#x69;&#108;&#x74;&#x6f;&#x3a;&#112;&#104;&#105;&#108;&#105;&#x70;&#x70;&#x65;&#46;&#102;&#x72;&#x65;&#x6d;&#x79;&#x40;&#x69;&#100;&#101;&#x6d;&#105;&#97;&#46;&#x63;&#111;&#x6d;">&#112;&#104;&#105;&#108;&#105;&#x70;&#x70;&#x65;&#46;&#102;&#x72;&#x65;&#x6d;&#x79;&#x40;&#x69;&#100;&#101;&#x6d;&#105;&#97;&#46;&#x63;&#111;&#x6d;</a></em></p>
+<p><em>by Phlipppe Fremy <a href="&#x6d;&#x61;&#105;&#108;&#x74;o&#x3a;&#x70;&#104;&#x69;&#108;&#105;&#112;&#x70;&#x65;&#46;&#102;&#x72;&#x65;&#109;&#121;&#64;&#105;&#100;&#101;&#109;&#105;&#x61;.&#x63;&#x6f;&#109;">&#x70;&#104;&#x69;&#108;&#105;&#112;&#x70;&#x65;&#46;&#102;&#x72;&#x65;&#109;&#121;&#64;&#105;&#100;&#101;&#109;&#105;&#x61;.&#x63;&#x6f;&#109;</a></em></p>
 
 <h2>Introduction</h2>
 
 <p>Multigit help users to manage many Git repositories simultaneously.</p>
+
+<h2>Version 1.7-pre (2025-02-05)</h2>
+
+<p>Improvements</p>
+
+<ul>
+<li>Porting to Qt6 / PySide6 for better suppoort on recent linux</li>
+</ul>
 
 <h2>Version 1.6.1 (2025-02-01)</h2>
 

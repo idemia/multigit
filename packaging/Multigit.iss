@@ -1,9 +1,13 @@
 ﻿#define SETUPNAME "Multigit OpenSource"
-#define VERSIONSTR "1.6.1"
-#define VERSION "1.6.1"
+
 #define COMPANY "IDEMIA"
 #define NAME "Multigit"
 
+; only digits allowed here
+#define VERSION "1.7"
+
+; text also allowed here
+#define VERSIONSTR "1.7-pre"
 
  [_ISTool]
 EnableISX=false
