@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 #    Copyright (c) 2019-2023 IDEMIA
 #    Author: IDEMIA (Philippe Fremy, Florent Oulieres)
 # 

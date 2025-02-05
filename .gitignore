@@ -10,3 +10,5 @@ release/
 examples/
 /images/incoming
 TODO-link.txt
+.flatpak-builder
+builddir

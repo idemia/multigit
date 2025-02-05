@@ -22,3 +22,6 @@ markdown2
 
 # verifying multigit file format
 jsonschema-cli
+
+# for flatpak pip commands generation
+requirements-parser 

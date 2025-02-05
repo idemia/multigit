@@ -1,0 +1,37 @@
+id: org.multigit.Multigit
+runtime: org.kde.Platform
+runtime-version: '5.15-22.08'
+sdk: org.kde.Sdk
+command: multigit
+
+
+modules:
+  - python3-requirements-release.json
+  - name: multigit
+    buildsystem: simple
+    build-commands:
+      - pip3 install --verbose --exists-action=i --no-index --find-links=file://${PWD} --prefix=${FLATPAK_DEST} multigit_gx --no-build-isolation
+
+    sources: 
+      - type: file
+        url: https://files.pythonhosted.org/packages/2d/da/343f36c3fcb924f59b67d1a06c6f80a19149a902b6b8482e6cba3cfa7d1a/multigit_gx-1.6.1-py3-none-any.whl
+        sha256: e9de74493223e704e2acd1d39feb49aa722a1905bd8949cb9e317658fd517b04
+  
+  
+
+
+finish-args:
+  # Qt
+  - --share=ipc
+  - --socket=fallback-x11
+  - --socket=wayland
+  - --device=dri
+
+  # Ability to launch programs on the host
+  - --talk-name=org.freedesktop.Flatpak
+
+  # Specific to multigit, to check a file's presence
+  - --filesystem=/opt/sublime_merge/sublime_merge:ro
+
+
+
