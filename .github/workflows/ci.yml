@@ -52,7 +52,7 @@ jobs:
 
   test-linux:
 
-    runs-on: [ubuntu-22.04, ubuntu-24.04]
+    runs-on: ubuntu-24.04
     strategy:
       fail-fast: false
       matrix:
