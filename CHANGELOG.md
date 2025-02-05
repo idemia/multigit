@@ -8,11 +8,11 @@ Introduction
 
 Multigit help users to manage many Git repositories simultaneously.
 
-Version 1.7-pre (2025-02-05)
+Version 1.7 (2025-02-05)
 ----------------------------
 Improvements
 
-* Porting to Qt6 / PySide6 for better suppoort on recent linux
+* Porting to Qt6 / PySide6 for better support on recent linux
 
 
 Version 1.6.1 (2025-02-01)

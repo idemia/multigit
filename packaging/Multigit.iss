@@ -7,7 +7,7 @@
 #define VERSION "1.7"
 
 ; text also allowed here
-#define VERSIONSTR "1.7-pre"
+#define VERSIONSTR "1.7"
 
  [_ISTool]
 EnableISX=false
