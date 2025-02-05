@@ -5,7 +5,7 @@ concurrent-log-handler
 ### for developing multigit
 
 # the last version to have a wheel. After that, it trigger a build which is kind of annoying
-pyyaml==5.3.1
+pyyaml==5.4
 
 # type verification
 mypy
