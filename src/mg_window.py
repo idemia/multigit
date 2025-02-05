@@ -274,7 +274,7 @@ class MgMainWindow(QMainWindow, Ui_MainWindow):
 
 
     def slotAppStateChanged(self, state: int) -> None:
-        if state == Qt.ApplicationActive:
+        if state == Qt.ApplicationState.ApplicationActive:
             # window just got activated
             if self.refreshOnFocusBack:
                 dbg('slotAppChangedState: %s' % state)
@@ -325,7 +325,7 @@ class MgMainWindow(QMainWindow, Ui_MainWindow):
         if self.config[mgc.CONFIG_DISPLAY_FETCH_ON_STARTUP_COUNTDOWN] == 0:
             answer = QMessageBox.question(self, 'Activate fetch on startup ?', 'Multigit can fetch all your repositories when you launch it. '
                                  'Do you want to activate this behavior ?\n\nNote that you can change it later in the settings dialog.\n')
-            fetchReposOnStartup = (answer == QMessageBox.Yes)
+            fetchReposOnStartup = (answer == QMessageBox.StandardButton.Yes)
             self.config[mgc.CONFIG_FETCH_ON_STARTUP] = fetchReposOnStartup
             self.config.save()
 
@@ -569,13 +569,13 @@ class MgMainWindow(QMainWindow, Ui_MainWindow):
         oldName = self.tabRepos.tabText(curIdx)
         self.tabRepos.setTabText(curIdx, '')
         tabRenameLineEdit = QLineEdit(oldName)
-        self.tabRepos.tabBar().setTabButton(curIdx, QTabBar.LeftSide, tabRenameLineEdit)
+        self.tabRepos.tabBar().setTabButton(curIdx, QTabBar.ButtonPosition.LeftSide, tabRenameLineEdit)
         tabRenameLineEdit.selectAll()
         tabRenameLineEdit.setFocus()
 
         def setNewName() -> None:
             self.tabRepos.setTabText(curIdx, tabRenameLineEdit.text())
-            self.tabRepos.tabBar().setTabButton(curIdx, QTabBar.LeftSide, None)     # type: ignore[arg-type]    # the None is not accepted in the stubs yet
+            self.tabRepos.tabBar().setTabButton(curIdx, QTabBar.ButtonPosition.LeftSide, None)
 
         tabRenameLineEdit.returnPressed.connect(setNewName)
 

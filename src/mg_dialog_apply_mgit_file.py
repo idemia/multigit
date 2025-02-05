@@ -19,8 +19,8 @@ from typing import List, Any, TYPE_CHECKING, Set
 import logging, pathlib, json, os, subprocess, shutil, time, stat
 
 from PySide6.QtWidgets import QDialog, QWidget, QFileDialog, QMessageBox, QTreeWidgetItem, QPushButton, QDialogButtonBox
-from PySide6.QtCore import Qt, QTimer, QRegExp
-from PySide6.QtGui import QRegExpValidator
+from PySide6.QtCore import Qt, QTimer, QRegularExpression
+from PySide6.QtGui import QRegularExpressionValidator
 
 if TYPE_CHECKING:
     from src.mg_window import MgMainWindow
@@ -61,7 +61,7 @@ class MgDialogApplyMgitFile(QDialog):
         self.ui.labelProjDesc.setVisible(False)
         self.ui.textEditProjectDesc.setVisible(False)
         self.adjustButton = QPushButton(' Adjust Project ', self)
-        self.ui.buttonBox.addButton(self.adjustButton, QDialogButtonBox.AcceptRole)
+        self.ui.buttonBox.addButton(self.adjustButton, QDialogButtonBox.ButtonRole.AcceptRole)
 
         self.userFinishedTypingMgitFileTimer = QTimer(self)
         self.userFinishedTypingMgitFileTimer.setSingleShot(True)
@@ -74,7 +74,7 @@ class MgDialogApplyMgitFile(QDialog):
         self.userFinishedTypingUsernameTimer.setInterval(1000)
         self.userFinishedTypingUsernameTimer.timeout.connect(self.slotUsernameUpdated)
         self.ui.lineEditUsername.textEdited.connect(self.slotUsernameEdited)
-        validator = QRegExpValidator(QRegExp(reBranchTagValues))
+        validator = QRegularExpressionValidator(QRegularExpression(reBranchTagValues))
         self.ui.lineEditUsername.setValidator(validator)
         self.ui.historyButtonUsername.fillHistory(mgc.get_config_instance().lruAsList(mgc.CONFIG_CLONE_USERNAME))
         self.ui.lineEditUsername.setText(mgc.get_config_instance().lruGetFirst(mgc.CONFIG_CLONE_USERNAME) or '')
@@ -92,7 +92,7 @@ class MgDialogApplyMgitFile(QDialog):
         f = self.ui.treeWidgetRepoList.header().font()
         f.setBold(True)
         self.ui.treeWidgetRepoList.header().setFont(f)
-        self.ui.treeWidgetRepoList.sortByColumn(0, Qt.AscendingOrder)
+        self.ui.treeWidgetRepoList.sortByColumn(0, Qt.SortOrder.AscendingOrder)
 
         # if both items are filled and exist, updates repos
 

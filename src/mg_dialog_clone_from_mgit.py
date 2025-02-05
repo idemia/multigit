@@ -17,9 +17,9 @@ import sys
 from typing import TYPE_CHECKING, List, Optional
 import logging, pathlib, json, os, subprocess, time
 
-from PySide6.QtGui import QRegExpValidator, QColor
+from PySide6.QtGui import QRegularExpressionValidator, QColor
 from PySide6.QtWidgets import QDialog, QWidget, QFileDialog, QMessageBox, QTreeWidgetItem, QPushButton, QDialogButtonBox
-from PySide6.QtCore import Qt, QTimer, QRegExp
+from PySide6.QtCore import Qt, QTimer, QRegularExpression
 
 if TYPE_CHECKING:
     from src.mg_window import MgMainWindow
@@ -60,7 +60,7 @@ class MgDialogCloneFromMgitFile(QDialog):
         self.ui.labelProjDesc.setVisible(False)
         self.ui.textEditProjectDesc.setVisible(False)
         self.cloneButton = QPushButton('Clone', self)
-        self.ui.buttonBox.addButton(self.cloneButton, QDialogButtonBox.AcceptRole)
+        self.ui.buttonBox.addButton(self.cloneButton, QDialogButtonBox.ButtonRole.AcceptRole)
 
         self.userFinishedTypingMgitFileTimer = QTimer(self)
         self.userFinishedTypingMgitFileTimer.setSingleShot(True)
@@ -87,7 +87,7 @@ class MgDialogCloneFromMgitFile(QDialog):
         self.proj = ProjectStructure()
         self.proj_copy: Optional[ProjectStructure] = None
 
-        validator = QRegExpValidator(QRegExp(reBranchTagValues))
+        validator = QRegularExpressionValidator(QRegularExpression(reBranchTagValues))
         self.ui.lineEditUsername.setValidator(validator)
 
         # set last values
@@ -101,7 +101,7 @@ class MgDialogCloneFromMgitFile(QDialog):
         f = self.ui.treeWidgetRepoList.header().font()
         f.setBold(True)
         self.ui.treeWidgetRepoList.header().setFont(f)
-        self.ui.treeWidgetRepoList.sortByColumn(0, Qt.AscendingOrder)
+        self.ui.treeWidgetRepoList.sortByColumn(0, Qt.SortOrder.AscendingOrder)
 
         # if both items are filled and exist, updates repos
 
@@ -188,7 +188,7 @@ class MgDialogCloneFromMgitFile(QDialog):
                 f = item.font(3)
                 f.setBold(True)
                 item.setFont(3, f)
-                item.setForeground(3, QColor(Qt.red))
+                item.setForeground(3, QColor(Qt.GlobalColor.red))
             # adjust columns size
             for i in range(self.ui.treeWidgetRepoList.columnCount()):
                 self.ui.treeWidgetRepoList.resizeColumnToContents(i)

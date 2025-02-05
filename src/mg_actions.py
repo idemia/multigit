@@ -363,7 +363,7 @@ class MgActions(QObject):
             def local_set_head(_repoName: str) -> None:
                 self.actionCopyHead.setText(repoInfo.head.split(' ')[1])
                 self.actionCopyHead.setEnabled(True)
-            self.menuCopyConnections.append( repoInfo.repo_info_available.connect(local_set_head) ) # type: ignore
+            self.menuCopyConnections.append( repoInfo.repo_info_available.connect(local_set_head) )
 
         if repoInfo.commit_sha1:
             self.actionCopyShortSha1.setText(repoInfo.commit_sha1[:SHORT_SHA1_NB_DIGITS])

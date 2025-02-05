@@ -87,7 +87,7 @@ class MgEnsureInfoAvailable(QObject):
             return
 
         steps = 0
-        for infoFlag in list(RepoInfoFlags):
+        for infoFlag in RepoInfoFlags:
             if infoTypes & infoFlag:
                 self.infoExpected[infoFlag] = len(self.repoList)
                 steps += len(self.repoList)
@@ -156,7 +156,7 @@ class MgEnsureInfoAvailable(QObject):
 
         Emit sigInfoAvailable() if all information expected is now available.
         '''
-        for infoFlag in list(RepoInfoFlags):
+        for infoFlag in RepoInfoFlags:
             if infoTypes & infoFlag:
                 self.infoAvailable[infoFlag] += 1
                 if self.progressDialog:
@@ -172,7 +172,7 @@ class MgEnsureInfoAvailable(QObject):
 
     def isAllInfoAvailable(self) -> bool:
         '''Return True if all expectations are met'''
-        for infoFlag in list(RepoInfoFlags):
+        for infoFlag in RepoInfoFlags:
             if self.infoExpected[infoFlag] != self.infoAvailable[infoFlag]:
                 return False
 

@@ -74,8 +74,8 @@ def main_gui() -> None:
     global app
     app = QApplication([])
     icon = QtGui.QIcon()
-    icon.addPixmap(QtGui.QPixmap(":/img/multigit-logo-256.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
-    icon.addPixmap(QtGui.QPixmap(":/img/multigit-logo-16.png"),  QtGui.QIcon.Normal, QtGui.QIcon.Off)
+    icon.addPixmap(QtGui.QPixmap(":/img/multigit-logo-256.png"), QtGui.QIcon.Mode.Normal, QtGui.QIcon.State.Off)
+    icon.addPixmap(QtGui.QPixmap(":/img/multigit-logo-16.png"),  QtGui.QIcon.Mode.Normal, QtGui.QIcon.State.Off)
     app.setWindowIcon(icon)
     w = MgMainWindow(sys.argv)
     w.setWindowIcon(icon)

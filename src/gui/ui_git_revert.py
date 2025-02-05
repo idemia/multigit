@@ -95,7 +95,7 @@ class Ui_GitRevert(object):
         self.buttonBox = QDialogButtonBox(GitRevert)
         self.buttonBox.setObjectName(u"buttonBox")
         self.buttonBox.setOrientation(Qt.Horizontal)
-        self.buttonBox.setStandardButtons(QDialogButtonBox.Cancel|QDialogButtonBox.Yes)
+        self.buttonBox.setStandardButtons(QDialogButtonBox.Cancel|QDialogButtonBox.StandardButton.Yes)
 
         self.horizontalLayout_4.addWidget(self.buttonBox)
 

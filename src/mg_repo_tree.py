@@ -355,7 +355,7 @@ class MgRepoTree(QTreeWidget):
             actionToPerform[mgc.get_config_instance()[mgc.CONFIG_DOUBLE_CLICK_ACTION]]()
         else:
             button = QMessageBox.question(self, "Action for double-click", "Action for double-click is not yet defined.\nDo you want to open the settings dialog to define it ?")
-            if button == QMessageBox.Yes:
+            if button == QMessageBox.StandardButton.Yes:
                 runDialogEditSettings(self, tabPage=0)
 
 

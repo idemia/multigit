@@ -39,7 +39,7 @@ class MgDialogGitRevert(MgDialogWithRepoList):
         super().__init__(parent, Ui_GitRevert, selectedRepos, allRepos)
         self.sigRepoListAdjusted.connect(self.updateDiffContent)
         self.updateDiffContent()
-        buttonYes = self.ui.buttonBox.button( QDialogButtonBox.Yes )
+        buttonYes = self.ui.buttonBox.button( QDialogButtonBox.StandardButton.Yes )
         buttonYes.setText('Revert')
 
 

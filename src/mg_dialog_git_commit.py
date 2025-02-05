@@ -18,7 +18,8 @@
 from typing import List, Tuple
 import logging
 
-from PySide6.QtWidgets import QMessageBox, QAction, QWidget
+from PySide6.QtWidgets import QMessageBox, QWidget
+from PySide6.QtGui import QAction
 
 from src.gui.ui_git_commit import Ui_GitCommit
 from src.mg_dialog_utils import MgDialogWithRepoList
