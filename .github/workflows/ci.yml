@@ -60,8 +60,6 @@ jobs:
           # oldest supported version of python
           - python-version: "3.8"
 
-          # limit python version to 3.10 due to Pyside2
-          # not supported at the moment, fix that later
           - python-version: "3.13"
 
 
@@ -77,6 +75,8 @@ jobs:
 
     - name: Install dependencies
       run: |
+        # apt update && sudo apt install -y libegl1-mesa-dev
+        sudo apt install -y libegl1-mesa-dev
         python -m pip install -r reqs/requirements-dev.txt
         pip list
 
