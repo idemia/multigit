@@ -18,8 +18,8 @@
 import logging
 from typing import TYPE_CHECKING, cast, Type, Union, Optional, List, Protocol
 
-from PySide2.QtWidgets import QMessageBox, QDialog, QTreeWidget, QAbstractItemView, QPushButton, QLabel, QWidget
-from PySide2.QtCore import Qt, Signal
+from PySide6.QtWidgets import QMessageBox, QDialog, QTreeWidget, QAbstractItemView, QPushButton, QLabel, QWidget
+from PySide6.QtCore import Qt, Signal
 
 if TYPE_CHECKING:
     from src.mg_window import MgMainWindow
@@ -89,7 +89,7 @@ class MgDialogWithRepoList(QDialog):
         selectedRepos = selectedRepos or []
 
         assert parent is not None
-        self.setWindowFlags(self.windowFlags() & ~Qt.WindowContextHelpButtonHint)
+        self.setWindowFlags(self.windowFlags() & ~Qt.WindowType.WindowContextHelpButtonHint)
 
         # prepare repository list
         prepareTreeWidgetRepoList(self.ui.treeWidgetRepoList)

@@ -20,8 +20,8 @@ from typing import Sequence, Union, Optional, Callable, Tuple, Any, List, Dict, 
 import functools, logging, subprocess, sys, os
 from pathlib import Path
 
-from PySide2.QtCore import QObject, QProcess, Signal
-from PySide2.QtWidgets import QMessageBox, QApplication
+from PySide6.QtCore import QObject, QProcess, Signal
+from PySide6.QtWidgets import QMessageBox, QApplication
 
 from src import mg_config
 from src.mg_utils import hasGitAuthFailureMsg
@@ -642,7 +642,7 @@ class RunProcess(QObject):
         dbg('Executing blocking: {}'.format(self.nice_cmdline()))
         self.process.start()
 
-        if (self.process.state() not in (QProcess.Starting, QProcess.Running)
+        if (self.process.state() not in (QProcess.ProcessState.Starting, QProcess.ProcessState.Running)
                 or not self.process.waitForStarted(-1)):
             # could not start the process...
             cmd_out = self.process_finished(GIT_EXIT_CODE_COULD_NOT_START_PROCESS, QProcess.ExitStatus.CrashExit)
@@ -741,7 +741,7 @@ class RunProcess(QObject):
             logger.error('Git segfault detected, forcing exit code to -1 for: %s' % self.nice_cmdline())
             self.last_exit_code = GIT_EXIT_CODE_SEGFAULT_OF_GIT_WITH_STACKTRACE
 
-        elif process.exitStatus() != QProcess.NormalExit and self.last_exit_code == 0:
+        elif process.exitStatus() != QProcess.ExitStatus.NormalExit and self.last_exit_code == 0:
             logger.error('Git segfault detected, forcing exit code to -2 for: %s' % self.nice_cmdline())
             self.last_exit_code = GIT_EXIT_CODE_SEGFAULT_OF_GIT_NO_STACKTRACE
 

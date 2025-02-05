@@ -18,9 +18,9 @@
 from typing import List, Any, TYPE_CHECKING, Set
 import logging, pathlib, json, os, subprocess, shutil, time, stat
 
-from PySide2.QtWidgets import QDialog, QWidget, QFileDialog, QMessageBox, QTreeWidgetItem, QPushButton, QDialogButtonBox
-from PySide2.QtCore import Qt, QTimer, QRegExp
-from PySide2.QtGui import QRegExpValidator
+from PySide6.QtWidgets import QDialog, QWidget, QFileDialog, QMessageBox, QTreeWidgetItem, QPushButton, QDialogButtonBox
+from PySide6.QtCore import Qt, QTimer, QRegExp
+from PySide6.QtGui import QRegExpValidator
 
 if TYPE_CHECKING:
     from src.mg_window import MgMainWindow
@@ -54,7 +54,7 @@ class MgDialogApplyMgitFile(QDialog):
     def __init__(self, window: QWidget, destDir: str, currentRepos: List[MgRepoInfo]) -> None:
         super().__init__(window)
         # noinspection PyTypeChecker
-        self.setWindowFlags( self.windowFlags() & ~Qt.WindowContextHelpButtonHint)
+        self.setWindowFlags( self.windowFlags() & ~Qt.WindowType.WindowContextHelpButtonHint)
         self.ui = Ui_ApplyMgitFile()
         self.ui.setupUi(self)
         self.ui.lineEditDestDir.setText(destDir)
@@ -259,8 +259,8 @@ class MgDialogApplyMgitFile(QDialog):
             msg += 'The following repositories do not exist. They will be cloned:\n - '
             msg += '\n - '.join(repoNameToCreate)
             msg += '\n'
-            buttonPressed = QMessageBox.warning(self, 'Cloning repositories', msg, QMessageBox.Ok | QMessageBox.Cancel)
-            if buttonPressed != QMessageBox.Ok:
+            buttonPressed = QMessageBox.warning(self, 'Cloning repositories', msg, QMessageBox.StandardButton.Ok | QMessageBox.StandardButton.Cancel)
+            if buttonPressed != QMessageBox.StandardButton.Ok:
                 return
 
             repoWithEmptyUrl = [
@@ -272,8 +272,8 @@ class MgDialogApplyMgitFile(QDialog):
 
             if len(repoWithEmptyUrl):
                 msg = 'The following repositories to clone have an empty URL. They can not be cloned and will be skipped:\n- ' + '\n- '.join(repoWithEmptyUrl)
-                buttonSelectedWarning = QMessageBox.warning(self, 'Repository with empty URL', msg, QMessageBox.Ok | QMessageBox.Abort)
-                if buttonSelectedWarning == QMessageBox.Abort:
+                buttonSelectedWarning = QMessageBox.warning(self, 'Repository with empty URL', msg, QMessageBox.StandardButton.Ok | QMessageBox.StandardButton.Abort)
+                if buttonSelectedWarning == QMessageBox.StandardButton.Abort:
                     # user wants to check what is going on
                     return
 
@@ -285,16 +285,16 @@ class MgDialogApplyMgitFile(QDialog):
             msg += 'The following directories will be removed to allow the git clone:\n - '
             msg += '\n - '.join(repoPathToCreateDirExists)
             msg += '\n'
-            buttonPressed = QMessageBox.warning(self, 'Removing directories', msg, QMessageBox.Ok | QMessageBox.Cancel)
-            if buttonPressed != QMessageBox.Ok:
+            buttonPressed = QMessageBox.warning(self, 'Removing directories', msg, QMessageBox.StandardButton.Ok | QMessageBox.StandardButton.Cancel)
+            if buttonPressed != QMessageBox.StandardButton.Ok:
                 return
             # remove target directory if it already exists to make clone smooth
             result = deleteDirList(repoPathToCreateDirExists)
             if len(result):
                 buttonPressed = QMessageBox.warning(self, 'Error during removal of directories',
                                                     'Error during removal of directories: ' + result,
-                                                    QMessageBox.Abort | QMessageBox.Ok)
-                if buttonPressed != QMessageBox.Ok:
+                                                    QMessageBox.StandardButton.Abort | QMessageBox.StandardButton.Ok)
+                if buttonPressed != QMessageBox.StandardButton.Ok:
                     return
 
         if len(repoNameToRemove):
@@ -302,16 +302,16 @@ class MgDialogApplyMgitFile(QDialog):
             msg += 'The following repositories are not in the multigit file and will be removed:\n - '
             msg += '\n - '.join(repoNameToRemove)
             msg += '\n'
-            buttonPressed = QMessageBox.warning(self, 'Removing repositories', msg, QMessageBox.Ok | QMessageBox.Cancel)
-            if buttonPressed != QMessageBox.Ok:
+            buttonPressed = QMessageBox.warning(self, 'Removing repositories', msg, QMessageBox.StandardButton.Ok | QMessageBox.StandardButton.Cancel)
+            if buttonPressed != QMessageBox.StandardButton.Ok:
                 return
             # TODO: create a button "delete" for more clarity, and "skip" for even more clarity
             result = deleteDirList(repoPathToRemove)
             if len(result):
                 buttonPressed = QMessageBox.warning(self, 'Error during removal of repositories',
                                                     'Error during removal of repositories: ' + result,
-                                                    QMessageBox.Abort | QMessageBox.Ok)
-                if buttonPressed != QMessageBox.Ok:
+                                                    QMessageBox.StandardButton.Abort | QMessageBox.StandardButton.Ok)
+                if buttonPressed != QMessageBox.StandardButton.Ok:
                     return
 
         mgc.get_config_instance().lruSetRecent(mgc.CONFIG_CLONE_USERNAME, self.ui.lineEditUsername.text())

@@ -19,7 +19,7 @@ from typing import List
 
 import logging
 
-from PySide2.QtWidgets import QWidget, QDialogButtonBox
+from PySide6.QtWidgets import QWidget, QDialogButtonBox
 
 from src.mg_dialog_utils import MgDialogWithRepoList
 from src.gui.ui_git_revert import Ui_GitRevert

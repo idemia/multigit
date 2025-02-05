@@ -18,8 +18,8 @@
 from typing import cast, List, Optional, Union
 import logging, pathlib
 
-from PySide2.QtWidgets import QMessageBox, QApplication, QWidget
-from PySide2.QtCore import Qt, Signal, QByteArray, QTimer
+from PySide6.QtWidgets import QMessageBox, QApplication, QWidget
+from PySide6.QtCore import Qt, Signal, QByteArray, QTimer
 
 from src.mg_repo_info import MultiRepo
 from src.mg_repo_tree_item import MgRepoTreeItem

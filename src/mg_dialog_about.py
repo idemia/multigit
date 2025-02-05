@@ -18,9 +18,9 @@ from typing import Optional
 
 import platform
 
-from PySide2.QtWidgets import QDialog, QWidget
-from PySide2.QtCore import Qt
-from PySide2.QtCore import qVersion
+from PySide6.QtWidgets import QDialog, QWidget
+from PySide6.QtCore import Qt
+from PySide6.QtCore import qVersion
 
 
 from src.gui.ui_about import Ui_dialogAbout
@@ -36,7 +36,7 @@ class MgAboutDialog(QDialog):
         super().__init__(parent)
         self.setModal(False)
         # noinspection PyTypeChecker
-        self.setWindowFlags(self.windowFlags() & ~Qt.WindowContextHelpButtonHint)
+        self.setWindowFlags(self.windowFlags() & ~Qt.WindowType.WindowContextHelpButtonHint)
         self.ui = Ui_dialogAbout()
         self.ui.setupUi(self)
 
@@ -57,7 +57,7 @@ class MgAboutDialog(QDialog):
 
     def showFullLicenseInfo(self) -> None:
         dlg = QDialog(self)
-        dlg.setWindowFlags(self.windowFlags() & ~Qt.WindowContextHelpButtonHint)
+        dlg.setWindowFlags(self.windowFlags() & ~Qt.WindowType.WindowContextHelpButtonHint)
         ui = Ui_FullLicenseInfoDialog()
         ui.setupUi(dlg)
         ui.textBrowser.setHtml(content_html)

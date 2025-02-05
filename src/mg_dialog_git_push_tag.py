@@ -19,7 +19,7 @@ from typing import List
 
 import logging, itertools
 
-from PySide2.QtWidgets import QWidget
+from PySide6.QtWidgets import QWidget
 
 from src.mg_dialog_utils import MgDialogWithRepoList
 from src.gui.ui_git_push_tag import Ui_GitPushTag

@@ -18,8 +18,8 @@
 from typing import Any, TYPE_CHECKING, Optional, cast, Tuple
 import logging
 
-from PySide2.QtGui import QIcon, QColor, QPalette
-from PySide2.QtWidgets import QTreeWidgetItem, QApplication, QWidget, QTreeWidget
+from PySide6.QtGui import QIcon, QColor, QPalette
+from PySide6.QtWidgets import QTreeWidgetItem, QApplication, QWidget, QTreeWidget
 
 from src.mg_utils import extractInt
 from src import mg_config as mgc
@@ -167,7 +167,7 @@ class MgRepoTreeItem(QTreeWidgetItem):
                 colorRgb = mgc.get_config_instance().get(mgc.CONFIG_HEAD_COLOR_TAG, mgc.DEFAULT_CONFIG_HEAD_COLOR_TAG)
             self.setForeground(COL_HEAD, QColor(colorRgb))
         else:
-            self.setForeground(COL_HEAD, QApplication.palette().brush(QPalette.Active, QPalette.WindowText ))
+            self.setForeground(COL_HEAD, QApplication.palette().brush(QPalette.ColorGroup.Active, QPalette.ColorRole.WindowText ))
 
         MgRepoTreeItem.autoAdjustColumnSize(self.treeWidget())
 

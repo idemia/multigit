@@ -19,9 +19,9 @@ from typing import List
 
 import functools, logging
 
-from PySide2.QtCore import QMetaObject, QObject
-from PySide2.QtGui import QIcon, QPixmap, QTransform
-from PySide2.QtWidgets import QAction, QMenu, QWidget
+from PySide6.QtCore import QMetaObject, QObject
+from PySide6.QtGui import QAction, QIcon, QPixmap, QTransform
+from PySide6.QtWidgets import QMenu, QWidget
 
 from src.mg_const import SHORT_SHA1_NB_DIGITS
 from src.mg_tools import ExecSublimeMerge, ExecTortoiseGit, ExecSourceTree, ExecGitBash, ExecGitGui, ExecGitK

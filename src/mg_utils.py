@@ -18,7 +18,7 @@
 from typing import cast, Match, Any, Iterable, Sequence, Union, List, Iterator
 import html, os, pathlib, re, shutil, stat, logging
 
-from PySide2.QtWidgets import QTreeWidget, QTreeWidgetItem
+from PySide6.QtWidgets import QTreeWidget, QTreeWidgetItem
 
 from src.mg_const import MSG_BIG_DIFF, GIT_AUTH_FAILURE_MARKER
 

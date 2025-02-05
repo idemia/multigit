@@ -17,9 +17,9 @@ import sys
 from typing import TYPE_CHECKING, List, Optional
 import logging, pathlib, json, os, subprocess, time
 
-from PySide2.QtGui import QRegExpValidator, QColor
-from PySide2.QtWidgets import QDialog, QWidget, QFileDialog, QMessageBox, QTreeWidgetItem, QPushButton, QDialogButtonBox
-from PySide2.QtCore import Qt, QTimer, QRegExp
+from PySide6.QtGui import QRegExpValidator, QColor
+from PySide6.QtWidgets import QDialog, QWidget, QFileDialog, QMessageBox, QTreeWidgetItem, QPushButton, QDialogButtonBox
+from PySide6.QtCore import Qt, QTimer, QRegExp
 
 if TYPE_CHECKING:
     from src.mg_window import MgMainWindow
@@ -54,7 +54,7 @@ class MgDialogCloneFromMgitFile(QDialog):
     def __init__(self, window: QWidget) -> None:
         super().__init__(window)
         # noinspection PyTypeChecker
-        self.setWindowFlags( self.windowFlags() & ~Qt.WindowContextHelpButtonHint)
+        self.setWindowFlags( self.windowFlags() & ~Qt.WindowType.WindowContextHelpButtonHint)
         self.ui = Ui_CloneFromMgitFile()
         self.ui.setupUi(self)
         self.ui.labelProjDesc.setVisible(False)
@@ -338,8 +338,8 @@ class MgDialogCloneFromMgitFile(QDialog):
 
         if len(repoWithEmptyUrl):
             msg = 'The following repositories have an empty URL. They will not be cloned:\n- ' + '\n- '.join(repoWithEmptyUrl)
-            buttonSelectedWarning = QMessageBox.warning(self, 'Repository with empty URL', msg, QMessageBox.Ok | QMessageBox.Abort)
-            if buttonSelectedWarning == QMessageBox.Abort:
+            buttonSelectedWarning = QMessageBox.warning(self, 'Repository with empty URL', msg, QMessageBox.StandardButton.Ok | QMessageBox.StandardButton.Abort)
+            if buttonSelectedWarning == QMessageBox.StandardButton.Abort:
                 # user wants to check what is going on
                 return
 
@@ -352,7 +352,7 @@ class MgDialogCloneFromMgitFile(QDialog):
         if repoWithSsh and self.ui.lineEditUsername.text() == '':
             # ssh cloning requires a username
             msg = 'You are cloning repositories with the ssh:// method, but you forgot to define the username in the dialog.\nSopping the operation'
-            buttonSelectedWarning = QMessageBox.warning(self, 'Repository with ssh URL and no user defined', msg, QMessageBox.Abort)
+            buttonSelectedWarning = QMessageBox.warning(self, 'Repository with ssh URL and no user defined', msg, QMessageBox.StandardButton.Abort)
             return
 
 
@@ -435,9 +435,9 @@ def runDialogCloneFromMgitFile(window: 'MgMainWindow') -> None:
         msgBox = QMessageBox(window)
         msgBox.setWindowTitle('Confirm clone on existing')
         msgBox.setText(msg)
-        continueButton = msgBox.addButton('Continue', QMessageBox.AcceptRole)
-        delButton = msgBox.addButton('Delete directories', QMessageBox.AcceptRole)
-        abortButton = msgBox.addButton(QMessageBox.Abort)
+        continueButton = msgBox.addButton('Continue', QMessageBox.ButtonRole.AcceptRole)
+        delButton = msgBox.addButton('Delete directories', QMessageBox.ButtonRole.AcceptRole)
+        abortButton = msgBox.addButton(QMessageBox.StandardButton.Abort)
         msgBox.exec()
         buttonSelected = msgBox.clickedButton()
 
@@ -453,8 +453,8 @@ def runDialogCloneFromMgitFile(window: 'MgMainWindow') -> None:
     if len(skipDir):
         msg = 'The following repositories already exists and will NOT be cloned (skip behavior):\n'
         msg += '- ' + '\n- '.join(skipDir) + '\n'
-        buttonSelectedWarning = QMessageBox.warning(window, 'Confirm skip of repositories', msg, QMessageBox.Ok | QMessageBox.Abort)
-        if buttonSelectedWarning == QMessageBox.Abort:
+        buttonSelectedWarning = QMessageBox.warning(window, 'Confirm skip of repositories', msg, QMessageBox.StandardButton.Ok | QMessageBox.StandardButton.Abort)
+        if buttonSelectedWarning == QMessageBox.StandardButton.Abort:
             # user changed its mind ...
             return
 
@@ -468,8 +468,8 @@ def runDialogCloneFromMgitFile(window: 'MgMainWindow') -> None:
             # the user has not yet validated the list of repos
             msg = 'The following repositories already exists and will be DELETED (delete behavior):\n'
             msg += '- ' + '\n- '.join(toDelDir) + '\n'
-            buttonSelectedWarning = QMessageBox.warning(window, 'Confirm deletion of repositories', msg, QMessageBox.Ok | QMessageBox.Abort)
-            if buttonSelectedWarning == QMessageBox.Abort:
+            buttonSelectedWarning = QMessageBox.warning(window, 'Confirm deletion of repositories', msg, QMessageBox.StandardButton.Ok | QMessageBox.StandardButton.Abort)
+            if buttonSelectedWarning == QMessageBox.StandardButton.Abort:
                 # user changed its mind ...
                 return
 
@@ -494,16 +494,16 @@ def runDialogCloneFromMgitFile(window: 'MgMainWindow') -> None:
 
         if len(results):
             msg = 'The deletion of repositories returned the following errors:\n' + results
-            buttonSelectedWarning = QMessageBox.warning(window, 'Directory deletion error', msg, QMessageBox.Ok | QMessageBox.Abort)
-            if buttonSelectedWarning == QMessageBox.Abort:
+            buttonSelectedWarning = QMessageBox.warning(window, 'Directory deletion error', msg, QMessageBox.StandardButton.Ok | QMessageBox.StandardButton.Abort)
+            if buttonSelectedWarning == QMessageBox.StandardButton.Abort:
                 # user wants to check what is going on
                 return
 
         if len(stillExists):
             msg = 'Deletion of the following repositories failed:\n'
             msg += '- ' + '\n- '.join(stillExists)
-            buttonSelectedWarning = QMessageBox.warning(window, 'Directory not deleted', msg, QMessageBox.Ok | QMessageBox.Abort)
-            if buttonSelectedWarning == QMessageBox.Abort:
+            buttonSelectedWarning = QMessageBox.warning(window, 'Directory not deleted', msg, QMessageBox.StandardButton.Ok | QMessageBox.StandardButton.Abort)
+            if buttonSelectedWarning == QMessageBox.StandardButton.Abort:
                 # user wants to check what is going on
                 return
 

@@ -18,8 +18,8 @@
 from typing import List
 import logging
 
-from PySide2.QtWidgets import QDialog, QWidget, QFileDialog, QMessageBox, QApplication
-from PySide2.QtCore import Qt
+from PySide6.QtWidgets import QDialog, QWidget, QFileDialog, QMessageBox, QApplication
+from PySide6.QtCore import Qt
 
 import src.mg_config as mgc
 from src.mg_repo_info import MgRepoInfo, MultiRepo
@@ -45,7 +45,7 @@ def runDialogExportCsv(window: QWidget, multiRepo: MultiRepo) -> None:
         repo_info.ensure_head_and_url_and_commit_date(blocking=False)
 
     dlg = QDialog(window)
-    dlg.setWindowFlags(dlg.windowFlags() & ~Qt.WindowContextHelpButtonHint)
+    dlg.setWindowFlags(dlg.windowFlags() & ~Qt.WindowType.WindowContextHelpButtonHint)
     dlg.setWindowTitle('Choose CSV fields')
     ui = Ui_dialogCsvExport()
     ui.setupUi(dlg)

@@ -17,8 +17,8 @@
 
 from typing import Optional
 
-from PySide2.QtWidgets import QWidget, QDialog, QTextEdit, QPushButton, QVBoxLayout, QHBoxLayout, QFrame
-from PySide2.QtCore import Qt
+from PySide6.QtWidgets import QWidget, QDialog, QTextEdit, QPushButton, QVBoxLayout, QHBoxLayout, QFrame
+from PySide6.QtCore import Qt
 
 from src.gui.content_whatisnew import content_html
 from src.mg_const import *
@@ -29,12 +29,12 @@ def showFullLicenseInfo(parent: Optional[QWidget] = None) -> None:
     '''Show what's new dialog'''
     dialog = QDialog(parent)
     dialog.setWindowTitle("What's New")
-    dialog.setWindowFlags( dialog.windowFlags() & ~Qt.WindowContextHelpButtonHint)
+    dialog.setWindowFlags( dialog.windowFlags() & ~Qt.WindowType.WindowContextHelpButtonHint)
 
     text = QTextEdit(dialog)
     text.setReadOnly(True)
     text.setHtml(content_html)
-    text.setFrameShape( QFrame.NoFrame )
+    text.setFrameShape( QFrame.Shape.NoFrame )
     text.zoomIn(2)
 
     okButton = QPushButton('OK', dialog)

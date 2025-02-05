@@ -8,9 +8,9 @@
 ## WARNING! All changes made in this file will be lost when recompiling UI file!
 ################################################################################
 
-from PySide2.QtCore import *
-from PySide2.QtGui import *
-from PySide2.QtWidgets import *
+from PySide6.QtCore import *
+from PySide6.QtGui import *
+from PySide6.QtWidgets import *
 
 
 class Ui_GitExecDialog(object):
@@ -81,7 +81,7 @@ class Ui_GitExecDialog(object):
         font1.setPointSize(10)
         self.buttonBox.setFont(font1)
         self.buttonBox.setOrientation(Qt.Horizontal)
-        self.buttonBox.setStandardButtons(QDialogButtonBox.Discard|QDialogButtonBox.Ok)
+        self.buttonBox.setStandardButtons(QDialogButtonBox.StandardButton.Discard|QDialogButtonBox.Ok)
 
         self.horizontalLayout.addWidget(self.buttonBox)
 

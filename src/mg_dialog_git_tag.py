@@ -18,9 +18,9 @@
 from typing import TYPE_CHECKING, List, Tuple
 import tempfile, logging
 
-from PySide2.QtWidgets import QMessageBox, QWidget
-from PySide2.QtCore import QRegExp
-from PySide2.QtGui import QRegExpValidator
+from PySide6.QtWidgets import QMessageBox, QWidget
+from PySide6.QtCore import QRegExp
+from PySide6.QtGui import QRegExpValidator
 
 from src.gui.ui_git_tag import Ui_GitAddTag
 from src.mg_dialog_utils import reBranchTagValues, MgDialogWithRepoList
@@ -57,7 +57,7 @@ class MgDialogGitAddTag(MgDialogWithRepoList):
     def accept(self) -> None:
         tagName = self.ui.comboBoxTagName.currentText()
         if len(tagName) == 0:
-            QMessageBox.warning(self, "No tag name specified",
+            QMessageBox.Icon.Warning(self, "No tag name specified",
                                 "You did not specify any tag name!")
             return
 

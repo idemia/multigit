@@ -19,8 +19,8 @@ from typing import List, Dict, Callable, Any
 
 import enum
 
-from PySide2.QtCore import QObject, Signal, Qt
-from PySide2.QtWidgets import QWidget, QProgressDialog, QApplication
+from PySide6.QtCore import QObject, Signal, Qt
+from PySide6.QtWidgets import QWidget, QProgressDialog, QApplication
 
 from src.mg_repo_info import MgRepoInfo
 
@@ -50,7 +50,7 @@ class MgEnsureInfoAvailable(QObject):
             self.progressDialog.setMinimumDuration(1000)    # 1s before showing the dialog
             self.progressDialog.setWindowTitle('Progress')
             self.progressDialog.setLabelText('Collecting repository information')
-            self.progressDialog.setWindowFlags(self.progressDialog.windowFlags() & ~Qt.WindowContextHelpButtonHint & ~Qt.WindowCloseButtonHint)
+            self.progressDialog.setWindowFlags(self.progressDialog.windowFlags() & ~Qt.WindowType.WindowContextHelpButtonHint & ~Qt.WindowType.WindowCloseButtonHint)
             self.progressDialog.setMinimumWidth(300)
             self.progressDialog.setMinimumHeight(50)
         self.repoList = repoList
@@ -63,7 +63,7 @@ class MgEnsureInfoAvailable(QObject):
 
     def clear(self) -> None:
         '''Clear the dictionnaries tracking the number of information expected and available'''
-        for infoType in list(RepoInfoFlags):
+        for infoType in RepoInfoFlags:
             self.infoAvailable[infoType] = 0
             self.infoExpected[infoType] = 0
 

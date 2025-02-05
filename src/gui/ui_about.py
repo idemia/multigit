@@ -8,9 +8,9 @@
 ## WARNING! All changes made in this file will be lost when recompiling UI file!
 ################################################################################
 
-from PySide2.QtCore import *
-from PySide2.QtGui import *
-from PySide2.QtWidgets import *
+from PySide6.QtCore import *
+from PySide6.QtGui import *
+from PySide6.QtWidgets import *
 
 # import multigit_resources_rc
 
@@ -22,8 +22,8 @@ class Ui_dialogAbout(object):
         palette = QPalette()
         brush = QBrush(QColor(255, 255, 255, 255))
         brush.setStyle(Qt.SolidPattern)
-        palette.setBrush(QPalette.Active, QPalette.Base, brush)
-        palette.setBrush(QPalette.Active, QPalette.Window, brush)
+        palette.setBrush(QPalette.ColorRole.Active, QPalette.Base, brush)
+        palette.setBrush(QPalette.ColorRole.Active, QPalette.Window, brush)
         palette.setBrush(QPalette.Inactive, QPalette.Base, brush)
         palette.setBrush(QPalette.Inactive, QPalette.Window, brush)
         palette.setBrush(QPalette.Disabled, QPalette.Base, brush)

@@ -18,9 +18,9 @@
 from typing import TYPE_CHECKING, List
 import logging
 
-from PySide2.QtWidgets import QMessageBox, QWidget
-from PySide2.QtCore import QRegExp, Qt
-from PySide2.QtGui import QRegExpValidator
+from PySide6.QtWidgets import QMessageBox, QWidget
+from PySide6.QtCore import QRegExp, Qt
+from PySide6.QtGui import QRegExpValidator
 
 from src.gui.ui_git_create_branch import Ui_GitCreateBranch
 from src.mg_dialog_utils import reBranchTagValues, MgDialogWithRepoList

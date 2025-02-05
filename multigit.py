@@ -24,8 +24,8 @@ from types import TracebackType
 
 from concurrent_log_handler import ConcurrentRotatingFileHandler
 
-from PySide2.QtWidgets import QApplication, QMessageBox
-from PySide2 import QtGui
+from PySide6.QtWidgets import QApplication, QMessageBox
+from PySide6 import QtGui
 
 if __package__:
     # when running inside a package, src/* is not on the path, only multigit_gx is.
@@ -220,7 +220,7 @@ def main() -> None:
         print('Based on:')
         print('- python v%s' % platform.python_version())
         try:
-            from PySide2.QtCore import qVersion
+            from PySide6.QtCore import qVersion
             print('- Qt for Python v' + qVersion())
         except ImportError:
             print('- Qt for Python version not available')
@@ -236,7 +236,7 @@ def main() -> None:
     init_logging(debug_activated=debug_activated, run_from_tests=False)
     logging.info( 'Starting multigit v%s on %s' % (mg_const.VERSION, datetime.datetime.now().isoformat(sep=' ', timespec='seconds') ))
     try:
-        from PySide2.QtCore import qVersion
+        from PySide6.QtCore import qVersion
         qt_version = 'v%s' % qVersion()
     except ImportError:
         qt_version = 'unknown'

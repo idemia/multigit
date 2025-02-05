@@ -18,9 +18,9 @@
 from typing import cast, List, Optional, Callable, Any, Union, Literal
 import subprocess, functools, logging, pathlib
 
-from PySide2.QtWidgets import QMainWindow, QFileDialog, QMessageBox, QAction, QApplication, QLineEdit, QTabBar
-from PySide2.QtCore import QTimer, Qt, QSignalMapper
-from PySide2.QtGui import QCloseEvent
+from PySide6.QtWidgets import QMainWindow, QFileDialog, QMessageBox, QApplication, QLineEdit, QTabBar
+from PySide6.QtCore import QTimer, Qt, QSignalMapper
+from PySide6.QtGui import QCloseEvent, QAction
 
 from src.gui.ui_main_window import Ui_MainWindow
 from src.mg_actions import MgActions

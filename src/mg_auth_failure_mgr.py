@@ -19,8 +19,8 @@ from typing import Optional, List, Sequence
 
 import logging, enum
 
-from PySide2.QtCore import QObject, Qt
-from PySide2.QtWidgets import QMessageBox
+from PySide6.QtCore import QObject, Qt
+from PySide6.QtWidgets import QMessageBox
 
 from src.mg_utils import isGitCommandRequiringAuth
 

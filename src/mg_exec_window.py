@@ -18,9 +18,9 @@
 from typing import Sequence, cast, Any, Tuple, List
 import logging, time
 
-from PySide2.QtCore import Qt, QTimer
-from PySide2.QtGui import QGuiApplication
-from PySide2.QtWidgets import QDialog, QTreeWidgetItem, QDialogButtonBox, QWidget, QApplication, QPushButton
+from PySide6.QtCore import Qt, QTimer
+from PySide6.QtGui import QGuiApplication
+from PySide6.QtWidgets import QDialog, QTreeWidgetItem, QDialogButtonBox, QWidget, QApplication, QPushButton
 
 from src.gui.ui_git_exec_window import Ui_GitExecDialog
 import src.mg_config as mgc
@@ -60,14 +60,14 @@ class MgExecWindow(QDialog):
         super().__init__(parent)
         self.setModal(False)
         # noinspection PyTypeChecker
-        self.setWindowFlags(self.windowFlags() & ~Qt.WindowContextHelpButtonHint)
+        self.setWindowFlags(self.windowFlags() & ~Qt.WindowType.WindowContextHelpButtonHint)
         self.ui = Ui_GitExecDialog()
         self.ui.setupUi(self)
         self.ui.treeGitJobs.itemExpanded.connect(self.autoAdjustColumnSize)
-        self.ui.buttonBox.button(QDialogButtonBox.Discard).clicked.connect( self.slotAbort )
-        self.ui.buttonBox.button(QDialogButtonBox.Discard).setText('Abort')
+        self.ui.buttonBox.button(QDialogButtonBox.StandardButton.Discard).clicked.connect( self.slotAbort )
+        self.ui.buttonBox.button(QDialogButtonBox.StandardButton.Discard).setText('Abort')
         self.buttonCopyLog = QPushButton('Copy git log to clipboard', self.ui.buttonBox)
-        self.ui.buttonBox.addButton(self.buttonCopyLog, QDialogButtonBox.ActionRole)
+        self.ui.buttonBox.addButton(self.buttonCopyLog, QDialogButtonBox.ButtonRole.ActionRole)
         self.ui.textEditSummary.hide()
         self.buttonCopyLog.clicked.connect( self.slotCopyLog )
         self.delta_between_concurrent_git_run = delta_between_concurrent_git_run
@@ -282,8 +282,8 @@ class MgExecWindow(QDialog):
         else:
             self.ui.progressBar.setValue(self.nb_jobs + self.nb_jobs_done*2)
         completed = (self.nb_jobs_done == self.nb_jobs)
-        self.ui.buttonBox.button(QDialogButtonBox.Discard).setEnabled(not completed)
-        self.ui.buttonBox.button(QDialogButtonBox.Ok).setEnabled(completed)
+        self.ui.buttonBox.button(QDialogButtonBox.StandardButton.Discard).setEnabled(not completed)
+        self.ui.buttonBox.button(QDialogButtonBox.StandardButton.Ok).setEnabled(completed)
 
 
     def oneMoreJobDone(self, success: bool) -> None:

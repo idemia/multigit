@@ -17,7 +17,7 @@ from typing import Union, Any, List
 
 import unittest
 
-from PySide2.QtWidgets import QApplication, QTreeWidget, QTreeWidgetItem
+from PySide6.QtWidgets import QApplication, QTreeWidget, QTreeWidgetItem
 
 from src.mg_repo_info import MgRepoInfo
 from src.mg_utils import treeWidgetFlatIterator, treeWidgetDeepIterator
