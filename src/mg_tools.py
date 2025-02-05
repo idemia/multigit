@@ -709,7 +709,7 @@ class RunProcess(QObject):
 
         Calls the cb_done if any.
         '''
-        dbg('Process finished for "%s" with exit status %d, exit code %d' % (self.nice_cmdline(), int(exit_status), exit_code))
+        dbg('Process finished for "%s" with exit status %d, exit code %d' % (self.nice_cmdline(), int(exit_status.value), exit_code))
         assert self.process
         cmd_out: str
         btext = bytes(self.process.readAllStandardOutput())
