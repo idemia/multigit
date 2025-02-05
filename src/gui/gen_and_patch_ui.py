@@ -77,8 +77,8 @@ def remove_import_rc(py_fname: str) -> None:
 
 
 def generate_ui(ui_fname: str, py_fname: str, forceGeneration: bool = False) -> None:
-    PYUIC5='pyside2-uic'
-    cmdline = [PYUIC5, ui_fname, '-o', py_fname]
+    PYUIC = 'pyside6-uic'
+    cmdline = [PYUIC, ui_fname, '-o', py_fname]
     print('Generating py file: ' + ' '.join(cmdline))
     subprocess.check_call(cmdline)
     print('OK')
@@ -91,6 +91,7 @@ def main() -> None:
 
     forceGeneration = False
     if '--force' in sys.argv:
+        print('Forcing generation')
         del sys.argv[ sys.argv.index('--force') ]
         forceGeneration = True
 

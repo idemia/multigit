@@ -18,9 +18,9 @@
 from typing import TYPE_CHECKING, List
 import logging
 
-from PySide2.QtWidgets import QDialog, QApplication, QWidget
-from PySide2.QtGui import QIcon
-from PySide2.QtCore import Qt
+from PySide6.QtWidgets import QDialog, QApplication, QWidget
+from PySide6.QtGui import QIcon
+from PySide6.QtCore import Qt
 
 from src.mg_repo_info import MgRepoInfo
 from src.gui.ui_repo_properties import Ui_RepoProperties
@@ -35,7 +35,7 @@ def runDialogGitProperties(parent: QWidget, currentRepo: MgRepoInfo) -> None:
     currentRepo.ensure_all_filled()
     dlg = QDialog(parent)
     dlg.setWindowFlags(
-        dlg.windowFlags() & ~Qt.WindowContextHelpButtonHint)
+        dlg.windowFlags() & ~Qt.WindowType.WindowContextHelpButtonHint)
     dlg.setWindowTitle('Properties of {}'.format(currentRepo.name))
     ui_rp = Ui_RepoProperties()
     ui_rp.setupUi(dlg)

@@ -23,9 +23,9 @@ from pprint import pformat
 import logging, traceback
 import datetime, shutil
 
-from PySide2.QtCore import Qt
-from PySide2.QtWidgets import QMessageBox, QApplication
-from PySide2.QtGui import QColor
+from PySide6.QtCore import Qt
+from PySide6.QtWidgets import QMessageBox, QApplication
+from PySide6.QtGui import QColor
 
 # keys for the configuration file
 CONFIG_MAINWINDOW_GEOMETRY = 'MAINWINDOW_GEOMETRY'
@@ -79,8 +79,8 @@ CONFIG_DISPLAY_FETCH_ON_STARTUP_COUNTDOWN = 'CONFIG_DISPLAY_FETCH_ON_STARTUP_COU
 DEFAULT_CHECK_UPDATE_FREQUENCY = 30 # check every month
 
 # Format is: 0xAARRGGBB with AA = alpha, RR = red, GG = green, BB = blue
-DEFAULT_CONFIG_HEAD_COLOR_BRANCH = QColor(Qt.blue).rgb()
-DEFAULT_CONFIG_HEAD_COLOR_TAG = QColor(Qt.darkCyan).rgb()
+DEFAULT_CONFIG_HEAD_COLOR_BRANCH = QColor(Qt.GlobalColor.blue).rgb()
+DEFAULT_CONFIG_HEAD_COLOR_TAG = QColor(Qt.GlobalColor.darkCyan).rgb()
 
 logger = logging.getLogger('mg_config')
 dbg = logger.debug

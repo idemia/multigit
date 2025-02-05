@@ -19,9 +19,9 @@ import logging
 from collections import defaultdict
 import enum
 
-from PySide2.QtWidgets import QMessageBox, QTreeWidgetItem, QApplication, QProgressDialog, \
+from PySide6.QtWidgets import QMessageBox, QTreeWidgetItem, QApplication, QProgressDialog, \
                             QTreeWidget, QWidget, QAbstractItemView
-from PySide2.QtCore import QTimer, Qt
+from PySide6.QtCore import QTimer, Qt
 
 if TYPE_CHECKING:
     pass
@@ -224,10 +224,10 @@ def applyFilterToTree(tree: QTreeWidget, filterText: str) -> None:
     # we wander through all items in DFS
     for item in treeWidgetDeepIterator(tree):
         # only end tag/branch names items are relevant for filtering
-        if item.data(0, Qt.UserRole) != ItemRole.BRANCH_TAG_END_NAME:
+        if item.data(0, Qt.ItemDataRole.UserRole) != ItemRole.BRANCH_TAG_END_NAME:
             continue
 
-        data = item.data(0, Qt.ToolTipRole)
+        data = item.data(0, Qt.ItemDataRole.ToolTipRole)
         if data and filterText in data.lower():
             unhideItemHierarchy(item)
             continue
@@ -288,16 +288,16 @@ def fillBranchTagInfo(repoItemInfo: List[Tuple[str, int, str, List[str]]],
     if grouping == GroupingBy.NONE:
         for name, count, infoLocalRemote, branchList in repoItemInfo:
             item = RepoBranchInfoTreeItem([name, '%d' % count, infoLocalRemote])
-            item.setData(0, Qt.ToolTipRole, name)
-            item.setData(1, Qt.ToolTipRole, 'Present in:\n' + '\n'.join(branchList))
-            item.setData(0, Qt.UserRole, ItemRole.BRANCH_TAG_END_NAME)
+            item.setData(0, Qt.ItemDataRole.ToolTipRole, name)
+            item.setData(1, Qt.ItemDataRole.ToolTipRole, 'Present in:\n' + '\n'.join(branchList))
+            item.setData(0, Qt.ItemDataRole.UserRole, ItemRole.BRANCH_TAG_END_NAME)
             for branch in branchList:
                 childItem = QTreeWidgetItem(['', '    ' + branch])
-                childItem.setData(0, Qt.UserRole, ItemRole.ITEM_REPOSITORY)
+                childItem.setData(0, Qt.ItemDataRole.UserRole, ItemRole.ITEM_REPOSITORY)
                 item.addChild(childItem)
             item.setExpanded(False)
             treeWidget.addTopLevelItem(item)
-        treeWidget.sortByColumn(0, Qt.AscendingOrder)
+        treeWidget.sortByColumn(0, Qt.SortOrder.AscendingOrder)
         return
 
     if grouping == GroupingBy.NAME:
@@ -320,7 +320,7 @@ def fillBranchTagInfo(repoItemInfo: List[Tuple[str, int, str, List[str]]],
                 childItem: QTreeWidgetItem = RepoBranchInfoTreeItem([splittedName[0]])
                 # Note that with the information available so far, we set it as middle-name. But if it turns
                 # out that the name is the final part, this will be overridden with BRANCH_TAG_END_NAME
-                childItem.setData(0, Qt.UserRole, ItemRole.BRANCH_TAG_MIDDLE_NAME)
+                childItem.setData(0, Qt.ItemDataRole.UserRole, ItemRole.BRANCH_TAG_MIDDLE_NAME)
                 parentItem.addChild(childItem)
                 parentItem.setExpanded(True)
 
@@ -330,12 +330,12 @@ def fillBranchTagInfo(repoItemInfo: List[Tuple[str, int, str, List[str]]],
                 # we just filled the end of the item name, also fill other columns
                 item.setText(1, str(count))
                 item.setText(2, infoLocalRemote)
-                item.setData(0, Qt.ToolTipRole, fullName)
-                item.setData(1, Qt.ToolTipRole, 'Present in:\n' + '\n'.join(branchList))
-                item.setData(0, Qt.UserRole, ItemRole.BRANCH_TAG_END_NAME)
+                item.setData(0, Qt.ItemDataRole.ToolTipRole, fullName)
+                item.setData(1, Qt.ItemDataRole.ToolTipRole, 'Present in:\n' + '\n'.join(branchList))
+                item.setData(0, Qt.ItemDataRole.UserRole, ItemRole.BRANCH_TAG_END_NAME)
                 for branch in branchList:
                     childItem = QTreeWidgetItem(['', '    ' + branch])
-                    childItem.setData(0, Qt.UserRole, ItemRole.ITEM_REPOSITORY)
+                    childItem.setData(0, Qt.ItemDataRole.UserRole, ItemRole.ITEM_REPOSITORY)
                     item.addChild(childItem)
                 item.setExpanded(False)
             else:
@@ -352,17 +352,17 @@ def fillBranchTagInfo(repoItemInfo: List[Tuple[str, int, str, List[str]]],
             else:
                 item = lastTopLevel
             if len(splittedName) > 1:
-                item.setData(0, Qt.UserRole, ItemRole.BRANCH_TAG_MIDDLE_NAME)
+                item.setData(0, Qt.ItemDataRole.UserRole, ItemRole.BRANCH_TAG_MIDDLE_NAME)
                 propagateItemContent(item, splittedName[1:], name, count, infoLocalRemote, branchList)
             else:
                 item.setText(1, str(count))
                 item.setText(2, infoLocalRemote)
-                item.setData(0, Qt.ToolTipRole, name)
-                item.setData(1, Qt.ToolTipRole, 'Present in:\n' + '\n'.join(branchList))
-                item.setData(0, Qt.UserRole, ItemRole.BRANCH_TAG_END_NAME)
+                item.setData(0, Qt.ItemDataRole.ToolTipRole, name)
+                item.setData(1, Qt.ItemDataRole.ToolTipRole, 'Present in:\n' + '\n'.join(branchList))
+                item.setData(0, Qt.ItemDataRole.UserRole, ItemRole.BRANCH_TAG_END_NAME)
                 for branch in branchList:
                     childItem = QTreeWidgetItem(['', '    ' + branch])
-                    childItem.setData(0, Qt.UserRole, ItemRole.ITEM_REPOSITORY)
+                    childItem.setData(0, Qt.ItemDataRole.UserRole, ItemRole.ITEM_REPOSITORY)
                     item.addChild(childItem)
                 item.setExpanded(False)
 
@@ -395,7 +395,7 @@ class MgDialogGitSwitchDeleteBranch(MgDialogWithRepoList):
 
         self.ui.treeWidgetBranches.clear()
         self.ui.treeWidgetBranches.setSortingEnabled(True)
-        self.ui.treeWidgetBranches.sortByColumn(0, Qt.AscendingOrder)
+        self.ui.treeWidgetBranches.sortByColumn(0, Qt.SortOrder.AscendingOrder)
         self.ui.treeWidgetBranches.itemSelectionChanged.connect(self.slotItemSelectionChanged)
 
         self.ui.lineEditBranchFilter.setPlaceholderText('Filter the list of %s by typing here' % ('branches' if self.isBranchDialog() else 'tags'))
@@ -462,15 +462,15 @@ class MgDialogGitSwitchDeleteBranch(MgDialogWithRepoList):
             + new_feat_2        -> if selected, returns feat/new_feat_2
 
         '''
-        if item.data(0, Qt.UserRole) == ItemRole.ITEM_REPOSITORY:
+        if item.data(0, Qt.ItemDataRole.UserRole) == ItemRole.ITEM_REPOSITORY:
             # when pointing to a repository, the branch/tag name ends in his parent
             item = item.parent()
 
-        if item.data(0, Qt.UserRole) == ItemRole.BRANCH_TAG_MIDDLE_NAME:
+        if item.data(0, Qt.ItemDataRole.UserRole) == ItemRole.BRANCH_TAG_MIDDLE_NAME:
             # for the middle-name, we don't want to report any text
             return ''
 
-        assert item.data(0, Qt.UserRole) == ItemRole.BRANCH_TAG_END_NAME
+        assert item.data(0, Qt.ItemDataRole.UserRole) == ItemRole.BRANCH_TAG_END_NAME
 
         # item has parent. Collect the name of all parents + name of the item to form
         # the full branch/tag name.
@@ -530,7 +530,7 @@ class MgDialogGitSwitchDeleteBranch(MgDialogWithRepoList):
         repoItemInfo = analyseRepoBranchOrTagInfo(repoBranchTagInfo)
         self.ui.treeWidgetBranches.clear()
         fillBranchTagInfo(repoItemInfo, self.ui.treeWidgetBranches, self.grouping)
-        self.ui.treeWidgetBranches.sortByColumn(0, Qt.AscendingOrder)
+        self.ui.treeWidgetBranches.sortByColumn(0, Qt.SortOrder.AscendingOrder)
         RepoBranchInfoTreeItem.autoAdjustColumnSize(self.ui.treeWidgetBranches)
         self.slotApplyFilter()
 
@@ -575,13 +575,13 @@ class MgDialogGitSwitchDeleteBranch(MgDialogWithRepoList):
             msg += '<p>What do you want to do ?<p>'
             msgBox = QMessageBox(self)
             msgBox.setWindowTitle('Must choose local or remote branch to delete ?')
-            msgBox.setTextFormat(Qt.RichText)
+            msgBox.setTextFormat(Qt.TextFormat.RichText)
             msgBox.setText(msg)
 
-            delLocalButton = msgBox.addButton('Delete local branch', QMessageBox.AcceptRole)
-            delRemoteButton = msgBox.addButton('Delete remote branch', QMessageBox.AcceptRole)
-            delBothButton = msgBox.addButton('Delete local and remote branch', QMessageBox.AcceptRole)
-            cancelButton = msgBox.addButton(QMessageBox.Cancel)
+            delLocalButton = msgBox.addButton('Delete local branch', QMessageBox.ButtonRole.AcceptRole)
+            delRemoteButton = msgBox.addButton('Delete remote branch', QMessageBox.ButtonRole.AcceptRole)
+            delBothButton = msgBox.addButton('Delete local and remote branch', QMessageBox.ButtonRole.AcceptRole)
+            cancelButton = msgBox.addButton(QMessageBox.StandardButton.Cancel)
             msgBox.setDefaultButton(cancelButton)
             msgBox.exec()
             buttonSelected = msgBox.clickedButton()
@@ -621,12 +621,12 @@ class MgDialogGitSwitchDeleteBranch(MgDialogWithRepoList):
             msg += '<p>What do you want to do ?<p>'
             msgBox = QMessageBox(self)
             msgBox.setWindowTitle('Delete remote branch ?')
-            msgBox.setTextFormat(Qt.RichText)
+            msgBox.setTextFormat(Qt.TextFormat.RichText)
             msgBox.setText(msg)
 
-            continueButton = msgBox.addButton('Continue', QMessageBox.AcceptRole)
-            delButton = msgBox.addButton('Delete remote branch', QMessageBox.AcceptRole)
-            cancelButton = msgBox.addButton(QMessageBox.Cancel)
+            continueButton = msgBox.addButton('Continue', QMessageBox.ButtonRole.AcceptRole)
+            delButton = msgBox.addButton('Delete remote branch', QMessageBox.ButtonRole.AcceptRole)
+            cancelButton = msgBox.addButton(QMessageBox.StandardButton.Cancel)
             msgBox.setDefaultButton(delButton)
             msgBox.exec()
             buttonSelected = msgBox.clickedButton()
@@ -646,12 +646,12 @@ class MgDialogGitSwitchDeleteBranch(MgDialogWithRepoList):
             msg += '<p>What do you want to do ?<p>'
             msgBox = QMessageBox(self)
             msgBox.setWindowTitle('Delete local branch ?')
-            msgBox.setTextFormat(Qt.RichText)
+            msgBox.setTextFormat(Qt.TextFormat.RichText)
             msgBox.setText(msg)
 
-            continueButton = msgBox.addButton('Continue', QMessageBox.AcceptRole)
-            delButton = msgBox.addButton('Delete local branch', QMessageBox.AcceptRole)
-            cancelButton = msgBox.addButton(QMessageBox.Cancel)
+            continueButton = msgBox.addButton('Continue', QMessageBox.ButtonRole.AcceptRole)
+            delButton = msgBox.addButton('Delete local branch', QMessageBox.ButtonRole.AcceptRole)
+            cancelButton = msgBox.addButton(QMessageBox.StandardButton.Cancel)
             msgBox.setDefaultButton(delButton)
             msgBox.exec()
             buttonSelected = msgBox.clickedButton()
@@ -828,15 +828,15 @@ def doGitSwitchBranchTag(parent: QWidget, dialog: MgDialogGitSwitchDeleteBranch)
                     msg1 += 'Please select the one you want.'
                     msgBox = QMessageBox(parent)
                     msgBox.setText(msg1)
-                    msgBox.setIcon(QMessageBox.Warning)
+                    msgBox.setIcon(QMessageBox.Icon.Warning)
                     msgBox.setWindowTitle('Multiple remote branch with same name')
                     buttons = []
                     for branch in remoteBranches:
-                        buttons.append(msgBox.addButton(branch, QMessageBox.ActionRole))
-                    msgBox.setStandardButtons(QMessageBox.Abort)
+                        buttons.append(msgBox.addButton(branch, QMessageBox.ButtonRole.ActionRole))
+                    msgBox.setStandardButtons(QMessageBox.StandardButton.Abort)
 
                     stdButtonClicked = msgBox.exec_()
-                    if stdButtonClicked == QMessageBox.Abort:
+                    if stdButtonClicked == QMessageBox.StandardButton.Abort:
                         # show the dialog again
                         return False
 

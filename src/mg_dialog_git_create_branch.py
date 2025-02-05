@@ -18,9 +18,9 @@
 from typing import TYPE_CHECKING, List
 import logging
 
-from PySide2.QtWidgets import QMessageBox, QWidget
-from PySide2.QtCore import QRegExp, Qt
-from PySide2.QtGui import QRegExpValidator
+from PySide6.QtWidgets import QMessageBox, QWidget
+from PySide6.QtCore import QRegularExpression, Qt
+from PySide6.QtGui import QRegularExpressionValidator
 
 from src.gui.ui_git_create_branch import Ui_GitCreateBranch
 from src.mg_dialog_utils import reBranchTagValues, MgDialogWithRepoList
@@ -43,7 +43,7 @@ class MgDialogGitCreateBranch(MgDialogWithRepoList):
         self.ui.comboBoxBranchName.insertItem(0, "")
         self.ui.comboBoxBranchName.setCurrentIndex(0)
         self.ui.comboBoxBranchName.setFocus()
-        validator = QRegExpValidator(QRegExp(reBranchTagValues))
+        validator = QRegularExpressionValidator(QRegularExpression(reBranchTagValues))
         self.ui.comboBoxBranchName.setValidator(validator)
         completer = self.ui.comboBoxBranchName.completer()
         completer.setCaseSensitivity(Qt.CaseSensitivity.CaseSensitive)

@@ -1,43 +1,33 @@
 # -*- coding: utf-8 -*-
 
-#    Copyright (c) 2023 IDEMIA
-#    Author: IDEMIA (Philippe Fremy, Florent Oulieres)
-# 
-#     Licensed under the Apache License, Version 2.0 (the "License");
-#     you may not use this file except in compliance with the License.
-#     You may obtain a copy of the License at
-# 
-#         http://www.apache.org/licenses/LICENSE-2.0
-# 
-#     Unless required by applicable law or agreed to in writing, software
-#     distributed under the License is distributed on an "AS IS" BASIS,
-#     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-#     See the License for the specific language governing permissions and
-#     limitations under the License.
-#
-
-
 ################################################################################
 ## Form generated from reading UI file 'ui_select_repos.ui'
 ##
-## Created by: Qt User Interface Compiler version 5.15.2
+## Created by: Qt User Interface Compiler version 6.8.2
 ##
 ## WARNING! All changes made in this file will be lost when recompiling UI file!
 ################################################################################
 
-from PySide2.QtCore import *
-from PySide2.QtGui import *
-from PySide2.QtWidgets import *
+from PySide6.QtCore import (QCoreApplication, QDate, QDateTime, QLocale,
+    QMetaObject, QObject, QPoint, QRect,
+    QSize, QTime, QUrl, Qt)
+from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,
+    QFont, QFontDatabase, QGradient, QIcon,
+    QImage, QKeySequence, QLinearGradient, QPainter,
+    QPalette, QPixmap, QRadialGradient, QTransform)
+from PySide6.QtWidgets import (QAbstractButton, QAbstractItemView, QApplication, QDialog,
+    QDialogButtonBox, QHBoxLayout, QHeaderView, QLabel,
+    QLineEdit, QPushButton, QSizePolicy, QSpacerItem,
+    QTreeWidgetItem, QVBoxLayout, QWidget)
 
 from src.mg_repo_tree import MgRepoTree
-
 
 class Ui_SelectRepos(object):
     def setupUi(self, SelectRepos: QDialog) -> None:
         if not SelectRepos.objectName():
             SelectRepos.setObjectName(u"SelectRepos")
         SelectRepos.resize(671, 573)
-        sizePolicy = QSizePolicy(QSizePolicy.Preferred, QSizePolicy.Preferred)
+        sizePolicy = QSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Preferred)
         sizePolicy.setHorizontalStretch(1)
         sizePolicy.setVerticalStretch(1)
         sizePolicy.setHeightForWidth(SelectRepos.sizePolicy().hasHeightForWidth())
@@ -50,12 +40,11 @@ class Ui_SelectRepos(object):
         self.label.setObjectName(u"label")
         font = QFont()
         font.setBold(True)
-        font.setWeight(75)
         self.label.setFont(font)
 
         self.horizontalLayout_5.addWidget(self.label)
 
-        self.horizontalSpacer = QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
+        self.horizontalSpacer = QSpacerItem(40, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
 
         self.horizontalLayout_5.addItem(self.horizontalSpacer)
 
@@ -64,13 +53,13 @@ class Ui_SelectRepos(object):
 
         self.horizontalLayout = QHBoxLayout()
         self.horizontalLayout.setObjectName(u"horizontalLayout")
-        self.horizontalSpacer_7 = QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
+        self.horizontalSpacer_7 = QSpacerItem(40, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
 
         self.horizontalLayout.addItem(self.horizontalSpacer_7)
 
         self.label_3 = QLabel(SelectRepos)
         self.label_3.setObjectName(u"label_3")
-        sizePolicy1 = QSizePolicy(QSizePolicy.Preferred, QSizePolicy.Preferred)
+        sizePolicy1 = QSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Preferred)
         sizePolicy1.setHorizontalStretch(0)
         sizePolicy1.setVerticalStretch(0)
         sizePolicy1.setHeightForWidth(self.label_3.sizePolicy().hasHeightForWidth())
@@ -84,7 +73,7 @@ class Ui_SelectRepos(object):
 
         self.horizontalLayout.addWidget(self.lineEditFilterList)
 
-        self.horizontalSpacer_8 = QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
+        self.horizontalSpacer_8 = QSpacerItem(40, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
 
         self.horizontalLayout.addItem(self.horizontalSpacer_8)
 
@@ -100,7 +89,7 @@ class Ui_SelectRepos(object):
 
         self.horizontalLayout_2 = QHBoxLayout()
         self.horizontalLayout_2.setObjectName(u"horizontalLayout_2")
-        self.horizontalSpacer_2 = QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
+        self.horizontalSpacer_2 = QSpacerItem(40, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
 
         self.horizontalLayout_2.addItem(self.horizontalSpacer_2)
 
@@ -109,7 +98,7 @@ class Ui_SelectRepos(object):
         __qtreewidgetitem.setText(0, u"1");
         self.treeWidgetAvailRepos.setHeaderItem(__qtreewidgetitem)
         self.treeWidgetAvailRepos.setObjectName(u"treeWidgetAvailRepos")
-        sizePolicy2 = QSizePolicy(QSizePolicy.MinimumExpanding, QSizePolicy.MinimumExpanding)
+        sizePolicy2 = QSizePolicy(QSizePolicy.Policy.MinimumExpanding, QSizePolicy.Policy.MinimumExpanding)
         sizePolicy2.setHorizontalStretch(1)
         sizePolicy2.setVerticalStretch(1)
         sizePolicy2.setHeightForWidth(self.treeWidgetAvailRepos.sizePolicy().hasHeightForWidth())
@@ -117,7 +106,7 @@ class Ui_SelectRepos(object):
         self.treeWidgetAvailRepos.setSelectionMode(QAbstractItemView.ExtendedSelection)
         self.treeWidgetAvailRepos.setSortingEnabled(True)
         self.treeWidgetAvailRepos.setAllColumnsShowFocus(True)
-        self.treeWidgetAvailRepos.header().setProperty("showSortIndicator", True)
+        self.treeWidgetAvailRepos.header().setProperty(u"showSortIndicator", True)
 
         self.horizontalLayout_2.addWidget(self.treeWidgetAvailRepos)
 
@@ -126,11 +115,11 @@ class Ui_SelectRepos(object):
 
         self.horizontalLayout_4 = QHBoxLayout()
         self.horizontalLayout_4.setObjectName(u"horizontalLayout_4")
-        self.horizontalSpacer_11 = QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
+        self.horizontalSpacer_11 = QSpacerItem(40, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
 
         self.horizontalLayout_4.addItem(self.horizontalSpacer_11)
 
-        self.horizontalSpacer_9 = QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
+        self.horizontalSpacer_9 = QSpacerItem(40, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
 
         self.horizontalLayout_4.addItem(self.horizontalSpacer_9)
 
@@ -139,7 +128,7 @@ class Ui_SelectRepos(object):
 
         self.horizontalLayout_4.addWidget(self.pushButtonMoveAllUp)
 
-        self.horizontalSpacer_4 = QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
+        self.horizontalSpacer_4 = QSpacerItem(40, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
 
         self.horizontalLayout_4.addItem(self.horizontalSpacer_4)
 
@@ -148,7 +137,7 @@ class Ui_SelectRepos(object):
 
         self.horizontalLayout_4.addWidget(self.pushButtonMoveUp)
 
-        self.horizontalSpacer_5 = QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
+        self.horizontalSpacer_5 = QSpacerItem(40, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
 
         self.horizontalLayout_4.addItem(self.horizontalSpacer_5)
 
@@ -157,7 +146,7 @@ class Ui_SelectRepos(object):
 
         self.horizontalLayout_4.addWidget(self.pushButtonMoveDown)
 
-        self.horizontalSpacer_6 = QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
+        self.horizontalSpacer_6 = QSpacerItem(40, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
 
         self.horizontalLayout_4.addItem(self.horizontalSpacer_6)
 
@@ -166,7 +155,7 @@ class Ui_SelectRepos(object):
 
         self.horizontalLayout_4.addWidget(self.pushButtonMoveAllDown)
 
-        self.horizontalSpacer_10 = QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
+        self.horizontalSpacer_10 = QSpacerItem(40, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
 
         self.horizontalLayout_4.addItem(self.horizontalSpacer_10)
 
@@ -181,7 +170,7 @@ class Ui_SelectRepos(object):
 
         self.horizontalLayout_3 = QHBoxLayout()
         self.horizontalLayout_3.setObjectName(u"horizontalLayout_3")
-        self.horizontalSpacer_3 = QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
+        self.horizontalSpacer_3 = QSpacerItem(40, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
 
         self.horizontalLayout_3.addItem(self.horizontalSpacer_3)
 
@@ -190,7 +179,7 @@ class Ui_SelectRepos(object):
         __qtreewidgetitem1.setText(0, u"1");
         self.treeWidgetSelectedRepos.setHeaderItem(__qtreewidgetitem1)
         self.treeWidgetSelectedRepos.setObjectName(u"treeWidgetSelectedRepos")
-        sizePolicy3 = QSizePolicy(QSizePolicy.MinimumExpanding, QSizePolicy.MinimumExpanding)
+        sizePolicy3 = QSizePolicy(QSizePolicy.Policy.MinimumExpanding, QSizePolicy.Policy.MinimumExpanding)
         sizePolicy3.setHorizontalStretch(1)
         sizePolicy3.setVerticalStretch(0)
         sizePolicy3.setHeightForWidth(self.treeWidgetSelectedRepos.sizePolicy().hasHeightForWidth())
@@ -198,7 +187,7 @@ class Ui_SelectRepos(object):
         self.treeWidgetSelectedRepos.setSelectionMode(QAbstractItemView.ExtendedSelection)
         self.treeWidgetSelectedRepos.setSortingEnabled(True)
         self.treeWidgetSelectedRepos.setAllColumnsShowFocus(True)
-        self.treeWidgetSelectedRepos.header().setProperty("showSortIndicator", True)
+        self.treeWidgetSelectedRepos.header().setProperty(u"showSortIndicator", True)
 
         self.horizontalLayout_3.addWidget(self.treeWidgetSelectedRepos)
 

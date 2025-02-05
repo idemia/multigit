@@ -17,9 +17,9 @@
 
 from typing import List, cast, Optional
 
-from PySide2.QtWidgets import QDialog, QWidget, QTreeWidget
-from PySide2.QtCore import Qt, QSize
-from PySide2.QtGui import QIcon
+from PySide6.QtWidgets import QDialog, QWidget, QTreeWidget
+from PySide6.QtCore import Qt, QSize
+from PySide6.QtGui import QIcon
 
 from src.gui.ui_select_repos import Ui_SelectRepos
 from src.mg_repo_info import MgRepoInfo
@@ -36,7 +36,7 @@ class MgDialogSelectRepos(QDialog):
         super().__init__(parent)
 
         # noinspection PyTypeChecker
-        self.setWindowFlags(self.windowFlags() & ~Qt.WindowContextHelpButtonHint)
+        self.setWindowFlags(self.windowFlags() & ~Qt.WindowType.WindowContextHelpButtonHint)
         self.ui = Ui_SelectRepos()
         self.ui.setupUi(self)
         prepareTreeWidgetRepoList(self.ui.treeWidgetSelectedRepos)

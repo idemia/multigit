@@ -22,9 +22,9 @@ import logging
 import enum
 import pathlib
 
-from PySide2.QtCore import Signal, QObject, Qt
-from PySide2.QtGui import QIcon, QPixmap, QFont
-from PySide2.QtWidgets import QWidget, QPushButton, QLabel, QHBoxLayout, QVBoxLayout, QTreeWidgetItem, QApplication
+from PySide6.QtCore import Signal, QObject, Qt
+from PySide6.QtGui import QIcon, QPixmap, QFont
+from PySide6.QtWidgets import QWidget, QPushButton, QLabel, QHBoxLayout, QVBoxLayout, QTreeWidgetItem, QApplication
 
 from src.mg_tools import RunProcess, ExecGit
 from src.mg_repo_info import MgRepoInfo
@@ -36,7 +36,7 @@ warning = logger.warning
 error = logger.error
 
 MAX_LINES_PER_ITEM = 1
-QTREE_WIDGET_ITEM_BUTTONBAR_TYPE = cast(int, QTreeWidgetItem.UserType)+1
+QTREE_WIDGET_ITEM_BUTTONBAR_TYPE = cast(int, QTreeWidgetItem.ItemType.UserType)+1
 
 class PreConditionState(enum.Enum):
     NotFulfilled = enum.auto
@@ -417,7 +417,7 @@ def getIcon(icon: IconSet) -> QIcon:
     '''
     if icon == IconSet.Empty:
         emptyPixmap = QPixmap(16, 16)
-        emptyPixmap.fill(Qt.transparent)
+        emptyPixmap.fill(Qt.GlobalColor.transparent)
         return QIcon(emptyPixmap)
 
     return QIcon(ICON_FNAME_DICT[icon])
@@ -796,7 +796,7 @@ class MgExecItemMultiCmd(MgExecItemBase):
         dbg(f'MgExecItemMultiCmd.handleQuestionResult({result}) - {self}')
         # hide the buttons
         assert self.buttonBarItem is not None
-        self.treeWidget().setItemWidget(self.buttonBarItem, 0, None)    # type: ignore[arg-type]    # stubs don't know that None is ok here
+        self.treeWidget().setItemWidget(self.buttonBarItem, 0, None)
         self.buttonBar = None
         lastTaskItem = cast(MgExecItemOneCmd, self.child(self.childCount()-2))
         lastTaskItem.setExpanded(False)

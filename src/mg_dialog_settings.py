@@ -16,9 +16,9 @@
 import sys
 from typing import TYPE_CHECKING, Union, Literal
 
-from PySide2.QtWidgets import QFileDialog, QDialog, QColorDialog, QWidget
-from PySide2.QtGui import QColor
-from PySide2.QtCore import Qt
+from PySide6.QtWidgets import QFileDialog, QDialog, QColorDialog, QWidget
+from PySide6.QtGui import QColor
+from PySide6.QtCore import Qt
 
 if TYPE_CHECKING:
     from src.mg_repo_tree import MgRepoTree
@@ -34,7 +34,7 @@ class MgDialogSettings(QDialog):
     def __init__(self, parent: QWidget) -> None:
         super().__init__(parent)
 
-        self.setWindowFlags(self.windowFlags() & ~Qt.WindowContextHelpButtonHint)
+        self.setWindowFlags(self.windowFlags() & ~Qt.WindowType.WindowContextHelpButtonHint)
         config = mgc.get_config_instance()
 
         self.ui = Ui_Preferences()

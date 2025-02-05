@@ -18,8 +18,8 @@
 from typing import cast, List, Optional, Union
 import logging, pathlib
 
-from PySide2.QtWidgets import QMessageBox, QApplication, QWidget
-from PySide2.QtCore import Qt, Signal, QByteArray, QTimer
+from PySide6.QtWidgets import QMessageBox, QApplication, QWidget
+from PySide6.QtCore import Qt, Signal, QByteArray, QTimer
 
 from src.mg_repo_info import MultiRepo
 from src.mg_repo_tree_item import MgRepoTreeItem
@@ -105,9 +105,9 @@ class MgMultigitWidget(QWidget, Ui_MultigitWidget):
             self.repoTree.clear()
             return
 
-        self.repoTree.setFocus(Qt.OtherFocusReason)
+        self.repoTree.setFocus(Qt.FocusReason.OtherFocusReason)
         try:
-            self.setCursor(Qt.WaitCursor)
+            self.setCursor(Qt.CursorShape.WaitCursor)
             QApplication.processEvents()
             # we keep that one blocking, it's very quick anyways
             self.multiRepo.find_git_repos()
@@ -116,7 +116,7 @@ class MgMultigitWidget(QWidget, Ui_MultigitWidget):
 
         finally:
             # all items are visible now, we can restore the cursor
-            self.setCursor(Qt.ArrowCursor)
+            self.setCursor(Qt.CursorShape.ArrowCursor)
 
         # 2nd step, we fill the repo information
         for it in items:
@@ -232,9 +232,9 @@ class MgMultigitWidget(QWidget, Ui_MultigitWidget):
 
     def slotRefreshAll(self) -> None:
         dbg('refreshAll()')
-        self.repoTree.setFocus(Qt.OtherFocusReason)
+        self.repoTree.setFocus(Qt.FocusReason.OtherFocusReason)
         try:
-            self.setCursor(Qt.WaitCursor)
+            self.setCursor(Qt.CursorShape.WaitCursor)
             QApplication.processEvents()
             # we keep that one blocking, it's very quick anyways
             added_repo, rm_repo = self.multiRepo.find_git_repos_added_removed()
@@ -245,7 +245,7 @@ class MgMultigitWidget(QWidget, Ui_MultigitWidget):
             self.repoTree.addRepos(added_repo)
 
         finally:
-            self.setCursor(Qt.ArrowCursor)
+            self.setCursor(Qt.CursorShape.ArrowCursor)
             QApplication.processEvents()
 
         # 2nd step, update multi-repo

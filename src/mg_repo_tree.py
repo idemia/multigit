@@ -18,9 +18,9 @@
 from typing import List, Any, Optional, Dict, Callable, cast
 import logging, subprocess
 
-from PySide2.QtWidgets import QTreeWidget, QMenu, QAction, QApplication, QMessageBox, QAbstractItemView, QTreeWidgetItem
-from PySide2.QtGui import QIcon
-from PySide2.QtCore import Qt, QPoint
+from PySide6.QtWidgets import QTreeWidget, QMenu, QApplication, QMessageBox, QAbstractItemView, QTreeWidgetItem
+from PySide6.QtGui import QIcon, QAction
+from PySide6.QtCore import Qt, QPoint
 
 import src.mg_const as mg_const
 from src import mg_config as mgc
@@ -61,20 +61,20 @@ class MgRepoTree(QTreeWidget):
         super().__init__(*args)
 
         # to allow right-mouse-button click signal
-        self.setContextMenuPolicy(Qt.CustomContextMenu)
+        self.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
 
         f = self.header().font()
         f.setBold(True)
         # the column for the refresh icon
         self.headerItem().setText(0, '')
         self.header().setFont(f)
-        self.sortByColumn(mg_const.COL_REPO_NAME, Qt.AscendingOrder)
+        self.sortByColumn(mg_const.COL_REPO_NAME, Qt.SortOrder.AscendingOrder)
         self.setColumnWidth(mg_const.COL_UPDATE, 40)
 
         if self.columnCount() < mg_const.COL_NB:
             self.setColumnCount(mg_const.COL_NB)
             self.setHeaderLabels(mg_const.COL_TITLES)
-            self.setSelectionMode(QAbstractItemView.ExtendedSelection)
+            self.setSelectionMode(QAbstractItemView.SelectionMode.ExtendedSelection)
             self.setAllColumnsShowFocus(True)
             self.header().setSortIndicatorShown(True)
 
@@ -306,8 +306,8 @@ class MgRepoTree(QTreeWidget):
         
         buttonSelected = QMessageBox.warning(self, 'Many repositories selected',
                                              'You are about to launch %d %s\nDo you want to continue ?' % (len(items), dialogName),
-                                             QMessageBox.Cancel | QMessageBox.Ok, QMessageBox.Cancel)
-        return not (buttonSelected != QMessageBox.Ok)
+                                             QMessageBox.StandardButton.Cancel | QMessageBox.StandardButton.Ok, QMessageBox.StandardButton.Cancel)
+        return not (buttonSelected != QMessageBox.StandardButton.Ok)
 
 
     def confirmIfNoOrTooManySelectedItems(self, dialogName: str) -> bool:
@@ -355,7 +355,7 @@ class MgRepoTree(QTreeWidget):
             actionToPerform[mgc.get_config_instance()[mgc.CONFIG_DOUBLE_CLICK_ACTION]]()
         else:
             button = QMessageBox.question(self, "Action for double-click", "Action for double-click is not yet defined.\nDo you want to open the settings dialog to define it ?")
-            if button == QMessageBox.Yes:
+            if button == QMessageBox.StandardButton.Yes:
                 runDialogEditSettings(self, tabPage=0)
 
 

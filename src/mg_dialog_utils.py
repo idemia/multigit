@@ -18,8 +18,8 @@
 import logging
 from typing import TYPE_CHECKING, cast, Type, Union, Optional, List, Protocol
 
-from PySide2.QtWidgets import QMessageBox, QDialog, QTreeWidget, QAbstractItemView, QPushButton, QLabel, QWidget
-from PySide2.QtCore import Qt, Signal
+from PySide6.QtWidgets import QMessageBox, QDialog, QTreeWidget, QAbstractItemView, QPushButton, QLabel, QWidget
+from PySide6.QtCore import Qt, Signal
 
 if TYPE_CHECKING:
     from src.mg_window import MgMainWindow
@@ -54,13 +54,13 @@ def prepareTreeWidgetRepoList(treeWidget: QTreeWidget) -> None:
     if treeWidget.columnCount() < COL_NB:
         treeWidget.setColumnCount(COL_NB)
         treeWidget.setHeaderLabels(COL_TITLES)
-        treeWidget.setSelectionMode(QAbstractItemView.ExtendedSelection)
+        treeWidget.setSelectionMode(QAbstractItemView.SelectionMode.ExtendedSelection)
         treeWidget.setAllColumnsShowFocus(True)
         treeWidget.header().setSortIndicatorShown(True)
     f = treeWidget.header().font()
     f.setBold(True)
     treeWidget.header().setFont(f)
-    treeWidget.sortByColumn(COL_REPO_NAME, Qt.AscendingOrder)
+    treeWidget.sortByColumn(COL_REPO_NAME, Qt.SortOrder.AscendingOrder)
     treeWidget.headerItem().setText(COL_UPDATE, "")
     treeWidget.setColumnHidden(COL_UPDATE, True)
     treeWidget.clear()
@@ -89,7 +89,7 @@ class MgDialogWithRepoList(QDialog):
         selectedRepos = selectedRepos or []
 
         assert parent is not None
-        self.setWindowFlags(self.windowFlags() & ~Qt.WindowContextHelpButtonHint)
+        self.setWindowFlags(self.windowFlags() & ~Qt.WindowType.WindowContextHelpButtonHint)
 
         # prepare repository list
         prepareTreeWidgetRepoList(self.ui.treeWidgetRepoList)

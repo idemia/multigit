@@ -17,9 +17,9 @@
 
 from typing import List, Tuple, Any
 
-from PySide2.QtWidgets import QPushButton, QMenu, QAction
-from PySide2.QtCore import Signal, QPoint
-from PySide2.QtGui import QIcon, QMouseEvent
+from PySide6.QtWidgets import QPushButton, QMenu
+from PySide6.QtCore import Signal, QPoint
+from PySide6.QtGui import QIcon, QMouseEvent, QAction
 
 class MgButtonHistory(QPushButton):
     '''A button to recall history of a text field'''

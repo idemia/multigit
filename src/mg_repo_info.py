@@ -19,8 +19,8 @@ from typing import Dict, Tuple, Optional, List, Callable, Any, Sequence
 import logging, re, csv, pathlib, os
 from glob import glob, escape
 
-from PySide2.QtCore import Signal, QObject, QCoreApplication
-from PySide2.QtWidgets import QMessageBox
+from PySide6.QtCore import Signal, QObject, QCoreApplication
+from PySide6.QtWidgets import QMessageBox
 
 from src.mg_const import MSG_NO_COMMIT, MSG_REMOTE_TOPUSH_TOPULL, MSG_REMOTE_SYNCHRO_OK, MSG_REMOTE_TOPULL, \
     MSG_REMOTE_TOPUSH, MSG_REMOTE_BRANCH_GONE, MSG_LOCAL_BRANCH, SHORT_SHA1_NB_DIGITS, MSG_EMPTY_REPO

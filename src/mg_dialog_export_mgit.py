@@ -18,8 +18,8 @@
 from typing import List, Any, TYPE_CHECKING
 import logging
 
-from PySide2.QtWidgets import QDialog, QWidget, QFileDialog, QMessageBox
-from PySide2.QtCore import Qt, QTimer
+from PySide6.QtWidgets import QDialog, QWidget, QFileDialog, QMessageBox
+from PySide6.QtCore import Qt, QTimer
 
 if TYPE_CHECKING:
     from src.mg_window import MgMainWindow
@@ -41,7 +41,7 @@ class MgDialogExportMgit(QDialog):
     def __init__(self, window: QWidget, allRepos: List[MgRepoInfo]) -> None:
         super().__init__(window)
         # noinspection PyTypeChecker
-        self.setWindowFlags( self.windowFlags() & ~Qt.WindowContextHelpButtonHint)
+        self.setWindowFlags( self.windowFlags() & ~Qt.WindowType.WindowContextHelpButtonHint)
         self.ui = Ui_ExportMgit()
         self.ui.setupUi(self)
 
@@ -140,10 +140,10 @@ class MgDialogExportMgit(QDialog):
             msg += '\n<li> '.join(repoWithEmtpyUrl)
             msg += '''</ul>What do you want to do ?<p>'''
             msgBox = QMessageBox(QMessageBox.Icon.Warning, 'Repositories with empty remote URL', msg)
-            msgBox.setTextFormat(Qt.RichText)
-            buttonCancel = msgBox.addButton(QMessageBox.Cancel)
-            buttonSkip = msgBox.addButton('Skip repositories', QMessageBox.AcceptRole)
-            buttonContinue = msgBox.addButton('Continue', QMessageBox.AcceptRole)
+            msgBox.setTextFormat(Qt.TextFormat.RichText)
+            buttonCancel = msgBox.addButton(QMessageBox.StandardButton.Cancel)
+            buttonSkip = msgBox.addButton('Skip repositories', QMessageBox.ButtonRole.AcceptRole)
+            buttonContinue = msgBox.addButton('Continue', QMessageBox.ButtonRole.AcceptRole)
             msgBox.exec()
             buttonSelected = msgBox.clickedButton()
             if buttonSelected == buttonCancel:
@@ -160,10 +160,10 @@ class MgDialogExportMgit(QDialog):
             msg += '\n<li> '.join(f'Repository {repo.name} - branch {repo.branch}' for repo in repoWithLocalOnlyBranch)
             msg += '''</ul>What do you want to do ?<p>'''
             msgBox = QMessageBox(QMessageBox.Icon.Warning, 'Repositories with local only branch', msg)
-            msgBox.setTextFormat(Qt.RichText)
+            msgBox.setTextFormat(Qt.TextFormat.RichText)
             msgBox.setText(msg)
-            buttonCancel = msgBox.addButton(QMessageBox.Cancel)
-            buttonContinue = msgBox.addButton('Continue', QMessageBox.AcceptRole)
+            buttonCancel = msgBox.addButton(QMessageBox.StandardButton.Cancel)
+            buttonContinue = msgBox.addButton('Continue', QMessageBox.ButtonRole.AcceptRole)
             msgBox.exec()
             buttonSelected = msgBox.clickedButton()
             if buttonSelected == buttonCancel:
@@ -211,4 +211,4 @@ def runDialogExportMgit(window: QWidget, allRepos: List[MgRepoInfo]) -> None:
 
     QMessageBox.information(window, 'Information exported',
                             'Export done to %s' % dialogExportMgit.mgitFname,
-                            QMessageBox.Ok)
+                            QMessageBox.StandardButton.Ok)

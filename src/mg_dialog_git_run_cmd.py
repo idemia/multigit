@@ -18,7 +18,7 @@
 from typing import List
 import logging
 
-from PySide2.QtWidgets import QMessageBox, QWidget
+from PySide6.QtWidgets import QMessageBox, QWidget
 
 from src.mg_exec_window import MgExecWindow
 from src.mg_dialog_utils import MgDialogWithRepoList

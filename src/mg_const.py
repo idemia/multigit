@@ -71,7 +71,7 @@ DISPLAY_IN_ITALIC_MSG = [ MSG_REMOTE_BRANCH_GONE, MSG_LOCAL_BRANCH ]
 DISPLAY_IN_BOLD_MSG   = [ 'to push', 'to pull', MSG_REMOTE_BRANCH_GONE ]
 
 try:
-    from PySide2.QtCore import qVersion
+    from PySide6.QtCore import qVersion
     pyqt_version_info = '* Qt for Python v%s\n' % qVersion()
     pyqt_version_info = pyqt_version_info.strip('\n')
 except ImportError:
