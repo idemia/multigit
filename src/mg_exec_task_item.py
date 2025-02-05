@@ -39,7 +39,7 @@ MAX_LINES_PER_ITEM = 1
 QTREE_WIDGET_ITEM_BUTTONBAR_TYPE = cast(int, QTreeWidgetItem.ItemType.UserType)+1
 
 class PreConditionState(enum.Enum):
-    NotFulfilled = enum.auto
+    NotFulfilled = enum.auto()
     FulFilled = enum.auto()
     Errored = enum.auto()
 

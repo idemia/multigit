@@ -17,7 +17,7 @@
 
 from typing import Optional
 
-import pathlib, platform, enum
+import pathlib, platform
 
 ############################################
 #   Product Constants
