@@ -4,10 +4,10 @@
 #define NAME "Multigit"
 
 ; only digits allowed here
-#define VERSION "1.7"
+#define VERSION "1.7.1"
 
 ; text also allowed here
-#define VERSIONSTR "1.7"
+#define VERSIONSTR "1.7.1"
 
  [_ISTool]
 EnableISX=false
