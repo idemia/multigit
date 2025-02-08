@@ -38,7 +38,7 @@ class Ui_GitPushTag(object):
         font = QFont()
         font.setPointSize(8)
         self.label.setFont(font)
-        self.label.setAlignment(Qt.AlignRight|Qt.AlignTrailing|Qt.AlignVCenter)
+        self.label.setAlignment(Qt.AlignmentFlag.AlignRight|Qt.AlignmentFlag.AlignTrailing|Qt.AlignmentFlag.AlignVCenter)
 
         self.horizontalLayout_2.addWidget(self.label)
 
@@ -98,7 +98,7 @@ class Ui_GitPushTag(object):
         sizePolicy3.setVerticalStretch(0)
         sizePolicy3.setHeightForWidth(self.labelRepoSelected.sizePolicy().hasHeightForWidth())
         self.labelRepoSelected.setSizePolicy(sizePolicy3)
-        self.labelRepoSelected.setAlignment(Qt.AlignCenter)
+        self.labelRepoSelected.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
         self.horizontalLayout.addWidget(self.labelRepoSelected)
 
@@ -118,7 +118,7 @@ class Ui_GitPushTag(object):
         self.treeWidgetRepoList = MgRepoTree(self.groupBox_2)
         self.treeWidgetRepoList.setObjectName(u"treeWidgetRepoList")
         self.treeWidgetRepoList.setAlternatingRowColors(True)
-        self.treeWidgetRepoList.setSelectionMode(QAbstractItemView.ExtendedSelection)
+        self.treeWidgetRepoList.setSelectionMode(QAbstractItemView.SelectionMode.ExtendedSelection)
         self.treeWidgetRepoList.setRootIsDecorated(False)
         self.treeWidgetRepoList.setUniformRowHeights(True)
         self.treeWidgetRepoList.setItemsExpandable(False)
@@ -133,8 +133,8 @@ class Ui_GitPushTag(object):
         self.horizontalLayout_4.setObjectName(u"horizontalLayout_4")
         self.buttonBox = QDialogButtonBox(GitPushTag)
         self.buttonBox.setObjectName(u"buttonBox")
-        self.buttonBox.setOrientation(Qt.Horizontal)
-        self.buttonBox.setStandardButtons(QDialogButtonBox.Cancel|QDialogButtonBox.Ok)
+        self.buttonBox.setOrientation(Qt.Orientation.Horizontal)
+        self.buttonBox.setStandardButtons(QDialogButtonBox.StandardButton.Cancel|QDialogButtonBox.StandardButton.Ok)
 
         self.horizontalLayout_4.addWidget(self.buttonBox)
 

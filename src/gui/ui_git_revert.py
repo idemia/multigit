@@ -35,7 +35,7 @@ class Ui_GitRevert(object):
         self.verticalLayout_2.setObjectName(u"verticalLayout_2")
         self.label = QLabel(self.groupBox)
         self.label.setObjectName(u"label")
-        self.label.setAlignment(Qt.AlignLeading|Qt.AlignLeft|Qt.AlignVCenter)
+        self.label.setAlignment(Qt.AlignmentFlag.AlignLeading|Qt.AlignmentFlag.AlignLeft|Qt.AlignmentFlag.AlignVCenter)
 
         self.verticalLayout_2.addWidget(self.label)
 
@@ -66,7 +66,7 @@ class Ui_GitRevert(object):
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.labelRepoSelected.sizePolicy().hasHeightForWidth())
         self.labelRepoSelected.setSizePolicy(sizePolicy)
-        self.labelRepoSelected.setAlignment(Qt.AlignCenter)
+        self.labelRepoSelected.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
         self.horizontalLayout.addWidget(self.labelRepoSelected)
 
@@ -86,7 +86,7 @@ class Ui_GitRevert(object):
         self.treeWidgetRepoList = MgRepoTree(self.groupBox_2)
         self.treeWidgetRepoList.setObjectName(u"treeWidgetRepoList")
         self.treeWidgetRepoList.setAlternatingRowColors(True)
-        self.treeWidgetRepoList.setSelectionMode(QAbstractItemView.ExtendedSelection)
+        self.treeWidgetRepoList.setSelectionMode(QAbstractItemView.SelectionMode.ExtendedSelection)
         self.treeWidgetRepoList.setRootIsDecorated(False)
         self.treeWidgetRepoList.setUniformRowHeights(True)
         self.treeWidgetRepoList.setItemsExpandable(False)
@@ -101,8 +101,8 @@ class Ui_GitRevert(object):
         self.horizontalLayout_4.setObjectName(u"horizontalLayout_4")
         self.buttonBox = QDialogButtonBox(GitRevert)
         self.buttonBox.setObjectName(u"buttonBox")
-        self.buttonBox.setOrientation(Qt.Horizontal)
-        self.buttonBox.setStandardButtons(QDialogButtonBox.Cancel|QDialogButtonBox.Yes)
+        self.buttonBox.setOrientation(Qt.Orientation.Horizontal)
+        self.buttonBox.setStandardButtons(QDialogButtonBox.StandardButton.Cancel|QDialogButtonBox.StandardButton.Yes)
 
         self.horizontalLayout_4.addWidget(self.buttonBox)
 

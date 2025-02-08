@@ -103,7 +103,7 @@ class Ui_SelectRepos(object):
         sizePolicy2.setVerticalStretch(1)
         sizePolicy2.setHeightForWidth(self.treeWidgetAvailRepos.sizePolicy().hasHeightForWidth())
         self.treeWidgetAvailRepos.setSizePolicy(sizePolicy2)
-        self.treeWidgetAvailRepos.setSelectionMode(QAbstractItemView.ExtendedSelection)
+        self.treeWidgetAvailRepos.setSelectionMode(QAbstractItemView.SelectionMode.ExtendedSelection)
         self.treeWidgetAvailRepos.setSortingEnabled(True)
         self.treeWidgetAvailRepos.setAllColumnsShowFocus(True)
         self.treeWidgetAvailRepos.header().setProperty(u"showSortIndicator", True)
@@ -184,7 +184,7 @@ class Ui_SelectRepos(object):
         sizePolicy3.setVerticalStretch(0)
         sizePolicy3.setHeightForWidth(self.treeWidgetSelectedRepos.sizePolicy().hasHeightForWidth())
         self.treeWidgetSelectedRepos.setSizePolicy(sizePolicy3)
-        self.treeWidgetSelectedRepos.setSelectionMode(QAbstractItemView.ExtendedSelection)
+        self.treeWidgetSelectedRepos.setSelectionMode(QAbstractItemView.SelectionMode.ExtendedSelection)
         self.treeWidgetSelectedRepos.setSortingEnabled(True)
         self.treeWidgetSelectedRepos.setAllColumnsShowFocus(True)
         self.treeWidgetSelectedRepos.header().setProperty(u"showSortIndicator", True)
@@ -203,8 +203,8 @@ class Ui_SelectRepos(object):
 
         self.buttonBox = QDialogButtonBox(SelectRepos)
         self.buttonBox.setObjectName(u"buttonBox")
-        self.buttonBox.setOrientation(Qt.Horizontal)
-        self.buttonBox.setStandardButtons(QDialogButtonBox.Cancel|QDialogButtonBox.Ok)
+        self.buttonBox.setOrientation(Qt.Orientation.Horizontal)
+        self.buttonBox.setStandardButtons(QDialogButtonBox.StandardButton.Cancel|QDialogButtonBox.StandardButton.Ok)
 
         self.horizontalLayout_6.addWidget(self.buttonBox)
 

@@ -44,7 +44,7 @@ class Ui_GitRunCommand(object):
         font = QFont()
         font.setFamilies([u"Consolas"])
         self.lineEditGitText.setFont(font)
-        self.lineEditGitText.setAlignment(Qt.AlignCenter)
+        self.lineEditGitText.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.lineEditGitText.setReadOnly(True)
 
         self.gridLayout.addWidget(self.lineEditGitText, 0, 1, 1, 1)
@@ -61,7 +61,7 @@ class Ui_GitRunCommand(object):
 
         self.label = QLabel(GitRunCommand)
         self.label.setObjectName(u"label")
-        self.label.setAlignment(Qt.AlignRight|Qt.AlignTrailing|Qt.AlignVCenter)
+        self.label.setAlignment(Qt.AlignmentFlag.AlignRight|Qt.AlignmentFlag.AlignTrailing|Qt.AlignmentFlag.AlignVCenter)
 
         self.gridLayout.addWidget(self.label, 0, 0, 1, 1)
 
@@ -95,7 +95,7 @@ class Ui_GitRunCommand(object):
         sizePolicy2.setVerticalStretch(0)
         sizePolicy2.setHeightForWidth(self.labelRepoSelected.sizePolicy().hasHeightForWidth())
         self.labelRepoSelected.setSizePolicy(sizePolicy2)
-        self.labelRepoSelected.setAlignment(Qt.AlignCenter)
+        self.labelRepoSelected.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
         self.horizontalLayout.addWidget(self.labelRepoSelected)
 
@@ -115,7 +115,7 @@ class Ui_GitRunCommand(object):
         self.treeWidgetRepoList = MgRepoTree(self.groupBox_2)
         self.treeWidgetRepoList.setObjectName(u"treeWidgetRepoList")
         self.treeWidgetRepoList.setAlternatingRowColors(True)
-        self.treeWidgetRepoList.setSelectionMode(QAbstractItemView.ExtendedSelection)
+        self.treeWidgetRepoList.setSelectionMode(QAbstractItemView.SelectionMode.ExtendedSelection)
         self.treeWidgetRepoList.setRootIsDecorated(False)
         self.treeWidgetRepoList.setUniformRowHeights(True)
         self.treeWidgetRepoList.setItemsExpandable(False)
@@ -133,8 +133,8 @@ class Ui_GitRunCommand(object):
 
         self.buttonBox = QDialogButtonBox(GitRunCommand)
         self.buttonBox.setObjectName(u"buttonBox")
-        self.buttonBox.setOrientation(Qt.Horizontal)
-        self.buttonBox.setStandardButtons(QDialogButtonBox.Cancel|QDialogButtonBox.Ok)
+        self.buttonBox.setOrientation(Qt.Orientation.Horizontal)
+        self.buttonBox.setStandardButtons(QDialogButtonBox.StandardButton.Cancel|QDialogButtonBox.StandardButton.Ok)
 
         self.verticalLayout_2.addWidget(self.buttonBox)
 

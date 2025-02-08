@@ -33,7 +33,7 @@ class Ui_MultigitWidget(object):
         self.verticalLayout_2.setObjectName(u"verticalLayout_2")
         self.splitter = QSplitter(MultigitWidget)
         self.splitter.setObjectName(u"splitter")
-        self.splitter.setOrientation(Qt.Vertical)
+        self.splitter.setOrientation(Qt.Orientation.Vertical)
         self.layoutWidget = QWidget(self.splitter)
         self.layoutWidget.setObjectName(u"layoutWidget")
         self.verticalLayout = QVBoxLayout(self.layoutWidget)
@@ -77,7 +77,7 @@ class Ui_MultigitWidget(object):
         self.repoTree.setLineWidth(3)
         self.repoTree.setMidLineWidth(4)
         self.repoTree.setAlternatingRowColors(True)
-        self.repoTree.setSelectionMode(QAbstractItemView.ExtendedSelection)
+        self.repoTree.setSelectionMode(QAbstractItemView.SelectionMode.ExtendedSelection)
         self.repoTree.setRootIsDecorated(False)
         self.repoTree.setUniformRowHeights(True)
         self.repoTree.setItemsExpandable(False)
@@ -151,11 +151,14 @@ class Ui_MultigitWidget(object):
         ___qtreewidgetitem.setText(1, QCoreApplication.translate("MultigitWidget", u"Git Repo Path", None));
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tabLastCommit), QCoreApplication.translate("MultigitWidget", u"Last Commit", None))
         self.textEditModFiles.setHtml(QCoreApplication.translate("MultigitWidget", u"<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
-"<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
+"<html><head><meta name=\"qrichtext\" content=\"1\" /><meta charset=\"utf-8\" /><style type=\"text/css\">\n"
 "p, li { white-space: pre-wrap; }\n"
-"</style></head><body style=\" font-family:'Courier New'; font-size:9.75pt; font-weight:400; font-style:normal;\">\n"
-"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:'MS Shell Dlg 2'; font-size:8pt; color:#0000ff;\">@@ this is a description @@</span><span style=\" font-family:'MS Shell Dlg 2'; font-size:8pt;\"> bla bla bla<br />this line is plain<br /></span><span style=\" font-family:'MS Shell Dlg 2'; font-size:8pt; color:#aa0000;\">- this line is removed</span><span style=\" font-family:'MS Shell Dlg 2'; font-size:8pt;\"><br /></span><span style=\" font-family:'MS Shell Dlg 2'; font-size:8pt; color:#00aa00;\">+ this line is added</span><span style=\" font-family:'MS Shell Dlg 2'; font-size:8"
-                        "pt;\"><br /><br /></span></p></body></html>", None))
+"hr { height: 1px; border-width: 0; }\n"
+"li.unchecked::marker { content: \"\\2610\"; }\n"
+"li.checked::marker { content: \"\\2612\"; }\n"
+"</style></head><body style=\" font-family:'Courier New'; font-size:9pt; font-weight:400; font-style:normal;\">\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:'MS Shell Dlg 2'; font-size:8pt; color:#0000ff;\">@@ this is a description @@</span><span style=\" font-family:'MS Shell Dlg 2'; font-size:8pt;\"> bla bla bla<br />this line is plain<br /></span><span style=\" font-family:'MS Shell Dlg 2'; font-size:8pt; color:#aa0000;\">- this line is removed</span><span style=\" font-family:'MS Shell Dlg 2'; font-size:8pt;\"><br /></spa"
+                        "n><span style=\" font-family:'MS Shell Dlg 2'; font-size:8pt; color:#00aa00;\">+ this line is added</span><span style=\" font-family:'MS Shell Dlg 2'; font-size:8pt;\"><br /><br /></span></p></body></html>", None))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tabModifiedFiles), QCoreApplication.translate("MultigitWidget", u"Modified Files", None))
     # retranslateUi
 
