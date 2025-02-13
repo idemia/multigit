@@ -1,6 +1,6 @@
 id: org.multigit.Multigit
 runtime: org.kde.Platform
-runtime-version: '5.15-22.08'
+runtime-version: '6.8'
 sdk: org.kde.Sdk
 command: multigit
 
@@ -14,9 +14,8 @@ modules:
 
     sources: 
       - type: file
-        url: https://files.pythonhosted.org/packages/2d/da/343f36c3fcb924f59b67d1a06c6f80a19149a902b6b8482e6cba3cfa7d1a/multigit_gx-1.6.1-py3-none-any.whl
-        sha256: e9de74493223e704e2acd1d39feb49aa722a1905bd8949cb9e317658fd517b04
-  
+        url: https://files.pythonhosted.org/packages/fe/c5/c96c7337a2d1242de5fade71b29494f0438def39617cf658c1b7758b6f1d/multigit_gx-1.7.1-py3-none-any.whl
+        sha256: ada16d1ab3450b8f845719d0acbc4ad99dc69150d3d19020124f93236517bcb7
   
 
 
