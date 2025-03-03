@@ -743,8 +743,8 @@ class TestRepoInfo(unittest.TestCase):
         git_init_repo('.')
 
         git_dir = self.gitdir
-        os.chdir(git_dir)
-        (git_dir/'tmp_a/.git').mkdir(parents=True)
+        tmp_dir = git_dir / 'tmp_a'
+        (tmp_dir / '..git').mkdir(parents=True)
         mr = MultiRepo(str(git_dir))
         repo_list = mr.find_git_repos()
         self.assertEqual(set(repo_list), {'dir2'})
@@ -768,6 +768,7 @@ class TestRepoInfo(unittest.TestCase):
         self.assertEqual(added_repo[0].name, 'dir2')
         self.assertEqual(rm_repo,    [mr.repo_dict['removed']])
 
+        rmtree_failsafe(tmp_dir)
         rmtree_failsafe(self.dir2)
 
 
