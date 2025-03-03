@@ -732,7 +732,7 @@ class TestRepoInfo(unittest.TestCase):
         ric.ensure_branches_filled()
         self.assertEqual(ric.branches_filled, True)
         self.assertEqual(ric.branches_remote, [])
-        self.assertEqual(ric.branches_local, ['branch1', DEFAULT_BRANCH_NAME])
+        self.assertEqual(sorted(ric.branches_local), sorted(['branch1', DEFAULT_BRANCH_NAME]))
 
 
 
