@@ -59,8 +59,10 @@ class ExecTool:
 
     WIN32_PATH_CANDIDATES: List[Path] = []
     LINUX_PATH_CANDIDATES: List[Path] = []
+    DARWIN_PATH_CANDIDATES: List[Path] = []
 
     EXEC_NAME_LINUX: str
+    EXEC_NAME_DARWIN: str
     EXEC_NAME_WIN32: str
 
     # if not None, this is a command which we can run to detect the program. Typically, this is ['--version']
@@ -142,7 +144,7 @@ class ExecTool:
         '''
         if not cls.platform_supported():
             return ''
-
+        
         config = mg_config.get_config_instance()
         if config[cls.CONFIG_ENTRY_AUTODETECT] in (None, True):
             result = cls.autodetect_executable()
@@ -157,6 +159,8 @@ class ExecTool:
             return cls.EXEC_NAME_WIN32
         elif sys.platform == 'linux':
             return cls.EXEC_NAME_LINUX
+        elif sys.platform == 'darwin':
+            return cls.EXEC_NAME_DARWIN
         else:
             raise ValueError('Platform not supported: ', sys.platform)
 
@@ -261,7 +265,7 @@ class ExecTool:
 #######################################################
 
 class ExecGit(ExecTool):
-    SUPPORTED_PLATFORMS = ['win32', 'linux']
+    SUPPORTED_PLATFORMS = ['win32', 'linux', 'darwin']
 
     WIN32_PATH_CANDIDATES: List[Path] = [
         Path(os.environ.get("ProgramFiles", '')) / "Git" / "bin",
@@ -276,8 +280,14 @@ class ExecGit(ExecTool):
         Path('/usr/bin'),
         Path('/usr/local/bin'),
     ]
+    
+    DARWIN_PATH_CANDIDATES = [
+        Path('/usr/bin'),
+        Path('/usr/local/bin'),
+    ]
 
     EXEC_NAME_LINUX = 'git'
+    EXEC_NAME_DARWIN = 'git'
     EXEC_NAME_WIN32 = 'git.exe'
 
     INNOCUOUS_COMMAND = ['--version']
