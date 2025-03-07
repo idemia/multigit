@@ -800,6 +800,38 @@ class TestRepoInfo(unittest.TestCase):
 
         rmtree_failsafe(strange_dir1)
 
+    def test_find_git_repos_with_symlinks(self) -> None:
+        base_dir = pathlib.Path(self.gitdir) / 'dir'
+        base_dir.mkdir()
+        os.chdir(base_dir)
+        git_init_repo(str(base_dir))
+
+        # Symlink to path outside base path
+        extdir = self.tempdir / (datetime.datetime.now().isoformat().replace(':', '_').split('.')[0] + '_ext')
+        extdir.mkdir()
+        git_init_repo(str(extdir))
+        extdir_link = pathlib.Path(base_dir) / 'extdir'
+        extdir_link.symlink_to(extdir)
+
+        # Symlink to parent
+        circular_ref_dir = pathlib.Path(base_dir) / 'circular_ref'
+        circular_ref_dir.symlink_to(base_dir)
+
+        # Symlink to an ancestor
+        subdir = pathlib.Path(base_dir) / 'subdir'
+        subdir.mkdir(parents=True)
+        circular_ref_dir_2 = pathlib.Path(subdir) / 'circular_ref_2'
+        circular_ref_dir_2.symlink_to(self.gitdir)
+
+        os.chdir(self.gitdir)
+        mr = MultiRepo(str(self.gitdir))
+        repo_list = mr.find_git_repos()
+        self.assertEqual(set(repo_list), {
+            'dir', 'dir/extdir'
+        })
+
+        rmtree_failsafe(base_dir)
+
 
     def run_clone_test_on_empty_git(self, dir1: pathlib.Path, dir3: pathlib.Path):
         print('    - run_clone_test_on_empty_git')
