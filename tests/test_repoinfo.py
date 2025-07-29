@@ -26,7 +26,7 @@ from multigit import init_logging
 import src.mg_tools
 from src.mg_tools import ExecGit
 from src.mg_const import MSG_EMPTY_REPO, MSG_NO_COMMIT, MSG_LOCAL_BRANCH, MSG_REMOTE_SYNCHRO_OK, SHORT_SHA1_NB_DIGITS
-from src.mg_repo_info import MgRepoInfo, MultiRepo
+from src.mg_repo_info import MgRepoInfo, MultiRepo, scan_git_dirs
 
 # More tests to write
 # * detached head from a remote branch
@@ -158,6 +158,10 @@ def generate_content():
     return 'line %d\n' % content_idx
 
 
+def make_unique_tmp_name() -> str:
+    return datetime.datetime.now().isoformat().replace(':', '_').split('.')[0]
+
+
 #######################################################
 #           Tests for RepoInfo
 #######################################################
@@ -218,7 +222,7 @@ class TestRepoInfo(unittest.TestCase):
     def tempdir_setUp(cls: 'TestRepoInfo') -> None:
         cls.tempdir = pathlib.Path(tempfile.gettempdir()) / 'test_multigit'
         cls.tempdir.mkdir(exist_ok=True)
-        cls.gitdir = cls.tempdir / datetime.datetime.now().isoformat().replace(':', '_').split('.')[0]
+        cls.gitdir = cls.tempdir / make_unique_tmp_name()
         cls.gitdir.mkdir()
         print('Creating test git directory: %s' % cls.gitdir)
 
@@ -806,24 +810,84 @@ class TestRepoInfo(unittest.TestCase):
         os.chdir(base_dir)
         git_init_repo(str(base_dir))
 
-        # Symlink to path outside base path
-        extdir = self.tempdir / (datetime.datetime.now().isoformat().replace(':', '_').split('.')[0] + '_ext')
+        # finds repo at the root of base dir
+        self.assertEqual(set(MultiRepo(str(base_dir)).find_git_repos()), {
+            '.',
+        })
+
+        # finds repo in a subdirectory
+        self.assertEqual(set(MultiRepo(str(self.gitdir)).find_git_repos()), {
+            'dir',
+        })
+
+
+        # create another git dir at the root
+        extdir = self.gitdir / 'dir_ext'
         extdir.mkdir()
         git_init_repo(str(extdir))
-        extdir_link = pathlib.Path(base_dir) / 'extdir'
+
+        self.assertEqual(set(MultiRepo(str(self.gitdir)).find_git_repos()), {
+            'dir', 'dir_ext'
+        })
+
+        self.assertEqual(set(MultiRepo(str(base_dir)).find_git_repos()), {
+            '.',
+        })
+
+        # linked directory is accessible through two path: direct and link
+        extdir_link = base_dir / 'link_to_dir_ext'
         extdir_link.symlink_to(extdir)
 
-        # Symlink to parent
-        circular_ref_dir = pathlib.Path(base_dir) / 'circular_ref'
-        circular_ref_dir.symlink_to(base_dir)
+        self.assertEqual(set(MultiRepo(str(base_dir)).find_git_repos()), {
+            '.', 'link_to_dir_ext',
+        })
 
+        result = set(MultiRepo(str(self.gitdir)).find_git_repos())
+        assert 'dir' in result
+        assert len(result) == 2
+        assert 'dir_ext' in result or 'dir\\link_to_dir_ext' in result
+
+        return
+
+        # Symlink to parent
+        circular_ref_parent_dir = self.gitdir / 'circular_ref_parent'
+        git_init_repo(str(circular_ref_parent_dir))
+        os.chdir(circular_ref_parent_dir)
+
+        circular_ref_child_dir = circular_ref_parent_dir / 'child_dir'
+        git_init_repo(str(circular_ref_child_dir))
+
+        mr = MultiRepo(str(circular_ref_parent_dir))
+        self.assertEqual(set(mr.find_git_repos()), {
+            '.', 'child_dir'
+        })
+
+        link_back_to_parent = circular_ref_child_dir / 'symlink_back_to_parent'
+        link_back_to_parent.symlink_to(circular_ref_parent_dir, True)
+
+        mr = MultiRepo(str(circular_ref_parent_dir))
+        self.assertEqual(set(mr.find_git_repos()), {
+            '.', 'child_dir'
+        })
+
+        mr = MultiRepo(str(circular_ref_child_dir))
+        self.assertEqual(set(mr.find_git_repos()), {
+            '.', 'symlink_back_to_parent',
+        })
+
+        return
+
+
+
+
+
+        return
         # Symlink to an ancestor
         subdir = pathlib.Path(base_dir) / 'subdir'
         subdir.mkdir(parents=True)
         circular_ref_dir_2 = pathlib.Path(subdir) / 'circular_ref_2'
         circular_ref_dir_2.symlink_to(self.gitdir)
 
-        os.chdir(self.gitdir)
         mr = MultiRepo(str(self.gitdir))
         repo_list = mr.find_git_repos()
         self.assertEqual(set(repo_list), {

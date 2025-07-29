@@ -99,24 +99,24 @@ def scan_git_dirs(base_path: str) -> Generator[str, str, None]:
     The traversal goes from top to bottom and it follows the symbolic links
     '''
     visited = set()
-    path_to_visit = [base_path]
+    # make sure to have absolute resolved path to get started
+    path_to_visit = [str(pathlib.Path(base_path).resolve())]
     while path_to_visit:
         dirpath = path_to_visit.pop(0)
-        for entry in os.scandir(dirpath):
-            if not entry.is_dir(follow_symlinks=False):
-                continue
 
-            # we do it twice to reject as much as possible in the first call
+        resolved_path = str(pathlib.Path(dirpath).resolve())
+        if resolved_path in visited:
+            # already visited, cycle created by symbolic links
+            continue
+
+        visited.add(resolved_path)
+        for entry in os.scandir(dirpath):
             if not entry.is_dir(follow_symlinks=True):
                 continue
 
-            if entry.path in visited:
-                # already visited, cycle created by symbolic links
-                continue
-
-            visited.add(entry.path)
             if entry.name == '.git':
                 yield entry.path
+                continue
 
             path_to_visit.append(entry.path)
 
