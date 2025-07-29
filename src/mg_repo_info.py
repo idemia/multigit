@@ -94,25 +94,32 @@ def is_not_sha1(ref: str) -> bool:
     # we don't know
     return False
 
-def scan_git_dirs(path) -> Generator:
-    '''Return the list of Git directories within the given directory tree
+def scan_git_dirs(base_path: str) -> Generator[str, str, None]:
+    '''Return the list of Git directories (.git) within the given directory tree
     The traversal goes from top to bottom and it follows the symbolic links
     '''
-    for entry in os.scandir(path):
-        if entry.is_dir(follow_symlinks=True):
-            try:
-                if entry.is_symlink() and pathlib.Path(entry.path).is_relative_to(pathlib.Path(entry.path).resolve()):
-                    dbg(f"Cyclic symlink detected: '{entry.path}' -> '{pathlib.Path(entry.path).resolve()}'")
-                    continue
-                elif entry.name == '.git':
-                    yield entry.path
-                else:
-                    yield from scan_git_dirs(entry.path) # traverse the sub dir
-            except OSError as e:
-                if e.errno == 40:  # Too many levels of symbolic links
-                    dbg(f'Skipping due to too many symlinks: {entry.name}')
-                else:
-                    dbg(f'Error accessing {entry.name}: {e}')
+    visited = set()
+    path_to_visit = [base_path]
+    while path_to_visit:
+        dirpath = path_to_visit.pop(0)
+        for entry in os.scandir(dirpath):
+            if not entry.is_dir(follow_symlinks=False):
+                continue
+
+            # we do it twice to reject as much as possible in the first call
+            if not entry.is_dir(follow_symlinks=True):
+                continue
+
+            if entry.path in visited:
+                # already visited, cycle created by symbolic links
+                continue
+
+            visited.add(entry.path)
+            if entry.name == '.git':
+                yield entry.path
+
+            path_to_visit.append(entry.path)
+
 
 
 
@@ -166,7 +173,7 @@ class MultiRepo:
         self.repo_list = []
         self.repo_names = []
         self.base_path = pathlib.Path(self.base_dir)
-        for d in scan_git_dirs(str(self.base_path)):
+        for d in scan_git_dirs(str(self.base_path.resolve())):
             repo = pathlib.Path(d).parent
             if is_git_repo(repo):
                 repo_name = str(repo.relative_to(self.base_path))
@@ -206,7 +213,7 @@ class MultiRepo:
         '''
         new_repo_names = []
         self.base_path = pathlib.Path(self.base_dir)
-        for d in scan_git_dirs(str(self.base_path)):
+        for d in scan_git_dirs(str(self.base_path.resolve())):
             repo = pathlib.Path(d).parent
             if is_git_repo(repo):
                 repo_name = str(repo.relative_to(self.base_path))
