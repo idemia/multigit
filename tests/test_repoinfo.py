@@ -847,8 +847,6 @@ class TestRepoInfo(unittest.TestCase):
         assert len(result) == 2
         assert 'dir_ext' in result or 'dir\\link_to_dir_ext' in result
 
-        return
-
         # Symlink to parent
         circular_ref_parent_dir = self.gitdir / 'circular_ref_parent'
         git_init_repo(str(circular_ref_parent_dir))
@@ -857,44 +855,25 @@ class TestRepoInfo(unittest.TestCase):
         circular_ref_child_dir = circular_ref_parent_dir / 'child_dir'
         git_init_repo(str(circular_ref_child_dir))
 
-        mr = MultiRepo(str(circular_ref_parent_dir))
-        self.assertEqual(set(mr.find_git_repos()), {
+        self.assertEqual(set(MultiRepo(str(circular_ref_parent_dir)).find_git_repos()), {
             '.', 'child_dir'
         })
 
+        # add a cycle with a symlink to parent
         link_back_to_parent = circular_ref_child_dir / 'symlink_back_to_parent'
         link_back_to_parent.symlink_to(circular_ref_parent_dir, True)
 
-        mr = MultiRepo(str(circular_ref_parent_dir))
-        self.assertEqual(set(mr.find_git_repos()), {
+        self.assertEqual(set(MultiRepo(str(circular_ref_parent_dir)).find_git_repos()), {
             '.', 'child_dir'
         })
 
-        mr = MultiRepo(str(circular_ref_child_dir))
-        self.assertEqual(set(mr.find_git_repos()), {
+        self.assertEqual(set(MultiRepo(str(circular_ref_child_dir)).find_git_repos()), {
             '.', 'symlink_back_to_parent',
         })
 
-        return
-
-
-
-
-
-        return
-        # Symlink to an ancestor
-        subdir = pathlib.Path(base_dir) / 'subdir'
-        subdir.mkdir(parents=True)
-        circular_ref_dir_2 = pathlib.Path(subdir) / 'circular_ref_2'
-        circular_ref_dir_2.symlink_to(self.gitdir)
-
-        mr = MultiRepo(str(self.gitdir))
-        repo_list = mr.find_git_repos()
-        self.assertEqual(set(repo_list), {
-            'dir', 'dir/extdir'
+        self.assertEqual(set(MultiRepo(str(self.gitdir)).find_git_repos()), {
+            'dir', 'dir_ext', 'circular_ref_parent', 'circular_ref_parent\\child_dir'
         })
-
-        rmtree_failsafe(base_dir)
 
 
     def run_clone_test_on_empty_git(self, dir1: pathlib.Path, dir3: pathlib.Path):
