@@ -17,6 +17,7 @@
 
 from typing import Dict, Tuple, Optional, List, Callable, Any, Sequence, Generator
 import logging, re, csv, pathlib, os
+from collections import deque
 
 from PySide6.QtCore import Signal, QObject, QCoreApplication
 from PySide6.QtWidgets import QMessageBox
@@ -100,9 +101,9 @@ def scan_git_dirs(base_path: str) -> Generator[str, str, None]:
     '''
     visited = set()
     # make sure to have absolute resolved path to get started
-    path_to_visit = [str(pathlib.Path(base_path).resolve())]
+    path_to_visit = deque([str(pathlib.Path(base_path).resolve())])
     while path_to_visit:
-        dirpath = path_to_visit.pop(0)
+        dirpath = path_to_visit.popleft()
 
         resolved_path = str(pathlib.Path(dirpath).resolve())
         if resolved_path in visited:
