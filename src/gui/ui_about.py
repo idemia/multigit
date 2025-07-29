@@ -51,7 +51,7 @@ class Ui_dialogAbout(object):
         self.label.setMaximumSize(QSize(100, 100))
         self.label.setPixmap(QPixmap(u":/img/multigit-logo-256.png"))
         self.label.setScaledContents(True)
-        self.label.setAlignment(Qt.AlignLeading|Qt.AlignLeft|Qt.AlignTop)
+        self.label.setAlignment(Qt.AlignmentFlag.AlignLeading|Qt.AlignmentFlag.AlignLeft|Qt.AlignmentFlag.AlignTop)
 
         self.verticalLayout.addWidget(self.label)
 
@@ -66,15 +66,15 @@ class Ui_dialogAbout(object):
         sizePolicy1.setHeightForWidth(self.textBrowserTitle.sizePolicy().hasHeightForWidth())
         self.textBrowserTitle.setSizePolicy(sizePolicy1)
         self.textBrowserTitle.setMinimumSize(QSize(0, 120))
-        self.textBrowserTitle.setFocusPolicy(Qt.NoFocus)
+        self.textBrowserTitle.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.textBrowserTitle.setAcceptDrops(False)
         self.textBrowserTitle.setAutoFillBackground(False)
-        self.textBrowserTitle.setFrameShape(QFrame.NoFrame)
-        self.textBrowserTitle.setFrameShadow(QFrame.Plain)
+        self.textBrowserTitle.setFrameShape(QFrame.Shape.NoFrame)
+        self.textBrowserTitle.setFrameShadow(QFrame.Shadow.Plain)
         self.textBrowserTitle.setLineWidth(0)
-        self.textBrowserTitle.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
-        self.textBrowserTitle.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
-        self.textBrowserTitle.setSizeAdjustPolicy(QAbstractScrollArea.AdjustToContents)
+        self.textBrowserTitle.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
+        self.textBrowserTitle.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
+        self.textBrowserTitle.setSizeAdjustPolicy(QAbstractScrollArea.SizeAdjustPolicy.AdjustToContents)
 
         self.horizontalLayout.addWidget(self.textBrowserTitle)
 
@@ -99,8 +99,8 @@ class Ui_dialogAbout(object):
         sizePolicy3.setVerticalStretch(0)
         sizePolicy3.setHeightForWidth(self.textBrowserContent.sizePolicy().hasHeightForWidth())
         self.textBrowserContent.setSizePolicy(sizePolicy3)
-        self.textBrowserContent.setFocusPolicy(Qt.NoFocus)
-        self.textBrowserContent.setFrameShape(QFrame.NoFrame)
+        self.textBrowserContent.setFocusPolicy(Qt.FocusPolicy.NoFocus)
+        self.textBrowserContent.setFrameShape(QFrame.Shape.NoFrame)
         self.textBrowserContent.setOpenExternalLinks(True)
         self.textBrowserContent.setOpenLinks(True)
 
@@ -151,39 +151,46 @@ class Ui_dialogAbout(object):
         dialogAbout.setWindowTitle(QCoreApplication.translate("dialogAbout", u"About Multigit", None))
         self.label.setText("")
         self.textBrowserTitle.setHtml(QCoreApplication.translate("dialogAbout", u"<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
-"<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
+"<html><head><meta name=\"qrichtext\" content=\"1\" /><meta charset=\"utf-8\" /><style type=\"text/css\">\n"
 "p, li { white-space: pre-wrap; }\n"
-"</style></head><body style=\" font-family:'MS Shell Dlg 2'; font-size:7.8pt; font-weight:400; font-style:normal;\">\n"
-"<p align=\"center\" style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:6.6pt;\"><br /></p>\n"
-"<p align=\"center\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:18pt; font-weight:600;\">Multigit by IDEMIA</span></p>\n"
-"<p align=\"center\" style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:12pt; font-style:italic;\"><br /></p>\n"
-"<p align=\"center\" style=\" margin-top:0px; margin-"
-                        "bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:12pt; font-style:italic;\">Multigit helps managing multiple Git repositories with one interface</span></p></body></html>", None))
+"hr { height: 1px; border-width: 0; }\n"
+"li.unchecked::marker { content: \"\\2610\"; }\n"
+"li.checked::marker { content: \"\\2612\"; }\n"
+"</style></head><body style=\" font-family:'Segoe UI'; font-size:9pt; font-weight:400; font-style:normal;\">\n"
+"<p align=\"center\" style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:'MS Shell Dlg 2'; font-size:6.6pt;\"><br /></p>\n"
+"<p align=\"center\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:'MS Shell Dlg 2'; font-size:18pt; font-weight:600;\">Multigit by IDEMIA</span></p>\n"
+"<p align=\"center\" style=\"-qt-paragraph-type:e"
+                        "mpty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:'MS Shell Dlg 2'; font-size:12pt; font-style:italic;\"><br /></p>\n"
+"<p align=\"center\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:'MS Shell Dlg 2'; font-size:12pt; font-style:italic;\">Multigit helps managing multiple Git repositories with one interface</span></p></body></html>", None))
         self.label_2.setText("")
         self.textBrowserContent.setHtml(QCoreApplication.translate("dialogAbout", u"<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
-"<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
+"<html><head><meta name=\"qrichtext\" content=\"1\" /><meta charset=\"utf-8\" /><style type=\"text/css\">\n"
 "p, li { white-space: pre-wrap; }\n"
-"</style></head><body style=\" font-family:'MS Shell Dlg 2'; font-size:7.8pt; font-weight:400; font-style:normal;\">\n"
-"<p style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:6.6pt;\"><br /></p>\n"
-"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:10pt;\">Multigit OpenSource version [version]</span></p>\n"
-"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:10pt;\">Copyright IDEMIA 2019-2024</span></p>\n"
-"<p style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right"
-                        ":0px; -qt-block-indent:0; text-indent:0px; font-size:10pt;\"><br /></p>\n"
-"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:10pt;\">Multigit is developed at </span><a href=\"https://www.idemia.com/\"><span style=\" font-size:10pt; text-decoration: underline; color:#0000ff;\">IDEMIA</span></a><span style=\" font-size:10pt;\"> by Philippe Fremy.</span></p>\n"
-"<p style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:10pt;\"><br /></p>\n"
-"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:10pt;\">Multigit is licensed under </span><a href=\"http://www.apache.org/licenses/LICENSE-2.0\"><span style=\" font-size:10pt; text-decoration: underline; color:#0000ff;\">Apache License 2.0</span></a></p>\n"
-"<p style=\"-qt-paragraph-type:em"
-                        "pty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:10pt;\"><br /></p>\n"
-"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:10pt;\">Multigit includes the software components:</span></p>\n"
-"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:10pt;\">- </span><a href=\"https://www.python.org\"><span style=\" font-size:10pt; text-decoration: underline; color:#0000ff;\">Python 3.8</span></a><span style=\" font-size:10pt;\">  (from the Python Software Foundation)</span></p>\n"
-"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:10pt;\">- </span><a href=\"https://www.qt.io/\"><span style=\" font-size:10pt; text-decoration: underline; color:#0000ff;\">Qt for Python 5"
-                        ".15 </span></a><span style=\" font-size:10pt;\">(by the Qt Group)</span></p>\n"
-"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:10pt;\">- </span><a href=\"https://pypi.org/project/concurrent-log-handler/\"><span style=\" font-size:10pt; text-decoration: underline; color:#0000ff;\">Concurrent-log-handler</span></a><span style=\" font-size:10pt;\"> (by Preston Landers)</span></p>\n"
-"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:10pt;\">- </span><a href=\"https://pyinstaller.org/en/stable/\"><span style=\" font-size:10pt; text-decoration: underline; color:#0000ff;\">PyInstaller</span></a><span style=\" font-size:10pt;\"> (by David Cortesi)</span></p>\n"
-"<p style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:10pt;\"><br"
-                        " /></p>\n"
-"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:10pt;\">Most icons are provided by freely </span><a href=\"https://icons8.com\"><span style=\" font-size:10pt; text-decoration: underline; color:#0000ff;\">Icons8</span></a></p>\n"
-"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:10pt;\">Icons from the softwares Git, TortoiseGit, SourceTree, SublimeMerge are used to represent activation of the related software. Icons remain the properties of their copyright owner. IDEMIA logo is copyrighted to IDEMIA and can not be used without IDEMIA's approval (see licensing for details).</span></p></body></html>", None))
+"hr { height: 1px; border-width: 0; }\n"
+"li.unchecked::marker { content: \"\\2610\"; }\n"
+"li.checked::marker { content: \"\\2612\"; }\n"
+"</style></head><body style=\" font-family:'Segoe UI'; font-size:9pt; font-weight:400; font-style:normal;\">\n"
+"<p style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:'MS Shell Dlg 2'; font-size:6.6pt;\"><br /></p>\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:'MS Shell Dlg 2'; font-size:10pt;\">Multigit OpenSource version [version]</span></p>\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px"
+                        "; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:'MS Shell Dlg 2'; font-size:10pt;\">Copyright IDEMIA 2019-2024</span></p>\n"
+"<p style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:'MS Shell Dlg 2'; font-size:10pt;\"><br /></p>\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:'MS Shell Dlg 2'; font-size:10pt;\">Multigit is developed at </span><a href=\"https://www.idemia.com/\"><span style=\" font-family:'MS Shell Dlg 2'; font-size:10pt; text-decoration: underline; color:#0000ff;\">IDEMIA</span></a><span style=\" font-family:'MS Shell Dlg 2'; font-size:10pt;\"> by Philippe Fremy.</span></p>\n"
+"<p style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:'MS Shell Dlg 2'; font-size:10pt;\"><br /><"
+                        "/p>\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:'MS Shell Dlg 2'; font-size:10pt;\">Multigit is licensed under </span><a href=\"http://www.apache.org/licenses/LICENSE-2.0\"><span style=\" font-family:'MS Shell Dlg 2'; font-size:10pt; text-decoration: underline; color:#0000ff;\">Apache License 2.0</span></a></p>\n"
+"<p style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:'MS Shell Dlg 2'; font-size:10pt;\"><br /></p>\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:'MS Shell Dlg 2'; font-size:10pt;\">Multigit includes the software components:</span></p>\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:'MS"
+                        " Shell Dlg 2'; font-size:10pt;\">- </span><a href=\"https://www.python.org\"><span style=\" font-family:'MS Shell Dlg 2'; font-size:10pt; text-decoration: underline; color:#0000ff;\">Python 3.8</span></a><span style=\" font-family:'MS Shell Dlg 2'; font-size:10pt;\">  (from the Python Software Foundation)</span></p>\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:'MS Shell Dlg 2'; font-size:10pt;\">- </span><a href=\"https://www.qt.io/\"><span style=\" font-family:'MS Shell Dlg 2'; font-size:10pt; text-decoration: underline; color:#0000ff;\">Qt for Python 5.15 </span></a><span style=\" font-family:'MS Shell Dlg 2'; font-size:10pt;\">(by the Qt Group)</span></p>\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:'MS Shell Dlg 2'; font-size:10pt;\">- </span><a href=\"https://pypi.org/project/concurrent-log-hand"
+                        "ler/\"><span style=\" font-family:'MS Shell Dlg 2'; font-size:10pt; text-decoration: underline; color:#0000ff;\">Concurrent-log-handler</span></a><span style=\" font-family:'MS Shell Dlg 2'; font-size:10pt;\"> (by Preston Landers)</span></p>\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:'MS Shell Dlg 2'; font-size:10pt;\">- </span><a href=\"https://pyinstaller.org/en/stable/\"><span style=\" font-family:'MS Shell Dlg 2'; font-size:10pt; text-decoration: underline; color:#0000ff;\">PyInstaller</span></a><span style=\" font-family:'MS Shell Dlg 2'; font-size:10pt;\"> (by David Cortesi)</span></p>\n"
+"<p style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:'MS Shell Dlg 2'; font-size:10pt;\"><br /></p>\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text"
+                        "-indent:0px;\"><span style=\" font-family:'MS Shell Dlg 2'; font-size:10pt;\">Most icons are provided by freely </span><a href=\"https://icons8.com\"><span style=\" font-family:'MS Shell Dlg 2'; font-size:10pt; text-decoration: underline; color:#0000ff;\">Icons8</span></a></p>\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:'MS Shell Dlg 2'; font-size:10pt;\">Icons from the softwares Git, TortoiseGit, SourceTree, SublimeMerge are used to represent activation of the related software. Icons remain the properties of their copyright owner. IDEMIA logo is copyrighted to IDEMIA and can not be used without IDEMIA's approval (see licensing for details).</span></p></body></html>", None))
         self.pushButtonFullLicense.setText(QCoreApplication.translate("dialogAbout", u"Full Licensing Information", None))
         self.pushButtonOk.setText(QCoreApplication.translate("dialogAbout", u"Ok", None))
     # retranslateUi

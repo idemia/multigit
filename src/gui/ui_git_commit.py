@@ -71,7 +71,7 @@ class Ui_GitCommit(object):
         sizePolicy1.setVerticalStretch(0)
         sizePolicy1.setHeightForWidth(self.labelRepoSelected.sizePolicy().hasHeightForWidth())
         self.labelRepoSelected.setSizePolicy(sizePolicy1)
-        self.labelRepoSelected.setAlignment(Qt.AlignCenter)
+        self.labelRepoSelected.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
         self.horizontalLayout.addWidget(self.labelRepoSelected)
 
@@ -91,7 +91,7 @@ class Ui_GitCommit(object):
         self.treeWidgetRepoList = MgRepoTree(self.groupBox_2)
         self.treeWidgetRepoList.setObjectName(u"treeWidgetRepoList")
         self.treeWidgetRepoList.setAlternatingRowColors(True)
-        self.treeWidgetRepoList.setSelectionMode(QAbstractItemView.ExtendedSelection)
+        self.treeWidgetRepoList.setSelectionMode(QAbstractItemView.SelectionMode.ExtendedSelection)
         self.treeWidgetRepoList.setRootIsDecorated(False)
         self.treeWidgetRepoList.setUniformRowHeights(True)
         self.treeWidgetRepoList.setItemsExpandable(False)
@@ -106,8 +106,8 @@ class Ui_GitCommit(object):
         self.horizontalLayout_4.setObjectName(u"horizontalLayout_4")
         self.buttonBox = QDialogButtonBox(GitCommit)
         self.buttonBox.setObjectName(u"buttonBox")
-        self.buttonBox.setOrientation(Qt.Horizontal)
-        self.buttonBox.setStandardButtons(QDialogButtonBox.Cancel|QDialogButtonBox.Ok)
+        self.buttonBox.setOrientation(Qt.Orientation.Horizontal)
+        self.buttonBox.setStandardButtons(QDialogButtonBox.StandardButton.Cancel|QDialogButtonBox.StandardButton.Ok)
 
         self.horizontalLayout_4.addWidget(self.buttonBox)
 
