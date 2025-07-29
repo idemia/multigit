@@ -20,11 +20,8 @@
 import pathlib
 
 files_to_exclude = set([
+
 ### Pure Python dependencies
-
-### Windows stuff
-
-### Qt stuff
 
     '_bz2.pyd',
     '_decimal.pyd',
@@ -33,6 +30,8 @@ files_to_exclude = set([
     '_wmi.pyd',
 
     'libcrypto-3.dll',
+
+### Qt stuff
 
     'PySide6\\plugins\\imageformats\\qtiff.dll',
     'PySide6\\plugins\\imageformats\\qico.dll',
