@@ -242,7 +242,7 @@ Python software is licensed under the PSF License Agreement.
 PySide / Qt6 for Python
 -----------------------
 
-See [Qt's detailed licensing information](https://doc.qt.io/qt-5/licenses-used-in-qt.html) for software
+See [Qt's detailed licensing information](https://doc.qt.io/qt-6/licenses-used-in-qt.html) for software
 used by Qt6.
 
 Qt/PySide6 is available under LGPLv3.
