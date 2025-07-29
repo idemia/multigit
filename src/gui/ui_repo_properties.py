@@ -33,7 +33,7 @@ class Ui_RepoProperties(object):
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.label.sizePolicy().hasHeightForWidth())
         self.label.setSizePolicy(sizePolicy)
-        self.label.setAlignment(Qt.AlignRight|Qt.AlignTrailing|Qt.AlignVCenter)
+        self.label.setAlignment(Qt.AlignmentFlag.AlignRight|Qt.AlignmentFlag.AlignTrailing|Qt.AlignmentFlag.AlignVCenter)
 
         self.gridLayout.addWidget(self.label, 0, 0, 1, 1)
 
@@ -45,7 +45,7 @@ class Ui_RepoProperties(object):
 
         self.label_3 = QLabel(RepoProperties)
         self.label_3.setObjectName(u"label_3")
-        self.label_3.setAlignment(Qt.AlignRight|Qt.AlignTrailing|Qt.AlignVCenter)
+        self.label_3.setAlignment(Qt.AlignmentFlag.AlignRight|Qt.AlignmentFlag.AlignTrailing|Qt.AlignmentFlag.AlignVCenter)
 
         self.gridLayout.addWidget(self.label_3, 1, 0, 1, 1)
 
@@ -62,7 +62,7 @@ class Ui_RepoProperties(object):
 
         self.label_4 = QLabel(RepoProperties)
         self.label_4.setObjectName(u"label_4")
-        self.label_4.setAlignment(Qt.AlignRight|Qt.AlignTrailing|Qt.AlignVCenter)
+        self.label_4.setAlignment(Qt.AlignmentFlag.AlignRight|Qt.AlignmentFlag.AlignTrailing|Qt.AlignmentFlag.AlignVCenter)
 
         self.gridLayout.addWidget(self.label_4, 2, 0, 1, 1)
 
@@ -79,7 +79,7 @@ class Ui_RepoProperties(object):
 
         self.label_5 = QLabel(RepoProperties)
         self.label_5.setObjectName(u"label_5")
-        self.label_5.setAlignment(Qt.AlignRight|Qt.AlignTrailing|Qt.AlignVCenter)
+        self.label_5.setAlignment(Qt.AlignmentFlag.AlignRight|Qt.AlignmentFlag.AlignTrailing|Qt.AlignmentFlag.AlignVCenter)
 
         self.gridLayout.addWidget(self.label_5, 3, 0, 1, 1)
 
@@ -91,7 +91,7 @@ class Ui_RepoProperties(object):
 
         self.label_7 = QLabel(RepoProperties)
         self.label_7.setObjectName(u"label_7")
-        self.label_7.setAlignment(Qt.AlignRight|Qt.AlignTrailing|Qt.AlignVCenter)
+        self.label_7.setAlignment(Qt.AlignmentFlag.AlignRight|Qt.AlignmentFlag.AlignTrailing|Qt.AlignmentFlag.AlignVCenter)
 
         self.gridLayout.addWidget(self.label_7, 4, 0, 1, 1)
 
@@ -103,7 +103,7 @@ class Ui_RepoProperties(object):
 
         self.label_6 = QLabel(RepoProperties)
         self.label_6.setObjectName(u"label_6")
-        self.label_6.setAlignment(Qt.AlignRight|Qt.AlignTrailing|Qt.AlignVCenter)
+        self.label_6.setAlignment(Qt.AlignmentFlag.AlignRight|Qt.AlignmentFlag.AlignTrailing|Qt.AlignmentFlag.AlignVCenter)
 
         self.gridLayout.addWidget(self.label_6, 5, 0, 1, 1)
 
@@ -115,7 +115,7 @@ class Ui_RepoProperties(object):
 
         self.label_9 = QLabel(RepoProperties)
         self.label_9.setObjectName(u"label_9")
-        self.label_9.setAlignment(Qt.AlignRight|Qt.AlignTrailing|Qt.AlignVCenter)
+        self.label_9.setAlignment(Qt.AlignmentFlag.AlignRight|Qt.AlignmentFlag.AlignTrailing|Qt.AlignmentFlag.AlignVCenter)
 
         self.gridLayout.addWidget(self.label_9, 6, 0, 1, 1)
 
@@ -142,7 +142,7 @@ class Ui_RepoProperties(object):
         sizePolicy1.setVerticalStretch(3)
         sizePolicy1.setHeightForWidth(self.label_8.sizePolicy().hasHeightForWidth())
         self.label_8.setSizePolicy(sizePolicy1)
-        self.label_8.setAlignment(Qt.AlignRight|Qt.AlignTrailing|Qt.AlignVCenter)
+        self.label_8.setAlignment(Qt.AlignmentFlag.AlignRight|Qt.AlignmentFlag.AlignTrailing|Qt.AlignmentFlag.AlignVCenter)
 
         self.gridLayout.addWidget(self.label_8, 8, 0, 1, 1)
 
@@ -175,8 +175,8 @@ class Ui_RepoProperties(object):
 
         self.buttonBox = QDialogButtonBox(RepoProperties)
         self.buttonBox.setObjectName(u"buttonBox")
-        self.buttonBox.setOrientation(Qt.Horizontal)
-        self.buttonBox.setStandardButtons(QDialogButtonBox.Ok)
+        self.buttonBox.setOrientation(Qt.Orientation.Horizontal)
+        self.buttonBox.setStandardButtons(QDialogButtonBox.StandardButton.Ok)
         self.buttonBox.setCenterButtons(False)
 
         self.gridLayout.addWidget(self.buttonBox, 10, 1, 1, 1)

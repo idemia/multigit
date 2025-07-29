@@ -150,7 +150,7 @@ class Ui_GitSwitchBranch(object):
         QTreeWidgetItem(self.treeWidgetBranches)
         self.treeWidgetBranches.setObjectName(u"treeWidgetBranches")
         self.treeWidgetBranches.setFont(font1)
-        self.treeWidgetBranches.setFrameShape(QFrame.NoFrame)
+        self.treeWidgetBranches.setFrameShape(QFrame.Shape.NoFrame)
         self.treeWidgetBranches.setProperty(u"showDropIndicator", False)
         self.treeWidgetBranches.setAlternatingRowColors(False)
         self.treeWidgetBranches.setSortingEnabled(True)
@@ -184,7 +184,7 @@ class Ui_GitSwitchBranch(object):
         sizePolicy1.setHeightForWidth(self.labelRepoSelected.sizePolicy().hasHeightForWidth())
         self.labelRepoSelected.setSizePolicy(sizePolicy1)
         self.labelRepoSelected.setFont(font1)
-        self.labelRepoSelected.setAlignment(Qt.AlignCenter)
+        self.labelRepoSelected.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
         self.horizontalLayout.addWidget(self.labelRepoSelected)
 
@@ -206,7 +206,7 @@ class Ui_GitSwitchBranch(object):
         self.treeWidgetRepoList.setObjectName(u"treeWidgetRepoList")
         self.treeWidgetRepoList.setFont(font1)
         self.treeWidgetRepoList.setAlternatingRowColors(True)
-        self.treeWidgetRepoList.setSelectionMode(QAbstractItemView.ExtendedSelection)
+        self.treeWidgetRepoList.setSelectionMode(QAbstractItemView.SelectionMode.ExtendedSelection)
         self.treeWidgetRepoList.setRootIsDecorated(False)
         self.treeWidgetRepoList.setUniformRowHeights(True)
         self.treeWidgetRepoList.setItemsExpandable(False)
@@ -222,8 +222,8 @@ class Ui_GitSwitchBranch(object):
         self.buttonBox = QDialogButtonBox(GitSwitchBranch)
         self.buttonBox.setObjectName(u"buttonBox")
         self.buttonBox.setFont(font1)
-        self.buttonBox.setOrientation(Qt.Horizontal)
-        self.buttonBox.setStandardButtons(QDialogButtonBox.Cancel|QDialogButtonBox.Ok)
+        self.buttonBox.setOrientation(Qt.Orientation.Horizontal)
+        self.buttonBox.setStandardButtons(QDialogButtonBox.StandardButton.Cancel|QDialogButtonBox.StandardButton.Ok)
 
         self.horizontalLayout_4.addWidget(self.buttonBox)
 

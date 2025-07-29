@@ -26,10 +26,11 @@ classifiers = [
   "Development Status :: 5 - Production/Stable",
   "Environment :: Win32 (MS Windows)",
   "Environment :: X11 Applications :: Qt",
+  "Environment :: MacOS X",
 ]
 
 dependencies = [
-    "pyside2",
+    "pyside6",
     "concurrent-log-handler",
 ]
 
@@ -40,7 +41,7 @@ dev = [
 
     # type verification
     "mypy",
-    "pyside2-stubs",
+    "pyside6-stubs",
 
     # running tests
     "pytest<8",

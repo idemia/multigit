@@ -32,12 +32,7 @@ def exclude_from_toc(toc: 'TOC', exclude_list: 'List[str]') -> 'TOC':
             print('\t\t\t\tExcluding:', dst)
         else:
             print('Keeping:', dst)
-
-    # this is needed for some versions of pyinstaller
-    if getattr(toc, '__sub__', None):
         return toc - rm_toc
-    else:
-        return [v for v in toc if v not in rm_toc]
 
 
 block_cipher = None
