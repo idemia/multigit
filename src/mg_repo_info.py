@@ -101,7 +101,7 @@ def scan_git_dirs(base_path: str) -> Generator[str, str, None]:
     '''
     visited = set()
     # make sure to have absolute resolved path to get started
-    path_to_visit = deque([str(pathlib.Path(base_path).resolve())])
+    path_to_visit = deque([base_path])
     while path_to_visit:
         dirpath = path_to_visit.popleft()
 
@@ -174,7 +174,7 @@ class MultiRepo:
         self.repo_list = []
         self.repo_names = []
         self.base_path = pathlib.Path(self.base_dir)
-        for d in scan_git_dirs(str(self.base_path.resolve())):
+        for d in scan_git_dirs(str(self.base_path)):
             repo = pathlib.Path(d).parent
             if is_git_repo(repo):
                 repo_name = str(repo.relative_to(self.base_path))
@@ -214,7 +214,7 @@ class MultiRepo:
         '''
         new_repo_names = []
         self.base_path = pathlib.Path(self.base_dir)
-        for d in scan_git_dirs(str(self.base_path.resolve())):
+        for d in scan_git_dirs(str(self.base_path)):
             repo = pathlib.Path(d).parent
             if is_git_repo(repo):
                 repo_name = str(repo.relative_to(self.base_path))

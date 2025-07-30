@@ -875,6 +875,14 @@ class TestRepoInfo(unittest.TestCase):
         basedir_link = extdir / 'link_to_dir'
         basedir_link.symlink_to(base_dir)
 
+        self.assertEqual(set(MultiRepo(str(extdir)).find_git_repos()), {
+            '.', 'link_to_dir',
+        })
+
+        self.assertEqual(set(MultiRepo(str(base_dir)).find_git_repos()), {
+            '.', 'link_to_dir_ext',
+        })
+
         # the final check
         self.assertEqual(set(MultiRepo(str(self.gitdir)).find_git_repos()), {
             'dir', 'dir_ext', 'circular_ref_parent', os.path.join('circular_ref_parent','child_dir')
