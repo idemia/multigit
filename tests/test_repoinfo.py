@@ -18,8 +18,8 @@
 from typing import Union, Any
 import unittest, tempfile, datetime, collections, pathlib, os, stat, shutil
 from logging import warning
-
 import os
+import sys
 import os.path
 
 from multigit import init_logging
@@ -805,6 +805,15 @@ class TestRepoInfo(unittest.TestCase):
         rmtree_failsafe(strange_dir1)
 
     def test_find_git_repos_with_symlinks(self) -> None:
+        try:
+            self.run_test_find_git_repos_with_symlinks()
+        except OSError:
+            if sys.platform == 'win32':
+               raise unittest.SkipTest('You need to have admin privilege to run this test on Windows')
+            raise
+
+
+    def run_test_find_git_repos_with_symlinks(self) -> None:
         base_dir = pathlib.Path(self.gitdir) / 'dir'
         base_dir.mkdir()
         os.chdir(base_dir)
