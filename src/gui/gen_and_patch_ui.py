@@ -54,6 +54,8 @@ def patch_ui_py(ui_fname: str, py_fname: str) -> None:
             py_line = py_line.replace('):', ': %s) -> None:' % main_widget_name)
             print('- adding annotation for "%s"' % py_line)
 
+        py_line = py_line.replace('QFormLayout.LabelRole', 'QFormLayout.ItemRole.LabelRole')
+        py_line = py_line.replace('QFormLayout.FieldRole', 'QFormLayout.ItemRole.FieldRole')
         py_new_content.append(py_line)
 
     with open(py_fname, 'w') as f:
