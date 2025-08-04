@@ -160,7 +160,6 @@ def init_logging(debug_activated: bool = False, run_from_tests: bool = False) ->
     configure_logpath(debug_activated, run_from_tests)
 
     formatter = logging.Formatter('%(asctime)s %(name)15s:%(levelname)7s %(message)s')
-    formatter.default_time_format = '%H:%M:%S'
 
     logger = logging.getLogger()
 
