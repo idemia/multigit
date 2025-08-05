@@ -15,14 +15,16 @@
 #
 
 
-from typing import List, Any, Optional, Dict, Callable, cast
+from typing import List, Any, Optional, Dict, Callable, cast, Tuple
 import logging, subprocess
+import functools
+import enum
 
-from PySide6.QtWidgets import QTreeWidget, QMenu, QApplication, QMessageBox, QAbstractItemView, QTreeWidgetItem
-from PySide6.QtGui import QIcon, QAction
-from PySide6.QtCore import Qt, QPoint
+from PySide6.QtWidgets import QTreeWidget, QMenu, QApplication, QMessageBox, QAbstractItemView, QTreeWidgetItem, QHeaderView, QDialog
+from PySide6.QtGui import QIcon, QMouseEvent, QContextMenuEvent, QPixmap, QAction
+from PySide6.QtCore import Qt, QPoint, Signal, QPoint
 
-import src.mg_const as mg_const
+from src import mg_const
 from src import mg_config as mgc
 from src.mg_tools import ExecTortoiseGit, ExecGitBash, ExecSourceTree, ExecSublimeMerge, ExecGit, ExecGitK, ExecExplorer, ExecGitGui
 from src.mg_repo_info import MgRepoInfo
@@ -37,6 +39,9 @@ logger = logging.getLogger('mg_repo_tree')
 dbg = logger.debug
 warn = logger.warning
 
+TWI_TYPE_REPO = QTreeWidgetItem.ItemType.Type # 0
+TWI_TYPE_GROUP = cast(int, QTreeWidgetItem.ItemType.UserType) # 1000
+
 '''
 What to keep in mg_window:
 --------------------------
@@ -50,6 +55,21 @@ tgui- operations specific to the repo being listed in the view
     + operations related to selected items
 '''
 
+class GroupAddType( enum.Enum ):
+    GroupName = 0
+    CreateGroup = 1
+    RemoveFromGroup = 2
+
+
+
+@functools.lru_cache(maxsize=None)
+def getEmptyIcon() -> QIcon:
+    '''Return an empty icon used for creating indentation'''
+    emptyPixmap = QPixmap(16, 16)
+    emptyPixmap.fill(Qt.GlobalColor.transparent)
+    return QIcon(emptyPixmap)
+
+
 
 class MgRepoTree(QTreeWidget):
     '''Widget managing a list of repositories'''
@@ -57,26 +77,27 @@ class MgRepoTree(QTreeWidget):
     rmbMenu: QMenu
     rmbTgitMenu: QMenu
 
+    show_column_menu = Signal(QPoint)
+
     def __init__(self, *args: Any) -> None:
         super().__init__(*args)
 
         # to allow right-mouse-button click signal
         self.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
+        self.setItemsExpandable(True)
 
         f = self.header().font()
         f.setBold(True)
         # the column for the refresh icon
         self.headerItem().setText(0, '')
         self.header().setFont(f)
+        self.header().setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
+
         self.sortByColumn(mg_const.COL_REPO_NAME, Qt.SortOrder.AscendingOrder)
         self.setColumnWidth(mg_const.COL_UPDATE, 40)
+        self.setIndentation(10)
 
-        if self.columnCount() < mg_const.COL_NB:
-            self.setColumnCount(mg_const.COL_NB)
-            self.setHeaderLabels(mg_const.COL_TITLES)
-            self.setSelectionMode(QAbstractItemView.SelectionMode.ExtendedSelection)
-            self.setAllColumnsShowFocus(True)
-            self.header().setSortIndicatorShown(True)
+        self.configureColumns()
 
         # calling slot to adjust the status of the column
         self.slotViewColSha1Changed(mgc.get_config_instance().get(mgc.CONFIG_VIEW_COL_SHA1, True))
@@ -86,7 +107,7 @@ class MgRepoTree(QTreeWidget):
 
         self.mgActions = MgActions(self)
         self.rmbMenu = QMenu(self)
-        self.mgActions.setupMenuView(self.rmbMenu)
+        self.mgActions.setupMenuView(self.rmbMenu, True)
         self.rmbGitMenu = self.rmbMenu.addMenu("Git")
         self.rmbGitMenu.setIcon(QIcon(":/img/git_black.png"))
         self.mgActions.setupMenuGit(self.rmbGitMenu)
@@ -95,15 +116,23 @@ class MgRepoTree(QTreeWidget):
         pluginMgrInstance.setupRepoRmbMenu(self)
 
 
+    def configureColumns(self) -> None:
+        self.setColumnCount(mg_const.COL_NB)
+        self.setHeaderLabels(mg_const.COL_TITLES)
+        self.setSelectionMode(QAbstractItemView.SelectionMode.ExtendedSelection)
+        self.setAllColumnsShowFocus(True)
+        self.header().setSortIndicatorShown(True)
+        self.headerItem().setToolTip(mg_const.COL_UPDATE, mg_const.MSG_TOOLTIP_UPDATE)
+        self.headerItem().setToolTip(mg_const.COL_STATUS, mg_const.MSG_TOOLTIP_STATUS)
+        self.headerItem().setToolTip(mg_const.COL_REMOTE_SYNCHRO, mg_const.MSG_TOOLTIP_REMOTE_SYNCHRO)
+
+
     def clear(self) -> None:
         '''Called when clearing the list of repoItem and also of removing all repoInfo items.'''
         # we want to disconnect all signals emitted from repoInfo to our items, to avoid C++ object already
         # deleted being called by Python objects still present
         for repoItem in self.allRepoItems():
-            # disconnect all signals, what so ever
-            # it does not work on PySide2
-            # QObject.disconnect(cast(QObject, repoItem.repoInfo))
-            pass
+            repoItem.clearRepoConnections()
 
         super().clear()
 
@@ -141,12 +170,15 @@ class MgRepoTree(QTreeWidget):
         '''Install all action connections'''
 
         self.customContextMenuRequested.connect(self.slotContextMenuRequested)
+        self.header().customContextMenuRequested.connect(self.slotHeaderContextMenuRequested)
         self.itemActivated.connect(self.slotItemActivated)
 
-        # menu Edit
+        # menu View
         self.mgActions.actionRefreshSelected.triggered.connect(self.slotRefreshSelected)
         self.mgActions.actionShowInExplorer.triggered.connect(self.slotShowInExplorer)
         self.mgActions.menuCopy.triggered.connect(self.slotMenuCopyAction)
+        self.mgActions.menuCopy.aboutToShow.connect(self.slotMenuCopyAboutToShow)
+        self.mgActions.menuCopy.aboutToHide.connect(self.slotMenuCopyAboutToHide)
 
         # Menu Git
         self.mgActions.actionGitProperties.triggered.connect(self.slotGitProperties)
@@ -161,6 +193,7 @@ class MgRepoTree(QTreeWidget):
         self.mgActions.actionGitSwitchBranch.triggered.connect(self.slotGitSwitchBranch)
         self.mgActions.actionGitCheckoutTag.triggered.connect(self.slotGitCheckoutTag)
         self.mgActions.actionGitDeleteBranch.triggered.connect(self.slotGitDeleteBranch)
+        self.mgActions.actionGitDeleteTag.triggered.connect(self.slotGitDeleteTag)
         self.mgActions.actionGitBash.triggered.connect(self.slotGitBash)
         self.mgActions.actionGitRunCommand.triggered.connect(self.slotGitRunCommand)
 
@@ -181,13 +214,15 @@ class MgRepoTree(QTreeWidget):
         self.mgActions.actionTGitSwitch   .triggered.connect(self.slotTGitSwitch)
         self.mgActions.actionTGitBranch   .triggered.connect(self.slotTGitBranch)
 
-        self.mgActions.menuCopy.aboutToShow.connect(self.slotMenuCopyAboutToShow)
-        self.mgActions.menuCopy.aboutToHide.connect(self.slotMenuCopyAboutToHide)
-
 
     def slotContextMenuRequested(self, p: QPoint) -> None:
-        '''Capture the right-button mouse release action to display a menu'''
+        '''Capture the right-button mouse click action to display a menu'''
         self.rmbMenu.exec_(self.viewport().mapToGlobal(p)) # qme.globalPos())
+
+
+    def slotHeaderContextMenuRequested(self, p: QPoint) -> None:
+        '''Capture the right-button mouse click action to display a column menu'''
+        self.show_column_menu.emit(self.header().mapToGlobal(p))  # qme.globalPos())
 
 
 ##########################################################################
@@ -239,8 +274,8 @@ class MgRepoTree(QTreeWidget):
 
     def selectedRepoItems(self) -> List[MgRepoTreeItem]:
         '''Return the list of selected MgRepoTreeItem'''
-        items = cast(List[MgRepoTreeItem], list(super().selectedItems()))
-        return items
+        items = [item for item in self.selectedItems() if item.type() == TWI_TYPE_REPO]
+        return cast(List[MgRepoTreeItem], items)
 
 
     def selectedRepos(self) -> List[MgRepoInfo]:
@@ -259,8 +294,11 @@ class MgRepoTree(QTreeWidget):
         '''Return the list of all MgRepoTreeItem of the widget'''
         items = []
         for idx in range(self.topLevelItemCount()):
-            items.append(cast(MgRepoTreeItem, self.topLevelItem(idx)))
+            item = self.topLevelItem(idx)
+            if item and item.type() == TWI_TYPE_REPO:
+                items.append(cast(MgRepoTreeItem, item))
         return items
+
 
 ##########################################################################
 #
@@ -317,9 +355,13 @@ class MgRepoTree(QTreeWidget):
         return self.confirmIfTooManySelectedItems(dialogName) and self.confirmIfNoSelectedItems()
 
 
-    def slotItemActivated(self, _item: QTreeWidgetItem, _col: int) -> None:
+    def slotItemActivated(self, item: QTreeWidgetItem, _col: int) -> None:
         '''Called when user double-clicked or presses enter on an item. Call user-defined action'''
         dbg('slotItemActivated()')
+
+        if item.type() == TWI_TYPE_GROUP:
+            item.setExpanded(not item.isExpanded())
+            return
 
         # Make sure you don't forget any action!
         actionToPerform = {
@@ -377,12 +419,7 @@ class MgRepoTree(QTreeWidget):
 
     def slotMenuCopyAboutToShow(self) -> None:
         '''Called when user clicked on the copy submenu. Fills the items of the menu'''
-        items = self.selectedRepoItems()
-        if len(items) == 0:
-            return
-
-        repoInfo = items[0].repoInfo
-        self.mgActions.setupDynamicMenuCopy(repoInfo)
+        self.mgActions.setupDynamicMenuCopy(self)
 
 
     def slotMenuCopyAboutToHide(self) -> None:
@@ -761,5 +798,4 @@ class MgRepoTree(QTreeWidget):
             QMessageBox.warning(self, 'Unable to execute GitK', 'Warning: could not locate the gitk.exe program.\n' +
                                 'Can not execute any GitK command..\nPlease configure the location in the settings dialog.\n')
             self.mgActions.actionSublimeMerge.setEnabled(False)
-
 

@@ -18,11 +18,12 @@
 from typing import cast, List, Optional, Callable, Any, Union, Literal
 import subprocess, functools, logging, pathlib
 
-from PySide6.QtWidgets import QMainWindow, QFileDialog, QMessageBox, QApplication, QLineEdit, QTabBar
-from PySide6.QtCore import QTimer, Qt, QSignalMapper
+from PySide6.QtWidgets import QMainWindow, QFileDialog, QMessageBox, QApplication, QLineEdit, QTabBar, QMenu, QDialog
+from PySide6.QtCore import QTimer, Qt, QPoint
 from PySide6.QtGui import QCloseEvent, QAction
 
 from src.gui.ui_main_window import Ui_MainWindow
+from src.gui.ui_dialog_quit import Ui_quitConfirmDialog
 from src.mg_actions import MgActions
 from src.mg_dialog_whatisnew import showWhatIsNew, showWhatisnewIfAppropriate
 from src.mg_dialog_export_mgit import runDialogExportMgit
@@ -64,7 +65,7 @@ class MgMainWindow(QMainWindow, Ui_MainWindow):
         else:
             self.setGeometry(self.x(), self.y(), 1000, 700)  # default reasonable window size when no configuration
 
-        self.setupActions()
+        self.mgActions = MgActions(self)
         self.setupMenus()
         self.setupConnections()
         pluginMgrInstance.setupTopMenu(self)
@@ -94,25 +95,11 @@ class MgMainWindow(QMainWindow, Ui_MainWindow):
 #
 ##########################################################################
 
-    def setupActions(self) -> None:
-        self.mgActions = MgActions(self)
-
-        self.mgActions.actionGitFetchAll = QAction(self)
-        self.mgActions.actionGitFetchAll.setText(u"Fetch All (current tab)")
-        self.mgActions.actionGitFetchAll.setToolTip("Run <code>git fetch</code> on all repositories of the current tab")
-        self.mgActions.actionGitFetchAll.setShortcut("F6")
-
-        self.mgActions.actionGitFetchAllOnAllTabs = QAction(self)
-        self.mgActions.actionGitFetchAllOnAllTabs.setText(u"Fetch All (all tabs)")
-        self.mgActions.actionGitFetchAllOnAllTabs.setToolTip("Run <code>git fetch</code> on all repositories of all tabs")
-        self.mgActions.actionGitFetchAllOnAllTabs.setShortcut("F7")
-
-
     def setupMenus(self) -> None:
         '''Setup all menu which were not already prepared by the Designer UI'''
         # menu File
         self.fillRecentDirMenu()
-        self.mgActions.setupMenuView(self.menuView)
+        self.mgActions.setupMenuView(self.menuView, False)
 
         # menu git
         self.menuGit.addAction(self.mgActions.actionGitFetchAll)
@@ -179,34 +166,40 @@ class MgMainWindow(QMainWindow, Ui_MainWindow):
         self.actionExportCSV.triggered.connect(self.slotExportCsv)
         self.actionEditPreferences.triggered.connect( self.slotEditSettings )
         # ----
-        self.actionAddTab.triggered.connect( lambda checked: self.slotAddTab() )  # note: ignore the checked parameter
-        self.actionDupTab.triggered.connect( self.slotDupTab )
-        self.actionRenameTab.triggered.connect( self.slotRenameTab )
-        self.actionCloseTab.triggered.connect( self.slotCloseTab )
-        # ----
-        self.actionOpenProject.triggered.connect(self.slotCloneFromMgitFile)
+        self.actionCloneFromMgit.triggered.connect(self.slotCloneFromMgitFile)
         self.actionApplyMultigitFile.triggered.connect(self.slotApplyMgitFile)
         self.actionExportToMgit.triggered.connect(self.slotExportToMgit)
         self.actionQuit.triggered.connect( self.close )
 
         ### menu View
+
+        # Submenu Show
         self.actionViewLastCommit.setChecked(mgc.get_config_instance().get(mgc.CONFIG_VIEW_TAB_LAST_COMMIT, False))
         self.actionViewLastCommit.changed.connect(self.slotViewTabChanged)
         self.actionViewModifiedFiles.setChecked(mgc.get_config_instance().get(mgc.CONFIG_VIEW_TAB_MOD_FILES, False))
         self.actionViewModifiedFiles.changed.connect(self.slotViewTabChanged)
 
-        # trigger the slot once to setup the GUI
+        # Submenu: show columns
+        # (trigger the slot once to setup the GUI)
         self.actionViewColSha1.setChecked(mgc.get_config_instance().get(mgc.CONFIG_VIEW_COL_SHA1, True))
         self.actionViewColSha1.changed.connect(self.slotViewColSha1Changed)
         self.actionViewColURL.setChecked(mgc.get_config_instance().get(mgc.CONFIG_VIEW_COL_URL, True))
         self.actionViewColURL.changed.connect(self.slotViewColUrlChanged)
-        self.actionRefreshAll.triggered.connect(self.dispatchToActiveMultigitTab('slotRefreshAll'))
 
+        self.actionRefreshAll.triggered.connect(self.dispatchToActiveMultigitTab('slotRefreshAll'))
         self.mgActions.actionRefreshSelected.triggered.connect(self.dispatchToActiveTreeOfMultigitTab('slotRefreshSelected'))
         self.mgActions.actionShowInExplorer.triggered.connect(self.dispatchToActiveTreeOfMultigitTab('slotShowInExplorer'))
+
+        # Submenu: copy
         self.mgActions.menuCopy.triggered.connect(self.dispatchToActiveTreeOfMultigitTab('slotMenuCopyAction', True))
         self.mgActions.menuCopy.aboutToShow.connect(self.slotMenuCopyAboutToShow)
         self.mgActions.menuCopy.aboutToHide.connect(self.slotMenuCopyAboutToHide)
+
+        # Tabs
+        self.mgActions.actionAddTab.triggered.connect( lambda checked: self.slotAddTab() )  # note: ignore the checked parameter
+        self.mgActions.actionDupTab.triggered.connect( self.slotDupTab )
+        self.mgActions.actionRenameTab.triggered.connect( self.slotRenameTab )
+        self.mgActions.actionCloseTab.triggered.connect( self.slotCloseTab )
 
 
         ### menu Git
@@ -287,6 +280,10 @@ class MgMainWindow(QMainWindow, Ui_MainWindow):
                          ]
         self.config[mgc.CONFIG_TABS_OPENED] = all_open_tabs
         self.config[mgc.CONFIG_TABS_CURRENT] = self.tabRepos.currentIndex()
+
+        all_mg_widgets = [ (self.tabRepos.tabText(tabIdx), cast(MgMultigitWidget, self.tabRepos.widget(tabIdx)))
+                             for tabIdx in range(self.tabRepos.count())
+                         ]
         self.config.save()
         return super().closeEvent(event)
 
@@ -461,12 +458,6 @@ class MgMainWindow(QMainWindow, Ui_MainWindow):
         showWhatIsNew(self)
 
 
-    def selectedItems(self) -> List[MgRepoTreeItem]:
-        '''Return the list of selected MgRepoTreeItem'''
-        items = cast(List[MgRepoTreeItem], list(self.currentMultigit().repoTree.selectedItems()))
-        return items
-
-
     # noinspection PyMethodMayBeStatic
     def slotShowLogFileDirectory(self) -> None:
         '''Open an explorer on the log file directory'''
@@ -519,20 +510,23 @@ class MgMainWindow(QMainWindow, Ui_MainWindow):
         mgc.get_config_instance()[mgc.CONFIG_VIEW_COL_URL] = showColUrl
         mgc.get_config_instance().save()
 
-
     def slotMenuCopyAboutToShow(self) -> None:
         '''Called when user clicked on the copy submenu. Fills the items of the menu'''
-        items = self.currentMultigit().repoTree.selectedRepoItems()
-        if len(items) == 0:
-            return
 
-        repoInfo = items[0].repoInfo
-        self.mgActions.setupDynamicMenuCopy(repoInfo)
+        ### Note:
+        # This slot looks duplicated from mg_repo_tree.py but MgRepoTree and MgWindow each have
+        # their own MgAction instance. We need to setup the dynamic menu copy separtely on each instance
+
+        self.mgActions.setupDynamicMenuCopy(self.currentMultigit().repoTree)
 
 
     def slotMenuCopyAboutToHide(self) -> None:
         '''Called when Copy menu is going to hide. We disable the connections created
         by the Copy menu to capture the repo missing info'''
+
+        ### Note:
+        # This slot looks duplicated from mg_repo_tree.py but MgRepoTree and MgWindow each have
+        # their own MgAction instance. We need to setup the dynamic menu copy separtely on each instance
 
         # connections are used to update the menu after is has been shown, when
         # information is missing. We must disconnect everything when the menu
@@ -558,6 +552,7 @@ class MgMainWindow(QMainWindow, Ui_MainWindow):
         multigitWidget.sig_dir_changed.connect(self.updateRecentDirMenu)
         multigitWidget.sig_request_dir_open.connect( self.slotOpenDir )
         multigitWidget.repoTree.itemSelectionChanged.connect( self.updateStatusBar )
+        multigitWidget.repoTree.show_column_menu.connect(self.menuColumns.popup)
         self.slotViewTabChanged()
         return tabIdx
 
@@ -570,7 +565,8 @@ class MgMainWindow(QMainWindow, Ui_MainWindow):
         '''
         tabIdx = self.slotAddTab(pos)
         if base_dir is not None:
-            cast(MgMultigitWidget, self.tabRepos.widget(tabIdx)).openDir(base_dir)
+            mgw = cast(MgMultigitWidget, self.tabRepos.widget(tabIdx))
+            mgw.openDir(base_dir)
         return tabIdx
 
 
@@ -603,7 +599,11 @@ class MgMainWindow(QMainWindow, Ui_MainWindow):
         if self.tabRepos.count() <= 1:
             QMessageBox.warning(self, 'Can not close tab', 'Can not close last tab!\nOperation canceled.')
             return
-        self.tabRepos.removeTab(self.tabRepos.currentIndex())
+        idx = self.tabRepos.currentIndex()
+        # to help destroy pending signals, connections, callbacks
+        self.currentMultigit().repoTree.clear()
+        self.tabRepos.removeTab(idx)
+
 
     def slotShowTabMenu(self, idx: int, pos: QPoint) -> None:
         '''Show a small menu on the tab to act on it'''
@@ -646,7 +646,7 @@ class MgMainWindow(QMainWindow, Ui_MainWindow):
             return
 
         nbRepo = len(self.currentMultigit().multiRepo)
-        nbRepoSelected = len(self.currentMultigit().selectedItems())
+        nbRepoSelected = len(self.currentMultigit().repoTree.selectedRepoItems())
         msg = f'{nbRepo} repositories, {nbRepoSelected} selected'
         self.statusbar.showMessage(msg, 0)
 

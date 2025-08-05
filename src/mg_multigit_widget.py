@@ -15,14 +15,15 @@
 #
 
 
-from typing import cast, List, Optional, Union
+from typing import cast, List, Optional, Dict
 import logging, pathlib
 
 from PySide6.QtWidgets import QMessageBox, QApplication, QWidget
-from PySide6.QtCore import Qt, Signal, QByteArray, QTimer
+from PySide6.QtCore import Qt, Signal, QByteArray, QTimer, QPoint
 
 from src.mg_repo_info import MultiRepo
 from src.mg_repo_tree_item import MgRepoTreeItem
+from src.mg_repo_tree import TWI_TYPE_GROUP
 from src.mg_utils import htmlize_diff
 from src import mg_config as mgc
 from src.mg_const import COL_REPO_NAME, MAX_DIFF_LINES
@@ -43,6 +44,8 @@ class MgMultigitWidget(QWidget, Ui_MultigitWidget):
     def __init__(self) -> None:
         super().__init__()
         self.setupUi(self)
+        # we need to apply this after setupUi()
+        self.repoTree.configureColumns()
 
         self.multiRepo = MultiRepo('')
 
@@ -72,7 +75,6 @@ class MgMultigitWidget(QWidget, Ui_MultigitWidget):
 #       Methods related to the display updates and internal machinery
 #
 ##########################################################################
-
 
     def setBaseDir(self, baseDir: Optional[str]) -> None:
         '''Set the base directory from which all git repos are searched.'''
@@ -124,7 +126,7 @@ class MgMultigitWidget(QWidget, Ui_MultigitWidget):
 
 
     def slotItemSelectionChanged(self) -> None:
-        items = self.selectedItems()
+        items = self.repoTree.selectedRepoItems()
         dbg('slotItemSelectionChanged() - %d items, %s' % (len(items), items[0].text(COL_REPO_NAME) if len(items) else ''))
 
         if not self.tabWidget.isVisible():
@@ -144,7 +146,7 @@ class MgMultigitWidget(QWidget, Ui_MultigitWidget):
     def slotTabWidgetIndexChanged(self, idx: int) -> None:
         '''Called when the tab widget between diff and modified files is changed'''
         dbg('slotTabWidgetIndexChanged(%d)' % idx)
-        items = self.selectedItems()
+        items = self.repoTree.selectedRepoItems()
         if len(items) == 0:
             return
 
@@ -160,7 +162,7 @@ class MgMultigitWidget(QWidget, Ui_MultigitWidget):
     def slotSetLastCommit(self, repo_name: str, last_commit: str) -> None:
         dbg('slotSetLastCommit("%s", ...)' % repo_name)
         currentItem = self.repoTree.currentItem()
-        if currentItem is None:
+        if currentItem is None or currentItem.type() == TWI_TYPE_GROUP:
             return
 
         currentRepoName = currentItem.text(COL_REPO_NAME)
@@ -267,10 +269,5 @@ class MgMultigitWidget(QWidget, Ui_MultigitWidget):
         cmd = ['fetch', '--prune']
         self.repoTree.getGitExecWindow().execOneGitCommand('Fetching all repositories', cmd, repos)
 
-
-    def selectedItems(self) -> List[MgRepoTreeItem]:
-        '''Return the list of selected MgRepoTreeItem'''
-        items = cast(List[MgRepoTreeItem], list(self.repoTree.selectedItems()))
-        return items
 
 
