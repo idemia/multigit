@@ -350,3 +350,25 @@ def treeWidgetDeepIterator(treeWidget: QTreeWidget) -> Iterator[QTreeWidgetItem]
         assert topItem
         yield topItem
         yield from yieldChild(topItem)
+def ignoreCppObjectDeletedError(method: Any) -> Any:
+    '''Avoids triggering RuntimeError when accessing a method of a QTreeWigetItem
+
+    The QTreeWidgetItem instance must also have a field `ignoreUpdates`
+
+    '''
+
+    def protected_method(self: Any, *args: Any, **kwargs: Any) -> Any:
+        if self.ignoreUpdates:
+            return
+
+        try:
+            self.text(0)
+        except RuntimeError:
+            warn('Trying to update an python item whose C++ object has already been deleted!')
+            return
+        return method(self, *args, **kwargs)
+
+    return protected_method
+
+
+
