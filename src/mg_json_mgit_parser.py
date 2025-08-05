@@ -15,14 +15,14 @@
 #
 
 
-import json
+import json, re
 import pathlib, logging
 from typing import Dict, Any, List, Union, TYPE_CHECKING
 
 if TYPE_CHECKING:
     from src.mg_repo_info import MultiRepo, MgRepoInfo
 
-from src.mg_utils import set_username_on_git_url, anonymise_git_url
+from src.mg_utils import anonymise_git_url
 
 logger = logging.getLogger('mg_json_mgit_parser')
 dbg = logger.debug
@@ -56,7 +56,7 @@ def exportToMgit(mgitFname: str, desc: str, repos: List['MgRepoInfo'], snapshotM
 
         repoDesc = ''
         head: str
-        if repoInfo.head and repoInfo.head.find('<empty repo>') == -1:
+
             if snapshotMode:
                 if 'tag' in repoInfo.head:
                     repoDesc = 'commit of %s' % repoInfo.head
@@ -69,9 +69,7 @@ def exportToMgit(mgitFname: str, desc: str, repos: List['MgRepoInfo'], snapshotM
                 head = repoInfo.commit_sha1
             else:
                 # branch or tag or commit
-                head_type, head = repoInfo.head.split(' ')
-        else:
-            head_type, head = '', ''
+            head_type, head = repoInfo.head_info()
 
         repoDict = {
             "url": repoInfo.url or '',
@@ -136,6 +134,7 @@ class Repository:
         # remove / or \ from the beginning of dest
         self.destination = dest.lstrip("/\\")
         self.update_basepath(base_path)
+        self.description = ''
 
     def update_basepath(self, base_path: str) -> None:
         '''Propagate the base_path information to all repositories, to fill the full path'''
@@ -283,4 +282,5 @@ class ProjectStructure:
             data = json.load(file)
         self.set_base_path(base_path)
         self.fill_from_json_data(data)
+
 

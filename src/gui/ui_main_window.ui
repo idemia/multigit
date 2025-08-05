@@ -16,7 +16,7 @@
   <widget class="QWidget" name="centralwidget">
    <layout class="QHBoxLayout" name="horizontalLayout_2">
     <item>
-     <widget class="QTabWidget" name="tabRepos">
+     <widget class="MgTabWidget" name="tabRepos">
       <property name="currentIndex">
        <number>-1</number>
       </property>
@@ -33,7 +33,7 @@
      <x>0</x>
      <y>0</y>
      <width>290</width>
-     <height>22</height>
+     <height>33</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -57,12 +57,7 @@
     <addaction name="menuOpenRecentDirectory"/>
     <addaction name="actionEditPreferences"/>
     <addaction name="separator"/>
-    <addaction name="actionAddTab"/>
-    <addaction name="actionDupTab"/>
-    <addaction name="actionRenameTab"/>
-    <addaction name="actionCloseTab"/>
-    <addaction name="separator"/>
-    <addaction name="actionOpenProject"/>
+    <addaction name="actionCloneFromMgit"/>
     <addaction name="actionApplyMultigitFile"/>
     <addaction name="actionExportToMgit"/>
     <addaction name="actionExportCSV"/>
@@ -84,6 +79,8 @@
       <property name="title">
        <string>Show Columns</string>
       </property>
+      <addaction name="actionShow_Columns"/>
+      <addaction name="separator"/>
       <addaction name="actionViewColSha1"/>
       <addaction name="actionViewColURL"/>
      </widget>
@@ -219,7 +216,7 @@
     <string>Export repository informations to a CSV files</string>
    </property>
   </action>
-  <action name="actionOpenProject">
+  <action name="actionCloneFromMgit">
    <property name="text">
     <string>Clone from Multigit file</string>
    </property>
@@ -295,39 +292,40 @@
     <string>Remote URL</string>
    </property>
   </action>
-  <action name="actionAddTab">
+  <action name="actionShow_Columns">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="text">
-    <string>New tab</string>
+    <string>Show Columns</string>
    </property>
-   <property name="shortcut">
-    <string>Ctrl+N</string>
+   <property name="font">
+    <font>
+     <bold>true</bold>
+    </font>
    </property>
-  </action>
-  <action name="actionDupTab">
-   <property name="text">
-    <string>Duplicate tab</string>
+   <property name="autoRepeat">
+    <bool>false</bool>
    </property>
-   <property name="shortcut">
-    <string>Ctrl+D</string>
+   <property name="menuRole">
+    <enum>QAction::MenuRole::NoRole</enum>
    </property>
-  </action>
-  <action name="actionCloseTab">
-   <property name="text">
-    <string>Close current tab</string>
+   <property name="shortcutVisibleInContextMenu">
+    <bool>false</bool>
    </property>
-   <property name="shortcut">
-    <string>Ctrl+W</string>
-   </property>
-  </action>
-  <action name="actionRenameTab">
-   <property name="text">
-    <string>Rename tab</string>
-   </property>
-   <property name="shortcut">
-    <string>F2</string>
+   <property name="priority">
+    <enum>QAction::Priority::LowPriority</enum>
    </property>
   </action>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>MgTabWidget</class>
+   <extends>QTabWidget</extends>
+   <header>src.mg_tabwidget</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
  <resources>
   <include location="../../images/multigit_resources.qrc"/>
  </resources>

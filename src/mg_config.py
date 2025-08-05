@@ -87,6 +87,8 @@ dbg = logger.debug
 __CONFIG_INSTANCE = None
 
 
+T = TypeVar('T')
+
 def get_config_instance() -> 'MgConfig':
     '''Return an instance of the configuration of Multigit, with the default configuration path'''
     global __CONFIG_INSTANCE
@@ -203,13 +205,16 @@ class MgConfig:
         with open(self.config_path, 'w', encoding='utf8') as f:
             f.write(pformat(self.config_dict, indent=4, width=200))
 
+
     def __getitem__(self, config_key: str) -> Any:
         '''Return the content of the configuration key or None if the key does not exist.'''
         return self.config_dict.get(config_key)
 
+
     def get(self, config_key: str, default_value: Any = None) -> Any:
         '''Return the content of the configuration key or None if the key does not exist.'''
         return self.config_dict.get(config_key, default_value)
+
 
     def __setitem__(self, key: str, value: Any) -> None:
         '''Set a configuration key with a value'''

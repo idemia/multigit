@@ -103,6 +103,15 @@ MSG_GIT_EXEC_ALL_OK = 'Successful execution of %d git %s'
 MSG_GIT_EXEC_1_OK = 'Successful execution of git %s'
 MSG_GIT_SOME_FAILED = 'Failed execution of git %s, %d errors out of %d'
 
+MSG_TOOLTIP_UPDATE = 'git information refresh in progress'
+MSG_TOOLTIP_STATUS = 'Display whether files are modified'
+MSG_TOOLTIP_REMOTE_SYNCHRO = 'Delta vs origin'
+
+
+
+############################################
+#   Double click actions
+############################################
 
 ### All possible double-click actions
 DBC_GITCOMMIT          = 'Git Commit'

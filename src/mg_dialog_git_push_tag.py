@@ -54,7 +54,7 @@ class MgDialogGitPushTag(MgDialogWithRepoList):
 
 
     def isPushAllTags(self) -> bool:
-        return self.ui.comboBoxTagName.currentIndex() == 0
+        return (self.ui.comboBoxTagName.currentIndex() == 0)
 
 
     def getTagName(self) -> str:

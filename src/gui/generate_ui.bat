@@ -6,6 +6,7 @@ pushd %~dp0
 rem Generate ui files only if needed and add type annotations
 py gen_and_patch_ui.py %* ^
 		ui_about.ui ^
+		ui_dialog_quit.ui ^
 		ui_about_license.ui ^
 		ui_main_window.ui ^
 		ui_multigit_widget.ui ^

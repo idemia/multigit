@@ -16,7 +16,10 @@
 
 
 import logging
-from typing import TYPE_CHECKING, cast, Type, Union, Optional, List, Protocol
+from typing import TYPE_CHECKING, cast, Type, Union, Optional, List
+
+if TYPE_CHECKING:
+    from typing_extensions import Protocol
 
 from PySide6.QtWidgets import QMessageBox, QDialog, QTreeWidget, QAbstractItemView, QPushButton, QLabel, QWidget
 from PySide6.QtCore import Qt, Signal
@@ -165,3 +168,5 @@ class MgDialogWithRepoList(QDialog):
             return
 
         super().accept()
+
+
