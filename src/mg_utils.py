@@ -15,8 +15,8 @@
 #
 
 
-from typing import cast, Match, Any, Iterable, Sequence, Union, List, Iterator
-import html, os, pathlib, re, shutil, stat, logging
+from typing import cast, Match, Any, Iterable, Sequence, Union, List, Iterator, Optional
+import html, os, pathlib, re, shutil, stat, logging, time, subprocess
 
 from PySide6.QtWidgets import QTreeWidget, QTreeWidgetItem
 
@@ -25,6 +25,7 @@ from src.mg_const import MSG_BIG_DIFF, GIT_AUTH_FAILURE_MARKER
 logger = logging.getLogger('mg_utils')
 dbg = logger.debug
 warn = logger.warning
+error = logger.error
 
 HTML_HEADER='''<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd">
 <html><head><meta name="qrichtext" content="1" /><style type="text/css">
@@ -201,8 +202,43 @@ def set_username_on_git_url(username: str, url: str) -> str:
     return url[:server_start] + server + url[server_end:]
 
 
+def tryHardDeletingDirList(dirIter: Iterable[str]) -> str:
+    '''Delete a list of directory, trying hard:
+
+    * kill tgitcache before starting
+    * when deleting a directory fails, try agin after forcing all readonly files to r/w
+    * when deleting fails, try again 2 more times with 0.5s delay
+
+    Returns an error message when something goes wrong, an empty string when everything is empty
+    '''
+    # kill tgitcache before anything. If it was running, it would prevent deletion of directories
+    subprocess.call(['taskkill', '/t', '/f', '/im', 'tgitcache.exe'])
+
+    dirList = list(dirIter)
+
+    # delete subdirs before deleting main dir
+    dirList.sort(reverse=True)
+
+    deleteDirList(dirList)
+
+    stillExists = [v for v in dirList if os.path.exists(v)]
+    if len(stillExists):
+        # let's try a second time with some delay
+        time.sleep(0.5)
+        deleteDirList(stillExists)
+
+    results = ''
+    stillExists = [v for v in dirList if os.path.exists(v)]
+    if len(stillExists):
+        # let's try a third time with more delay
+        time.sleep(0.5)
+        results = deleteDirList(stillExists)
+
+    return results
+
+
 def deleteDirList(dirList: Iterable[str], ignoreDirDoesNotExist: bool = True) -> str:
-    '''Try hard to delete directories listed in input.
+    '''Delete directories listed in input.
 
     Returns:
         * empty string when everything goes fine.
@@ -226,7 +262,7 @@ def deleteDirList(dirList: Iterable[str], ignoreDirDoesNotExist: bool = True) ->
 
 
 def deleteDir(folder: str) -> str:
-    '''Try hard to delete the input directory.
+    '''Delete the input directory with two attempts.
 
     When files in the directory are read-only, the initial deletion will fail but this
     function will retry after setting the files as writeable.
@@ -350,6 +386,27 @@ def treeWidgetDeepIterator(treeWidget: QTreeWidget) -> Iterator[QTreeWidgetItem]
         assert topItem
         yield topItem
         yield from yieldChild(topItem)
+
+
+
+INDENT_TEXT = ' ' * 4
+def collectColumnText(depth: int, item: QTreeWidgetItem, emptyColumnLookForNextCol: bool = False) -> List[str]:
+    '''Collect text of item and all child, with an indentation. Should be called with an initial depth of 0'''
+    idx = 0
+    coltext = item.text(idx).strip()
+
+    # when text is empty, search it on the next column
+    if emptyColumnLookForNextCol:
+        while idx+1 < item.columnCount() and coltext == '':
+            idx += 1
+            coltext = item.text(idx).strip()
+
+    result = [ INDENT_TEXT * depth + line for line in coltext.split('\n') ]
+    for itemChildIdx in range(item.childCount()):
+        result.extend( collectColumnText(depth + 1, item.child(itemChildIdx), emptyColumnLookForNextCol ) )
+    return result
+
+
 def ignoreCppObjectDeletedError(method: Any) -> Any:
     '''Avoids triggering RuntimeError when accessing a method of a QTreeWigetItem
 

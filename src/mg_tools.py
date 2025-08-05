@@ -17,7 +17,7 @@
 
 from typing import Sequence, Union, Optional, Callable, Tuple, Any, List, Dict, Type
 
-import functools, logging, subprocess, sys, os
+import logging, subprocess, sys, os
 from pathlib import Path
 
 from PySide6.QtCore import QObject, QProcess, Signal

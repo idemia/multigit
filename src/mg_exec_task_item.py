@@ -15,20 +15,21 @@
 #
 
 
-from typing import List, Callable, Any, Optional, ClassVar, cast
+from typing import List, Callable, Any, Optional, ClassVar, cast, Union
 
 import functools
 import logging
 import enum
 import pathlib
+import shutil
 
-from PySide6.QtCore import Signal, QObject, Qt
+from PySide6.QtCore import Signal, QObject, Qt, QThread
 from PySide6.QtGui import QIcon, QPixmap, QFont
 from PySide6.QtWidgets import QWidget, QPushButton, QLabel, QHBoxLayout, QVBoxLayout, QTreeWidgetItem, QApplication
 
 from src.mg_tools import RunProcess, ExecGit
 from src.mg_repo_info import MgRepoInfo
-from src.mg_utils import handle_cr_in_text
+from src.mg_utils import handle_cr_in_text, ignoreCppObjectDeletedError, tryHardDeletingDirList
 
 logger = logging.getLogger('mg_exec_task')
 dbg = logger.debug
@@ -54,6 +55,46 @@ class TaskState(enum.Enum):
 PreConditionFunc = Callable[[], PreConditionState]
 
 
+class IconSet(enum.Enum):
+    Empty = enum.auto()
+    InProgress = enum.auto()
+    Aborted = enum.auto()
+    Success = enum.auto()
+    UserOk = enum.auto()
+    Failed = enum.auto()
+    Question = enum.auto()
+    Retry = enum.auto()
+    Warning = enum.auto()
+    Comment = enum.auto()
+
+
+ICON_FNAME_DICT = {
+    IconSet.InProgress   : ':img/icons8-loader-96.png',
+    IconSet.Aborted      : ':img/icons8-stop-sign-96.png',
+    IconSet.Failed       : ':img/icons8-cancel-96.png',
+    IconSet.Success      : ':img/icons8-checked-96.png',
+    IconSet.Warning      : ':img/icons8-general-warning-sign-96.png',
+    IconSet.Question     : ':img/icons8-question-mark-96.png',
+    IconSet.UserOk       : ':img/icons8-checkmark-96.png',
+    IconSet.Retry        : ':img/icons8-reset-96.png',
+    IconSet.Comment      : ':img/icons8-buble-conversation-96.png',
+}
+
+
+@functools.lru_cache(maxsize=None)
+def getIcon(icon: IconSet) -> QIcon:
+    '''Return an icon corresponding to string provided. Caches the result so that QIcon() is called
+    only once per icon to generate.
+    '''
+    if icon == IconSet.Empty:
+        emptyPixmap = QPixmap(16, 16)
+        emptyPixmap.fill(Qt.GlobalColor.transparent)
+        return QIcon(emptyPixmap)
+
+    return QIcon(ICON_FNAME_DICT[icon])
+
+
+
 class MgExecTask(QObject):
     '''Generic task class, inherited by specialized task class
 
@@ -62,16 +103,17 @@ class MgExecTask(QObject):
     - call task_done() when the execution is finished.
     '''
 
-    sig_task_done: ClassVar[Signal] = Signal(bool, str)
+    sig_task_done: ClassVar[Signal] = Signal(bool, str, IconSet)
     sig_partial_output: ClassVar[Signal] = Signal(str)
 
-    def __init__(self, desc: str, repo: MgRepoInfo, ignore_failure: bool = False):
+    def __init__(self, desc: str, repo: MgRepoInfo, ignore_failure: bool = False, icon_success_hint: IconSet = IconSet.Success):
         super().__init__()
         self.desc = desc
         self.repo = repo
         self.task_state = TaskState.NotStarted
         self.cmd_line = ''
         self.ignore_failure = ignore_failure
+        self.icon_success_hint = icon_success_hint
 
 
     def __str__(self) -> str:
@@ -113,7 +155,10 @@ class MgExecTask(QObject):
 
 
     def _do_run(self) -> None:
-        '''Called to start the task. To be reimplemented'''
+        '''Called to start the task. To be reimplemented.
+
+        The call should not be blocking: please use threads or processes for that
+        '''
         raise NotImplementedError('Not implemented!')
 
 
@@ -124,7 +169,7 @@ class MgExecTask(QObject):
         if not success and self.ignore_failure:
             dbg('MgExecTask.task_done() - ignoring failure requested, so reporting success')
             success = True
-        self.sig_task_done.emit(success, output)
+        self.sig_task_done.emit(success, output, self.icon_success_hint)
 
 
     def abort(self) -> None:
@@ -171,6 +216,195 @@ class MgExecTaskCollectRemoteUrl(MgExecTask):
         else:
             self.task_done(False, 'Fail to collect url')
 
+
+class ThreadRunningPythonCode(QThread):
+    '''A convenient class for running python code
+
+    Please fill self.output and self.success to express the status of the finished task
+    '''
+
+    def __init__(self, desc: str, func: Callable[..., Any]) -> None:
+        '''
+        Prepare the calling function for the thread.
+
+        `func` is the called with the instance of ThreadRunningPythonCode + the other arguments
+
+        The output of the function execution should be added with add_output() and the final
+        result if failing should be set explicitely with the attribute success . By default
+        success is True.
+
+            Exmaple:
+
+                def myfunc(thread) -> None:
+                    ...
+                    thread.add_output('Some output from exeucing the code')
+                    if error:
+                        thread.success = False
+
+
+        '''
+        super().__init__()
+        self.desc = desc
+        self.func = func
+        self.output_lines: List[str] = []
+        self.success = True
+
+
+    def run(self) -> None:
+        dbg(f'ThreadRunningPythonCode.run() - {self.desc}')
+        self.func(self)
+
+
+    def add_output(self, msg: str) -> None:
+        '''Fill output with one more line. The line must contain the endline'''
+        self.output_lines.append(msg)
+
+
+    def get_output(self) -> str:
+        return ''.join(self.output_lines)
+
+
+
+class MgTaskExecPythonCode(MgExecTask):
+    def __init__(self, desc: str, repo: MgRepoInfo, func: Callable[..., Any]) -> None:
+        MgExecTask.__init__(self, desc, repo, ignore_failure=True)
+        self.runner = ThreadRunningPythonCode(desc, func)
+        self.runner.finished.connect(self.thread_task_done)
+
+
+    def _do_run(self) -> None:
+        '''Start the thread with the python funtion to execute'''
+        dbg(f'MgTaskExecPythonCode._do_run() - {self.desc}')
+        self.runner.start()
+
+
+    def thread_task_done(self) -> None:
+        '''Slot called when the thread is finished running'''
+        dbg(f'MgTaskExecPythonCode.thread_task_done() - {self.desc}')
+        self.task_done(self.runner.success, self.runner.get_output())
+
+
+class MgTaskDelDirectory(MgTaskExecPythonCode):
+    '''Task for deleting a directory'''
+
+    def __init__(self,
+                 desc: str,
+                 repo: MgRepoInfo,
+                 dir_path: Union[str, pathlib.Path],
+                 ) -> None:
+        super().__init__(desc, repo, self.delDirectory)
+        self.dir_path = pathlib.Path(dir_path)
+        self.dir_path.resolve()
+        self.cmd_line = f'Deleting {self.dir_path}'
+
+
+    def delDirectory(self, thread: ThreadRunningPythonCode) -> None:
+        '''Called from within the thread'''
+        dbg(f'Deleting directory files from {self.dir_path}')
+        result = tryHardDeletingDirList([str(self.dir_path)])
+        if len(result):
+            if result[-1] != '\n':
+                result += '\n'
+            thread.add_output(result)
+            thread.success = False
+
+
+
+class MgTaskMoveDirectory(MgExecTask):
+    '''Task for moving a directory'''
+
+    def __init__(self,
+                 desc: str,
+                 repo: MgRepoInfo,
+                 src_path: Union[str, pathlib.Path],
+                 dest_path: Union[str, pathlib.Path],
+                 skip_git_admin_dir: bool = True
+                 ) -> None:
+        '''Move a directory to another location
+
+        if skip_git_admind_dir is True (default), the `.git` directory will be ignored
+        '''
+        super().__init__(desc, repo)
+        self.src_path = pathlib.Path(src_path)
+        self.src_path.resolve()
+        self.dest_path = pathlib.Path(dest_path)
+        self.dest_path.resolve()
+        self.skip_git_admin_dir = skip_git_admin_dir
+        self.cmd = ['robocopy', '/move', '/s', '/e', str(self.src_path), str(self.dest_path)]
+        if self.skip_git_admin_dir:
+            self.cmd.extend(['/xd', '.git'])
+        self.cmd_line = ' '.join(self.cmd)
+        self.run_process: Optional[RunProcess] = None
+
+
+    def _do_run(self) -> None:
+        dbg('MgExecTaskMoveDirectory._do_run() - %s' % self.cmd)
+
+        self.run_process = RunProcess()
+        self.run_process.sigProcessOutput.connect(self.sig_partial_output)
+        # We allow error in git because we have our own way of handling it
+        self.run_process.exec_async(self.cmd,
+                                    self.move_task_done,
+                                    allow_errors=True,  # to avoid dialog
+                                    emit_output=True)
+
+
+    def move_task_done(self, exit_code: int, stdout: str) -> None:
+        dbg(f'MgExecTaskMoveDirectory.move_task_done(exit_code={exit_code}) - "{self}"')
+
+        # for exit code analysis, see https://learn.microsoft.com/en-us/windows-server/administration/windows-commands/robocopy
+        success = True
+        if exit_code >= 8:
+            if len(stdout) != 0:
+                stdout += '\n'
+            stdout += 'Robocopy did not complete successfully.'
+            if self.ignore_failure:
+                stdout += '\nIgnoring failure'
+            else:
+                success = False
+
+        self.run_process = None
+        self.task_done(success, stdout)
+
+
+    def _do_abort(self) -> None:
+        '''Abort the current task and call self.task_done() appropriately'''
+        assert self.task_state == TaskState.Started
+        if self.run_process is not None:
+            # process was indeed started
+            # kill the process in progress, this will call slotGitDone()
+            self.run_process.abortProcessInProgress()
+            self.run_process = None
+        else:
+            warning('MgExecTaskMoveDirectory._do_abort() with self.run_process == None, should not happen!')
+            self.task_done(False, '')
+
+
+class MgTaskComment(MgExecTask):
+    '''Display a comment'''
+
+    def __init__(self,
+                 comment: str,
+                 repo: MgRepoInfo,
+                 more_comment: str = '',
+                 ) -> None:
+        '''Display a comment
+        '''
+        super().__init__(comment, repo)
+        self.more_comment = more_comment
+        self.run_process: Optional[RunProcess] = None
+        self.icon_success_hint = IconSet.Comment
+
+
+    def _do_run(self) -> None:
+        dbg('MgExecTaskComment._do_run() - %s' % self.desc)
+        self.task_done(True, self.more_comment)
+
+
+    def _do_abort(self) -> None:
+        '''Abort the current task and call self.task_done() appropriately'''
+        assert self.task_state == TaskState.Started
+        self.task_done(True, self.more_comment)
 
 
 
@@ -272,10 +506,17 @@ class MgExecTaskGroup:
 
 
     def appendTask(self, task: MgExecTask) -> None:
+        '''Append one task to the list of task for this group'''
         self.tasks.append(task)
 
 
+    def appendTasks(self, taskList: List[MgExecTask]) -> None:
+        '''Append multiple tasks to the list of task for this group'''
+        self.tasks.extend(taskList)
+
+
     def appendGitTask(self, desc: str, git_args: List[str], run_inside_git_repo: bool = True) -> None:
+        '''Shortcut for adding a git task'''
         git_task = MgExecTaskGit(desc, self.repo, git_args, run_inside_git_repo=run_inside_git_repo)
         self.tasks.append(git_task)
 
@@ -386,43 +627,6 @@ def after_other_taskgroup_is_started_and_dir_exists(task_group: MgExecTaskGroup)
     return is_taskgroup_started_and_dir_exists
 
 
-class IconSet(enum.Enum):
-    Empty = enum.auto()
-    InProgress = enum.auto()
-    Aborted = enum.auto()
-    Success = enum.auto()
-    UserOk = enum.auto()
-    Failed = enum.auto()
-    Question = enum.auto()
-    Retry = enum.auto()
-    Warning = enum.auto()
-
-
-ICON_FNAME_DICT = {
-    IconSet.InProgress   : ':img/icons8-loader-96.png',
-    IconSet.Aborted      : ':img/icons8-stop-sign-96.png',
-    IconSet.Failed       : ':img/icons8-cancel-96.png',
-    IconSet.Success      : ':img/icons8-checked-96.png',
-    IconSet.Warning      : ':img/icons8-general-warning-sign-96.png',
-    IconSet.Question     : ':img/icons8-question-mark-96.png',
-    IconSet.UserOk       : ':img/icons8-checkmark-96.png',
-    IconSet.Retry        : ':img/icons8-reset-96.png',
-}
-
-
-@functools.lru_cache(maxsize=None)
-def getIcon(icon: IconSet) -> QIcon:
-    '''Return an icon corresponding to string provided. Caches the result so that QIcon() is called
-    only once per icon to generate.
-    '''
-    if icon == IconSet.Empty:
-        emptyPixmap = QPixmap(16, 16)
-        emptyPixmap.fill(Qt.GlobalColor.transparent)
-        return QIcon(emptyPixmap)
-
-    return QIcon(ICON_FNAME_DICT[icon])
-
-
 class UserActionOnGitError(enum.IntFlag):
     NOTHING     = 0x00
     ABORT       = 0x01
@@ -437,6 +641,7 @@ class MgExecItemBase(QTreeWidgetItem):
     def __init__(self, desc: str, cbExecDone: Callable[[bool], Any]) -> None:
         super().__init__()
         self.cbExecDone = cbExecDone
+        self.ignoreUpdates = False
         self.setText(0, desc)
         self.fixedFont = QFont("Consolas")
         self.refresh_when_completed = True
@@ -447,15 +652,11 @@ class MgExecItemBase(QTreeWidgetItem):
     def abortItem(self) -> None:
         raise NotImplementedError()
 
+    @ignoreCppObjectDeletedError
     def autoAdjustColumnSize(self) -> None:
         '''Adjust automatically the column size to the largest item'''
-        try:
             for i in range(self.treeWidget().columnCount()):
                 self.treeWidget().resizeColumnToContents(i)
-        except RuntimeError:
-            # happens when accessing a deleted C++ object, for example when the dialog has been closed before
-            # all processes complete. Just ignore it
-            pass
         QApplication.processEvents()
 
 
@@ -474,10 +675,10 @@ class MgExecItemOneCmd(MgExecItemBase):
         self.task.sig_partial_output.connect(self.slotProgressiveOutput)
         self.setIcon(0, getIcon(IconSet.Empty))
         self.gitContentItem: Optional[QTreeWidgetItem] = None
-        self.gitContentNbLines = 0
         self.abortRequested = False
 
 
+    @ignoreCppObjectDeletedError
     def run(self) -> None:
         dbg(f'MgExecItemOneCmd.run() - {self}')
         # setting icon must be done before calling run(), because run() may actually complete
@@ -487,55 +688,71 @@ class MgExecItemOneCmd(MgExecItemBase):
         self.setContentItem('')
 
 
-    def setContentItem(self, output: str) -> None:
-        '''Set the content of git output by splitting it into chunks of 10 lines,
-        one chunk per QTreeWidgetItem. This gets around Qt limitation where it is
+    @ignoreCppObjectDeletedError
+    def setContentItem(self, task_output: str) -> None:
+        '''Set the content of a task output
+
+        Each line of the output creates a new QTreeWidgetItem showing this line only
+        (because Qt5 scroll behavior is atrocious else).
+
+        This gets around Qt limitation where it is
         impossible to show on screen an item with more lines than the screen height
-        can show.'''
-        strCmdline = '> %s\n' % self.task.cmd_line
-        output = strCmdline + output
+        can show
+
+        This method may be called multiple times, always with the full output. It will update
+        the existing items of the previous lines have changed, remove extra line if the content
+        has diminished, add items for new lines being added.
+        '''
+        output = ''
+        if self.task.cmd_line:
+            output += f"> {self.task.cmd_line}\n"
+        output += task_output
         output = handle_cr_in_text(output)
         out_lines = output.split('\n')
-        # put idx on a multiple of MAX_LINES_PER_ITEM
-        out_idx = self.gitContentNbLines - (self.gitContentNbLines % MAX_LINES_PER_ITEM)
-        itemFull = False
+
+        # strip out empty lines at the end
+        while out_lines and out_lines[-1] == '':
+            del out_lines[-1]
+
+        out_idx = 0
+
+        # update the existing items
+        for child_idx in range(self.childCount()):
+            # do we have a text for this child ? If not, get out
+            if out_idx >= len(out_lines):
+                break
+
+            child = self.child(child_idx)
+            if child.text(0) != out_lines[out_idx]:
+                child.setText(0, out_lines[out_idx])
+            out_idx += 1
+
+        # if we have less lines of text than during the previous update, remove the extra
+        while out_idx > self.childCount():
+            self.takeChild( self.childCount()-1 )
+            self.gitContentItem = self.child(self.childCount()-1)
+
+        # fill content with new items
         while out_idx < len(out_lines):
-            if itemFull or self.gitContentItem is None:
                 self.gitContentItem = QTreeWidgetItem()
                 self.gitContentItem.setFont(0, self.fixedFont)
                 self.gitContentItem.setIcon(0, getIcon(IconSet.Empty))
                 self.addChild(self.gitContentItem)
-            itemTextNbLines = min(len(out_lines) - out_idx, MAX_LINES_PER_ITEM)
-            itemText = '\n'.join( out_lines[out_idx:out_idx+itemTextNbLines] )
-            self.gitContentItem.setText(0, itemText)
-            out_idx += itemTextNbLines
-            itemFull = True
-
-        self.gitContentNbLines = out_idx
+            self.gitContentItem.setText(0, out_lines[out_idx])
+            out_idx += 1
 
 
+    @ignoreCppObjectDeletedError
     def slotProgressiveOutput(self, output: str) -> None:
         item = self.gitContentItem
-        try:
             while item:
                 item = item.parent()
             self.setContentItem(output)
-        except RuntimeError:
-            # happens when the C++ object has been deleted, just ignore it
-            warning('slotProgressiveOutput() - C++ object deleted event')
 
 
-    def slotTaskDone(self, success: bool, task_stdout: str) -> None:
-        # note that this slot may be called by the async git command after the dialog has
-        # been closed. In this case, this creates a RuntimeError: wrapped C/C++ object of type MgExecItemOneCmd has been deleted
-        # we use a try/except to cover for this case
+    @ignoreCppObjectDeletedError
+    def slotTaskDone(self, success: bool, task_stdout: str, icon_success_hint: IconSet) -> None:
         dbg(f'MgExecItemOneCmd.slotTaskDone(success={success}) - {str(self.task)}')
-        try:
-            # just to trigger access to C++ object
-            self.setExpanded(self.isExpanded())
-        except RuntimeError:
-            warning('slotTaskDone() - C++ object deleted event')
-            return
 
         if self.abortRequested:
             self.setIcon(0, getIcon(IconSet.Aborted))
@@ -543,7 +760,7 @@ class MgExecItemOneCmd(MgExecItemBase):
             if not success:
                 task_stdout += '\nAborted!'
         elif success:
-            self.setIcon(0, getIcon(IconSet.Success))
+            self.setIcon(0, getIcon(icon_success_hint))
         else:
             self.setIcon(0, getIcon(IconSet.Failed))
             self.setExpanded(True)
@@ -583,6 +800,22 @@ class MgExecItemOneCmd(MgExecItemBase):
     def isTaskStarted(self) -> bool:
         '''Return True if the underlying task was started'''
         return self.task.is_task_started()
+
+
+    def clearRepoConnections(self) -> None:
+        self.ignoreUpdates = True
+        try:
+            self.task.sig_task_done.disconnect(self.slotTaskDone)
+        except RuntimeError:
+            # happens sometimes
+            pass
+
+        try:
+            self.task.sig_partial_output.disconnect(self.slotProgressiveOutput)
+        except RuntimeError:
+            # happens sometimes
+            pass
+
 
 
 class MgButtonBarErrorHandling(QWidget):
@@ -674,6 +907,7 @@ class MgExecItemMultiCmd(MgExecItemBase):
         return self.nbCmdDone == len(self.taskGroup) or self.abortRequested
 
 
+    @ignoreCppObjectDeletedError
     def run(self) -> None:
         dbg(f'MgExecItemMultiCmd.run() - {self}')
         self.isStarted = True
@@ -702,7 +936,6 @@ class MgExecItemMultiCmd(MgExecItemBase):
         assert not self.isDone, "nbCmdDone=%d, len(tasks)=%d" % (self.nbCmdDone, len(self.taskGroup))  # more tasks to run
         self.taskIdx += 1
         task = self.taskGroup.tasks[self.taskIdx]
-        # disconnect any previous connection, needed when retrying a task
         jobitem = MgExecItemOneCmd(task, self.slotOneCmdDone)
         jobitem.refresh_when_completed = False
         self.addChild(jobitem)
@@ -719,12 +952,18 @@ class MgExecItemMultiCmd(MgExecItemBase):
 
         try:
             # just to trigger access to C++ object
-            self.setExpanded(self.isExpanded())
+            self.text(0)
         except RuntimeError:
             # dialog has been closed, we no longer care to update it
             warning('slotOneCmdDone() - C++ object deleted event')
+            # no need to update it graphically anymore
+            self.ignoreUpdates = True
+
+        if self.ignoreUpdates:
+            dbg('MgExecitemMultiCmd.slotOneCmdDone() - ignore updates and aborting early')
             self.taskGroup.repo.refresh()
             return
+
 
         if not success and not self.abortRequested:
             # last command fail, show it in the icon, ask a question
@@ -873,3 +1112,13 @@ class MgExecItemMultiCmd(MgExecItemBase):
 
         # self.allCmdDone() will be called indirectly when the running finished, successfully or with error
         raise ValueError('Should not be reached!')
+
+
+    def clearRepoConnections(self) -> None:
+        self.ignoreUpdates = True
+        for childIdx in range(self.childCount()):
+            child = self.child(childIdx)
+            if child.type() != QTREE_WIDGET_ITEM_BUTTONBAR_TYPE:
+                cast(MgExecItemOneCmd, child).clearRepoConnections()
+
+
