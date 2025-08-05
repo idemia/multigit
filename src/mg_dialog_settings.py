@@ -90,6 +90,8 @@ class MgDialogSettings(QDialog):
 
         self.ui.checkBoxFetchOnStartup.setChecked(bool(config[mgc.CONFIG_FETCH_ON_STARTUP]))
 
+        confirmBeforeQuit = config[mgc.CONFIG_CONFIRM_BEFORE_QUIT]
+        self.ui.checkBoxConfirmWhenQuitting.setChecked( (confirmBeforeQuit is None) or confirmBeforeQuit)
 
         ### Second tab stuff
         git_auto_detect = (True if config[mgc.CONFIG_GIT_AUTODETECT] is None
@@ -382,6 +384,7 @@ def runDialogEditSettings(parent: QWidget, tabPage: Union[Literal[0], Literal[1]
     config[mgc.CONFIG_NB_GIT_PROC] = (0 if dlg.ui.radioButtonGitProcUnlimited.isChecked()
                                                 else dlg.ui.spinBoxLimitValue.value())
     config[mgc.CONFIG_FETCH_ON_STARTUP]  = dlg.ui.checkBoxFetchOnStartup.isChecked()
+    config[mgc.CONFIG_CONFIRM_BEFORE_QUIT] = dlg.ui.checkBoxConfirmWhenQuitting.isChecked()
 
     ### Second tab stuff
     config[mgc.CONFIG_GIT_AUTODETECT] = dlg.ui.radioGitAutoDetect.isChecked()

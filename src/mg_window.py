@@ -257,6 +257,22 @@ class MgMainWindow(QMainWindow, Ui_MainWindow):
 
     def closeEvent(self, event: QCloseEvent) -> None:
         dbg('closeEvent()')
+
+        confirmBeforeQuit = self.config[mgc.CONFIG_CONFIRM_BEFORE_QUIT]
+        if confirmBeforeQuit in (None, True):
+            dlg = QDialog(self)
+            ui = Ui_quitConfirmDialog()
+            ui.setupUi(dlg)
+            result = dlg.exec_()
+            if result != QDialog.DialogCode.Accepted:
+                # we refuse the event
+                event.ignore()
+                return
+            self.config[mgc.CONFIG_CONFIRM_BEFORE_QUIT] = ui.checkBoxConfirmQuit.isChecked()
+
+        # let it close
+        super().close()
+
         rect = self.geometry()
         self.config[mgc.CONFIG_MAINWINDOW_GEOMETRY] = (rect.x(), rect.y(), rect.width(), rect.height())
 
