@@ -545,24 +545,32 @@ class MgRepoTree(QTreeWidget):
         '''Switch to a branch on all listed repos'''
         dbg('slotGitSwitchBranch()')
         # local import to prevent circular dependencies
-        from src.mg_dialog_git_switch_delete_branch import runDialogGitSwitchDelete, DeleteOrSwitch
-        runDialogGitSwitchDelete(self, DeleteOrSwitch.SWITCH_BRANCH, self.selectedRepos(), self.allRepos())
+        from src.mg_dialog_git_switch_delete_branch import runDialogGitSwitchDelete, DeleteOrSwitchBranchOrTag
+        runDialogGitSwitchDelete(self, DeleteOrSwitchBranchOrTag.SWITCH_BRANCH, self.selectedRepos(), self.allRepos())
 
 
     def slotGitCheckoutTag(self) -> None:
         '''Switch to a tag on all listed repos'''
         dbg('slotGitCheckoutTag()')
         # local import to prevent circular dependencies
-        from src.mg_dialog_git_switch_delete_branch import runDialogGitSwitchDelete, DeleteOrSwitch
-        runDialogGitSwitchDelete(self, DeleteOrSwitch.CHECKOUT_TAG, self.selectedRepos(), self.allRepos())
+        from src.mg_dialog_git_switch_delete_branch import runDialogGitSwitchDelete, DeleteOrSwitchBranchOrTag
+        runDialogGitSwitchDelete(self, DeleteOrSwitchBranchOrTag.CHECKOUT_TAG, self.selectedRepos(), self.allRepos())
 
 
     def slotGitDeleteBranch(self) -> None:
         '''Delete branch on all listed repos'''
         dbg('slotGitDeleteBranch()')
         # local import to prevent circular dependencies
-        from src.mg_dialog_git_switch_delete_branch import runDialogGitSwitchDelete, DeleteOrSwitch
-        runDialogGitSwitchDelete(self, DeleteOrSwitch.DELETE, self.selectedRepos(), self.allRepos())
+        from src.mg_dialog_git_switch_delete_branch import runDialogGitSwitchDelete, DeleteOrSwitchBranchOrTag
+        runDialogGitSwitchDelete(self, DeleteOrSwitchBranchOrTag.DELETE_BRANCH, self.selectedRepos(), self.allRepos())
+
+
+    def slotGitDeleteTag(self) -> None:
+        '''Delete branch on all listed repos'''
+        dbg('slotGitDeleteTag()')
+        # local import to prevent circular dependencies
+        from src.mg_dialog_git_switch_delete_branch import runDialogGitSwitchDelete, DeleteOrSwitchBranchOrTag
+        runDialogGitSwitchDelete(self, DeleteOrSwitchBranchOrTag.DELETE_TAG, self.selectedRepos(), self.allRepos())
 
 
     def slotGitBash(self) -> None:
