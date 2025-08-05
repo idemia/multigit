@@ -19,7 +19,7 @@ from typing import List, Tuple
 
 import unittest
 
-from src.mg_dialog_clone_from_mgit import addPreconditionToEnsureCloneOrderLogic, \
+from src.mg_clone_execution import addPreconditionToEnsureCloneOrderLogic, \
     build_taskgroup_dep_graph, addPreconditionsToTaskGroup
 from src.mg_exec_task_item import MgExecTaskGroup
 from src.mg_repo_info import MgRepoInfo

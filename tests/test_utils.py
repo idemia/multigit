@@ -92,6 +92,67 @@ class TestUtilityFunctions(unittest.TestCase):
         self.assertEqual( set_username_on_git_url('', "ssh://some.server.com:29418/some/path/to/repo.git"),
              "ssh://some.server.com:29418/some/path/to/repo.git")
 
+
+    def test_strip_protocol_from_git_url(self):
+
+        test_data = [
+            ("ssh://fremy@some.server.com:29418/some/path/to/repo.git",
+             "some.server.com:29418/some/path/to/repo.git"),
+            ("ssh://some.server.com:29418/some/path/to/repo.git",
+             "some.server.com:29418/some/path/to/repo.git"),
+            ("https://fremy@some.server.com:29418/some/path/to/repo.git",
+             "some.server.com:29418/some/path/to/repo.git"),
+            ("https://some.server.com:29418/some/path/to/repo.git",
+             "some.server.com:29418/some/path/to/repo.git"),
+            ("http://fremy@some.server.com:29418/some/path/to/repo.git",
+             "some.server.com:29418/some/path/to/repo.git"),
+            ("http://some.server.com:29418/some/path/to/repo.git",
+             "some.server.com:29418/some/path/to/repo.git"),
+            (r"c:\cloned\from\filesystem",
+             r"c:\cloned\from\filesystem",),
+            (r"c:\cloned\from\filesystem",
+             r"c:\cloned\from\filesystem",),
+            ("file://fremy@C:/work/Multigit/Sandbox/",
+             "C:/work/Multigit/Sandbox/"),
+            ("file://C:/work/Multigit/Sandbox/",
+             "C:/work/Multigit/Sandbox/"),
+            (None,''),
+            ('', ''),
+        ]
+
+        for before, after in test_data:
+            with self.subTest(before) as _:
+                self.assertEqual( strip_protocol_from_url(before), after)
+
+
+    def test_anonymise_git_url(self):
+
+        test_data = [
+            ("ssh://fremy@some.server.com:29418/some/path/to/repo.git",
+             "ssh://username@some.server.com:29418/some/path/to/repo.git"),
+            ("ssh://some.server.com:29418/some/path/to/repo.git",
+             "ssh://username@some.server.com:29418/some/path/to/repo.git"),
+            ("https://fremy@some.server.com:29418/some/path/to/repo.git",
+             "https://some.server.com:29418/some/path/to/repo.git"),
+            ("https://some.server.com:29418/some/path/to/repo.git",
+             "https://some.server.com:29418/some/path/to/repo.git"),
+            ("http://fremy@some.server.com:29418/some/path/to/repo.git",
+             "http://some.server.com:29418/some/path/to/repo.git"),
+            ("http://some.server.com:29418/some/path/to/repo.git",
+             "http://some.server.com:29418/some/path/to/repo.git"),
+            (r"c:\cloned\from\filesystem",
+             r"c:\cloned\from\filesystem",),
+            (r"c:\cloned\from\filesystem",
+             r"c:\cloned\from\filesystem",),
+            ("file://C:/work/Multigit/Sandbox/",
+             "file://C:/work/Multigit/Sandbox/"),
+        ]
+
+        for before, after in test_data:
+            with self.subTest(before) as _:
+                self.assertEqual( anonymise_git_url(before), after)
+
+
     def test_handle_cr_in_text(self):
         self.assertEqual( handle_cr_in_text('abc\n'),               'abc\n')
         self.assertEqual( handle_cr_in_text('abc\ndef\r'),          'abc\ndef')

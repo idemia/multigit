@@ -126,6 +126,10 @@ def handle_cr_in_text(s: str) -> str:
 
 
 def anonymise_git_url(url: str) -> str:
+    '''Remove current username from url:
+    - for https, simply remove the username
+    - for ssh, an actual username is mandatory. So just change whatever the current user is to "username"'''
+    
     # clear username from url
     if not url:
         return url
@@ -148,6 +152,18 @@ def anonymise_git_url(url: str) -> str:
 
 
 reWinPath = re.compile('^[a-zA-Z]:\\.*')
+def strip_protocol_from_url(url: Optional[str]) -> str:
+    '''Remove the https:// and ssh:// part of the url'''
+    if url is None:
+        return ''
+    if '://' in url:
+        url = url[url.find('://')+3:]
+    if '@' in url:
+        url = url[url.find('@')+1:]
+    return url
+
+reWinPath = re.compile('^[a-zA-Z]:\\.*')
+
 
 def set_username_on_git_url(username: str, url: str) -> str:
     '''Take a git url and add or substitute the username part. Returns the new url.

@@ -29,10 +29,11 @@ from src.mg_json_mgit_parser import ProjectStructure
 import src.mg_config as mgc
 from src.mg_exec_window import MgExecWindow
 from src.mg_repo_info import MgRepoInfo
-from src.mg_utils import deleteDirList, set_username_on_git_url
+from src.mg_utils import set_username_on_git_url, tryHardDeletingDirList
 from src.mg_dialog_utils import reBranchTagValues
-from src.mg_exec_task_item import MgExecTaskGroup
-from src.mg_dialog_clone_from_mgit import addPreconditionToEnsureCloneOrderLogic
+from src.mg_exec_task_item import MgExecTaskGroup, MgTaskDelDirectory, MgTaskComment, MgExecTaskGit
+from src.mg_clone_execution import addPreconditionToEnsureCloneOrderLogic
+from idemia.mg_const_idemia import MSG_AUTO_STASH
 
 logger = logging.getLogger('mg_dialog_adjust_project_from_mgit')
 dbg = logger.debug
@@ -79,10 +80,13 @@ class MgDialogApplyMgitFile(QDialog):
         self.ui.historyButtonUsername.fillHistory(mgc.get_config_instance().lruAsList(mgc.CONFIG_CLONE_USERNAME))
         self.ui.lineEditUsername.setText(mgc.get_config_instance().lruGetFirst(mgc.CONFIG_CLONE_USERNAME) or '')
 
+        self.ui.checkBoxAutoStash.setToolTip(MSG_AUTO_STASH)
 
         self.currentRepos = currentRepos
+        self.currentReposByName = { repo.name : repo for repo in currentRepos }
         self.proj = ProjectStructure()
         self.reposToClone: List[str] = []
+        self.reposToDelete: List[str] = []
 
         # set last values
         self.ui.historyButtonMgitFile.fillHistory(mgc.get_config_instance().lruAsList(mgc.CONFIG_LAST_MGIT_FILE))
@@ -251,8 +255,7 @@ class MgDialogApplyMgitFile(QDialog):
         repoPathToCreateDirExists = set(repo.dest_fullpath for repo in self.proj.repos
                                             if repo.destination in repoNameToCreate and os.path.exists(repo.dest_fullpath))
         repoNameToRemove = currentRepoSet - targetRepoSet
-        repoPathToRemove = [repo.fullpath for repo in self.currentRepos if repo.name in repoNameToRemove]
-
+        self.reposToDelete = list(sorted(repoNameToRemove))
 
         if len(repoNameToCreate):
             msg = ''
@@ -288,31 +291,33 @@ class MgDialogApplyMgitFile(QDialog):
             buttonPressed = QMessageBox.warning(self, 'Removing directories', msg, QMessageBox.StandardButton.Ok | QMessageBox.StandardButton.Cancel)
             if buttonPressed != QMessageBox.StandardButton.Ok:
                 return
-            # remove target directory if it already exists to make clone smooth
-            result = deleteDirList(repoPathToCreateDirExists)
-            if len(result):
-                buttonPressed = QMessageBox.warning(self, 'Error during removal of directories',
-                                                    'Error during removal of directories: ' + result,
-                                                    QMessageBox.StandardButton.Abort | QMessageBox.StandardButton.Ok)
-                if buttonPressed != QMessageBox.StandardButton.Ok:
+
+        if len(self.reposToDelete):
+            msg = ''
+            msg += 'The following repositories are not listed in the multigit file. Should we remove them ?\n - '
+            msg += '\n - '.join(self.reposToDelete)
+            msg += '\n'
+
+            msgBox = QMessageBox(self)
+            msgBox.setWindowTitle('Removing repositories ?')
+            msgBox.setText(msg)
+
+            keepReposButton = msgBox.addButton('   Keep repositories   ', QMessageBox.ButtonRole.AcceptRole)
+            delReposButton = msgBox.addButton('   Delete repositories   ', QMessageBox.ButtonRole.AcceptRole)
+            cancelButton = msgBox.addButton(QMessageBox.StandardButton.Cancel)
+            msgBox.setDefaultButton(cancelButton)
+            msgBox.exec()
+            buttonSelected = msgBox.clickedButton()
+
+            if buttonSelected == cancelButton:
+                # user changed its mind ...
                     return
 
-        if len(repoNameToRemove):
-            msg = ''
-            msg += 'The following repositories are not in the multigit file and will be removed:\n - '
-            msg += '\n - '.join(repoNameToRemove)
-            msg += '\n'
-            buttonPressed = QMessageBox.warning(self, 'Removing repositories', msg, QMessageBox.StandardButton.Ok | QMessageBox.StandardButton.Cancel)
-            if buttonPressed != QMessageBox.StandardButton.Ok:
-                return
-            # TODO: create a button "delete" for more clarity, and "skip" for even more clarity
-            result = deleteDirList(repoPathToRemove)
-            if len(result):
-                buttonPressed = QMessageBox.warning(self, 'Error during removal of repositories',
-                                                    'Error during removal of repositories: ' + result,
-                                                    QMessageBox.StandardButton.Abort | QMessageBox.StandardButton.Ok)
-                if buttonPressed != QMessageBox.StandardButton.Ok:
-                    return
+            if buttonSelected == keepReposButton:
+                self.reposToDelete = []
+
+            # if action is to delete them, nothing to do
+
 
         mgc.get_config_instance().lruSetRecent(mgc.CONFIG_CLONE_USERNAME, self.ui.lineEditUsername.text())
         mgc.get_config_instance().lruSetRecent(mgc.CONFIG_LAST_MGIT_FILE, self.ui.lineEditMgitFile.text())
@@ -338,35 +343,60 @@ def runDialogApplyMgitFile(window: 'MgMainWindow', baseDir: str, allRepos: List[
     # user clicked on OK, display the folder in the main window
     # performing project adjustment
 
+    autostash = dialogApplyMgitFile.ui.checkBoxAutoStash.isChecked()
     taskGroups: List[MgExecTaskGroup] = []
     reposToAdjust =  dialogApplyMgitFile.proj.repos[:]
     reposToAdjust.sort(key=lambda r: r.destination)
 
     for repoDictInfo in reposToAdjust:
-        repoInfo = MgRepoInfo(repoDictInfo.destination, repoDictInfo.dest_fullpath, repoDictInfo.destination)
-        if repoDictInfo.destination in dialogApplyMgitFile.reposToClone:
+        repoName = repoDictInfo.destination
+        repoDestPath = repoDictInfo.dest_fullpath
+
+        if repoName in dialogApplyMgitFile.reposToClone:
+            repoInfo = MgRepoInfo(repoName, repoDestPath, repoName)
             if repoDictInfo.url == '':
                 # user has already been warned about this
                 continue
 
             # we must clone these, no checkout them
-            taskGroup = MgExecTaskGroup(f'Cloning and checkouting repository {repoInfo.name}', repoInfo)
-            taskGroup.appendGitTask(f'git clone {repoInfo.name}',
-                                    ['clone', '--progress', repoDictInfo.url, repoDictInfo.dest_fullpath])
+            taskGroup = MgExecTaskGroup(f'Cloning and checkouting repository {repoName}', repoInfo)
+            if pathlib.Path(repoDestPath).exists():
+                taskGroup.tasks.append(
+                    MgTaskDelDirectory(f'Delete directory prior to cloning `{repoDestPath}`', repoInfo, repoDestPath,)
+                    )
+            taskGroup.appendGitTask(f'git clone {repoName}',
+                                    ['clone', '--progress', repoDictInfo.url, repoDestPath])
             taskGroup.appendGitTask(f'git checkout {repoDictInfo.head}',
                                     ['checkout', repoDictInfo.head])
         else:
-            seq_of_git_cmd = [
-                ['fetch', '--prune', '--tags'],
-                ['checkout', repoDictInfo.head],
-            ]
-            taskGroup = MgExecTaskGroup(f'Fetching and checkouting repository {repoInfo.name}', repoInfo)
-            taskGroup.appendGitTask(f'git fetch {repoInfo.name}',
-                                    ['fetch', '--prune', '--tags'])
-            taskGroup.appendGitTask(f'git checkout {repoDictInfo.head}',
-                                    ['checkout', repoDictInfo.head, '--']
-                                    )
+            repoInfo = dialogApplyMgitFile.currentReposByName[ repoName ]
+            taskGroup = MgExecTaskGroup(f'Fetching and checkouting repository {repoName}', repoInfo)
+            taskGroup.appendGitTask(f'git fetch {repoInfo.name}', ['fetch', '--prune', '--tags'])
+            if autostash:
+                if repoInfo.hasModifiedFiles():
+                    taskGroup.appendTask( MgExecTaskGit('', repoInfo, ['stash', 'push', '--']) )
+                else:
+                    taskGroup.appendTask( MgTaskComment('No need to stash, no files modified', repoInfo) )
 
+            taskGroup.appendGitTask(f'git checkout {repoDictInfo.head}', ['checkout', repoDictInfo.head, '--'] )
+
+            if autostash and repoInfo.hasModifiedFiles():
+                taskGroup.appendTask( MgExecTaskGit('', repoInfo, ['stash', 'pop', '--'] ) )
+
+        taskGroups.append( taskGroup )
+
+
+    # removing superfluous directories
+    for repo in allRepos:
+        if repo.name in dialogApplyMgitFile.reposToDelete:
+            if pathlib.Path(repo.fullpath).exists():
+                taskGroup = MgExecTaskGroup(f'Deleting repository no longer present', repo)
+                taskGroup.tasks.append(
+                    MgTaskDelDirectory(f'Deleting repository no longer present',
+                                       repo,
+                                       repo.fullpath,
+                                       )
+                                    )
         taskGroups.append( taskGroup )
 
 
@@ -378,6 +408,3 @@ def runDialogApplyMgitFile(window: 'MgMainWindow', baseDir: str, allRepos: List[
     gitExecWindow.finished.connect(lambda _result: window.actionRefreshAll.trigger())
 
 
-# TODO:
-# use colors just like in main repo display branch/tag/commit
-# use colors just like in main repo display branch/tag/commit
