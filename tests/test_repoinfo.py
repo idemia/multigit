@@ -300,6 +300,7 @@ class TestRepoInfo(unittest.TestCase):
             self.run_clone_test_on_origin_main_2_commits(self.dir1, self.dir3)
 
         self.run_test_on_main_modified_files(self.dir1, sha1)
+        self.run_test_on_main_conflicts_stash(self.dir1, sha1)
 
         # tag the file
         git_exec('tag', 'tag1')
@@ -424,7 +425,7 @@ class TestRepoInfo(unittest.TestCase):
                                        head=MSG_EMPTY_REPO,
                                        branch=MSG_EMPTY_REPO,
                                        fullpath=fp,
-                                       status='1 modified file',
+                                       status='1 modified',
                                        last_commit=MSG_NO_COMMIT,
                                        tags=''
                                        ))
@@ -491,7 +492,7 @@ class TestRepoInfo(unittest.TestCase):
         self.assertEqual(to_named_tuple(ric.refresh()),
                          RepoInfoTuple(name=n, head=f'branch {DEFAULT_BRANCH_NAME}', branch=DEFAULT_BRANCH_NAME,
                                        remote_synchro=MSG_LOCAL_BRANCH, fullpath=fp,
-                                       status='1 modified file'
+                                       status='1 modified'
                                        ))
 
         with open(p / 'file3', 'a') as f:
@@ -501,14 +502,14 @@ class TestRepoInfo(unittest.TestCase):
         self.assertEqual(to_named_tuple(ric.refresh()),
                          RepoInfoTuple(name=n, head=f'branch {DEFAULT_BRANCH_NAME}', branch=DEFAULT_BRANCH_NAME,
                                        remote_synchro=MSG_LOCAL_BRANCH, fullpath=fp,
-                                       status='2 modified files'
+                                       status='2 modified'
                                        ))
 
         (p/'file2').unlink()
         self.assertEqual(to_named_tuple(ric.refresh()),
                          RepoInfoTuple(name=n, head=f'branch {DEFAULT_BRANCH_NAME}', branch=DEFAULT_BRANCH_NAME,
                                        remote_synchro=MSG_LOCAL_BRANCH, fullpath=fp,
-                                       status='3 modified files'
+                                       status='3 modified'
                                        ))
 
         git_exec('add', 'file1', gitdir=p)
@@ -516,7 +517,7 @@ class TestRepoInfo(unittest.TestCase):
         self.assertEqual(to_named_tuple(ric.refresh()),
                          RepoInfoTuple(name=n, head=f'branch {DEFAULT_BRANCH_NAME}', branch=DEFAULT_BRANCH_NAME,
                                        remote_synchro=MSG_LOCAL_BRANCH, fullpath=fp,
-                                       status='3 modified files'
+                                       status='3 modified'
                                        ))
 
         git_commit(fp, 'check on modified files done')
@@ -527,8 +528,79 @@ class TestRepoInfo(unittest.TestCase):
                                        status='OK',
                                        ))
 
-    def run_test_on_main_with_one_tag(self, dir1, tag1: str):
-        print('    - run_test_on_main_with_one_tag')
+
+
+    def run_test_on_main_conflicts_stash(self, dir1, _sha1: str):
+        print('    - run_test_on_master_conflicts_stash')
+        n, p, fp = str(dir1), dir1, str(dir1.resolve())
+
+        ric = MgRepoInfo(n, fp)
+        self.assertEqual(to_named_tuple(ric.refresh()),
+                         RepoInfoTuple(name=n, head='branch master', branch='master',
+                                       remote_synchro = MSG_LOCAL_BRANCH, fullpath=fp,
+                                       status='OK',
+                                       ))
+
+        with open(p / 'file1', 'a') as f:
+            f.write(generate_content())
+
+        self.assertEqual(to_named_tuple(ric.refresh()),
+                         RepoInfoTuple(name=n, head='branch master', branch='master',
+                                       remote_synchro=MSG_LOCAL_BRANCH, fullpath=fp,
+                                       status='1 modified'
+                                       ))
+
+
+        # stash something
+        git_exec('stash', 'push', gitdir=p)
+        self.assertEqual(to_named_tuple(ric.refresh()),
+                         RepoInfoTuple(name=n, head='branch master', branch='master',
+                                       remote_synchro = MSG_LOCAL_BRANCH, fullpath=fp,
+                                       status='OK',
+                                       ))
+
+
+        # create conflict
+        with open(p / 'file1', 'a') as f:
+            f.write(generate_content())
+
+        git_exec('add', 'file1', gitdir=p)
+        git_commit(fp, 'check on modified files done')
+
+
+        git_exec('stash', 'pop', gitdir=p, allow_errors=True)
+        self.assertEqual(to_named_tuple(ric.refresh()),
+                         RepoInfoTuple(name=n, head='branch master', branch='master',
+                                       remote_synchro = MSG_LOCAL_BRANCH, fullpath=fp,
+                                       status='1 conflicted',
+                                       ))
+
+
+        with open(p / 'file3', 'a') as f:
+            f.write(generate_content())
+
+
+        self.assertEqual(to_named_tuple(ric.refresh()),
+                         RepoInfoTuple(name=n, head='branch master', branch='master',
+                                       remote_synchro = MSG_LOCAL_BRANCH, fullpath=fp,
+                                       status='1 conflicted, 1 modified',
+                                       ))
+
+
+        git_exec('add', 'file1', gitdir=p)
+        git_exec('checkout', 'file3', gitdir=p)
+        git_commit(fp, 'check on modified files done')
+
+
+        self.assertEqual(to_named_tuple(ric.refresh()),
+                         RepoInfoTuple(name=n, head='branch master', branch='master',
+                                       remote_synchro = MSG_LOCAL_BRANCH, fullpath=fp,
+                                       status='OK',
+                                       ))
+
+
+    def run_test_on_master_with_one_tag(self, dir1, tag1: str):
+        print('    - run_test_on_master_with_one_tag')
         n, p, fp = str(dir1), dir1, str(dir1.resolve())
         # check refesh() effect
         ric = MgRepoInfo(n, fp)
