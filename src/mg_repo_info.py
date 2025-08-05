@@ -23,7 +23,7 @@ from PySide6.QtCore import Signal, QObject, QCoreApplication
 from PySide6.QtWidgets import QMessageBox
 
 from src.mg_const import MSG_NO_COMMIT, MSG_REMOTE_TOPUSH_TOPULL, MSG_REMOTE_SYNCHRO_OK, MSG_REMOTE_TOPULL, \
-    MSG_REMOTE_TOPUSH, MSG_REMOTE_BRANCH_GONE, MSG_LOCAL_BRANCH, SHORT_SHA1_NB_DIGITS, MSG_EMPTY_REPO
+    MSG_REMOTE_TOPUSH, MSG_REMOTE_BRANCH_GONE, MSG_LOCAL_BRANCH, SHORT_SHA1_NB_DIGITS, MSG_EMPTY_REPO, MSG_REMOTE_NA
 from src.mg_tools import RunProcess, ExecGit
 from src.mg_utils import anonymise_git_url
 
@@ -324,6 +324,7 @@ class MgRepoInfo(QObject):
     tag_or_commit: Optional[str]    # internal field, used in log -1
     force_blocking_git: bool        # internal field, used in ensure_all_filled()
 
+
     # signals to emit
     repo_update_in_progress = Signal(str)
     repo_info_available = Signal(str)
@@ -401,6 +402,14 @@ class MgRepoInfo(QObject):
         return self._refresh(True)
 
 
+    def hasModifiedFiles(self) -> bool:
+        '''Return:
+        - True if status is ready and some files are locally modified
+        - False if status is not ready or if no files are modifed
+        '''
+        return self.status != 'OK'
+
+
     def refresh(self) -> 'MgRepoInfo':
         '''Reread all relevant information from git repositories, keeping remote url'''
         dbg('refresh() - %s' % self.name)
@@ -419,6 +428,22 @@ class MgRepoInfo(QObject):
         '''Nicer status line, longer to display'''
         s = self.status
         return s
+
+
+    def head_info(self) -> Tuple[str, str]:
+        '''Return head information depending on where head points:
+        Examples:
+            ('branch', 'dev')
+            ('tag', 'v1.1')
+            ('commit', '1234566FF')
+            ('', '')     # empty repo
+        '''
+        if self.head and self.head.find('<empty repo>') == -1:
+            # branch or tag or commit
+            head_type, head = self.head.split(' ')
+        else:
+            head_type, head = '', ''
+        return head_type, head
 
 
     def repo_info_is_available(self) -> None:
@@ -619,7 +644,6 @@ class MgRepoInfo(QObject):
         if self.tags is None:
             self.fill_tags()
 
-
     def ensure_sha1(self, cb_commit_sha1: Optional[Callable[[str], Any]] = None, blocking: bool = False) -> None:
         '''Ensure that the sha1 information is available. If blocking is True,
         the function will return only after the sha1 is available.'''
@@ -729,6 +753,7 @@ class MgRepoInfo(QObject):
 
 
     re_status_mod_files = re.compile('([MDRCUA ][MDRCUA]|[MDRCUA][MDRCUA ]) (.+)')
+    re_status_conflict_files = re.compile('(AA|DD|U.|.U) (.+)')
 
 
     def cb_fill_repo_info_status_done(self, _repo_name: str, git_exit_code: int, status_out: str) -> None:
@@ -768,18 +793,31 @@ class MgRepoInfo(QObject):
             -> renamed file name
         '''
         status_out_lines = status_out.split('\n')
+        conflict_files = [ self.re_status_conflict_files.match(l).group(2)  # type: ignore # mypy does not understand theat the None value is excluded from the list
+                      for l in status_out_lines
+                      if self.re_status_conflict_files.match(l)
+                      ]
         mod_files = [ self.re_status_mod_files.match(l).group(2)  # type: ignore # mypy does not understand theat the None value is excluded from the list
                         for l in status_out_lines 
                         if self.re_status_mod_files.match(l) 
         ]
         
-        if len(mod_files) == 1:
-            self.status = '{} modified file'.format(len(mod_files))
-        elif len(mod_files) > 1:
-            self.status = '{} modified files'.format(len(mod_files))
-        else:
+        # mod_files also captures conflict files, so trim them out
+        mod_files = [ f for f in mod_files if f not in conflict_files ]
+
+
+        if len(mod_files)  + len(conflict_files) == 0:
+            # nothing modifed, no conflicts
             self.status = 'OK'
             self.diff = ''
+        else:
+            self.status = ''
+            if len(mod_files) > 0 and len(conflict_files) > 0:
+                self.status = f'{len(conflict_files)} conflicted, {len(mod_files)} modified'
+            elif len(mod_files) > 0:
+                self.status = f'{len(mod_files)} modified'
+            elif len(conflict_files) > 0:
+                self.status = f'{len(conflict_files)} conflicted'
 
         if '## HEAD (no branch)' in status_out:
             # HEAD is detached
@@ -810,19 +848,17 @@ class MgRepoInfo(QObject):
         if '...' in status_out_header:
             # branch + remote-tracking branch
             self.branch, remote_branch_and_remote_status = status_out_header[3:].split('...')
-            if '[' in remote_branch_and_remote_status:
+            self.head = 'branch %s' % self.branch
+
+            if '[' not in remote_branch_and_remote_status:
+                self.remote_branch = remote_branch_and_remote_status
+                self.remote_synchro = MSG_REMOTE_SYNCHRO_OK
+            else:
                 # ahead / behind info is present
                 self.remote_branch, remote_status = remote_branch_and_remote_status.split(' [')
                 remote_status = remote_status.strip(']')
-                # remote_status is either: "ahead 33", "behind 2", "ahead 2, behind 3"
-                nb_ahead, nb_behind = match_ahead_behind(remote_status)
-                if nb_ahead > 0 and nb_behind > 0:
-                    self.remote_synchro = MSG_REMOTE_TOPUSH_TOPULL % (nb_ahead, nb_behind)
-                elif nb_ahead > 0:
-                    self.remote_synchro = MSG_REMOTE_TOPUSH % nb_ahead
-                elif nb_behind > 0:
-                    self.remote_synchro = MSG_REMOTE_TOPULL % nb_behind
-                elif remote_status == 'gone':
+                # remote_status is either: "gone, ahead 33", "behind 2", "ahead 2, behind 3"
+                if remote_status == 'gone':
                     # possible cases:
                     # - cloning an empty repo
                     #     output: '## No commits yet on master...origin/master [gone]
@@ -835,12 +871,16 @@ class MgRepoInfo(QObject):
                     # and then comitting to it
                     self.remote_synchro = MSG_REMOTE_BRANCH_GONE
                 else:
+                    nb_ahead, nb_behind = match_ahead_behind(remote_status)
+                    if nb_ahead > 0 and nb_behind > 0:
+                        self.remote_synchro = MSG_REMOTE_TOPUSH_TOPULL % (nb_ahead, nb_behind)
+                    elif nb_ahead > 0:
+                        self.remote_synchro = MSG_REMOTE_TOPUSH % nb_ahead
+                    elif nb_behind > 0:
+                        self.remote_synchro = MSG_REMOTE_TOPULL % nb_behind
+                    else:
                     assert False, "neither ahead nor behind are positive: ahead = %d, behind = %d" % (nb_ahead, nb_behind)
-            else:
-                self.remote_branch = remote_branch_and_remote_status
-                self.remote_synchro = MSG_REMOTE_SYNCHRO_OK
 
-            self.head = 'branch %s' % self.branch
         else:
             self.branch = status_out_header[3:]
             self.head = 'branch %s' % self.branch

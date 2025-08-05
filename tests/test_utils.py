@@ -137,6 +137,45 @@ class TestUtilityFunctions(unittest.TestCase):
         assert mo
         self.assertEqual(mo.group(2), 'toto -> titi')
 
+
+        # conflict
+        mo = MgRepoInfo.re_status_mod_files.match('AA  toto')
+        assert mo
+        mo = MgRepoInfo.re_status_mod_files.match('DD  toto')
+        assert mo
+        mo = MgRepoInfo.re_status_mod_files.match('UA  toto')
+        assert mo
+        mo = MgRepoInfo.re_status_mod_files.match('DU  toto')
+        assert mo
+        mo = MgRepoInfo.re_status_mod_files.match('UU  toto')
+        assert mo
+
+    def test_re_conflict_files(self):
+
+        # not a conflict
+        mo = MgRepoInfo.re_status_conflict_files.match('A  toto')
+        assert not mo
+
+        mo = MgRepoInfo.re_status_conflict_files.match('D  toto')
+        assert not mo
+
+        mo = MgRepoInfo.re_status_conflict_files.match('AD  toto')
+        assert not mo
+
+        # conflict
+        mo = MgRepoInfo.re_status_conflict_files.match('AA  toto')
+        assert mo
+        mo = MgRepoInfo.re_status_conflict_files.match('DD  toto')
+        assert mo
+        mo = MgRepoInfo.re_status_conflict_files.match('UA  toto')
+        assert mo
+        mo = MgRepoInfo.re_status_conflict_files.match('DU  toto')
+        assert mo
+        mo = MgRepoInfo.re_status_conflict_files.match('UU  toto')
+        assert mo
+
+
+
     def test_add_suffix_if_missing(self):
         self.assertEqual(add_suffix_if_missing('toto', '.mgit'), 'toto.mgit')
         self.assertEqual(add_suffix_if_missing('toto.mgit', '.mgit'), 'toto.mgit')

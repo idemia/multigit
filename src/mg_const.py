@@ -36,7 +36,7 @@ COL_REMOTE_SYNCHRO = 4
 COL_SHA1 = 5
 COL_URL = 6
 COL_NB = 7
-COL_TITLES = ['', 'Git Repo Path', 'Head', 'Status', 'Last Remote Synchro', 'SHA1', 'URL']
+COL_TITLES = ['', 'Git Repo Path', 'Head', 'Status', 'Synchro current branch', 'SHA1', 'URL']
 
 SHORT_SHA1_NB_DIGITS = 7
 
@@ -66,6 +66,7 @@ MSG_REMOTE_TOPUSH_TOPULL = '%d to push, %d to pull'
 MSG_REMOTE_BRANCH_GONE = 'remote branch deleted'
 MSG_LOCAL_BRANCH = 'No remote tracking'
 MSG_LOCAL_BRANCH_TOOLTIP = 'Set remote tracking branch by using Multigit -> git -> push .'
+MSG_REMOTE_NA = 'N.A.'
 
 DISPLAY_IN_ITALIC_MSG = [ MSG_REMOTE_BRANCH_GONE, MSG_LOCAL_BRANCH ]
 DISPLAY_IN_BOLD_MSG   = [ 'to push', 'to pull', MSG_REMOTE_BRANCH_GONE ]
