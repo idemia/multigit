@@ -39,6 +39,7 @@ from src.mg_dialog_settings import runDialogEditSettings
 from src.mg_exec_window import MgExecWindow
 from src import mg_config as mgc
 from src.mg_const import VERSION, DISPLAY_FETCH_ON_STARTUP_COUNTDOWN_INIT
+from src.mg_tabwidget import MgTabBar
 
 
 logger = logging.getLogger('mg_main_window')
@@ -253,6 +254,7 @@ class MgMainWindow(QMainWindow, Ui_MainWindow):
         # we enable refresh on focus in
         cast(QApplication, QApplication.instance()).applicationStateChanged.connect(self.slotAppStateChanged)
         self.tabRepos.currentChanged.connect( self.slotCurrentTabChanged )
+        cast(MgTabBar, self.tabRepos.tabBar()).showTabMenu.connect( self.slotShowTabMenu )
 
 
     def closeEvent(self, event: QCloseEvent) -> None:
@@ -602,6 +604,16 @@ class MgMainWindow(QMainWindow, Ui_MainWindow):
             QMessageBox.warning(self, 'Can not close tab', 'Can not close last tab!\nOperation canceled.')
             return
         self.tabRepos.removeTab(self.tabRepos.currentIndex())
+
+    def slotShowTabMenu(self, idx: int, pos: QPoint) -> None:
+        '''Show a small menu on the tab to act on it'''
+        self.tabRepos.setCurrentIndex(idx)
+        tabMenu = QMenu(self)
+        tabMenu.addAction(self.mgActions.actionAddTab)
+        tabMenu.addAction(self.mgActions.actionDupTab)
+        tabMenu.addAction(self.mgActions.actionRenameTab)
+        tabMenu.addAction(self.mgActions.actionCloseTab)
+        tabMenu.popup(pos)
 
 
     def slotCurrentTabChanged(self, tabIdx: int) -> None:
