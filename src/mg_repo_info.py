@@ -799,7 +799,7 @@ class MgRepoInfo(QObject):
                       ]
         mod_files = [ self.re_status_mod_files.match(l).group(2)  # type: ignore # mypy does not understand theat the None value is excluded from the list
                         for l in status_out_lines 
-                        if self.re_status_mod_files.match(l) 
+                        if self.re_status_mod_files.match(l)
         ]
         
         # mod_files also captures conflict files, so trim them out
@@ -879,7 +879,7 @@ class MgRepoInfo(QObject):
                     elif nb_behind > 0:
                         self.remote_synchro = MSG_REMOTE_TOPULL % nb_behind
                     else:
-                    assert False, "neither ahead nor behind are positive: ahead = %d, behind = %d" % (nb_ahead, nb_behind)
+                        assert False, "neither ahead nor behind are positive: ahead = %d, behind = %d" % (nb_ahead, nb_behind)
 
         else:
             self.branch = status_out_header[3:]

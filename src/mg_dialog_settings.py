@@ -108,7 +108,7 @@ class MgDialogSettings(QDialog):
         self.ui.pushButtonGitManualBrowse.clicked.connect(self.slotEditPrefBrowseForGit)
 
         if ExecTortoiseGit.platform_supported():
-            self.ui.checkBoxTortoiseGit.toggled.connect(self.enableTGitIfAcivated)
+            self.ui.checkBoxTortoiseGit.toggled.connect(self.enableTGitIfActivated)
             self.ui.checkBoxTortoiseGit.setChecked(ExecTortoiseGit.shouldShow())
             tgit_auto_detect = True if config[mgc.CONFIG_TORTOISEGIT_AUTODETECT] is None else config[mgc.CONFIG_TORTOISEGIT_AUTODETECT]
             self.ui.radioTGitAutoDetect.setChecked(tgit_auto_detect)

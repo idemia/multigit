@@ -225,11 +225,11 @@ class MgRepoTree(QTreeWidget):
         self.show_column_menu.emit(self.header().mapToGlobal(p))  # qme.globalPos())
 
 
-##########################################################################
-#
-#       Item and repo management
-#
-##########################################################################
+    ##########################################################################
+    #
+    #       Item and repo management
+    #
+    ##########################################################################
 
     def deleteRepos(self, deletedRepo: List[MgRepoInfo]) -> None:
         '''Remove all the items related to the listed repositories'''
@@ -300,11 +300,11 @@ class MgRepoTree(QTreeWidget):
         return items
 
 
-##########################################################################
-#
-#       Actions on selected items
-#
-##########################################################################
+    ##########################################################################
+    #
+    #       Actions on selected items
+    #
+    ##########################################################################
 
     def getGitExecWindow(self) -> MgExecWindow:
         '''Get the running git execution window if any, or create it if necessary'''

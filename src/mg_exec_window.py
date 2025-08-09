@@ -271,11 +271,11 @@ class MgExecWindow(QDialog):
                     dbg('startNewJobs() - proceed to the next job')
                     return
 
-                    dbg('startNewJobs() - actually starting: %s' % jobItem)
-                    self.last_started_job_time = cur_time
-                    self.nb_jobs_running += 1
-                    nb_jobs_started += 1
-                    jobItem.run()
+                dbg('startNewJobs() - actually starting: %s' % jobItem)
+                self.last_started_job_time = cur_time
+                self.nb_jobs_running += 1
+                nb_jobs_started += 1
+                jobItem.run()
 
         if nb_jobs_blocked_by_precondition > 0 and not self.abort_requested \
                 and (not max_git_process or self.nb_jobs_running < max_git_process):
@@ -353,7 +353,7 @@ class MgExecWindow(QDialog):
             #       which is not aborted yet at the item level
             for i in reversed(range(topLevel.childCount())):
                 try:
-                childItem = topLevel.child(i)
+                    childItem = topLevel.child(i)
                 except RuntimeError:
                     # C++ object already removed
                     continue

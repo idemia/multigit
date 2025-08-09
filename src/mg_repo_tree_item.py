@@ -104,9 +104,9 @@ class MgRepoTreeItem(QTreeWidgetItem):
 
     @ignoreCppObjectDeletedError
     def markItemInProgress(self) -> None:
-            dbg('markItemInProgress(%s)' % self.repoInfo.name)
-            self.setText(COL_UPDATE, '')
-            self.setIcon(COL_UPDATE, QIcon(':img/icons8-loader-96.png'))
+        dbg('markItemInProgress(%s)' % self.repoInfo.name)
+        self.setText(COL_UPDATE, '')
+        self.setIcon(COL_UPDATE, QIcon(':img/icons8-loader-96.png'))
         self.setToolTip(COL_UPDATE, MSG_TOOLTIP_UPDATE)
         QApplication.processEvents()
 
@@ -167,13 +167,13 @@ class MgRepoTreeItem(QTreeWidgetItem):
         self.filledColumns = MgRepoTreeItem.ColumnFlags(0)
 
         if self.repoInfo.commit_sha1:
-        self.setText(COL_SHA1, (self.repoInfo.commit_sha1 or '')[:SHORT_SHA1_NB_DIGITS])
+            self.setText(COL_SHA1, (self.repoInfo.commit_sha1 or '')[:SHORT_SHA1_NB_DIGITS])
             self.setToolTip(COL_SHA1, self.repoInfo.commit_sha1 or '') # non truncated
             self.filledColumns |= self.ColumnFlags.fieldSHA
 
 
         if self.repoInfo.url:
-        self.setText(COL_URL, self.repoInfo.url or '')
+            self.setText(COL_URL, self.repoInfo.url or '')
             self.filledColumns |= self.ColumnFlags.fieldURL
 
 
@@ -227,13 +227,13 @@ class MgRepoTreeItem(QTreeWidgetItem):
         if not self.filledColumns & self.ColumnFlags.fieldSHA and not self.treeWidget().isColumnHidden(COL_SHA1):
             # to avoid starting to fill a column multiple times
             self.filledColumns |= self.ColumnFlags.fieldSHA
-                self.repoInfo.ensure_sha1(self.cbSha1available)
+            self.repoInfo.ensure_sha1(self.cbSha1available)
             return
 
         if not self.filledColumns & self.ColumnFlags.fieldURL and not self.treeWidget().isColumnHidden(COL_URL):
             # to avoid starting to fill a column multiple times
             self.filledColumns |= self.ColumnFlags.fieldURL
-                self.repoInfo.ensure_url(self.cbUrlAvailable)
+            self.repoInfo.ensure_url(self.cbUrlAvailable)
             return
 
         # hey, all columns are filled! :-)
@@ -242,9 +242,9 @@ class MgRepoTreeItem(QTreeWidgetItem):
     @ignoreCppObjectDeletedError
     def cbSha1available(self, commit_sha1: str) -> None:
         '''Called when sha1 information is eventually available'''
-            self.setText(COL_SHA1, commit_sha1[:SHORT_SHA1_NB_DIGITS])
+        self.setText(COL_SHA1, commit_sha1[:SHORT_SHA1_NB_DIGITS])
         self.setToolTip(COL_SHA1, commit_sha1)  # full sha1
-            self.autoAdjustColumnSize(self.treeWidget())
+        self.autoAdjustColumnSize(self.treeWidget())
         self.fillNextColumns()
 
 

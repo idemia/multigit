@@ -35,7 +35,6 @@ from src import mg_config as mgc
 from src.mg_ensure_info_available import MgEnsureInfoAvailable, RepoInfoFlags
 from src.mg_exec_task_item import MgExecTaskGit, MgExecTaskGroup, MgTaskComment, MgExecTask
 from src import mg_const
-from idemia.mg_const_idemia import MSG_AUTO_STASH
 
 class GroupingBy(enum.Enum):
     NONE = 0
@@ -422,7 +421,7 @@ class MgDialogGitSwitchDeleteBranch(MgDialogWithRepoList):
         self.ui.comboBoxBranchTagName.setPlaceholderText('Choose %s from list below or type it or select it from the right' % ('branch' if self.isBranchDialog() else 'tag'))
         self.configEntry = ''
 
-        self.ui.checkBoxAutoStash.setToolTip(MSG_AUTO_STASH)
+        self.ui.checkBoxAutoStash.setToolTip(mg_const.MSG_AUTO_STASH)
 
         if deleteOrSwitch == DeleteOrSwitchBranchOrTag.DELETE_BRANCH:
             self.setWindowTitle('Git Delete Branch')
@@ -899,7 +898,7 @@ def doGitSwitchBranch(parent: QWidget, dialog: MgDialogGitSwitchDeleteBranch) ->
     taskGroupsCmdBranchTag = []
     taskGroupsCmdInt = []
 
-        for repo in dialog.getTargetedRepoList():
+    for repo in dialog.getTargetedRepoList():
 
         tasks: List[MgExecTask] = []
 
@@ -910,51 +909,51 @@ def doGitSwitchBranch(parent: QWidget, dialog: MgDialogGitSwitchDeleteBranch) ->
                 tasks.append(MgTaskComment('No need to stash, no files modified', repo))
 
         if branchName in repo.branches_local:
-                # local branch found
+            # local branch found
             tasks.extend([ MgExecTaskGit(descCheckout, repo, cmdLine)
                              for cmdLine in gitCheckoutBranch ])
             taskGroupsCmdBranchTag.append( MgExecTaskGroup(descCheckout, repo, tasks) )
 
         elif branchNameIsPresentInRemote(branchName, repo.branches_remote):
-                # remote branch found!
+            # remote branch found!
 
-                # present in multiple origins ?
+            # present in multiple origins ?
             remoteBranches = remoteBranchesForBranchName(branchName, repo.branches_remote)
-                if len(remoteBranches) == 1:
-                    # ok, only one origin, simple command:
+            if len(remoteBranches) == 1:
+                # ok, only one origin, simple command:
 
                 tasks.extend([MgExecTaskGit(descCheckout, repo, cmdLine)
                               for cmdLine in gitCheckoutBranch])
 
                 taskGroupsCmdBranchTag.append( MgExecTaskGroup(descCheckout, repo, tasks ) )
 
-                else:
-                    # multiple origins, ask the user
+            else:
+                # multiple origins, ask the user
                 msg1 = f'Multiple remote branches match the name "{branchName}" in repository "{repo.name}"\n'
-                    msg1 += 'Please select the one you want.'
-                    msgBox = QMessageBox(parent)
-                    msgBox.setText(msg1)
-                    msgBox.setIcon(QMessageBox.Icon.Warning)
-                    msgBox.setWindowTitle('Multiple remote branch with same name')
-                    buttons = []
-                    for branch in remoteBranches:
-                        buttons.append(msgBox.addButton(branch, QMessageBox.ButtonRole.ActionRole))
-                    msgBox.setStandardButtons(QMessageBox.StandardButton.Abort)
+                msg1 += 'Please select the one you want.'
+                msgBox = QMessageBox(parent)
+                msgBox.setText(msg1)
+                msgBox.setIcon(QMessageBox.Icon.Warning)
+                msgBox.setWindowTitle('Multiple remote branch with same name')
+                buttons = []
+                for branch in remoteBranches:
+                    buttons.append(msgBox.addButton(branch, QMessageBox.ButtonRole.ActionRole))
+                msgBox.setStandardButtons(QMessageBox.StandardButton.Abort)
 
-                    stdButtonClicked = msgBox.exec_()
-                    if stdButtonClicked == QMessageBox.StandardButton.Abort:
+                stdButtonClicked = msgBox.exec_()
+                if stdButtonClicked == QMessageBox.StandardButton.Abort:
                     # Re-run the git switch dialog so that user can inspect better the situation
-                        return False
+                    return False
 
-                    clickedButton = msgBox.clickedButton()
-                    remoteBranch = clickedButton.text()
+                clickedButton = msgBox.clickedButton()
+                remoteBranch = clickedButton.text()
 
                 tasks.extend([ MgExecTaskGit(f'Checkouting branch {remoteBranch}', repo, ['checkout', '--track', remoteBranch, '--']) ])
                 taskGroupsCmdBranchTag.append( MgExecTaskGroup(f'Checkouting branch {remoteBranch}', repo, tasks ) )
 
 
-            elif dialog.ui.checkBoxDefaultForNotExist.isChecked():
-                # branch not found and default branch specified
+        elif dialog.ui.checkBoxDefaultForNotExist.isChecked():
+            # branch not found and default branch specified
             tasks.extend([MgExecTaskGit(descCheckoutInt, repo, cmdLine)
                           for cmdLine in gitCheckoutBranchInt])
 
@@ -984,8 +983,8 @@ def doGitCheckoutTag(parent: QWidget, dialog: MgDialogGitSwitchDeleteBranch) -> 
     taskGroupsCmdBranchTag = []
     autostash = dialog.ui.checkBoxAutoStash.isChecked()
 
-        # TODO: when tag does not exist and we know it in advance, display a message instead of trying to checkout it
-        for repo in dialog.getTargetedRepoList():
+    # TODO: when tag does not exist and we know it in advance, display a message instead of trying to checkout it
+    for repo in dialog.getTargetedRepoList():
         tasks: List[MgExecTask] = []
 
         if autostash:
@@ -994,7 +993,7 @@ def doGitCheckoutTag(parent: QWidget, dialog: MgDialogGitSwitchDeleteBranch) -> 
             else:
                 tasks.append(MgTaskComment('No need to stash, no files modified', repo))
 
-                    # we force git to checkout another version first, so that it reflects the tag name in git status
+        # we force git to checkout another version first, so that it reflects the tag name in git status
         # if we checkout a tag on which git is already pointing through another tag, it will not update the HEAD
         # reference and continue to display the old tag. That's why we force a change of HEAD
         # Note that this will fail on repositories with only one commit. We accept this limitation because this

@@ -30,7 +30,7 @@ def showWhatisnewIfAppropriate() -> None:
     last_shown = mgc.get_config_instance()[mgc.CONFIG_LAST_SHOWN_WHATISNEW]
     if last_shown is not None and last_shown < VERSION:
         showWhatIsNew()
-    mgc.get_config_instance()[mgc.CONFIG_LAST_SHOWN_WHATISNEW] = VERSION
+        mgc.get_config_instance()[mgc.CONFIG_LAST_SHOWN_WHATISNEW] = VERSION
 
 
 def showWhatIsNew(parent: Optional[QWidget] = None) -> None:

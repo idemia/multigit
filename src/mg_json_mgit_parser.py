@@ -57,18 +57,18 @@ def exportToMgit(mgitFname: str, desc: str, repos: List['MgRepoInfo'], snapshotM
         repoDesc = ''
         head: str
 
-            if snapshotMode:
-                if 'tag' in repoInfo.head:
-                    repoDesc = 'commit of %s' % repoInfo.head
-                elif 'branch' in repoInfo.head:
-                    repoDesc = 'commit on %s' % repoInfo.head
+        if snapshotMode:
+            if 'tag' in repoInfo.head:
+                repoDesc = 'commit of %s' % repoInfo.head
+            elif 'branch' in repoInfo.head:
+                repoDesc = 'commit on %s' % repoInfo.head
 
-                # force pointing to last commit
-                head_type = 'commit'
-                assert repoInfo.commit_sha1 is not None # to make mypy happy, we already know that sha1 is set
-                head = repoInfo.commit_sha1
-            else:
-                # branch or tag or commit
+            # force pointing to last commit
+            head_type = 'commit'
+            assert repoInfo.commit_sha1 is not None # to make mypy happy, we already know that sha1 is set
+            head = repoInfo.commit_sha1
+        else:
+            # branch or tag or commit
             head_type, head = repoInfo.head_info()
 
         repoDict = {

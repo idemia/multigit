@@ -33,7 +33,7 @@ from src.mg_utils import set_username_on_git_url, tryHardDeletingDirList
 from src.mg_dialog_utils import reBranchTagValues
 from src.mg_exec_task_item import MgExecTaskGroup, MgTaskDelDirectory, MgTaskComment, MgExecTaskGit
 from src.mg_clone_execution import addPreconditionToEnsureCloneOrderLogic
-from idemia.mg_const_idemia import MSG_AUTO_STASH
+from src.mg_const import MSG_AUTO_STASH
 
 logger = logging.getLogger('mg_dialog_adjust_project_from_mgit')
 dbg = logger.debug
@@ -311,7 +311,7 @@ class MgDialogApplyMgitFile(QDialog):
 
             if buttonSelected == cancelButton:
                 # user changed its mind ...
-                    return
+                return
 
             if buttonSelected == keepReposButton:
                 self.reposToDelete = []
@@ -396,8 +396,8 @@ def runDialogApplyMgitFile(window: 'MgMainWindow', baseDir: str, allRepos: List[
                                        repo,
                                        repo.fullpath,
                                        )
-                                    )
-        taskGroups.append( taskGroup )
+                )
+                taskGroups.append( taskGroup )
 
 
     # Ensure that clone will work with nested subdirectories

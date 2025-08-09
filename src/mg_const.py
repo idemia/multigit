@@ -57,6 +57,14 @@ DISPLAY_FETCH_ON_STARTUP_COUNTDOWN_INIT = 5
 MSG_BIG_DIFF = 'Diff is too big to be displayed in total.'
 MSG_NO_COMMIT= 'No commit yet...'
 MSG_EMPTY_REPO = '<empty repo>'
+MSG_AUTO_STASH = '''Save and restore your local changes that prevents running a checkout.<br><br>
+
+Before all commands, runs:<br>
+<code>git stash push</code><br>
+<br>
+And after all commands runs:<br>
+<code>git stash pop</code>
+'''
 
 # remote_synchro messages
 MSG_REMOTE_SYNCHRO_OK = 'Up-to-date'

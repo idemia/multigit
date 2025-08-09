@@ -655,8 +655,8 @@ class MgExecItemBase(QTreeWidgetItem):
     @ignoreCppObjectDeletedError
     def autoAdjustColumnSize(self) -> None:
         '''Adjust automatically the column size to the largest item'''
-            for i in range(self.treeWidget().columnCount()):
-                self.treeWidget().resizeColumnToContents(i)
+        for i in range(self.treeWidget().columnCount()):
+            self.treeWidget().resizeColumnToContents(i)
         QApplication.processEvents()
 
 
@@ -734,10 +734,10 @@ class MgExecItemOneCmd(MgExecItemBase):
 
         # fill content with new items
         while out_idx < len(out_lines):
-                self.gitContentItem = QTreeWidgetItem()
-                self.gitContentItem.setFont(0, self.fixedFont)
-                self.gitContentItem.setIcon(0, getIcon(IconSet.Empty))
-                self.addChild(self.gitContentItem)
+            self.gitContentItem = QTreeWidgetItem()
+            self.gitContentItem.setFont(0, self.fixedFont)
+            self.gitContentItem.setIcon(0, getIcon(IconSet.Empty))
+            self.addChild(self.gitContentItem)
             self.gitContentItem.setText(0, out_lines[out_idx])
             out_idx += 1
 
@@ -745,9 +745,9 @@ class MgExecItemOneCmd(MgExecItemBase):
     @ignoreCppObjectDeletedError
     def slotProgressiveOutput(self, output: str) -> None:
         item = self.gitContentItem
-            while item:
-                item = item.parent()
-            self.setContentItem(output)
+        while item:
+            item = item.parent()
+        self.setContentItem(output)
 
 
     @ignoreCppObjectDeletedError
