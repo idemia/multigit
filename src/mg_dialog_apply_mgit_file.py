@@ -365,7 +365,7 @@ def runDialogApplyMgitFile(window: 'MgMainWindow', baseDir: str, allRepos: List[
                     MgTaskDelDirectory(f'Delete directory prior to cloning `{repoDestPath}`', repoInfo, repoDestPath,)
                     )
             taskGroup.appendGitTask(f'git clone {repoName}',
-                                    ['clone', '--progress', repoDictInfo.url, repoDestPath])
+                                    ['clone', '--progress', repoDictInfo.url, repoDestPath], run_inside_git_repo=False)
             taskGroup.appendGitTask(f'git checkout {repoDictInfo.head}',
                                     ['checkout', repoDictInfo.head])
         else:
