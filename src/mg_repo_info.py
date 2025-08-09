@@ -51,7 +51,7 @@ def is_git_repo(repo: pathlib.Path) -> bool:
         # good, git_dir is not in the Recycle Bin...
         pass
 
-    for subd in [ 'hooks', 'info', 'objects', 'refs' ]:
+    for subd in [ 'objects', 'refs' ]:
         subd_path = git_dir/subd
         if not subd_path.exists() or not subd_path.is_dir():
             return False
