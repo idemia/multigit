@@ -28,30 +28,30 @@ from src.mg_tools import ExecGit, ExecTortoiseGit, ExecSourceTree, ExecSublimeMe
 import src.mg_const as mg_const
 import src.mg_config as mgc
 
-
 class MgDialogSettings(QDialog):
+    ui: Ui_Preferences
 
     def __init__(self, parent: QWidget) -> None:
         super().__init__(parent)
-
-        self.setWindowFlags(self.windowFlags() & ~Qt.WindowType.WindowContextHelpButtonHint)
-        config = mgc.get_config_instance()
-
+        self.setWindowFlags( self.windowFlags() & ~Qt.WindowType.WindowContextHelpButtonHint )
         self.ui = Ui_Preferences()
         self.ui.setupUi(self)
+
+        config = mgc.get_config_instance()
+
+        ### First tab stuff
 
         # disable multigit update feature as it is not available
         self.ui.groupBox_6.setVisible(False)
 
-        ### First tab stuff
         self.colorBranch = QColor()
         self.colorBranch.setRgb(mgc.get_config_instance().get(mgc.CONFIG_HEAD_COLOR_BRANCH, mgc.DEFAULT_CONFIG_HEAD_COLOR_BRANCH))
         self.colorTag = QColor()
         self.colorTag.setRgb(mgc.get_config_instance().get(mgc.CONFIG_HEAD_COLOR_TAG, mgc.DEFAULT_CONFIG_HEAD_COLOR_TAG))
-
+        self.updateColorButtons()
         self.ui.pushButtonColorBranch.clicked.connect( self.slotSetColorBranch )
         self.ui.pushButtonColorTag.clicked.connect( self.slotSetColorTag )
-        self.updateColorButtons()
+
 
         self.ui.comboBoxDoubleClickAction.clear()
         universalDoubleClickActions = [
@@ -94,6 +94,8 @@ class MgDialogSettings(QDialog):
         self.ui.checkBoxConfirmWhenQuitting.setChecked( (confirmBeforeQuit is None) or confirmBeforeQuit)
 
         ### Second tab stuff
+
+        # git stuff
         git_auto_detect = (True if config[mgc.CONFIG_GIT_AUTODETECT] is None
                            else config[mgc.CONFIG_GIT_AUTODETECT])
         self.ui.labelExecGitChoose.setText(f'Choose {ExecGit.get_exec_name()} executable location')
@@ -116,7 +118,7 @@ class MgDialogSettings(QDialog):
             self.ui.lineEditTGitManual.setEnabled(not tgit_auto_detect)
             self.ui.pushButtonTGitManualBrowse.setEnabled(not tgit_auto_detect)
             self.ui.pushButtonTGitManualBrowse.clicked.connect(self.slotEditPrefBrowseForTortoiseGit)
-            self.enableTGitIfAcivated()
+            self.enableTGitIfActivated()
         else:
             self.ui.groupBoxTGit.setVisible(False)
 
@@ -303,7 +305,7 @@ class MgDialogSettings(QDialog):
             self.ui.lineEditExplorerManual.setText(result)
 
 
-    def enableTGitIfAcivated(self) -> None:
+    def enableTGitIfActivated(self) -> None:
         enable_tgit_stuff = self.ui.checkBoxTortoiseGit.isChecked()
         self.ui.radioTGitAutoDetect.setEnabled(enable_tgit_stuff)
         self.ui.radioTGitManual.setEnabled(enable_tgit_stuff)
