@@ -75,7 +75,7 @@ jobs:
 
     - name: Install dependencies
       run: |
-        sudo apt update && sudo apt install -y libegl1  libegl-mesa-glx libegl1-mesa-dev 
+        sudo apt update && sudo apt install -y libegl-mesa0 libgl1 libglx-mesa0 libegl1-mesa-dev 
         sudo ls -l /usr/lib/x86_64-linux-gnu/libEGL.so.1
         python -m pip install -r reqs/requirements-dev.txt
         pip list
