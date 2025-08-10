@@ -31,6 +31,9 @@ finish-args:
 
   # Specific to multigit, to check a file's presence
   - --filesystem=/opt/sublime_merge/sublime_merge:ro
+  - --filesystem=/usr/local/bin:ro
+  - --filesystem=/usr/bin:ro
+  - --filesystem=/usr/lib/git-core:ro
 
 
 
