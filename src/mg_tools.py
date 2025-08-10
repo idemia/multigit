@@ -39,17 +39,13 @@ GIT_EXIT_CODE_COULD_NOT_START_PROCESS = -3
 GIT_EXIT_CODE_STOPPED_BECAUSE_AUTH_FAILURE = -4
 
 
-def isRunningInsideSnap() -> bool:
-    """Return TTrue if running inside a snap container.
+FLATPAK_SPAWN = ['flatpak-spawn', '--host']
 
-    Used to identify the proper program locations which are different when running inside a snap."""
-    return 'SNAP_EUID' in os.environ
+def isRunningInsideFlatpak() -> bool:
+    """Return TTrue if running inside a flatpak container.
 
-
-def snapRoot() -> Path:
-    '''Return the equivalent of root under snap, used to look for /usr/bin for example'''
-    ret = Path(os.environ.get('SNAP', '/'))
-    return ret
+    Used to use proper flatpak launcher when launching an external program"""
+    return 'FLATPAK_SANDBOX' in os.environ
 
 
 
@@ -101,8 +97,12 @@ class ExecTool:
 
         if cls.INNOCUOUS_COMMAND:
             # first, try on the command-line
+            innocuous_command = [cls.get_exec_name()] + cls.INNOCUOUS_COMMAND
+            if isRunningInsideFlatpak():
+                innocuous_command = FLATPAK_SPAWN + innocuous_command
+
             try:
-                exit_code, output = RunProcess().exec_blocking([cls.get_exec_name()] + cls.INNOCUOUS_COMMAND, allow_errors=True)
+                exit_code, output = RunProcess().exec_blocking(innocuous_command, allow_errors=True)
                 if exit_code == 0:
                     # program is on the path, use it
                     cls.SESSION_CACHE[cls] = cls.get_exec_name()
@@ -116,12 +116,7 @@ class ExecTool:
         if sys.platform == 'win32':
             path_candidates = cls.WIN32_PATH_CANDIDATES
         elif sys.platform == 'linux':
-            if isRunningInsideSnap():
-                # to find the path of a file inside the snap, remove the first '/'
-                # and make the path relative to snap root
-                path_candidates = [ snapRoot() / str(p)[1:] for p in cls.LINUX_PATH_CANDIDATES ]
-            else:
-                path_candidates = cls.LINUX_PATH_CANDIDATES
+            path_candidates = cls.LINUX_PATH_CANDIDATES
         else:
             raise ValueError('Unsupported platform')
 
@@ -227,6 +222,8 @@ class ExecTool:
 
         rp = RunProcess()
         cmdline = [prog_to_run] + cmd_args
+        if isRunningInsideFlatpak():
+            cmdline = FLATPAK_SPAWN + cmdline
         rp.exec_async(cmdline=cmdline, cb_done=cb_done, working_dir=workdir, allow_errors=allow_errors)
 
 
@@ -240,6 +237,8 @@ class ExecTool:
             raise FileNotFoundError(f'Could not locate {cls.get_exec_name()}')
 
         cmdline = [prog_to_run] + list(cmd_args)
+        if isRunningInsideFlatpak():
+            cmdline = FLATPAK_SPAWN + cmdline
         exitCode, output = RunProcess().exec_blocking(cmdline, allow_errors=allow_errors, working_dir=workdir)
         if exitCode != 0 and not allow_errors:
             raise subprocess.CalledProcessError(cmd=cmdline, returncode=exitCode, output=output)
@@ -273,8 +272,8 @@ class ExecGit(ExecTool):
     ]
 
     LINUX_PATH_CANDIDATES = [
-        Path('/usr/bin'),
         Path('/usr/local/bin'),
+        Path('/usr/bin'),
     ]
 
     EXEC_NAME_LINUX = 'git'
