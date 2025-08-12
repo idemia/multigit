@@ -151,7 +151,6 @@ def configure_logpath(debug_activated: bool = False, run_from_tests: bool = Fals
     mg_const.PATH_LOG_DEBUG = path_log_debug
     mg_const.PATH_LOG_GIT_CMD = path_log_git_cmd
 
-
 def init_logging(debug_activated: bool = False, run_from_tests: bool = False) -> None:
     '''run_from_tests: when activated, a different logging filename is used
     debug_activated: when True, a lot more informaiton is written to a debug log file.
@@ -214,6 +213,10 @@ def init_logging(debug_activated: bool = False, run_from_tests: bool = False) ->
         shandler_err.setLevel( logging.INFO )
     logger.addHandler(shandler_err)
     shandler_err.setFormatter(formatter)
+
+    logging.info('log dirs: ')
+    logging.info(mg_const.PATH_LOG_DEBUG)
+    logging.info(mg_const.PATH_LOG_NORMAL)
 
 
 def main() -> None:
