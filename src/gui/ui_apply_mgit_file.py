@@ -171,7 +171,7 @@ class Ui_ApplyMgitFile(object):
         self.verticalLayout.setObjectName(u"verticalLayout")
         self.horizontalLayout_2 = QHBoxLayout()
         self.horizontalLayout_2.setObjectName(u"horizontalLayout_2")
-        self.horizontalLayout_2.setSizeConstraint(QLayout.SetNoConstraint)
+        self.horizontalLayout_2.setSizeConstraint(QLayout.SizeConstraint.SetNoConstraint)
         self.labelProjDesc = QLabel(self.tabProject)
         self.labelProjDesc.setObjectName(u"labelProjDesc")
         sizePolicy.setHeightForWidth(self.labelProjDesc.sizePolicy().hasHeightForWidth())
@@ -235,8 +235,8 @@ class Ui_ApplyMgitFile(object):
 
         self.buttonBox = QDialogButtonBox(self.groupBox_3)
         self.buttonBox.setObjectName(u"buttonBox")
-        self.buttonBox.setOrientation(Qt.Horizontal)
-        self.buttonBox.setStandardButtons(QDialogButtonBox.Cancel)
+        self.buttonBox.setOrientation(Qt.Orientation.Horizontal)
+        self.buttonBox.setStandardButtons(QDialogButtonBox.StandardButton.Cancel)
 
         self.horizontalLayout.addWidget(self.buttonBox)
 
@@ -284,10 +284,13 @@ class Ui_ApplyMgitFile(object):
         self.historyButtonUsername.setText("")
         self.labelProjDesc.setText(QCoreApplication.translate("ApplyMgitFile", u"Project description :", None))
         self.textEditProjectDesc.setHtml(QCoreApplication.translate("ApplyMgitFile", u"<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
-"<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
+"<html><head><meta name=\"qrichtext\" content=\"1\" /><meta charset=\"utf-8\" /><style type=\"text/css\">\n"
 "p, li { white-space: pre-wrap; }\n"
-"</style></head><body style=\" font-family:'MS Shell Dlg 2'; font-size:9.75pt; font-weight:400; font-style:normal;\">\n"
-"<p style=\"-qt-paragraph-type:empty; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:8.25pt;\"><br /></p></body></html>", None))
+"hr { height: 1px; border-width: 0; }\n"
+"li.unchecked::marker { content: \"\\2610\"; }\n"
+"li.checked::marker { content: \"\\2612\"; }\n"
+"</style></head><body style=\" font-family:'Segoe UI'; font-size:9pt; font-weight:400; font-style:normal;\">\n"
+"<p style=\"-qt-paragraph-type:empty; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:'MS Shell Dlg 2'; font-size:8.25pt;\"><br /></p></body></html>", None))
         ___qtreewidgetitem = self.treeWidgetRepoList.headerItem()
         ___qtreewidgetitem.setText(2, QCoreApplication.translate("ApplyMgitFile", u"Path", None));
         ___qtreewidgetitem.setText(1, QCoreApplication.translate("ApplyMgitFile", u"HEAD target", None));

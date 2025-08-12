@@ -86,8 +86,8 @@ class Ui_GitExecDialog(object):
         font1 = QFont()
         font1.setPointSize(10)
         self.buttonBox.setFont(font1)
-        self.buttonBox.setOrientation(Qt.Horizontal)
-        self.buttonBox.setStandardButtons(QDialogButtonBox.Discard|QDialogButtonBox.Ok)
+        self.buttonBox.setOrientation(Qt.Orientation.Horizontal)
+        self.buttonBox.setStandardButtons(QDialogButtonBox.StandardButton.Discard|QDialogButtonBox.StandardButton.Ok)
 
         self.horizontalLayout.addWidget(self.buttonBox)
 

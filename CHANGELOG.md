@@ -8,7 +8,7 @@ Introduction
 
 Multigit help users to manage many Git repositories simultaneously.
 
-Version 1.7 (2025-02-05)
+Version 1.7.1 (2025-02-05)
 ----------------------------
 Improvements
 

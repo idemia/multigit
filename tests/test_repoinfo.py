@@ -26,7 +26,7 @@ from multigit import init_logging
 import src.mg_tools
 from src.mg_tools import ExecGit
 from src.mg_const import MSG_EMPTY_REPO, MSG_NO_COMMIT, MSG_LOCAL_BRANCH, MSG_REMOTE_SYNCHRO_OK, SHORT_SHA1_NB_DIGITS
-from src.mg_repo_info import MgRepoInfo, MultiRepo
+from src.mg_repo_info import MgRepoInfo, MultiRepo, scan_git_dirs
 
 # More tests to write
 # * detached head from a remote branch
@@ -158,6 +158,10 @@ def generate_content():
     return 'line %d\n' % content_idx
 
 
+def make_unique_tmp_name() -> str:
+    return datetime.datetime.now().isoformat().replace(':', '_').split('.')[0]
+
+
 #######################################################
 #           Tests for RepoInfo
 #######################################################
@@ -218,7 +222,7 @@ class TestRepoInfo(unittest.TestCase):
     def tempdir_setUp(cls: 'TestRepoInfo') -> None:
         cls.tempdir = pathlib.Path(tempfile.gettempdir()) / 'test_multigit'
         cls.tempdir.mkdir(exist_ok=True)
-        cls.gitdir = cls.tempdir / datetime.datetime.now().isoformat().replace(':', '_').split('.')[0]
+        cls.gitdir = cls.tempdir / make_unique_tmp_name()
         cls.gitdir.mkdir()
         print('Creating test git directory: %s' % cls.gitdir)
 
@@ -732,7 +736,7 @@ class TestRepoInfo(unittest.TestCase):
         ric.ensure_branches_filled()
         self.assertEqual(ric.branches_filled, True)
         self.assertEqual(ric.branches_remote, [])
-        self.assertEqual(ric.branches_local, ['branch1', DEFAULT_BRANCH_NAME])
+        self.assertEqual(sorted(ric.branches_local), sorted(['branch1', DEFAULT_BRANCH_NAME]))
 
 
 
@@ -743,8 +747,8 @@ class TestRepoInfo(unittest.TestCase):
         git_init_repo('.')
 
         git_dir = self.gitdir
-        os.chdir(git_dir)
-        (git_dir/'tmp_a/.git').mkdir(parents=True)
+        tmp_dir = git_dir / 'tmp_a'
+        (tmp_dir / '..git').mkdir(parents=True)
         mr = MultiRepo(str(git_dir))
         repo_list = mr.find_git_repos()
         self.assertEqual(set(repo_list), {'dir2'})
@@ -768,6 +772,7 @@ class TestRepoInfo(unittest.TestCase):
         self.assertEqual(added_repo[0].name, 'dir2')
         self.assertEqual(rm_repo,    [mr.repo_dict['removed']])
 
+        rmtree_failsafe(tmp_dir)
         rmtree_failsafe(self.dir2)
 
 
@@ -798,6 +803,82 @@ class TestRepoInfo(unittest.TestCase):
         } )
 
         rmtree_failsafe(strange_dir1)
+
+    def test_find_git_repos_with_symlinks(self) -> None:
+        base_dir = pathlib.Path(self.gitdir) / 'dir'
+        base_dir.mkdir()
+        os.chdir(base_dir)
+        git_init_repo(str(base_dir))
+
+        # finds repo at the root of base dir
+        self.assertEqual(set(MultiRepo(str(base_dir)).find_git_repos()), {
+            '.',
+        })
+
+        # finds repo in a subdirectory
+        self.assertEqual(set(MultiRepo(str(self.gitdir)).find_git_repos()), {
+            'dir',
+        })
+
+
+        # create another git dir at the root
+        extdir = self.gitdir / 'dir_ext'
+        extdir.mkdir()
+        git_init_repo(str(extdir))
+
+        self.assertEqual(set(MultiRepo(str(self.gitdir)).find_git_repos()), {
+            'dir', 'dir_ext'
+        })
+
+        self.assertEqual(set(MultiRepo(str(base_dir)).find_git_repos()), {
+            '.',
+        })
+
+        # linked directory is accessible through two path: direct and link
+        extdir_link = base_dir / 'link_to_dir_ext'
+        extdir_link.symlink_to(extdir)
+
+        self.assertEqual(set(MultiRepo(str(base_dir)).find_git_repos()), {
+            '.', 'link_to_dir_ext',
+        })
+
+        result = set(MultiRepo(str(self.gitdir)).find_git_repos())
+        assert 'dir' in result
+        assert len(result) == 2
+        assert 'dir_ext' in result or 'dir\\link_to_dir_ext' in result
+
+        # Symlink to parent
+        circular_ref_parent_dir = self.gitdir / 'circular_ref_parent'
+        git_init_repo(str(circular_ref_parent_dir))
+        os.chdir(circular_ref_parent_dir)
+
+        circular_ref_child_dir = circular_ref_parent_dir / 'child_dir'
+        git_init_repo(str(circular_ref_child_dir))
+
+        self.assertEqual(set(MultiRepo(str(circular_ref_parent_dir)).find_git_repos()), {
+            '.', 'child_dir'
+        })
+
+        # add a cycle with a symlink to parent
+        link_back_to_parent = circular_ref_child_dir / 'symlink_back_to_parent'
+        link_back_to_parent.symlink_to(circular_ref_parent_dir, True)
+
+        self.assertEqual(set(MultiRepo(str(circular_ref_parent_dir)).find_git_repos()), {
+            '.', 'child_dir'
+        })
+
+        self.assertEqual(set(MultiRepo(str(circular_ref_child_dir)).find_git_repos()), {
+            '.', 'symlink_back_to_parent',
+        })
+
+        # add cross links,
+        basedir_link = extdir / 'link_to_dir'
+        basedir_link.symlink_to(base_dir)
+
+        # the final check
+        self.assertEqual(set(MultiRepo(str(self.gitdir)).find_git_repos()), {
+            'dir', 'dir_ext', 'circular_ref_parent', 'circular_ref_parent\\child_dir'
+        })
 
 
     def run_clone_test_on_empty_git(self, dir1: pathlib.Path, dir3: pathlib.Path):

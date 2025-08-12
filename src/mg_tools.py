@@ -55,8 +55,10 @@ class ExecTool:
 
     WIN32_PATH_CANDIDATES: List[Path] = []
     LINUX_PATH_CANDIDATES: List[Path] = []
+    DARWIN_PATH_CANDIDATES: List[Path] = []
 
     EXEC_NAME_LINUX: str
+    EXEC_NAME_DARWIN: str
     EXEC_NAME_WIN32: str
 
     # if not None, this is a command which we can run to detect the program. Typically, this is ['--version']
@@ -117,8 +119,10 @@ class ExecTool:
             path_candidates = cls.WIN32_PATH_CANDIDATES
         elif sys.platform == 'linux':
             path_candidates = cls.LINUX_PATH_CANDIDATES
+        elif sys.platform == 'darwin':
+            path_candidates = cls.DARWIN_PATH_CANDIDATES
         else:
-            raise ValueError('Unsupported platform')
+            raise ValueError(f'Unsupported platform: {sys.platform}')
 
         cmd = cls.find_prog_exec(path_candidates)
 
@@ -137,7 +141,7 @@ class ExecTool:
         '''
         if not cls.platform_supported():
             return ''
-
+        
         config = mg_config.get_config_instance()
         if config[cls.CONFIG_ENTRY_AUTODETECT] in (None, True):
             result = cls.autodetect_executable()
@@ -152,6 +156,8 @@ class ExecTool:
             return cls.EXEC_NAME_WIN32
         elif sys.platform == 'linux':
             return cls.EXEC_NAME_LINUX
+        elif sys.platform == 'darwin':
+            return cls.EXEC_NAME_DARWIN
         else:
             raise ValueError('Platform not supported: ', sys.platform)
 
@@ -260,7 +266,7 @@ class ExecTool:
 #######################################################
 
 class ExecGit(ExecTool):
-    SUPPORTED_PLATFORMS = ['win32', 'linux']
+    SUPPORTED_PLATFORMS = ['win32', 'linux', 'darwin']
 
     WIN32_PATH_CANDIDATES: List[Path] = [
         Path(os.environ.get("ProgramFiles", '')) / "Git" / "bin",
@@ -275,8 +281,14 @@ class ExecGit(ExecTool):
         Path('/usr/local/bin'),
         Path('/usr/bin'),
     ]
+    
+    DARWIN_PATH_CANDIDATES = [
+        Path('/usr/local/bin'),
+        Path('/usr/bin'),
+    ]
 
     EXEC_NAME_LINUX = 'git'
+    EXEC_NAME_DARWIN = 'git'
     EXEC_NAME_WIN32 = 'git.exe'
 
     INNOCUOUS_COMMAND = ['--version']
@@ -439,7 +451,7 @@ class ExecGitGui(ExecTool):
 #######################################################
 
 class ExecGitK(ExecTool):
-    SUPPORTED_PLATFORMS = ['win32', 'linux']
+    SUPPORTED_PLATFORMS = ['win32', 'linux', 'darwin']
 
     WIN32_PATH_CANDIDATES = [
         Path(os.environ.get("ProgramFiles", '')) / "Git" / "cmd",
@@ -451,8 +463,14 @@ class ExecGitK(ExecTool):
         Path('/usr/bin'),  # Ubuntu
     ]
 
+    DARWIN_PATH_CANDIDATES = [
+        Path('/usr/bin'),  # darwin
+        Path('/opt/homebrew/bin/')  #brew install
+    ]
+
     EXEC_NAME_WIN32 = "gitk.exe"
     EXEC_NAME_LINUX = "gitk"
+    EXEC_NAME_DARWIN = "gitk"
 
     CONFIG_ENTRY_AUTODETECT = mg_config.CONFIG_GITK_AUTODETECT
     CONFIG_ENTRY_MANUAL_PATH = mg_config.CONFIG_GITK_MANUAL_PATH
@@ -467,7 +485,7 @@ class ExecGitK(ExecTool):
 #######################################################
 
 class ExecExplorer(ExecTool):
-    SUPPORTED_PLATFORMS = ['win32', 'linux']
+    SUPPORTED_PLATFORMS = ['win32', 'linux', 'darwin']
 
     # no path candidates, it should be on the execution path
     WIN32_PATH_CANDIDATES = [
@@ -476,9 +494,12 @@ class ExecExplorer(ExecTool):
     LINUX_PATH_CANDIDATES = [
         Path("/usr/bin"),
     ]
-
+    DARWIN_PATH_CANDIDATES = [
+        Path("/usr/bin"),
+    ]
     EXEC_NAME_WIN32 = 'explorer.exe'
     EXEC_NAME_LINUX = 'xdg-open'
+    EXEC_NAME_DARWIN = 'open'
 
     # name of the configuration entry to store auto-detection behavior
     CONFIG_ENTRY_AUTODETECT = mg_config.CONFIG_EXPLORER_AUTODETECT

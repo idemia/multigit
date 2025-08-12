@@ -42,8 +42,8 @@ Multigit has been used widely for several years within IDEMIA, it's mature and s
 
 Platform support:
 * Windows: rock-stable, primary development platform, used everyday
-* Linux: stable, but small user base so far
-* MacOs X: None yet, contribution welcome.
+* Linux: stable, but small user base so far. Validated on: Ubuntu 22.04, Ubuntu 24.10 and Linux Mint 22 
+* MacOs X: working, but with limited user base so far
 
 
 Installation

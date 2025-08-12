@@ -23,7 +23,7 @@ import pathlib, platform
 #   Product Constants
 ############################################
 
-VERSION = '1.7'
+VERSION = '1.7.1'
 
 MAX_DIFF_LINES = 1000
 MAX_GIT_DBG_OUT_CHAR = 5000

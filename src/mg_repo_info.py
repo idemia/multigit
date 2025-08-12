@@ -15,9 +15,9 @@
 #
 
 
-from typing import Dict, Tuple, Optional, List, Callable, Any, Sequence
+from typing import Dict, Tuple, Optional, List, Callable, Any, Sequence, Generator
 import logging, re, csv, pathlib, os
-from glob import glob, escape
+from collections import deque
 
 from PySide6.QtCore import Signal, QObject, QCoreApplication
 from PySide6.QtWidgets import QMessageBox
@@ -95,6 +95,34 @@ def is_not_sha1(ref: str) -> bool:
     # we don't know
     return False
 
+def scan_git_dirs(base_path: str) -> Generator[str, str, None]:
+    '''Return the list of Git directories (.git) within the given directory tree
+    The traversal goes from top to bottom and it follows the symbolic links
+    '''
+    visited = set()
+    # make sure to have absolute resolved path to get started
+    path_to_visit = deque([str(pathlib.Path(base_path).resolve())])
+    while path_to_visit:
+        dirpath = path_to_visit.popleft()
+
+        resolved_path = str(pathlib.Path(dirpath).resolve())
+        if resolved_path in visited:
+            # already visited, cycle created by symbolic links
+            continue
+
+        visited.add(resolved_path)
+        for entry in os.scandir(dirpath):
+            if not entry.is_dir(follow_symlinks=True):
+                continue
+
+            if entry.name == '.git':
+                yield entry.path
+                continue
+
+            path_to_visit.append(entry.path)
+
+
+
 
 class MultiRepo:
     '''Public fields:
@@ -146,9 +174,7 @@ class MultiRepo:
         self.repo_list = []
         self.repo_names = []
         self.base_path = pathlib.Path(self.base_dir)
-        # Use glob.glob(recursive=True) to follow symlinks whereas Path.glob() doesn't.
-        # RND_P_5RNDIT_05-85: ensure base path does not contain magic chars like []*?
-        for d in glob(escape(str(self.base_path)) + '/**/.git', recursive=True):
+        for d in scan_git_dirs(str(self.base_path.resolve())):
             repo = pathlib.Path(d).parent
             if is_git_repo(repo):
                 repo_name = str(repo.relative_to(self.base_path))
@@ -188,9 +214,7 @@ class MultiRepo:
         '''
         new_repo_names = []
         self.base_path = pathlib.Path(self.base_dir)
-        # Use glob.glob(recursive=True) to follow symlinks whereas Path.glob() doesn't.
-        # RND_P_5RNDIT_05-85: ensure base path does not contain magic chars like []*?
-        for d in glob(escape(str(self.base_path)) + '/**/.git', recursive=True):
+        for d in scan_git_dirs(str(self.base_path.resolve())):
             repo = pathlib.Path(d).parent
             if is_git_repo(repo):
                 repo_name = str(repo.relative_to(self.base_path))
