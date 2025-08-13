@@ -29,6 +29,19 @@ $ flatpak run org.multigit.Multigit
 Debug build process
 ===================
 
+Build process
+-------------
+
+- Download all sources
+- Initialize the application directory with `flatpak build-init`
+- Build and install each module with `flatpak build`
+- Clean up the final build tree by removing unwanted files and e.g. stripping binaries
+- Finish the application directory with flatpak `build-finish`
+
+
+Tips
+----
+
 Runs a shell inside the sandbox:
 
 	$ flatpak-builder --run build-dir org.multigit.Multigit.yaml sh
