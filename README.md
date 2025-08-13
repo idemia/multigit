@@ -62,7 +62,7 @@ Multigit is installation is possible through different formats and on different 
     $ multigit
 ```
     
-* (future) snap
+* (future) flatpak
 * (future) chocolatey package
 
 
