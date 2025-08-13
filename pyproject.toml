@@ -96,3 +96,7 @@ include = [
     'mypy.ini',
 ]
 
+[tool.pytest.ini_options]
+norecursedirs = [
+    "packaging",
+]
