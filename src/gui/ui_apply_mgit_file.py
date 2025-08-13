@@ -15,11 +15,12 @@ from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,
     QFont, QFontDatabase, QGradient, QIcon,
     QImage, QKeySequence, QLinearGradient, QPainter,
     QPalette, QPixmap, QRadialGradient, QTransform)
-from PySide6.QtWidgets import (QAbstractButton, QApplication, QDialog, QDialogButtonBox,
-    QGridLayout, QGroupBox, QHBoxLayout, QHeaderView,
-    QLabel, QLayout, QLineEdit, QPushButton,
-    QSizePolicy, QSpacerItem, QTabWidget, QTextEdit,
-    QTreeWidget, QTreeWidgetItem, QVBoxLayout, QWidget)
+from PySide6.QtWidgets import (QAbstractButton, QApplication, QCheckBox, QDialog,
+    QDialogButtonBox, QGridLayout, QGroupBox, QHBoxLayout,
+    QHeaderView, QLabel, QLayout, QLineEdit,
+    QPushButton, QSizePolicy, QSpacerItem, QTabWidget,
+    QTextEdit, QTreeWidget, QTreeWidgetItem, QVBoxLayout,
+    QWidget)
 
 from src.mg_button_history import MgButtonHistory
 # import multigit_resources_rc
@@ -118,6 +119,28 @@ class Ui_ApplyMgitFile(object):
 
         self.verticalLayout_4.addWidget(self.groupBox)
 
+        self.groupBox_2 = QGroupBox(ApplyMgitFile)
+        self.groupBox_2.setObjectName(u"groupBox_2")
+        self.groupBox_2.setFont(font)
+        self.verticalLayout_5 = QVBoxLayout(self.groupBox_2)
+        self.verticalLayout_5.setObjectName(u"verticalLayout_5")
+        self.checkBoxAutoStash = QCheckBox(self.groupBox_2)
+        self.checkBoxAutoStash.setObjectName(u"checkBoxAutoStash")
+        sizePolicy5 = QSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
+        sizePolicy5.setHorizontalStretch(3)
+        sizePolicy5.setVerticalStretch(0)
+        sizePolicy5.setHeightForWidth(self.checkBoxAutoStash.sizePolicy().hasHeightForWidth())
+        self.checkBoxAutoStash.setSizePolicy(sizePolicy5)
+        self.checkBoxAutoStash.setFont(font1)
+#if QT_CONFIG(tooltip)
+        self.checkBoxAutoStash.setToolTip(u"")
+#endif // QT_CONFIG(tooltip)
+
+        self.verticalLayout_5.addWidget(self.checkBoxAutoStash)
+
+
+        self.verticalLayout_4.addWidget(self.groupBox_2)
+
         self.groupBox_4 = QGroupBox(ApplyMgitFile)
         self.groupBox_4.setObjectName(u"groupBox_4")
         self.groupBox_4.setFont(font)
@@ -133,21 +156,21 @@ class Ui_ApplyMgitFile(object):
         self.horizontalLayout_4.setObjectName(u"horizontalLayout_4")
         self.lineEditUsername = QLineEdit(self.groupBox_4)
         self.lineEditUsername.setObjectName(u"lineEditUsername")
-        sizePolicy5 = QSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Fixed)
-        sizePolicy5.setHorizontalStretch(0)
-        sizePolicy5.setVerticalStretch(0)
-        sizePolicy5.setHeightForWidth(self.lineEditUsername.sizePolicy().hasHeightForWidth())
-        self.lineEditUsername.setSizePolicy(sizePolicy5)
+        sizePolicy6 = QSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Fixed)
+        sizePolicy6.setHorizontalStretch(0)
+        sizePolicy6.setVerticalStretch(0)
+        sizePolicy6.setHeightForWidth(self.lineEditUsername.sizePolicy().hasHeightForWidth())
+        self.lineEditUsername.setSizePolicy(sizePolicy6)
 
         self.horizontalLayout_4.addWidget(self.lineEditUsername)
 
         self.historyButtonUsername = MgButtonHistory(self.groupBox_4)
         self.historyButtonUsername.setObjectName(u"historyButtonUsername")
-        sizePolicy6 = QSizePolicy(QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Fixed)
-        sizePolicy6.setHorizontalStretch(0)
-        sizePolicy6.setVerticalStretch(0)
-        sizePolicy6.setHeightForWidth(self.historyButtonUsername.sizePolicy().hasHeightForWidth())
-        self.historyButtonUsername.setSizePolicy(sizePolicy6)
+        sizePolicy7 = QSizePolicy(QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Fixed)
+        sizePolicy7.setHorizontalStretch(0)
+        sizePolicy7.setVerticalStretch(0)
+        sizePolicy7.setHeightForWidth(self.historyButtonUsername.sizePolicy().hasHeightForWidth())
+        self.historyButtonUsername.setSizePolicy(sizePolicy7)
         self.historyButtonUsername.setIcon(icon1)
 
         self.horizontalLayout_4.addWidget(self.historyButtonUsername)
@@ -160,11 +183,11 @@ class Ui_ApplyMgitFile(object):
 
         self.tabWidgetProject = QTabWidget(ApplyMgitFile)
         self.tabWidgetProject.setObjectName(u"tabWidgetProject")
-        sizePolicy7 = QSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
-        sizePolicy7.setHorizontalStretch(0)
-        sizePolicy7.setVerticalStretch(10)
-        sizePolicy7.setHeightForWidth(self.tabWidgetProject.sizePolicy().hasHeightForWidth())
-        self.tabWidgetProject.setSizePolicy(sizePolicy7)
+        sizePolicy8 = QSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
+        sizePolicy8.setHorizontalStretch(0)
+        sizePolicy8.setVerticalStretch(10)
+        sizePolicy8.setHeightForWidth(self.tabWidgetProject.sizePolicy().hasHeightForWidth())
+        self.tabWidgetProject.setSizePolicy(sizePolicy8)
         self.tabProject = QWidget()
         self.tabProject.setObjectName(u"tabProject")
         self.verticalLayout = QVBoxLayout(self.tabProject)
@@ -182,11 +205,11 @@ class Ui_ApplyMgitFile(object):
 
         self.textEditProjectDesc = QTextEdit(self.tabProject)
         self.textEditProjectDesc.setObjectName(u"textEditProjectDesc")
-        sizePolicy8 = QSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Preferred)
-        sizePolicy8.setHorizontalStretch(0)
-        sizePolicy8.setVerticalStretch(1)
-        sizePolicy8.setHeightForWidth(self.textEditProjectDesc.sizePolicy().hasHeightForWidth())
-        self.textEditProjectDesc.setSizePolicy(sizePolicy8)
+        sizePolicy9 = QSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Preferred)
+        sizePolicy9.setHorizontalStretch(0)
+        sizePolicy9.setVerticalStretch(1)
+        sizePolicy9.setHeightForWidth(self.textEditProjectDesc.sizePolicy().hasHeightForWidth())
+        self.textEditProjectDesc.setSizePolicy(sizePolicy9)
         self.textEditProjectDesc.setMaximumSize(QSize(16777215, 50))
         self.textEditProjectDesc.setReadOnly(True)
 
@@ -198,11 +221,11 @@ class Ui_ApplyMgitFile(object):
 
         self.treeWidgetRepoList = QTreeWidget(self.tabProject)
         self.treeWidgetRepoList.setObjectName(u"treeWidgetRepoList")
-        sizePolicy9 = QSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
-        sizePolicy9.setHorizontalStretch(0)
-        sizePolicy9.setVerticalStretch(20)
-        sizePolicy9.setHeightForWidth(self.treeWidgetRepoList.sizePolicy().hasHeightForWidth())
-        self.treeWidgetRepoList.setSizePolicy(sizePolicy9)
+        sizePolicy10 = QSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
+        sizePolicy10.setHorizontalStretch(0)
+        sizePolicy10.setVerticalStretch(20)
+        sizePolicy10.setHeightForWidth(self.treeWidgetRepoList.sizePolicy().hasHeightForWidth())
+        self.treeWidgetRepoList.setSizePolicy(sizePolicy10)
         self.treeWidgetRepoList.setRootIsDecorated(False)
         self.treeWidgetRepoList.setUniformRowHeights(True)
         self.treeWidgetRepoList.setItemsExpandable(False)
@@ -276,6 +299,8 @@ class Ui_ApplyMgitFile(object):
         self.historyButtonMgitFile.setToolTip(QCoreApplication.translate("ApplyMgitFile", u"Select recent multigit file", None))
 #endif // QT_CONFIG(tooltip)
         self.historyButtonMgitFile.setText("")
+        self.groupBox_2.setTitle(QCoreApplication.translate("ApplyMgitFile", u"Apply behavior", None))
+        self.checkBoxAutoStash.setText(QCoreApplication.translate("ApplyMgitFile", u"Auto-stash : stash local changes before switching branch, unstash after switching", None))
         self.groupBox_4.setTitle(QCoreApplication.translate("ApplyMgitFile", u" User Name", None))
         self.label_3.setText(QCoreApplication.translate("ApplyMgitFile", u"User name in the git URL when cloning", None))
 #if QT_CONFIG(tooltip)

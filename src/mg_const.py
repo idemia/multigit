@@ -36,7 +36,7 @@ COL_REMOTE_SYNCHRO = 4
 COL_SHA1 = 5
 COL_URL = 6
 COL_NB = 7
-COL_TITLES = ['', 'Git Repo Path', 'Head', 'Status', 'Last Remote Synchro', 'SHA1', 'URL']
+COL_TITLES = ['', 'Git Repo Path', 'Head', 'Status', 'Synchro current branch', 'SHA1', 'URL']
 
 SHORT_SHA1_NB_DIGITS = 7
 
@@ -57,6 +57,14 @@ DISPLAY_FETCH_ON_STARTUP_COUNTDOWN_INIT = 5
 MSG_BIG_DIFF = 'Diff is too big to be displayed in total.'
 MSG_NO_COMMIT= 'No commit yet...'
 MSG_EMPTY_REPO = '<empty repo>'
+MSG_AUTO_STASH = '''Save and restore your local changes that prevents running a checkout.<br><br>
+
+Before all commands, runs:<br>
+<code>git stash push</code><br>
+<br>
+And after all commands runs:<br>
+<code>git stash pop</code>
+'''
 
 # remote_synchro messages
 MSG_REMOTE_SYNCHRO_OK = 'Up-to-date'
@@ -66,6 +74,7 @@ MSG_REMOTE_TOPUSH_TOPULL = '%d to push, %d to pull'
 MSG_REMOTE_BRANCH_GONE = 'remote branch deleted'
 MSG_LOCAL_BRANCH = 'No remote tracking'
 MSG_LOCAL_BRANCH_TOOLTIP = 'Set remote tracking branch by using Multigit -> git -> push .'
+MSG_REMOTE_NA = 'N.A.'
 
 DISPLAY_IN_ITALIC_MSG = [ MSG_REMOTE_BRANCH_GONE, MSG_LOCAL_BRANCH ]
 DISPLAY_IN_BOLD_MSG   = [ 'to push', 'to pull', MSG_REMOTE_BRANCH_GONE ]
@@ -102,6 +111,15 @@ MSG_GIT_EXEC_ALL_OK = 'Successful execution of %d git %s'
 MSG_GIT_EXEC_1_OK = 'Successful execution of git %s'
 MSG_GIT_SOME_FAILED = 'Failed execution of git %s, %d errors out of %d'
 
+MSG_TOOLTIP_UPDATE = 'git information refresh in progress'
+MSG_TOOLTIP_STATUS = 'Display whether files are modified'
+MSG_TOOLTIP_REMOTE_SYNCHRO = 'Delta vs origin'
+
+
+
+############################################
+#   Double click actions
+############################################
 
 ### All possible double-click actions
 DBC_GITCOMMIT          = 'Git Commit'

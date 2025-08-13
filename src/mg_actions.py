@@ -15,7 +15,7 @@
 #
 
 
-from typing import List
+from typing import List, Any, Callable, TYPE_CHECKING, Tuple
 
 import functools, logging
 
@@ -26,6 +26,8 @@ from PySide6.QtWidgets import QMenu, QWidget
 from src.mg_const import SHORT_SHA1_NB_DIGITS
 from src.mg_tools import ExecSublimeMerge, ExecTortoiseGit, ExecSourceTree, ExecGitBash, ExecGitGui, ExecGitK
 from src.mg_repo_info import MgRepoInfo
+if TYPE_CHECKING:
+    from src.mg_repo_tree import MgRepoTree
 
 logger = logging.getLogger('mg_actions')
 dbg = logger.debug
@@ -51,9 +53,9 @@ class MgActions(QObject):
     def __init__(self, parent: QWidget) -> None:
         super().__init__(parent)
 
-        self.menuCopyConnections = []    # type: List[QMetaObject.Connection]
+        self.menuCopyConnections: List[ Tuple[Any, Callable[..., None]] ] = []
 
-        ######## Edit actions ##########
+        ######## View actions ##########
 
         self.actionRefreshSelected = QAction(self)
         self.actionRefreshSelected.setText("Refresh selected repositories")
@@ -92,7 +94,39 @@ class MgActions(QObject):
         self.actionCopyUrl.setToolTip('Copy remote URL of repository')
 
 
+        self.actionAddTab = QAction(self)
+        self.actionAddTab.setText("New tab")
+        self.actionAddTab.setShortcut("Ctrl+N")
+        self.actionAddTab.setToolTip("Add new tab")
+
+        self.actionDupTab = QAction(self)
+        self.actionDupTab.setText("Duplicate tab")
+        self.actionDupTab.setShortcut("Ctrl+D")
+
+        self.actionRenameTab = QAction(self)
+        self.actionRenameTab.setText("Rename tab")
+        self.actionRenameTab.setShortcut("F2")
+
+        self.actionCloseTab = QAction(self)
+        self.actionCloseTab.setText("Close tab")
+        self.actionCloseTab.setShortcut("Ctrl+W")
+
+
+
         ######## Git actions ##########
+
+        # note: action used only in window menu
+        self.actionGitFetchAll = QAction(self)
+        self.actionGitFetchAll.setText(u"Fetch All (current tab)")
+        self.actionGitFetchAll.setToolTip("Run <code>git fetch</code> on all repositories of the current tab")
+        self.actionGitFetchAll.setShortcut("F6")
+
+        # note: action used only in window menu
+        self.actionGitFetchAllOnAllTabs = QAction(self)
+        self.actionGitFetchAllOnAllTabs.setText(u"Fetch All (all tabs)")
+        self.actionGitFetchAllOnAllTabs.setToolTip("Run <code>git fetch</code> on all repositories of all tabs")
+        self.actionGitFetchAllOnAllTabs.setShortcut("F7")
+
 
         self.actionGitProperties = QAction(self)
         self.actionGitProperties.setText("Git properties")
@@ -160,6 +194,11 @@ class MgActions(QObject):
         self.actionGitDeleteBranch.setText("Delete branch")
         self.actionGitDeleteBranch.setShortcut("Ctrl+Shift+D")
         self.actionGitDeleteBranch.setToolTip('Open dialog for deleting a branch')
+
+        self.actionGitDeleteTag = QAction(self)
+        self.actionGitDeleteTag.setText("Delete tag")
+        self.actionGitDeleteTag.setShortcut("Alt+Shift+D")
+        self.actionGitDeleteTag.setToolTip('Open dialog for deleting a tag')
 
         self.actionGitBash = QAction(self)
         self.actionGitBash.setText("Git bash here")
@@ -259,14 +298,21 @@ class MgActions(QObject):
         self.actionTGitBranch.setToolTip('Open TortoiseGit dialog for Branch')
 
 
-    def setupMenuView(self, menuView: QMenu) -> None:
-        '''Install more actions in the menu View'''
-        menuView.addAction(self.actionShowInExplorer)
-        menuView.addAction(self.actionRefreshSelected)
-        self.menuCopy = QMenu('Copy', menuView)
-        menuView.addMenu(self.menuCopy)
+    def setupMenuView(self, menuBase: QMenu, inRmbMenu: bool) -> None:
+        '''Install more actions in the menu View or in the right-mouse-button menu
 
-        '''Setup the internal menu copy used in menu edit'''
+        menuBase: if inRmbMenu is True, the RMB menu
+                  if inRmbMenu is False, the window menu View
+
+        '''
+        menuBase.addAction(self.actionShowInExplorer)
+        menuBase.addAction(self.actionRefreshSelected)
+
+        ### Menu copy
+        self.menuCopy = QMenu('Copy', menuBase)
+        menuBase.addMenu(self.menuCopy)
+
+        # Setup the internal menu copy used in menu edit
         self.menuCopy.setToolTip('Copy repository information to clipboard')
         self.menuCopy.setToolTipsVisible(True)
         self.menuCopy.addAction(self.actionCopyFullPath)
@@ -275,6 +321,17 @@ class MgActions(QObject):
         self.menuCopy.addAction(self.actionCopyShortSha1)
         self.menuCopy.addAction(self.actionCopyLongSha1)
         self.menuCopy.addAction(self.actionCopyUrl)
+
+        menuBase.addSeparator()
+        menuBaseGroup = menuBase
+
+        ### actions
+        if not inRmbMenu:
+            menuBase.addSeparator()
+            menuBase.addAction(self.actionAddTab)
+            menuBase.addAction(self.actionDupTab)
+            menuBase.addAction(self.actionRenameTab)
+            menuBase.addAction(self.actionCloseTab)
 
 
 
@@ -292,6 +349,7 @@ class MgActions(QObject):
         menuGit.addAction( self.actionGitSwitchBranch)
         menuGit.addAction( self.actionGitCheckoutTag)
         menuGit.addAction( self.actionGitDeleteBranch)
+        menuGit.addAction( self.actionGitDeleteTag)
         menuGit.addSeparator()
         menuGit.addAction( self.actionGitBash )
         menuGit.addAction( self.actionGitRunCommand )
@@ -348,7 +406,14 @@ class MgActions(QObject):
             self.actionConfigureGitProgram.setVisible(True)
 
 
-    def setupDynamicMenuCopy(self, repoInfo: MgRepoInfo) -> None:
+    def setupDynamicMenuCopy(self, repoTree: 'MgRepoTree') -> None:
+
+        items = repoTree.selectedRepoItems()
+        if len(items) == 0:
+            return
+
+        repoInfo = items[0].repoInfo
+
         self.actionCopyFullPath.setText(repoInfo.fullpath)
         self.actionCopyDirectory.setText(repoInfo.name)
 
@@ -363,7 +428,8 @@ class MgActions(QObject):
             def local_set_head(_repoName: str) -> None:
                 self.actionCopyHead.setText(repoInfo.head.split(' ')[1])
                 self.actionCopyHead.setEnabled(True)
-            self.menuCopyConnections.append( repoInfo.repo_info_available.connect(local_set_head) )
+            repoInfo.repo_info_available.connect(local_set_head)
+            self.menuCopyConnections.append( (repoInfo.repo_info_available, local_set_head) )
 
         if repoInfo.commit_sha1:
             self.actionCopyShortSha1.setText(repoInfo.commit_sha1[:SHORT_SHA1_NB_DIGITS])
@@ -398,12 +464,8 @@ class MgActions(QObject):
     def clearMenuCopyConnections(self) -> None:
         '''Called when Copy menu is going to hide. We disable the connections created
         by the Copy menu to capture the repo missing info'''
-        for c in self.menuCopyConnections:
-            if bool(c):
-                # QObject.disconnect(c)
-                # this is not working in pyside2
-                # re-enable it in pyside6
-                pass
+        for signal, slot in self.menuCopyConnections:
+            signal.disconnect( slot )
         self.menuCopyConnections = []
 
 

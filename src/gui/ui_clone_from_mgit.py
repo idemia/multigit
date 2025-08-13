@@ -31,29 +31,29 @@ class Ui_CloneFromMgitFile(object):
         CloneFromMgitFile.resize(935, 692)
         self.gridLayout_3 = QGridLayout(CloneFromMgitFile)
         self.gridLayout_3.setObjectName(u"gridLayout_3")
-        self.groupBox = QGroupBox(CloneFromMgitFile)
-        self.groupBox.setObjectName(u"groupBox")
+        self.groupBoxMultigitFile = QGroupBox(CloneFromMgitFile)
+        self.groupBoxMultigitFile.setObjectName(u"groupBoxMultigitFile")
         sizePolicy = QSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Fixed)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
-        sizePolicy.setHeightForWidth(self.groupBox.sizePolicy().hasHeightForWidth())
-        self.groupBox.setSizePolicy(sizePolicy)
+        sizePolicy.setHeightForWidth(self.groupBoxMultigitFile.sizePolicy().hasHeightForWidth())
+        self.groupBoxMultigitFile.setSizePolicy(sizePolicy)
         font = QFont()
         font.setBold(True)
-        self.groupBox.setFont(font)
-        self.groupBox.setFlat(False)
-        self.groupBox.setCheckable(False)
-        self.gridLayout = QGridLayout(self.groupBox)
+        self.groupBoxMultigitFile.setFont(font)
+        self.groupBoxMultigitFile.setFlat(False)
+        self.groupBoxMultigitFile.setCheckable(False)
+        self.gridLayout = QGridLayout(self.groupBoxMultigitFile)
         self.gridLayout.setObjectName(u"gridLayout")
-        self.label = QLabel(self.groupBox)
-        self.label.setObjectName(u"label")
+        self.labelSelectMultigitFile = QLabel(self.groupBoxMultigitFile)
+        self.labelSelectMultigitFile.setObjectName(u"labelSelectMultigitFile")
         font1 = QFont()
         font1.setBold(False)
-        self.label.setFont(font1)
+        self.labelSelectMultigitFile.setFont(font1)
 
-        self.gridLayout.addWidget(self.label, 0, 0, 1, 4)
+        self.gridLayout.addWidget(self.labelSelectMultigitFile, 0, 0, 1, 4)
 
-        self.pushButtonChooseMgitFile = QPushButton(self.groupBox)
+        self.pushButtonChooseMgitFile = QPushButton(self.groupBoxMultigitFile)
         self.pushButtonChooseMgitFile.setObjectName(u"pushButtonChooseMgitFile")
         sizePolicy1 = QSizePolicy(QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Fixed)
         sizePolicy1.setHorizontalStretch(1)
@@ -68,7 +68,7 @@ class Ui_CloneFromMgitFile(object):
 
         self.gridLayout.addWidget(self.pushButtonChooseMgitFile, 1, 3, 1, 1)
 
-        self.lineEditMgitFile = QLineEdit(self.groupBox)
+        self.lineEditMgitFile = QLineEdit(self.groupBoxMultigitFile)
         self.lineEditMgitFile.setObjectName(u"lineEditMgitFile")
         sizePolicy2 = QSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
         sizePolicy2.setHorizontalStretch(10)
@@ -79,7 +79,7 @@ class Ui_CloneFromMgitFile(object):
 
         self.gridLayout.addWidget(self.lineEditMgitFile, 1, 1, 1, 1)
 
-        self.historyButtonMgitFile = MgButtonHistory(self.groupBox)
+        self.historyButtonMgitFile = MgButtonHistory(self.groupBoxMultigitFile)
         self.historyButtonMgitFile.setObjectName(u"historyButtonMgitFile")
         icon1 = QIcon()
         icon1.addFile(u":/img/icons8-history-64.png", QSize(), QIcon.Mode.Normal, QIcon.State.Off)
@@ -88,7 +88,7 @@ class Ui_CloneFromMgitFile(object):
         self.gridLayout.addWidget(self.historyButtonMgitFile, 1, 2, 1, 1)
 
 
-        self.gridLayout_3.addWidget(self.groupBox, 0, 0, 1, 2)
+        self.gridLayout_3.addWidget(self.groupBoxMultigitFile, 0, 0, 1, 2)
 
         self.groupBox_2 = QGroupBox(CloneFromMgitFile)
         self.groupBox_2.setObjectName(u"groupBox_2")
@@ -320,7 +320,7 @@ class Ui_CloneFromMgitFile(object):
         self.radioForceUsername.toggled.connect(self.lineEditUsername.setEnabled)
         self.radioForceUsername.toggled.connect(self.historyButtonUsername.setEnabled)
 
-        self.tabWidgetProject.setCurrentIndex(0)
+        self.tabWidgetProject.setCurrentIndex(1)
 
 
         QMetaObject.connectSlotsByName(CloneFromMgitFile)
@@ -328,8 +328,8 @@ class Ui_CloneFromMgitFile(object):
 
     def retranslateUi(self, CloneFromMgitFile: QDialog) -> None:
         CloneFromMgitFile.setWindowTitle(QCoreApplication.translate("CloneFromMgitFile", u"Clone from Multigit file", None))
-        self.groupBox.setTitle(QCoreApplication.translate("CloneFromMgitFile", u"Multigit File", None))
-        self.label.setText(QCoreApplication.translate("CloneFromMgitFile", u"Select a multigit file (extension .mgit)", None))
+        self.groupBoxMultigitFile.setTitle(QCoreApplication.translate("CloneFromMgitFile", u"Multigit File", None))
+        self.labelSelectMultigitFile.setText(QCoreApplication.translate("CloneFromMgitFile", u"Select a multigit file (extension .mgit)", None))
 #if QT_CONFIG(tooltip)
         self.pushButtonChooseMgitFile.setToolTip(QCoreApplication.translate("CloneFromMgitFile", u"Choose multigit file", None))
 #endif // QT_CONFIG(tooltip)

@@ -16,15 +16,8 @@
   <layout class="QVBoxLayout" name="verticalLayout_2">
    <item>
     <layout class="QGridLayout" name="gridLayout">
-     <item row="0" column="1">
-      <widget class="QLabel" name="labelBranchOrTag">
-       <property name="text">
-        <string>Choose branch</string>
-       </property>
-      </widget>
-     </item>
      <item row="0" column="2">
-      <widget class="QLineEdit" name="lineEditBranchTagName">
+      <widget class="QComboBox" name="comboBoxBranchTagName">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
          <horstretch>2</horstretch>
@@ -35,6 +28,9 @@
         <font>
          <pointsize>10</pointsize>
         </font>
+       </property>
+       <property name="editable">
+        <bool>true</bool>
        </property>
       </widget>
      </item>
@@ -48,14 +44,14 @@
        </property>
       </widget>
      </item>
-     <item row="1" column="2">
+     <item row="2" column="2">
       <widget class="QCheckBox" name="checkBoxDefaultForNotExist">
        <property name="text">
         <string>If selected branch does not exist, switch to branch int</string>
        </property>
       </widget>
      </item>
-     <item row="2" column="2">
+     <item row="3" column="2">
       <widget class="QCheckBox" name="checkBoxDeleteLocalBranch">
        <property name="text">
         <string>Delete local branch</string>
@@ -65,7 +61,14 @@
        </property>
       </widget>
      </item>
-     <item row="3" column="2">
+     <item row="0" column="1">
+      <widget class="QLabel" name="labelBranchOrTag">
+       <property name="text">
+        <string>Choose branch</string>
+       </property>
+      </widget>
+     </item>
+     <item row="4" column="2">
       <widget class="QCheckBox" name="checkBoxDeleteRemoteBranch">
        <property name="text">
         <string>Delete remote branch</string>
@@ -75,8 +78,24 @@
        </property>
       </widget>
      </item>
-     <item row="4" column="0" colspan="3">
+     <item row="5" column="0" colspan="3">
       <widget class="QWidget" name="widget_4" native="true"/>
+     </item>
+     <item row="1" column="2">
+      <widget class="QCheckBox" name="checkBoxAutoStash">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+         <horstretch>3</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="toolTip">
+        <string notr="true"/>
+       </property>
+       <property name="text">
+        <string>Auto-stash : stash local changes before switching branch, unstash after switching</string>
+       </property>
+      </widget>
      </item>
     </layout>
    </item>
@@ -385,7 +404,7 @@
   </customwidget>
  </customwidgets>
  <tabstops>
-  <tabstop>lineEditBranchTagName</tabstop>
+  <tabstop>comboBoxBranchTagName</tabstop>
   <tabstop>checkBoxDefaultForNotExist</tabstop>
   <tabstop>checkBoxDeleteLocalBranch</tabstop>
   <tabstop>checkBoxDeleteRemoteBranch</tabstop>
@@ -395,7 +414,9 @@
   <tabstop>pushButtonAdjustRepoList</tabstop>
   <tabstop>treeWidgetRepoList</tabstop>
  </tabstops>
- <resources/>
+ <resources>
+  <include location="../../images/multigit_resources.qrc"/>
+ </resources>
  <connections>
   <connection>
    <sender>buttonBox</sender>

@@ -18,8 +18,8 @@
 from typing import Union, Any
 import unittest, tempfile, datetime, collections, pathlib, os, stat, shutil
 from logging import warning
-
 import os
+import sys
 import os.path
 
 from multigit import init_logging
@@ -300,6 +300,7 @@ class TestRepoInfo(unittest.TestCase):
             self.run_clone_test_on_origin_main_2_commits(self.dir1, self.dir3)
 
         self.run_test_on_main_modified_files(self.dir1, sha1)
+        self.run_test_on_main_conflicts_stash(self.dir1, sha1)
 
         # tag the file
         git_exec('tag', 'tag1')
@@ -424,7 +425,7 @@ class TestRepoInfo(unittest.TestCase):
                                        head=MSG_EMPTY_REPO,
                                        branch=MSG_EMPTY_REPO,
                                        fullpath=fp,
-                                       status='1 modified file',
+                                       status='1 modified',
                                        last_commit=MSG_NO_COMMIT,
                                        tags=''
                                        ))
@@ -491,7 +492,7 @@ class TestRepoInfo(unittest.TestCase):
         self.assertEqual(to_named_tuple(ric.refresh()),
                          RepoInfoTuple(name=n, head=f'branch {DEFAULT_BRANCH_NAME}', branch=DEFAULT_BRANCH_NAME,
                                        remote_synchro=MSG_LOCAL_BRANCH, fullpath=fp,
-                                       status='1 modified file'
+                                       status='1 modified'
                                        ))
 
         with open(p / 'file3', 'a') as f:
@@ -501,14 +502,14 @@ class TestRepoInfo(unittest.TestCase):
         self.assertEqual(to_named_tuple(ric.refresh()),
                          RepoInfoTuple(name=n, head=f'branch {DEFAULT_BRANCH_NAME}', branch=DEFAULT_BRANCH_NAME,
                                        remote_synchro=MSG_LOCAL_BRANCH, fullpath=fp,
-                                       status='2 modified files'
+                                       status='2 modified'
                                        ))
 
         (p/'file2').unlink()
         self.assertEqual(to_named_tuple(ric.refresh()),
                          RepoInfoTuple(name=n, head=f'branch {DEFAULT_BRANCH_NAME}', branch=DEFAULT_BRANCH_NAME,
                                        remote_synchro=MSG_LOCAL_BRANCH, fullpath=fp,
-                                       status='3 modified files'
+                                       status='3 modified'
                                        ))
 
         git_exec('add', 'file1', gitdir=p)
@@ -516,7 +517,7 @@ class TestRepoInfo(unittest.TestCase):
         self.assertEqual(to_named_tuple(ric.refresh()),
                          RepoInfoTuple(name=n, head=f'branch {DEFAULT_BRANCH_NAME}', branch=DEFAULT_BRANCH_NAME,
                                        remote_synchro=MSG_LOCAL_BRANCH, fullpath=fp,
-                                       status='3 modified files'
+                                       status='3 modified'
                                        ))
 
         git_commit(fp, 'check on modified files done')
@@ -526,6 +527,77 @@ class TestRepoInfo(unittest.TestCase):
                                        remote_synchro = MSG_LOCAL_BRANCH, fullpath=fp,
                                        status='OK',
                                        ))
+
+
+
+    def run_test_on_main_conflicts_stash(self, dir1, _sha1: str):
+        print('    - run_test_on_main_conflicts_stash')
+        n, p, fp = str(dir1), dir1, str(dir1.resolve())
+
+        ric = MgRepoInfo(n, fp)
+        self.assertEqual(to_named_tuple(ric.refresh()),
+                         RepoInfoTuple(name=n, head=f'branch {DEFAULT_BRANCH_NAME}', branch=f'{DEFAULT_BRANCH_NAME}',
+                                       remote_synchro = MSG_LOCAL_BRANCH, fullpath=fp,
+                                       status='OK',
+                                       ))
+
+        with open(p / 'file1', 'a') as f:
+            f.write(generate_content())
+
+        self.assertEqual(to_named_tuple(ric.refresh()),
+                         RepoInfoTuple(name=n, head=f'branch {DEFAULT_BRANCH_NAME}', branch=f'{DEFAULT_BRANCH_NAME}',
+                                       remote_synchro=MSG_LOCAL_BRANCH, fullpath=fp,
+                                       status='1 modified'
+                                       ))
+
+
+        # stash something
+        git_exec('stash', 'push', gitdir=p)
+        self.assertEqual(to_named_tuple(ric.refresh()),
+                         RepoInfoTuple(name=n, head=f'branch {DEFAULT_BRANCH_NAME}', branch=f'{DEFAULT_BRANCH_NAME}',
+                                       remote_synchro = MSG_LOCAL_BRANCH, fullpath=fp,
+                                       status='OK',
+                                       ))
+
+
+        # create conflict
+        with open(p / 'file1', 'a') as f:
+            f.write(generate_content())
+
+        git_exec('add', 'file1', gitdir=p)
+        git_commit(fp, 'check on modified files done')
+
+
+        git_exec('stash', 'pop', gitdir=p, allow_errors=True)
+        self.assertEqual(to_named_tuple(ric.refresh()),
+                         RepoInfoTuple(name=n, head=f'branch {DEFAULT_BRANCH_NAME}', branch=f'{DEFAULT_BRANCH_NAME}',
+                                       remote_synchro = MSG_LOCAL_BRANCH, fullpath=fp,
+                                       status='1 conflicted',
+                                       ))
+
+
+        with open(p / 'file3', 'a') as f:
+            f.write(generate_content())
+
+
+        self.assertEqual(to_named_tuple(ric.refresh()),
+                         RepoInfoTuple(name=n, head=f'branch {DEFAULT_BRANCH_NAME}', branch=f'{DEFAULT_BRANCH_NAME}',
+                                       remote_synchro = MSG_LOCAL_BRANCH, fullpath=fp,
+                                       status='1 conflicted, 1 modified',
+                                       ))
+
+
+        git_exec('add', 'file1', gitdir=p)
+        git_exec('checkout', 'file3', gitdir=p)
+        git_commit(fp, 'check on modified files done')
+
+
+        self.assertEqual(to_named_tuple(ric.refresh()),
+                         RepoInfoTuple(name=n, head=f'branch {DEFAULT_BRANCH_NAME}', branch=f'{DEFAULT_BRANCH_NAME}',
+                                       remote_synchro = MSG_LOCAL_BRANCH, fullpath=fp,
+                                       status='OK',
+                                       ))
+
 
     def run_test_on_main_with_one_tag(self, dir1, tag1: str):
         print('    - run_test_on_main_with_one_tag')
@@ -805,6 +877,15 @@ class TestRepoInfo(unittest.TestCase):
         rmtree_failsafe(strange_dir1)
 
     def test_find_git_repos_with_symlinks(self) -> None:
+        try:
+            self.run_test_find_git_repos_with_symlinks()
+        except OSError:
+            if sys.platform == 'win32':
+               raise unittest.SkipTest('You need to have admin privilege to run this test on Windows')
+            raise
+
+
+    def run_test_find_git_repos_with_symlinks(self) -> None:
         base_dir = pathlib.Path(self.gitdir) / 'dir'
         base_dir.mkdir()
         os.chdir(base_dir)
@@ -845,7 +926,7 @@ class TestRepoInfo(unittest.TestCase):
         result = set(MultiRepo(str(self.gitdir)).find_git_repos())
         assert 'dir' in result
         assert len(result) == 2
-        assert 'dir_ext' in result or 'dir\\link_to_dir_ext' in result
+        assert 'dir_ext' in result or os.path.join('dir','link_to_dir_ext') in result
 
         # Symlink to parent
         circular_ref_parent_dir = self.gitdir / 'circular_ref_parent'
@@ -875,9 +956,17 @@ class TestRepoInfo(unittest.TestCase):
         basedir_link = extdir / 'link_to_dir'
         basedir_link.symlink_to(base_dir)
 
+        self.assertEqual(set(MultiRepo(str(extdir)).find_git_repos()), {
+            '.', 'link_to_dir',
+        })
+
+        self.assertEqual(set(MultiRepo(str(base_dir)).find_git_repos()), {
+            '.', 'link_to_dir_ext',
+        })
+
         # the final check
         self.assertEqual(set(MultiRepo(str(self.gitdir)).find_git_repos()), {
-            'dir', 'dir_ext', 'circular_ref_parent', 'circular_ref_parent\\child_dir'
+            'dir', 'dir_ext', 'circular_ref_parent', os.path.join('circular_ref_parent','child_dir')
         })
 
 
@@ -982,7 +1071,7 @@ class TestRepoInfo(unittest.TestCase):
                                        branch=DEFAULT_BRANCH_NAME,
                                        fullpath=fp,
                                        status='OK',
-                                       remote_synchro='2 to pull',
+                                       remote_synchro='4 to pull',
                                        remote_branch=f'origin/{DEFAULT_BRANCH_NAME}',
                                        last_commit='',
                                        tags=None,
@@ -996,7 +1085,7 @@ class TestRepoInfo(unittest.TestCase):
                                        branch=DEFAULT_BRANCH_NAME,
                                        fullpath=fp,
                                        status='OK',
-                                       remote_synchro='1 to push, 2 to pull',
+                                       remote_synchro='1 to push, 4 to pull',
                                        remote_branch=f'origin/{DEFAULT_BRANCH_NAME}',
                                        last_commit='',
                                        tags=None,

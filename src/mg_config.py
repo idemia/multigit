@@ -75,8 +75,7 @@ CONFIG_VIEW_COL_URL = 'CONFIG_VIEW_COL_URL'
 CONFIG_CLONE_USERNAME = 'CONFIG_CONFIG_CLONE_USERNAME'
 CONFIG_FETCH_ON_STARTUP = 'CONFIG_FETCH_ON_STARTUP'
 CONFIG_DISPLAY_FETCH_ON_STARTUP_COUNTDOWN = 'CONFIG_DISPLAY_FETCH_ON_STARTUP_COUNTDOWN'
-
-DEFAULT_CHECK_UPDATE_FREQUENCY = 30 # check every month
+CONFIG_CONFIRM_BEFORE_QUIT = 'CONFIG_CONFIRM_BEFORE_QUIT'
 
 # Format is: 0xAARRGGBB with AA = alpha, RR = red, GG = green, BB = blue
 DEFAULT_CONFIG_HEAD_COLOR_BRANCH = QColor(Qt.GlobalColor.blue).rgb()
@@ -87,6 +86,8 @@ dbg = logger.debug
 
 __CONFIG_INSTANCE = None
 
+
+T = TypeVar('T')
 
 def get_config_instance() -> 'MgConfig':
     '''Return an instance of the configuration of Multigit, with the default configuration path'''
@@ -204,13 +205,16 @@ class MgConfig:
         with open(self.config_path, 'w', encoding='utf8') as f:
             f.write(pformat(self.config_dict, indent=4, width=200))
 
+
     def __getitem__(self, config_key: str) -> Any:
         '''Return the content of the configuration key or None if the key does not exist.'''
         return self.config_dict.get(config_key)
 
+
     def get(self, config_key: str, default_value: Any = None) -> Any:
         '''Return the content of the configuration key or None if the key does not exist.'''
         return self.config_dict.get(config_key, default_value)
+
 
     def __setitem__(self, key: str, value: Any) -> None:
         '''Set a configuration key with a value'''

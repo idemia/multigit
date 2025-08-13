@@ -18,15 +18,17 @@
 from typing import Sequence, cast, Any, Tuple, List
 import logging, time
 
-from PySide6.QtCore import Qt, QTimer
-from PySide6.QtGui import QGuiApplication
-from PySide6.QtWidgets import QDialog, QTreeWidgetItem, QDialogButtonBox, QWidget, QApplication, QPushButton
+from PySide6.QtCore import Qt, QTimer, QPoint
+from PySide6.QtGui import QGuiApplication, QAction
+from PySide6.QtWidgets import QDialog, QTreeWidgetItem, QDialogButtonBox, QWidget, QApplication, QPushButton, QAbstractItemView, QMenu
 
 from src.gui.ui_git_exec_window import Ui_GitExecDialog
 import src.mg_config as mgc
+from src.mg_utils import collectColumnText
 from src.mg_repo_info import MgRepoInfo
 from src.mg_auth_failure_mgr import MgAuthFailureMgr
-from src.mg_exec_task_item import MgExecTaskGit, MgExecTask, MgExecItemBase, MgExecItemOneCmd, MgExecItemMultiCmd, MgExecTaskGroup, after_other_taskgroup_is_finished, PreConditionState
+from src.mg_exec_task_item import MgExecTaskGit, MgExecTask, MgExecItemBase, MgExecItemMultiCmd, MgExecTaskGroup, \
+    PreConditionState
 
 logger = logging.getLogger('mg_git_exec_window')
 dbg = logger.debug
@@ -43,18 +45,36 @@ error = logger.error
 # to the user.
 DELTA_BETWEEN_CONCURRENT_GIT_RUN = 0.10
 
-INDENT_TEXT = '    '
-def collectColumnText(depth: int, item: QTreeWidgetItem) -> List[str]:
-    '''Collect text of item and all child, with an indentation'''
-    result = [ INDENT_TEXT * depth + text for text in item.text(0).split('\n') ]
-    for itemChildIdx in range(item.childCount()):
-        result.extend( collectColumnText(depth + 1, item.child(itemChildIdx) ) )
-    return result
 
 
 # noinspection PyAttributeOutsideInit
 class MgExecWindow(QDialog):
     '''Window for the execution of one or several git commands'''
+
+    # Structure of the items in the tree
+    #
+    # QTreeWidget:
+    # + topLevel QTreeWidgetItem: Fetching repositories
+    #       + JobItemOncCmd(): repo toto, command git fetch
+    #           + git result (hidden by default)
+    #       + JobItemOncCmd(): repo titi, command git fetch
+    #           + git result
+    # + topLevel QTreeWidgetItem: Running GitFlow start feature branch
+    #       + MgExecItemMultiCmd(): repo toto, GitFlow start feature  branch
+    #           + JobItemOncCmd(): repo toto, git switch dev
+    #               + git result (hidden by default)
+    #           + JobItemOncCmd(): repo toto, git pull
+    #               + git result
+    #           + JobItemOncCmd(): repo toto, git switch --create feat/my-feature
+    #               + git result
+    #       + MgExecItemMultiCmd(): repo titi, GitFlow start feature  branch
+    #           + JobItemOncCmd(): repo titi, git switch dev
+    #               + git result
+    #           + JobItemOncCmd(): repo titi, git pull
+    #               + git result
+    #           + JobItemOncCmd(): repo titi, git switch --create feat/my-feature
+    #               + git result
+
 
     def __init__(self, parent: QWidget, delta_between_concurrent_git_run: float = DELTA_BETWEEN_CONCURRENT_GIT_RUN) -> None:
         super().__init__(parent)
@@ -64,18 +84,24 @@ class MgExecWindow(QDialog):
         self.ui = Ui_GitExecDialog()
         self.ui.setupUi(self)
         self.ui.treeGitJobs.itemExpanded.connect(self.autoAdjustColumnSize)
+        self.ui.treeGitJobs.setSelectionMode( QAbstractItemView.SelectionMode.ExtendedSelection )
         self.ui.buttonBox.button(QDialogButtonBox.StandardButton.Discard).clicked.connect( self.slotAbort )
         self.ui.buttonBox.button(QDialogButtonBox.StandardButton.Discard).setText('Abort')
         self.buttonCopyLog = QPushButton('Copy git log to clipboard', self.ui.buttonBox)
         self.ui.buttonBox.addButton(self.buttonCopyLog, QDialogButtonBox.ButtonRole.ActionRole)
         self.ui.textEditSummary.hide()
+        self.ui.treeGitJobs.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
+        self.ui.treeGitJobs.customContextMenuRequested.connect(self.slotCustomContextMenuRequested)
         self.buttonCopyLog.clicked.connect( self.slotCopyLog )
         self.delta_between_concurrent_git_run = delta_between_concurrent_git_run
         self.clear()
         MgAuthFailureMgr.newSession()
 
+
     def clear(self) -> None:
         self.abort_requested = False
+        for item in self.getAllJobItems():
+            item.clearRepoConnections()
         self.ui.treeGitJobs.clear()
         self.nb_errors = 0
         self.nb_jobs = 0
@@ -229,19 +255,27 @@ class MgExecWindow(QDialog):
 
                 # note: the processEvent() call may catch another job finishing, triggering
                 #       a call to startNewJobs() in parallel to the currently running one.
-                #       This in-between call may start the job which we are currently looking at.
+                #       This in-between call may start the job which we are currently looking at, or
+                #       an abort request from the user can be propagated in the meantine.
                 #       So be sure to check again that the job is not started.
 
-                if not jobItem.isStarted:
-                    dbg('startNewJobs() - actually starting: %s' % jobItem)
-                    self.last_started_job_time = cur_time
-                    self.nb_jobs_running += 1
-                    nb_jobs_started += 1
-                    jobItem.run()
-                else:
+                if jobItem.isStarted:
                     # job was started in the interim
                     dbg('startNewJobs() - job started while we were waiting: {}'.format(jobItem))
                     dbg('startNewJobs() - proceed to the next job')
+                    return
+
+                if jobItem.abortRequested:
+                    # job was aborted in the interim
+                    dbg('startNewJobs() - job aborted while we were waiting: {}'.format(jobItem))
+                    dbg('startNewJobs() - proceed to the next job')
+                    return
+
+                dbg('startNewJobs() - actually starting: %s' % jobItem)
+                self.last_started_job_time = cur_time
+                self.nb_jobs_running += 1
+                nb_jobs_started += 1
+                jobItem.run()
 
         if nb_jobs_blocked_by_precondition > 0 and not self.abort_requested \
                 and (not max_git_process or self.nb_jobs_running < max_git_process):
@@ -318,7 +352,12 @@ class MgExecWindow(QDialog):
             # note: we must abort in the reverse order, else one abort is going to trigger the next job
             #       which is not aborted yet at the item level
             for i in reversed(range(topLevel.childCount())):
-                childItem = topLevel.child(i)
+                try:
+                    childItem = topLevel.child(i)
+                except RuntimeError:
+                    # C++ object already removed
+                    continue
+
                 if isinstance(childItem, MgExecItemBase):
                     childItem.abortItem()
 
@@ -354,4 +393,28 @@ class MgExecWindow(QDialog):
             QApplication.processEvents()
 
 
-# TODO: ensure that passing multiple commands per repo gets a proper title
+    def slotCustomContextMenuRequested(self, p: QPoint) -> None:
+        globalPoint = self.ui.treeGitJobs.viewport().mapToGlobal(p)
+        m = QMenu(self)
+        a = QAction('Copy log', self)
+        a.setCheckable(False)
+        m.addAction(a)
+        a.triggered.connect(lambda checked: self.slotCopyItemLogToClipboard())
+        m.popup(globalPoint)
+
+
+    def slotCopyItemLogToClipboard(self) -> None:
+        dbg('slotCopyItemLogToClipboard')
+
+        items = self.ui.treeGitJobs.selectedItems()
+        if not items:
+            # if no item is clicked, copy the full log
+            self.slotCopyLog()
+            return
+
+        fullLog = []        # type: List[str]
+        for item in items:
+            fullLog.extend(collectColumnText(0, item))
+
+        QGuiApplication.clipboard().setText('\n'.join(fullLog))
+

@@ -16,12 +16,13 @@ from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,
     QImage, QKeySequence, QLinearGradient, QPainter,
     QPalette, QPixmap, QRadialGradient, QTransform)
 from PySide6.QtWidgets import (QAbstractButton, QAbstractItemView, QApplication, QCheckBox,
-    QDialog, QDialogButtonBox, QFrame, QGridLayout,
-    QGroupBox, QHBoxLayout, QHeaderView, QLabel,
-    QLineEdit, QPushButton, QSizePolicy, QTreeWidget,
-    QTreeWidgetItem, QVBoxLayout, QWidget)
+    QComboBox, QDialog, QDialogButtonBox, QFrame,
+    QGridLayout, QGroupBox, QHBoxLayout, QHeaderView,
+    QLabel, QLineEdit, QPushButton, QSizePolicy,
+    QTreeWidget, QTreeWidgetItem, QVBoxLayout, QWidget)
 
 from src.mg_repo_tree import MgRepoTree
+# import multigit_resources_rc
 
 class Ui_GitSwitchBranch(object):
     def setupUi(self, GitSwitchBranch: QDialog) -> None:
@@ -32,23 +33,19 @@ class Ui_GitSwitchBranch(object):
         self.verticalLayout_2.setObjectName(u"verticalLayout_2")
         self.gridLayout = QGridLayout()
         self.gridLayout.setObjectName(u"gridLayout")
-        self.labelBranchOrTag = QLabel(GitSwitchBranch)
-        self.labelBranchOrTag.setObjectName(u"labelBranchOrTag")
-
-        self.gridLayout.addWidget(self.labelBranchOrTag, 0, 1, 1, 1)
-
-        self.lineEditBranchTagName = QLineEdit(GitSwitchBranch)
-        self.lineEditBranchTagName.setObjectName(u"lineEditBranchTagName")
+        self.comboBoxBranchTagName = QComboBox(GitSwitchBranch)
+        self.comboBoxBranchTagName.setObjectName(u"comboBoxBranchTagName")
         sizePolicy = QSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
         sizePolicy.setHorizontalStretch(2)
         sizePolicy.setVerticalStretch(0)
-        sizePolicy.setHeightForWidth(self.lineEditBranchTagName.sizePolicy().hasHeightForWidth())
-        self.lineEditBranchTagName.setSizePolicy(sizePolicy)
+        sizePolicy.setHeightForWidth(self.comboBoxBranchTagName.sizePolicy().hasHeightForWidth())
+        self.comboBoxBranchTagName.setSizePolicy(sizePolicy)
         font = QFont()
         font.setPointSize(10)
-        self.lineEditBranchTagName.setFont(font)
+        self.comboBoxBranchTagName.setFont(font)
+        self.comboBoxBranchTagName.setEditable(True)
 
-        self.gridLayout.addWidget(self.lineEditBranchTagName, 0, 2, 1, 1)
+        self.gridLayout.addWidget(self.comboBoxBranchTagName, 0, 2, 1, 1)
 
         self.widget_2 = QWidget(GitSwitchBranch)
         self.widget_2.setObjectName(u"widget_2")
@@ -63,24 +60,42 @@ class Ui_GitSwitchBranch(object):
         self.checkBoxDefaultForNotExist = QCheckBox(GitSwitchBranch)
         self.checkBoxDefaultForNotExist.setObjectName(u"checkBoxDefaultForNotExist")
 
-        self.gridLayout.addWidget(self.checkBoxDefaultForNotExist, 1, 2, 1, 1)
+        self.gridLayout.addWidget(self.checkBoxDefaultForNotExist, 2, 2, 1, 1)
 
         self.checkBoxDeleteLocalBranch = QCheckBox(GitSwitchBranch)
         self.checkBoxDeleteLocalBranch.setObjectName(u"checkBoxDeleteLocalBranch")
         self.checkBoxDeleteLocalBranch.setChecked(True)
 
-        self.gridLayout.addWidget(self.checkBoxDeleteLocalBranch, 2, 2, 1, 1)
+        self.gridLayout.addWidget(self.checkBoxDeleteLocalBranch, 3, 2, 1, 1)
+
+        self.labelBranchOrTag = QLabel(GitSwitchBranch)
+        self.labelBranchOrTag.setObjectName(u"labelBranchOrTag")
+
+        self.gridLayout.addWidget(self.labelBranchOrTag, 0, 1, 1, 1)
 
         self.checkBoxDeleteRemoteBranch = QCheckBox(GitSwitchBranch)
         self.checkBoxDeleteRemoteBranch.setObjectName(u"checkBoxDeleteRemoteBranch")
         self.checkBoxDeleteRemoteBranch.setChecked(True)
 
-        self.gridLayout.addWidget(self.checkBoxDeleteRemoteBranch, 3, 2, 1, 1)
+        self.gridLayout.addWidget(self.checkBoxDeleteRemoteBranch, 4, 2, 1, 1)
 
         self.widget_4 = QWidget(GitSwitchBranch)
         self.widget_4.setObjectName(u"widget_4")
 
-        self.gridLayout.addWidget(self.widget_4, 4, 0, 1, 3)
+        self.gridLayout.addWidget(self.widget_4, 5, 0, 1, 3)
+
+        self.checkBoxAutoStash = QCheckBox(GitSwitchBranch)
+        self.checkBoxAutoStash.setObjectName(u"checkBoxAutoStash")
+        sizePolicy2 = QSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
+        sizePolicy2.setHorizontalStretch(3)
+        sizePolicy2.setVerticalStretch(0)
+        sizePolicy2.setHeightForWidth(self.checkBoxAutoStash.sizePolicy().hasHeightForWidth())
+        self.checkBoxAutoStash.setSizePolicy(sizePolicy2)
+#if QT_CONFIG(tooltip)
+        self.checkBoxAutoStash.setToolTip(u"")
+#endif // QT_CONFIG(tooltip)
+
+        self.gridLayout.addWidget(self.checkBoxAutoStash, 1, 2, 1, 1)
 
 
         self.verticalLayout_2.addLayout(self.gridLayout)
@@ -108,32 +123,32 @@ class Ui_GitSwitchBranch(object):
 
         self.lineEditBranchFilter = QLineEdit(self.groupBoxBranchOrTagSelection)
         self.lineEditBranchFilter.setObjectName(u"lineEditBranchFilter")
-        sizePolicy2 = QSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
-        sizePolicy2.setHorizontalStretch(9)
-        sizePolicy2.setVerticalStretch(0)
-        sizePolicy2.setHeightForWidth(self.lineEditBranchFilter.sizePolicy().hasHeightForWidth())
-        self.lineEditBranchFilter.setSizePolicy(sizePolicy2)
+        sizePolicy3 = QSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
+        sizePolicy3.setHorizontalStretch(9)
+        sizePolicy3.setVerticalStretch(0)
+        sizePolicy3.setHeightForWidth(self.lineEditBranchFilter.sizePolicy().hasHeightForWidth())
+        self.lineEditBranchFilter.setSizePolicy(sizePolicy3)
         self.lineEditBranchFilter.setFont(font1)
 
         self.horizontalLayout_2.addWidget(self.lineEditBranchFilter)
 
         self.widget = QWidget(self.groupBoxBranchOrTagSelection)
         self.widget.setObjectName(u"widget")
-        sizePolicy3 = QSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Preferred)
-        sizePolicy3.setHorizontalStretch(3)
-        sizePolicy3.setVerticalStretch(0)
-        sizePolicy3.setHeightForWidth(self.widget.sizePolicy().hasHeightForWidth())
-        self.widget.setSizePolicy(sizePolicy3)
+        sizePolicy4 = QSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Preferred)
+        sizePolicy4.setHorizontalStretch(3)
+        sizePolicy4.setVerticalStretch(0)
+        sizePolicy4.setHeightForWidth(self.widget.sizePolicy().hasHeightForWidth())
+        self.widget.setSizePolicy(sizePolicy4)
 
         self.horizontalLayout_2.addWidget(self.widget)
 
         self.pushButtonGrouping = QPushButton(self.groupBoxBranchOrTagSelection)
         self.pushButtonGrouping.setObjectName(u"pushButtonGrouping")
-        sizePolicy4 = QSizePolicy(QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Fixed)
-        sizePolicy4.setHorizontalStretch(0)
-        sizePolicy4.setVerticalStretch(0)
-        sizePolicy4.setHeightForWidth(self.pushButtonGrouping.sizePolicy().hasHeightForWidth())
-        self.pushButtonGrouping.setSizePolicy(sizePolicy4)
+        sizePolicy5 = QSizePolicy(QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Fixed)
+        sizePolicy5.setHorizontalStretch(0)
+        sizePolicy5.setVerticalStretch(0)
+        sizePolicy5.setHeightForWidth(self.pushButtonGrouping.sizePolicy().hasHeightForWidth())
+        self.pushButtonGrouping.setSizePolicy(sizePolicy5)
         self.pushButtonGrouping.setFont(font1)
 
         self.horizontalLayout_2.addWidget(self.pushButtonGrouping)
@@ -190,11 +205,11 @@ class Ui_GitSwitchBranch(object):
 
         self.pushButtonAdjustRepoList = QPushButton(self.groupBox_2)
         self.pushButtonAdjustRepoList.setObjectName(u"pushButtonAdjustRepoList")
-        sizePolicy5 = QSizePolicy(QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Fixed)
-        sizePolicy5.setHorizontalStretch(1)
-        sizePolicy5.setVerticalStretch(0)
-        sizePolicy5.setHeightForWidth(self.pushButtonAdjustRepoList.sizePolicy().hasHeightForWidth())
-        self.pushButtonAdjustRepoList.setSizePolicy(sizePolicy5)
+        sizePolicy6 = QSizePolicy(QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Fixed)
+        sizePolicy6.setHorizontalStretch(1)
+        sizePolicy6.setVerticalStretch(0)
+        sizePolicy6.setHeightForWidth(self.pushButtonAdjustRepoList.sizePolicy().hasHeightForWidth())
+        self.pushButtonAdjustRepoList.setSizePolicy(sizePolicy6)
         self.pushButtonAdjustRepoList.setFont(font1)
 
         self.horizontalLayout.addWidget(self.pushButtonAdjustRepoList)
@@ -230,7 +245,7 @@ class Ui_GitSwitchBranch(object):
 
         self.verticalLayout_2.addLayout(self.horizontalLayout_4)
 
-        QWidget.setTabOrder(self.lineEditBranchTagName, self.checkBoxDefaultForNotExist)
+        QWidget.setTabOrder(self.comboBoxBranchTagName, self.checkBoxDefaultForNotExist)
         QWidget.setTabOrder(self.checkBoxDefaultForNotExist, self.checkBoxDeleteLocalBranch)
         QWidget.setTabOrder(self.checkBoxDeleteLocalBranch, self.checkBoxDeleteRemoteBranch)
         QWidget.setTabOrder(self.checkBoxDeleteRemoteBranch, self.lineEditBranchFilter)
@@ -248,10 +263,11 @@ class Ui_GitSwitchBranch(object):
 
     def retranslateUi(self, GitSwitchBranch: QDialog) -> None:
         GitSwitchBranch.setWindowTitle(QCoreApplication.translate("GitSwitchBranch", u"Git Switch branch", None))
-        self.labelBranchOrTag.setText(QCoreApplication.translate("GitSwitchBranch", u"Choose branch", None))
         self.checkBoxDefaultForNotExist.setText(QCoreApplication.translate("GitSwitchBranch", u"If selected branch does not exist, switch to branch int", None))
         self.checkBoxDeleteLocalBranch.setText(QCoreApplication.translate("GitSwitchBranch", u"Delete local branch", None))
+        self.labelBranchOrTag.setText(QCoreApplication.translate("GitSwitchBranch", u"Choose branch", None))
         self.checkBoxDeleteRemoteBranch.setText(QCoreApplication.translate("GitSwitchBranch", u"Delete remote branch", None))
+        self.checkBoxAutoStash.setText(QCoreApplication.translate("GitSwitchBranch", u"Auto-stash : stash local changes before switching branch, unstash after switching", None))
         self.groupBoxBranchOrTagSelection.setTitle(QCoreApplication.translate("GitSwitchBranch", u"Branch selection", None))
         self.label_3.setText(QCoreApplication.translate("GitSwitchBranch", u"Display filter :", None))
         self.label.setText("")

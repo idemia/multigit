@@ -22,7 +22,6 @@ import pathlib
 files_to_exclude = set([
 
 ### Pure Python dependencies
-
     '_bz2.pyd',
     '_decimal.pyd',
     '_hashlib.pyd',

@@ -99,14 +99,15 @@ def runDialogGitCommit(parent: QWidget, selectedRepos: List[MgRepoInfo], allRepo
     desc = "Git Commit"
     for repoInfo in dialog.getTargetedRepoList():
         # commit command
-        cmd = ['commit', '-a', '-m', commitMsg]
-        repoAndListOfGitCmd.append((desc, repoInfo, [cmd]))
-
+        commandsToRun = [
+            ['commit', '-a', '-m', commitMsg]
+        ]
         # push command
         if dialog.ui.checkBoxPushToRemote.isChecked():
-            cmd = ['push', '-u', '--progress', '--verbose', 'origin', '{0}'.format(repoInfo.branch)]
-            repoAndListOfGitCmd.append(('Push branch %s' % repoInfo.branch,
-                                        repoInfo, [cmd]))
+            commandsToRun.append( ['push', '-u', '--progress', '--verbose', 'origin', '{0}'.format(repoInfo.branch)] )
+            desc += f' and Push branch {repoInfo.branch}'
+
+        repoAndListOfGitCmd.append((desc, repoInfo, commandsToRun))
 
     # show window for executing git
     gitExecWindow = MgExecWindow(parent)

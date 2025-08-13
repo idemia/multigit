@@ -13,9 +13,10 @@
 #     See the License for the specific language governing permissions and
 #     limitations under the License.
 #
-import sys
-from typing import TYPE_CHECKING, List, Optional
-import logging, pathlib, json, os, subprocess, time
+
+
+from typing import TYPE_CHECKING, List, Optional, cast
+import logging, pathlib, json, os, subprocess, time, sys
 
 from PySide6.QtGui import QRegularExpressionValidator, QColor
 from PySide6.QtWidgets import QDialog, QWidget, QFileDialog, QMessageBox, QTreeWidgetItem, QPushButton, QDialogButtonBox
@@ -25,13 +26,11 @@ if TYPE_CHECKING:
     from src.mg_window import MgMainWindow
 from src.gui.ui_clone_from_mgit import Ui_CloneFromMgitFile
 from src.mg_json_mgit_parser import ProjectStructure
-from src.mg_repo_info import MgRepoInfo
 import src.mg_config as mgc
-from src.mg_exec_window import MgExecWindow
-from src.mg_exec_task_item import MgExecTaskGroup, after_other_taskgroup_is_started_and_dir_exists
 from src.mg_dialog_utils import reBranchTagValues
-from src.mg_utils import set_username_on_git_url, deleteDirList
+from src.mg_utils import set_username_on_git_url
 from src.mg_plugin_mgr import pluginMgrInstance
+from src.mg_clone_execution import cloneFromDialog, CloneExistDirBehavior
 
 logger = logging.getLogger('mg_dialog_clone_from_mgit')
 dbg = logger.debug
@@ -315,6 +314,19 @@ class MgDialogCloneFromMgitFile(QDialog):
         self.updateDisplayOfMultigitFile()
 
 
+    def getExistingDirBehavior(self) -> CloneExistDirBehavior:
+        if self.ui.radioButtonDirExistsDelDir.isChecked():
+            return CloneExistDirBehavior.deleteDirectory
+
+        if self.ui.radioButtonDirExistsSkipDir.isChecked():
+            return CloneExistDirBehavior.skipClone
+
+        if self.ui.radioButtonDirExistsGitFail.isChecked():
+            return CloneExistDirBehavior.gitFails
+
+        assert False, "No radio button checked for directory behavior"
+
+
     def accept(self) -> None:
         '''Called when the dialog is validated'''
         if self.ui.lineEditDestDir.text() == '':
@@ -357,7 +369,6 @@ class MgDialogCloneFromMgitFile(QDialog):
 
 
         mgc.get_config_instance().lruSetRecent(mgc.CONFIG_LAST_PROJECT_DIR, self.ui.lineEditDestDir.text())
-        mgc.get_config_instance().lruSetRecent(mgc.CONFIG_LAST_MGIT_FILE, self.ui.lineEditMgitFile.text())
         mgc.get_config_instance().lruSetRecent(mgc.CONFIG_CLONE_USERNAME, self.ui.lineEditUsername.text())
         mgc.get_config_instance().save()
         # everyting is fine, accept the dialog
@@ -373,6 +384,7 @@ def runDialogCloneFromMgitFile(window: 'MgMainWindow') -> None:
     :param window: application window
     :return:
     """
+    dbg('runDialogCloneFromMgitFile')
 
     dialogCloneFromMgitFile = MgDialogCloneFromMgitFile(window)
 
@@ -382,246 +394,6 @@ def runDialogCloneFromMgitFile(window: 'MgMainWindow') -> None:
         # Cancel was clicked, do nothing
         return
 
-    # user clicked on OK, display the folder in the main window
-    # performing clone
-
-    taskGroups: List[MgExecTaskGroup] = []
-    reposToClone = dialogCloneFromMgitFile.proj.repos[:]
-    reposToClone.sort(key=lambda r: r.destination)
-
-    skipDir  = []
-    toDelDir = []
-    alreadyExists = []
-
-    for jsonFileRepo in reposToClone:
-        if jsonFileRepo.url == '':
-            # the user was informed about this, skip the repo
-            continue
-
-        if os.path.exists(jsonFileRepo.dest_fullpath):
-            # oh oh, directory exists, let see what user want us to do:
-            if dialogCloneFromMgitFile.ui.radioButtonDirExistsSkipDir.isChecked():
-                skipDir.append(jsonFileRepo.dest_fullpath)
-                # the best way to skip is to do nothing
-                continue
-
-            if dialogCloneFromMgitFile.ui.radioButtonDirExistsDelDir.isChecked():
-                toDelDir.append(jsonFileRepo.dest_fullpath)
-
-            if dialogCloneFromMgitFile.ui.radioButtonDirExistsGitFail.isChecked():
-                # this is the default behavior, so do nothing
-                alreadyExists.append(jsonFileRepo.dest_fullpath)
-
-
-        repoInfo = MgRepoInfo(jsonFileRepo.destination, jsonFileRepo.dest_fullpath, jsonFileRepo.destination)
-        taskGroup = MgExecTaskGroup(f'Cloning {repoInfo.name}', repoInfo)
-        taskGroup.appendGitTask(f'git clone {repoInfo.name}',
-                                ['clone', '--progress', jsonFileRepo.url, jsonFileRepo.dest_fullpath],
-                                run_inside_git_repo=False,
-                                )
-
-        if len(jsonFileRepo.head):
-            # use checkout and not switch because HEAD may point to a branch, tag or commit SHA1
-            taskGroup.appendGitTask( f'git checkout {jsonFileRepo.head}', ['checkout', jsonFileRepo.head, '--' ] )
-
-        # if head is empty, the repo is probably empty, so do nothing
-
-        taskGroups.append( taskGroup )
-
-    if len(alreadyExists):
-        msg = 'The following repositories already exists:\n'
-        msg += '- ' + '\n- '.join(alreadyExists) + '\n\n'
-        msg += 'Continue will trigger a git error for these repositories, please consider Deleting them.'
-        msgBox = QMessageBox(window)
-        msgBox.setWindowTitle('Confirm clone on existing')
-        msgBox.setText(msg)
-        continueButton = msgBox.addButton('Continue', QMessageBox.ButtonRole.AcceptRole)
-        delButton = msgBox.addButton('Delete directories', QMessageBox.ButtonRole.AcceptRole)
-        abortButton = msgBox.addButton(QMessageBox.StandardButton.Abort)
-        msgBox.exec()
-        buttonSelected = msgBox.clickedButton()
-
-        if buttonSelected == abortButton:
-            # user changed its mind ...
-            return
-
-        elif buttonSelected == delButton:
-            # mark the directories to be deleted
-            toDelDir = alreadyExists
-
-
-    if len(skipDir):
-        msg = 'The following repositories already exists and will NOT be cloned (skip behavior):\n'
-        msg += '- ' + '\n- '.join(skipDir) + '\n'
-        buttonSelectedWarning = QMessageBox.warning(window, 'Confirm skip of repositories', msg, QMessageBox.StandardButton.Ok | QMessageBox.StandardButton.Abort)
-        if buttonSelectedWarning == QMessageBox.StandardButton.Abort:
-            # user changed its mind ...
-            return
-
-    if len(toDelDir):
-        # sorting in reverse order allows to remove subdirectories before updirectories
-        toDelDir.sort(reverse=True)
-
-        # alreadyExists is set when user chose no special action in the clone dialog, but
-        # choose to delete in the second dialog
-        if not alreadyExists:
-            # the user has not yet validated the list of repos
-            msg = 'The following repositories already exists and will be DELETED (delete behavior):\n'
-            msg += '- ' + '\n- '.join(toDelDir) + '\n'
-            buttonSelectedWarning = QMessageBox.warning(window, 'Confirm deletion of repositories', msg, QMessageBox.StandardButton.Ok | QMessageBox.StandardButton.Abort)
-            if buttonSelectedWarning == QMessageBox.StandardButton.Abort:
-                # user changed its mind ...
-                return
-
-        # kill tgitcache before anything. If it was running, it would prevent deletion of directories
-        if sys.platform == 'win32':
-            subprocess.call(['taskkill', '/t', '/f', '/im', 'tgitcache.exe'])
-
-        deleteDirList(toDelDir)
-
-        stillExists = [v for v in toDelDir if os.path.exists(v)]
-        if len(stillExists):
-            # let's try a second time with some delay
-            time.sleep(0.5)
-            deleteDirList(stillExists)
-
-        results = ''
-        stillExists = [v for v in toDelDir if os.path.exists(v)]
-        if len(stillExists):
-            # let's try a third time with more delay
-            time.sleep(0.5)
-            results = deleteDirList(stillExists)
-
-        if len(results):
-            msg = 'The deletion of repositories returned the following errors:\n' + results
-            buttonSelectedWarning = QMessageBox.warning(window, 'Directory deletion error', msg, QMessageBox.StandardButton.Ok | QMessageBox.StandardButton.Abort)
-            if buttonSelectedWarning == QMessageBox.StandardButton.Abort:
-                # user wants to check what is going on
-                return
-
-        if len(stillExists):
-            msg = 'Deletion of the following repositories failed:\n'
-            msg += '- ' + '\n- '.join(stillExists)
-            buttonSelectedWarning = QMessageBox.warning(window, 'Directory not deleted', msg, QMessageBox.StandardButton.Ok | QMessageBox.StandardButton.Abort)
-            if buttonSelectedWarning == QMessageBox.StandardButton.Abort:
-                # user wants to check what is going on
-                return
-
-    # Ensure that clone will work with nested subdirectories
-    taskGroups = addPreconditionToEnsureCloneOrderLogic(taskGroups)
-
-    # Give some time between two clones to make sure a clone is fully started
-    # before the next one starts, because the next one may create some subdirectories
-    # which would then prevent the first clone.
-    gitExecWindow = MgExecWindow(window, 0.5)
-    gitExecWindow.execTaskGroups('Clone project repositories', taskGroups)
-
-    # show the newly created path in MultiGit
-    gitExecWindow.finished.connect( lambda result: window.openDir(dialogCloneFromMgitFile.ui.lineEditDestDir.text()))
-
-
-class TaskNode:
-    def __init__(self, parent: Optional['TaskNode'], name: str, taskGroup: Optional[MgExecTaskGroup]) -> None:
-        self.parent = parent
-        self.name = name
-        self.taskGroup = taskGroup
-        self.children: List['TaskNode'] = []
-
-
-    def addChild(self, parts: List[str], taskGroup: MgExecTaskGroup ) -> 'TaskNode':
-        '''Add a child in the graph, in the right node'''
-        if len(parts) == 0:
-            # we are ready to set the task group
-            self.taskGroup = taskGroup
-            return self
-
-        for child in self.children:
-            if child.name == parts[0]:
-                # we have found our children !
-                break
-        else:
-            # we have found no children, create one
-            child = TaskNode(self, parts[0], None)
-            self.children.append(child)
-
-        # continue the search
-        return child.addChild(parts[1:], taskGroup)
-
-
-def build_taskgroup_dep_graph(taskGroups: List[MgExecTaskGroup]) -> TaskNode:
-    '''Build a dependency graph with the nodes and return the top node of the graph'''
-    topNode = TaskNode(None, '', None)
-
-    for taskGroup in taskGroups:
-        splitter = '/'
-        if not splitter in taskGroup.repo.name and '\\' in taskGroup.repo.name:
-            splitter = '\\'
-        topNode.addChild( taskGroup.repo.name.split(splitter), taskGroup )
-
-    return topNode
-
-
-def findParentTaskGroup(node: TaskNode) -> Optional[TaskNode]:
-    '''Walk the parent of this tasknode until another tasknode is found and return it.
-
-    If no tasknode is found, return None'''
-    while node.parent is not None:
-        if node.parent.taskGroup is not None:
-            return node.parent
-
-        node = node.parent
-
-    return None
-
-
-def addPreconditionsToTaskGroup(node: TaskNode) -> None:
-    '''Using the graph, modify the taskGroup objects in place by adding preconditions
-    when one taskGroup depends on another one.'''
-
-    if node.taskGroup is not None:
-        # add precondition for this node
-        parentTaskGroupNode = findParentTaskGroup(node)
-
-        if parentTaskGroupNode is not None:
-            assert parentTaskGroupNode.taskGroup is not None
-            node.taskGroup.pre_condition = after_other_taskgroup_is_started_and_dir_exists(parentTaskGroupNode.taskGroup)
-
-    # add preconditions for this nodes children
-    for n in node.children:
-        addPreconditionsToTaskGroup(n)
-
-
-
-def addPreconditionToEnsureCloneOrderLogic(taskGroups: List[MgExecTaskGroup]) -> List[MgExecTaskGroup]:
-    '''Generate preconditions so that a subdirectory of a git repo is cloned after the git parent git repo.
-
-    The taskGroup inside the list are modifed in place, with a new precondition.
-
-    Example, with the structure:
-    dev/ (git repo)
-      + subdev1 (git repo)
-        + subdev1_sub1 (git repo)
-        + subdev1_sub2 (git repo)
-      + subdev2 (git repo)
-        + toto
-           + subdev2_sub1 (git repo)
-
-    It will generate the following pre-conditions:
-    - subdev1 is cloned after dev/ clone has started
-    - subdev1_sub1 is cloned after subdev1/ clone has started
-    - subdev1_sub2 is cloned after subdev1/ clone has started
-    - subdev2 is cloned after dev/ clone has started
-    - subdev2_sub1 is cloned after subdev2/ clone has started
-    '''
-    topNode = build_taskgroup_dep_graph(taskGroups)
-
-    addPreconditionsToTaskGroup(topNode)
-
-    return taskGroups
-
-# TODO
-# - rename Structure  to JsonFileStructure
-# - rename Repository to JsonFileRepo
-# - rename Repository to JsonFilePostCloneCommand
-
+    mgc.get_config_instance().lruSetRecent(mgc.CONFIG_LAST_MGIT_FILE, dialogCloneFromMgitFile.ui.lineEditMgitFile.text())
+    cloneFromDialog(dialogCloneFromMgitFile.proj, window, dialogCloneFromMgitFile.getExistingDirBehavior())
 

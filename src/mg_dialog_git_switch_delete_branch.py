@@ -20,19 +20,20 @@ from collections import defaultdict
 import enum
 
 from PySide6.QtWidgets import QMessageBox, QTreeWidgetItem, QApplication, QProgressDialog, \
-                            QTreeWidget, QWidget, QAbstractItemView
-from PySide6.QtCore import QTimer, Qt
+                            QTreeWidget, QWidget, QAbstractItemView, QMenu
+from PySide6.QtGui import QAction
+from PySide6.QtCore import QTimer, Qt, QPoint
 
 if TYPE_CHECKING:
     pass
 from src.gui.ui_git_switch_branch import Ui_GitSwitchBranch
 from src.mg_dialog_utils import MgDialogWithRepoList
 from src.mg_exec_window import MgExecWindow
-from src.mg_utils import extractInt, istrcmp, treeWidgetDeepIterator
+from src.mg_utils import extractInt, istrcmp, treeWidgetDeepIterator, collectColumnText
 from src.mg_repo_info import MgRepoInfo
 from src import mg_config as mgc
 from src.mg_ensure_info_available import MgEnsureInfoAvailable, RepoInfoFlags
-from src.mg_exec_task_item import MgExecTaskGit, MgExecTaskGroup
+from src.mg_exec_task_item import MgExecTaskGit, MgExecTaskGroup, MgTaskComment, MgExecTask
 from src import mg_const
 
 class GroupingBy(enum.Enum):
@@ -44,10 +45,11 @@ groupingLabel = {
     GroupingBy.NAME: 'Group by name',
 }
 
-class DeleteOrSwitch(enum.Enum):
-    DELETE        = enum.auto()
+class DeleteOrSwitchBranchOrTag(enum.Enum):
+    DELETE_BRANCH = enum.auto()
     SWITCH_BRANCH = enum.auto()
     CHECKOUT_TAG  = enum.auto()
+    DELETE_TAG    = enum.auto()
 
 
 class ItemRole(enum.Enum):
@@ -186,7 +188,7 @@ def analyseRepoBranchOrTagInfo(repoBranchInfo: List[Tuple[str, List[str], List[s
 
 def applyFilterToTree(tree: QTreeWidget, filterText: str) -> None:
     '''Apply a filter to the tree of repositories with the following rules:
-    - matching is case insensitive and can match in the middle of a word
+    - matching is case-insensitive and can match in the middle of a word
     - branch/tag names are searched and hidden if they don't match
     - list of repositories of a branch/tag are shown if the branch/tag is shown
     '''
@@ -221,7 +223,7 @@ def applyFilterToTree(tree: QTreeWidget, filterText: str) -> None:
     for item in treeWidgetDeepIterator(tree):
         item.setHidden(True)
 
-    # we wander through all items in DFS
+    # we wander through all items in Depth-First-Search
     for item in treeWidgetDeepIterator(tree):
         # only end tag/branch names items are relevant for filtering
         if item.data(0, Qt.ItemDataRole.UserRole) != ItemRole.BRANCH_TAG_END_NAME:
@@ -372,11 +374,24 @@ def fillBranchTagInfo(repoItemInfo: List[Tuple[str, int, str, List[str]]],
 
 
 class MgDialogGitSwitchDeleteBranch(MgDialogWithRepoList):
+    '''Dialog 4-in-1:
+
+    This dialog can be configured to be:
+    - git switch branch
+    - git checkout tag
+    - git delete branch
+    - git delete tag
+
+    So, it's complex!
+
+    '''
+
+
     ui: Ui_GitSwitchBranch
     progressDialog: QProgressDialog
 
     def __init__(self, parent: QWidget,
-                 deleteOrSwitch: DeleteOrSwitch,
+                 deleteOrSwitch: DeleteOrSwitchBranchOrTag,
                  selectedRepos:
                  List[MgRepoInfo],
                  allRepos: List[MgRepoInfo]
@@ -397,44 +412,69 @@ class MgDialogGitSwitchDeleteBranch(MgDialogWithRepoList):
         self.ui.treeWidgetBranches.setSortingEnabled(True)
         self.ui.treeWidgetBranches.sortByColumn(0, Qt.SortOrder.AscendingOrder)
         self.ui.treeWidgetBranches.itemSelectionChanged.connect(self.slotItemSelectionChanged)
+        self.ui.treeWidgetBranches.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
+        self.ui.treeWidgetBranches.customContextMenuRequested.connect(self.slotCustomContextMenuRequested)
 
         self.ui.lineEditBranchFilter.setPlaceholderText('Filter the list of %s by typing here' % ('branches' if self.isBranchDialog() else 'tags'))
         self.ui.lineEditBranchFilter.setClearButtonEnabled(True)
         self.ui.lineEditBranchFilter.textEdited.connect(self.slotApplyFilter)
-        self.ui.lineEditBranchTagName.setPlaceholderText('Choose %s from list below or type it here' % ('branch' if self.isBranchDialog() else 'tag'))
+        self.ui.comboBoxBranchTagName.setPlaceholderText('Choose %s from list below or type it or select it from the right' % ('branch' if self.isBranchDialog() else 'tag'))
+        self.configEntry = ''
 
-        if deleteOrSwitch == DeleteOrSwitch.DELETE:
+        self.ui.checkBoxAutoStash.setToolTip(mg_const.MSG_AUTO_STASH)
+
+        if deleteOrSwitch == DeleteOrSwitchBranchOrTag.DELETE_BRANCH:
             self.setWindowTitle('Git Delete Branch')
-            self.ui.labelBranchOrTag.setText('Git delete branch')
-            self.ui.labelBranchOrTag.setVisible(True)
+            self.ui.labelBranchOrTag.setText('Choose branch(es) to delete')
+            self.ui.groupBoxBranchOrTagSelection.setTitle('Branch selection')
             self.ui.checkBoxDefaultForNotExist.setVisible(False)
             self.ui.checkBoxDeleteLocalBranch.setVisible(True)
+            self.ui.checkBoxDeleteLocalBranch.setChecked(True)
             self.ui.checkBoxDeleteRemoteBranch.setVisible(True)
-            self.ui.checkBoxDefaultForNotExist.setVisible(False)
+            self.ui.checkBoxDeleteRemoteBranch.setChecked(False)
+            self.ui.checkBoxAutoStash.setVisible(False)
             self.ui.treeWidgetBranches.setSelectionMode(QAbstractItemView.SelectionMode.ExtendedSelection)
-            self.ui.treeWidgetBranches.headerItem().setText(0, 'Branches')
-        elif deleteOrSwitch == DeleteOrSwitch.SWITCH_BRANCH:
-            self.setWindowTitle('Git Switch Branch')
-            self.ui.labelBranchOrTag.setText('Choose branch')
-            self.ui.groupBoxBranchOrTagSelection.setTitle('Branch selection')
-            self.ui.labelBranchOrTag.setVisible(True)
-            self.ui.checkBoxDeleteRemoteBranch.setVisible(False)
-            self.ui.checkBoxDeleteLocalBranch.setVisible(False)
-            self.ui.checkBoxDefaultForNotExist.setVisible(True)
             self.ui.treeWidgetBranches.setColumnHidden(COL_BRANCH_TYPE, False)
             self.ui.treeWidgetBranches.headerItem().setText(0, 'Branches')
-        else:
-            assert deleteOrSwitch == DeleteOrSwitch.CHECKOUT_TAG
-            self.setWindowTitle('Git Checkout Tag')
-            self.ui.labelBranchOrTag.setText('Choose tag')
+            self.configEntry = mgc.CONFIG_GIT_BRANCH_HISTORY
+
+        elif deleteOrSwitch == DeleteOrSwitchBranchOrTag.DELETE_TAG:
+            self.setWindowTitle('Git Delete Tag')
+            self.ui.labelBranchOrTag.setText('Choose (local) tag(s) to delete')
             self.ui.groupBoxBranchOrTagSelection.setTitle('Tag selection')
-            self.ui.labelBranchOrTag.setVisible(True)
-            self.ui.checkBoxDeleteRemoteBranch.setVisible(False)
-            self.ui.checkBoxDeleteLocalBranch.setVisible(False)
             self.ui.checkBoxDefaultForNotExist.setVisible(False)
+            self.ui.checkBoxDeleteLocalBranch.setVisible(False)
+            self.ui.checkBoxDeleteRemoteBranch.setVisible(False)
+            self.ui.checkBoxAutoStash.setVisible(False)
+            self.ui.treeWidgetBranches.setSelectionMode(QAbstractItemView.SelectionMode.ExtendedSelection)
             self.ui.treeWidgetBranches.setColumnHidden(COL_BRANCH_TYPE, True)
             self.ui.treeWidgetBranches.headerItem().setText(0, 'Tags')
+            self.configEntry = mgc.CONFIG_TAG_HISTORY
 
+        elif deleteOrSwitch == DeleteOrSwitchBranchOrTag.SWITCH_BRANCH:
+            self.setWindowTitle('Git Switch Branch')
+            self.ui.labelBranchOrTag.setText('Choose branch to switch to')
+            self.ui.groupBoxBranchOrTagSelection.setTitle('Branch selection')
+            self.ui.checkBoxDefaultForNotExist.setVisible(True)
+            self.ui.checkBoxDeleteRemoteBranch.setVisible(False)
+            self.ui.checkBoxDeleteLocalBranch.setVisible(False)
+            self.ui.treeWidgetBranches.setColumnHidden(COL_BRANCH_TYPE, False)
+            self.ui.treeWidgetBranches.headerItem().setText(0, 'Branches')
+            self.configEntry = mgc.CONFIG_GIT_BRANCH_HISTORY
+        else:
+            assert deleteOrSwitch == DeleteOrSwitchBranchOrTag.CHECKOUT_TAG
+            self.setWindowTitle('Git Checkout Tag')
+            self.ui.labelBranchOrTag.setText('Choose tag to checkout')
+            self.ui.groupBoxBranchOrTagSelection.setTitle('Tag selection')
+            self.ui.checkBoxDefaultForNotExist.setVisible(False)
+            self.ui.checkBoxDeleteRemoteBranch.setVisible(False)
+            self.ui.checkBoxDeleteLocalBranch.setVisible(False)
+            self.ui.treeWidgetBranches.setColumnHidden(COL_BRANCH_TYPE, True)
+            self.ui.treeWidgetBranches.headerItem().setText(0, 'Tags')
+            self.configEntry = mgc.CONFIG_TAG_HISTORY
+
+        if len(mgc.get_config_instance().lruAsList(self.configEntry)):
+            self.ui.comboBoxBranchTagName.insertItems(0, mgc.get_config_instance().lruAsList(self.configEntry))
 
     def exec_(self) -> Any:
         QTimer.singleShot(0, self.ensureBranchTagInfoAvailable)
@@ -451,7 +491,7 @@ class MgDialogGitSwitchDeleteBranch(MgDialogWithRepoList):
 
         branchNames = [self.resolveBranchName(item) for item in items]
         branchNamesExcludingNone = [name for name in branchNames if name]
-        self.ui.lineEditBranchTagName.setText( '  '.join(branchNamesExcludingNone) )
+        self.ui.comboBoxBranchTagName.setCurrentText( '  '.join(branchNamesExcludingNone) )
 
 
     def resolveBranchName(self, item: QTreeWidgetItem) -> str:
@@ -491,7 +531,7 @@ class MgDialogGitSwitchDeleteBranch(MgDialogWithRepoList):
         targetedRepos = self.getTargetedRepoList()
         self.ensureInfoAvailable = MgEnsureInfoAvailable(self, targetedRepos, showProgressDialog=True)
 
-        if self.deleteOrSwitch in (DeleteOrSwitch.SWITCH_BRANCH, DeleteOrSwitch.DELETE):
+        if self.deleteOrSwitch in (DeleteOrSwitchBranchOrTag.SWITCH_BRANCH, DeleteOrSwitchBranchOrTag.DELETE_BRANCH):
             repoInfo = RepoInfoFlags.ALL_BRANCHES
         else:
             repoInfo = RepoInfoFlags.ALL_TAGS
@@ -535,33 +575,53 @@ class MgDialogGitSwitchDeleteBranch(MgDialogWithRepoList):
         self.slotApplyFilter()
 
 
-
     def slotApplyFilter(self) -> None:
         '''Called when the user modifies text of the branch line edit. Trigger filtering
         the content of the items'''
         filterText = self.ui.lineEditBranchFilter.text().lower()
         applyFilterToTree(self.ui.treeWidgetBranches, filterText)
 
-    def getTargetedBranchTag(self) -> str:
-        '''Get the branch selected in either local or remote tree'''
-        if self.deleteOrSwitch == DeleteOrSwitch.DELETE:
+
+    def getSwitchTargetBranchTag(self) -> str:
+        '''Get the branch or tag selected in either local or remote tree'''
+        if self.deleteOrSwitch not in (DeleteOrSwitchBranchOrTag.SWITCH_BRANCH, DeleteOrSwitchBranchOrTag.CHECKOUT_TAG):
             raise ValueError('Do not use this method in DELETE branch mode')
-        return self.ui.lineEditBranchTagName.text()
+        return self.ui.comboBoxBranchTagName.currentText()
 
 
-    def getDeleteTargetedBranches(self) -> List[str]:
+    def getDeleteTargetedBranchTag(self) -> List[str]:
         '''Get the branch selected in either local or remote tree'''
-        if self.deleteOrSwitch != DeleteOrSwitch.DELETE:
-            raise ValueError('Do not use this method when not in DELETE branch mode')
-        branchesText =  self.ui.lineEditBranchTagName.text()
-        branchesWithEmpty = branchesText.split(' ')
-        branches = [br for br in branchesWithEmpty if br]
-        return branches
+        if self.deleteOrSwitch not in (DeleteOrSwitchBranchOrTag.DELETE_BRANCH, DeleteOrSwitchBranchOrTag.DELETE_TAG):
+            raise ValueError('Do not use this method when not in DELETE branch/tag mode')
+        branchTagsText =  self.ui.comboBoxBranchTagName.currentText()
+        branchTagsWithEmpty = branchTagsText.split(' ')
+        branchTags = [br for br in branchTagsWithEmpty if br]
+        return branchTags
 
 
     def isBranchDialog(self) -> bool:
         '''Return True if dialog is about branch (switching, deleting)'''
-        return self.deleteOrSwitch in (DeleteOrSwitch.SWITCH_BRANCH, DeleteOrSwitch.DELETE)
+        return self.deleteOrSwitch in (DeleteOrSwitchBranchOrTag.SWITCH_BRANCH, DeleteOrSwitchBranchOrTag.DELETE_BRANCH)
+
+
+    def slotCustomContextMenuRequested(self, p: QPoint) -> None:
+        '''Triggered with right-clicking on an item. Used to copy the repository list'''
+        item = self.ui.treeWidgetBranches.itemAt(p)
+        m = QMenu(self)
+        a = QAction('Copy repository list', self)
+        a.setCheckable(False)
+        m.addAction(a)
+        a.triggered.connect(lambda checked: self.slotCopyItemRepositories(item))
+        globalPoint = self.ui.treeWidgetBranches.viewport().mapToGlobal(p)
+        m.popup(globalPoint)
+
+
+    def slotCopyItemRepositories(self, item: QTreeWidgetItem) -> None:
+        '''Copy repositoriy list from item'''
+        dbg('SlotCopyItemRepositories')
+        fullLog = []        # type: List[str]
+        fullLog.extend(collectColumnText(0, item, True))
+        QApplication.clipboard().setText('\n'.join(fullLog))
 
 
     def checkAcceptDeleteBranch(self, targetBranch: str) -> bool:
@@ -663,6 +723,30 @@ class MgDialogGitSwitchDeleteBranch(MgDialogWithRepoList):
             if buttonSelected == delButton:
                 self.ui.checkBoxDeleteLocalBranch.setChecked(True)
 
+
+        # display list of remote branches to delete and ask for usr confirmation
+        if remoteRepoWithTargetedBranch and self.ui.checkBoxDeleteRemoteBranch.isChecked():
+            msg = f'Deleting remote branches affects all users of the repositories. '
+            msg += f'Please confirm that you want to delete the remote branch <b>{targetBranch}</b>:\n<ul>'
+            for repo in remoteRepoWithTargetedBranch:
+                msg += f'<li> <i>{repo}</i>'
+            msg += '</ul>'
+            msgBox = QMessageBox(self)
+            msgBox.setIcon(QMessageBox.Icon.Warning)
+            msgBox.setWindowTitle('Confirm Delete remote branch ?')
+            msgBox.setTextFormat(Qt.TextFormat.RichText)
+            msgBox.setText(msg)
+
+            yesButton = msgBox.addButton(QMessageBox.StandardButton.Yes)
+            cancelButton = msgBox.addButton(QMessageBox.StandardButton.Cancel)
+            msgBox.setDefaultButton(yesButton)
+            msgBox.exec()
+            buttonSelected = msgBox.clickedButton()
+
+            if buttonSelected == cancelButton:
+                # user changed its mind ...
+                return False
+
         mgc.get_config_instance().lruSetRecent(mgc.CONFIG_GIT_BRANCH_HISTORY, targetBranch)
         return True
 
@@ -673,55 +757,60 @@ class MgDialogGitSwitchDeleteBranch(MgDialogWithRepoList):
 
         repoWithTargetedBranch = [repo
                                   for repo, repoLocalBranches, repoRemoteBranches in repoBranchInfo
-                                  if self.getTargetedBranchTag() in repoLocalBranches
-                                  or self.getTargetedBranchTag() in repoRemoteBranches
+                                  if self.getSwitchTargetBranchTag() in repoLocalBranches
+                                  or self.getSwitchTargetBranchTag() in repoRemoteBranches
                                   ]
 
         if len(repoWithTargetedBranch) == 0:
             # this branch name does not exist in any repos!
             QMessageBox.warning(self, "Invalid branch name",
-                                'No repository exists with the branch: %s' % self.getTargetedBranchTag())
+                                'No repository exists with the branch: %s' % self.getSwitchTargetBranchTag())
             return False
 
-        mgc.get_config_instance().lruSetRecent(mgc.CONFIG_GIT_BRANCH_HISTORY, self.getTargetedBranchTag())
+        mgc.get_config_instance().lruSetRecent(mgc.CONFIG_GIT_BRANCH_HISTORY, self.getSwitchTargetBranchTag())
         return True
 
 
-    def checkAcceptCheckoutTag(self) -> bool:
+    def checkAcceptCheckoutTagDeleteTag(self, targetTag: str) -> bool:
         # switch to tag
         all_repo_tags: Set[str] = set()
         for repo in self.getTargetedRepoList():
             all_repo_tags.update(repo.all_tags)
 
-        if not self.getTargetedBranchTag() in all_repo_tags:
+        if not targetTag in all_repo_tags:
             QMessageBox.warning(self, "Invalid tag name",
-                                'No repository exists with the tag: %s' % self.getTargetedBranchTag())
+                                'No repository exists with the tag: %s' % targetTag)
             return False
 
-        mgc.get_config_instance().lruSetRecent(mgc.CONFIG_TAG_HISTORY, self.getTargetedBranchTag())
+        mgc.get_config_instance().lruSetRecent(mgc.CONFIG_TAG_HISTORY, targetTag)
         return True
 
 
     def accept(self) -> None:
-        if ((self.deleteOrSwitch in (DeleteOrSwitch.SWITCH_BRANCH, DeleteOrSwitch.CHECKOUT_TAG) and self.getTargetedBranchTag() == '')
-            or (self.deleteOrSwitch == DeleteOrSwitch.DELETE and self.getDeleteTargetedBranches() == [])):
+        if ((self.deleteOrSwitch in (DeleteOrSwitchBranchOrTag.SWITCH_BRANCH, DeleteOrSwitchBranchOrTag.CHECKOUT_TAG) and self.getSwitchTargetBranchTag() == '')
+            or (self.deleteOrSwitch in (DeleteOrSwitchBranchOrTag.DELETE_BRANCH, DeleteOrSwitchBranchOrTag.DELETE_TAG) and self.getDeleteTargetedBranchTag() == [])):
             # no branch/tag is actually selected!
             branchOrTag = 'branch' if self.isBranchDialog() else 'tag'
             QMessageBox.warning(self, "No %s selected" % branchOrTag,
                                 "You did not select a %s to checkout!" % branchOrTag)
             return
 
-        if self.deleteOrSwitch == DeleteOrSwitch.DELETE:
-            for targetBranch in self.getDeleteTargetedBranches():
+        if self.deleteOrSwitch == DeleteOrSwitchBranchOrTag.DELETE_BRANCH:
+            for targetBranch in self.getDeleteTargetedBranchTag():
                 if not self.checkAcceptDeleteBranch(targetBranch):
                     return
 
-        elif self.deleteOrSwitch == DeleteOrSwitch.SWITCH_BRANCH:
+        elif self.deleteOrSwitch == DeleteOrSwitchBranchOrTag.DELETE_TAG:
+            for targetTag in self.getDeleteTargetedBranchTag():
+                if not self.checkAcceptCheckoutTagDeleteTag(targetTag):
+                    return
+
+        elif self.deleteOrSwitch == DeleteOrSwitchBranchOrTag.SWITCH_BRANCH:
             if not self.checkAcceptSwitchBranch():
                 return
 
-        elif self.deleteOrSwitch == DeleteOrSwitch.CHECKOUT_TAG:
-            if not self.checkAcceptCheckoutTag():
+        elif self.deleteOrSwitch == DeleteOrSwitchBranchOrTag.CHECKOUT_TAG:
+            if not self.checkAcceptCheckoutTagDeleteTag(self.getSwitchTargetBranchTag()):
                 return
 
         else:
@@ -731,7 +820,7 @@ class MgDialogGitSwitchDeleteBranch(MgDialogWithRepoList):
         super().accept()
 
 
-def runDialogGitSwitchDelete(parent: QWidget, deleteOrSwitch: DeleteOrSwitch, selectedRepos: List[MgRepoInfo], allRepos: List[MgRepoInfo]) -> None:
+def runDialogGitSwitchDelete(parent: QWidget, deleteOrSwitch: DeleteOrSwitchBranchOrTag, selectedRepos: List[MgRepoInfo], allRepos: List[MgRepoInfo]) -> None:
     '''Run a dialog to switch or delete a branch'''
     dbg('runDialogGitSwitchDelete')
 
@@ -741,23 +830,32 @@ def runDialogGitSwitchDelete(parent: QWidget, deleteOrSwitch: DeleteOrSwitch, se
         # command execution canceled
         return
 
-    if deleteOrSwitch == DeleteOrSwitch.DELETE:
+    if deleteOrSwitch == DeleteOrSwitchBranchOrTag.DELETE_BRANCH:
         doGitDeleteBranch(parent, dialog)
-    elif deleteOrSwitch in (DeleteOrSwitch.SWITCH_BRANCH, DeleteOrSwitch.CHECKOUT_TAG):
-        if not doGitSwitchBranchTag(parent, dialog):
-            # re-run the dialog
+
+    elif deleteOrSwitch == DeleteOrSwitchBranchOrTag.DELETE_TAG:
+        doGitDeleteTag(parent, dialog)
+
+    elif deleteOrSwitch == DeleteOrSwitchBranchOrTag.CHECKOUT_TAG:
+        doGitCheckoutTag(parent, dialog)
+
+    elif deleteOrSwitch == DeleteOrSwitchBranchOrTag.SWITCH_BRANCH:
+        if not doGitSwitchBranch(parent, dialog):
+            # a branch exists in multiple origins
+            # Re-run the git switch dialog so that user can inspect better the situation
             runDialogGitSwitchDelete(parent, deleteOrSwitch, selectedRepos, allRepos)
     else:
         raise ValueError('No such value: %s' % deleteOrSwitch)
 
 
 def doGitDeleteBranch(parent: QWidget, dialog: MgDialogGitSwitchDeleteBranch) -> None:
+    dbg('doGitDeleteBranch')
 
     # use the same history as git create branch
     descGitDelete = 'Git Delete branch'
 
     descRepoCmdBranch = []
-    deleteBranchesName = dialog.getDeleteTargetedBranches()
+    deleteBranchesName = dialog.getDeleteTargetedBranchTag()
     for repo in dialog.getTargetedRepoList():
         gitCmds = []
 
@@ -789,86 +887,85 @@ def doGitDeleteBranch(parent: QWidget, dialog: MgDialogGitSwitchDeleteBranch) ->
                             'No repository found for branch names: {}.'.format(', '.join(deleteBranchesName)))
 
 
-def doGitSwitchBranchTag(parent: QWidget, dialog: MgDialogGitSwitchDeleteBranch) -> bool:
+def doGitSwitchBranch(parent: QWidget, dialog: MgDialogGitSwitchDeleteBranch) -> bool:
+    dbg('doGitSwitchBranch')
     # switch branch/tag
-    branchTagName = dialog.getTargetedBranchTag()
+    branchName = dialog.getSwitchTargetBranchTag()
+    autostash = dialog.ui.checkBoxAutoStash.isChecked()
 
-    gitCheckoutBranch = [['checkout', branchTagName, '--']]
+    gitCheckoutBranch = [['checkout', branchName, '--']]
     gitCheckoutBranchInt = [['checkout', 'int', '--']]
-    descCheckout = 'Checkouting %s %s ' % ('branch' if dialog.isBranchDialog() else 'tag', branchTagName)
-    descCheckoutInt = 'Checkouting backup branch int'
+    descCheckout = f'Switching to branch {branchName}'
+    descCheckoutInt = 'Switching to backup branch int'
     taskGroupsCmdBranchTag = []
     taskGroupsCmdInt = []
 
-    if dialog.isBranchDialog():
-        # checkouting a branch
-        for repo in dialog.getTargetedRepoList():
-            if branchTagName in repo.branches_local:
-                # local branch found
-                taskGroupsCmdBranchTag.append(
-                    MgExecTaskGroup(descCheckout, repo,
-                                                        [MgExecTaskGit(descCheckout, repo, cmdLine)
-                                                         for cmdLine in gitCheckoutBranch]))
+    for repo in dialog.getTargetedRepoList():
 
-            elif branchNameIsPresentInRemote(branchTagName, repo.branches_remote):
-                # remote branch found!
+        tasks: List[MgExecTask] = []
 
-                # present in multiple origins ?
-                remoteBranches = remoteBranchesForBranchName(branchTagName, repo.branches_remote)
-                if len(remoteBranches) == 1:
-                    # ok, only one origin, simple command:
-                    taskGroupsCmdBranchTag.append(
-                        MgExecTaskGroup(descCheckout, repo,
-                                        [MgExecTaskGit(descCheckout, repo, cmdLine)
-                                         for cmdLine in gitCheckoutBranch]))
+        if autostash:
+            if repo.hasModifiedFiles():
+                tasks.append(MgExecTaskGit('', repo, ['stash', 'push', '--']))
+            else:
+                tasks.append(MgTaskComment('No need to stash, no files modified', repo))
 
-                else:
-                    # multiple origins, ask the user
-                    msg1 = f'Multiple remote branches match the name "{branchTagName}" in repository "{repo.name}"\n'
-                    msg1 += 'Please select the one you want.'
-                    msgBox = QMessageBox(parent)
-                    msgBox.setText(msg1)
-                    msgBox.setIcon(QMessageBox.Icon.Warning)
-                    msgBox.setWindowTitle('Multiple remote branch with same name')
-                    buttons = []
-                    for branch in remoteBranches:
-                        buttons.append(msgBox.addButton(branch, QMessageBox.ButtonRole.ActionRole))
-                    msgBox.setStandardButtons(QMessageBox.StandardButton.Abort)
+        if branchName in repo.branches_local:
+            # local branch found
+            tasks.extend([ MgExecTaskGit(descCheckout, repo, cmdLine)
+                             for cmdLine in gitCheckoutBranch ])
+            taskGroupsCmdBranchTag.append( MgExecTaskGroup(descCheckout, repo, tasks) )
 
-                    stdButtonClicked = msgBox.exec_()
-                    if stdButtonClicked == QMessageBox.StandardButton.Abort:
-                        # show the dialog again
-                        return False
+        elif branchNameIsPresentInRemote(branchName, repo.branches_remote):
+            # remote branch found!
 
-                    clickedButton = msgBox.clickedButton()
-                    remoteBranch = clickedButton.text()
-                    taskGroupsCmdBranchTag.append(
-                        MgExecTaskGroup(f'Checkouting branch {remoteBranch}', repo,
-                                        [MgExecTaskGit(f'Checkouting branch {remoteBranch}', repo,
-                                                ['checkout', '--track', remoteBranch, '--'] )]
-                                        )
-                    )
+            # present in multiple origins ?
+            remoteBranches = remoteBranchesForBranchName(branchName, repo.branches_remote)
+            if len(remoteBranches) == 1:
+                # ok, only one origin, simple command:
+
+                tasks.extend([MgExecTaskGit(descCheckout, repo, cmdLine)
+                              for cmdLine in gitCheckoutBranch])
+
+                taskGroupsCmdBranchTag.append( MgExecTaskGroup(descCheckout, repo, tasks ) )
+
+            else:
+                # multiple origins, ask the user
+                msg1 = f'Multiple remote branches match the name "{branchName}" in repository "{repo.name}"\n'
+                msg1 += 'Please select the one you want.'
+                msgBox = QMessageBox(parent)
+                msgBox.setText(msg1)
+                msgBox.setIcon(QMessageBox.Icon.Warning)
+                msgBox.setWindowTitle('Multiple remote branch with same name')
+                buttons = []
+                for branch in remoteBranches:
+                    buttons.append(msgBox.addButton(branch, QMessageBox.ButtonRole.ActionRole))
+                msgBox.setStandardButtons(QMessageBox.StandardButton.Abort)
+
+                stdButtonClicked = msgBox.exec_()
+                if stdButtonClicked == QMessageBox.StandardButton.Abort:
+                    # Re-run the git switch dialog so that user can inspect better the situation
+                    return False
+
+                clickedButton = msgBox.clickedButton()
+                remoteBranch = clickedButton.text()
+
+                tasks.extend([ MgExecTaskGit(f'Checkouting branch {remoteBranch}', repo, ['checkout', '--track', remoteBranch, '--']) ])
+                taskGroupsCmdBranchTag.append( MgExecTaskGroup(f'Checkouting branch {remoteBranch}', repo, tasks ) )
 
 
-            elif dialog.ui.checkBoxDefaultForNotExist.isChecked():
-                # branch not found and default branch specified
-                taskGroupsCmdInt.append(
-                    MgExecTaskGroup(descCheckoutInt, repo,
-                                    [MgExecTaskGit(descCheckoutInt, repo, cmdLine)
-                                     for cmdLine in gitCheckoutBranchInt]))
+        elif dialog.ui.checkBoxDefaultForNotExist.isChecked():
+            # branch not found and default branch specified
+            tasks.extend([MgExecTaskGit(descCheckoutInt, repo, cmdLine)
+                          for cmdLine in gitCheckoutBranchInt])
+
+            taskGroupsCmdInt.append(MgExecTaskGroup(descCheckoutInt, repo, tasks) )
 
             # else:
             #    do Nothing
-    else:
-        # checkouting a tag
-        # TODO: when tag does not exist and we know it in advance, display a message instead of trying to checkout it
-        for repo in dialog.getTargetedRepoList():
-            taskGroupsCmdBranchTag.append(
-                MgExecTaskGroup(descCheckout, repo, [
-                    # we force git to checkout another version first, so that it reflects the tag name in git status
-                    MgExecTaskGit(f'{descCheckout} (step 1)', repo, ['checkout', f'{branchTagName}~1', '--'], ignore_failure=True),
-                    MgExecTaskGit(f'{descCheckout} (step 2)', repo, ['checkout', branchTagName, '--']),
-                ]))
+
+        if autostash and repo.hasModifiedFiles():
+            tasks.append( MgExecTaskGit('', repo, ['stash', 'pop', '--'] ) )
 
     # show window for executing git
     gitExecWindow = MgExecWindow(parent)
@@ -877,8 +974,68 @@ def doGitSwitchBranchTag(parent: QWidget, dialog: MgDialogGitSwitchDeleteBranch)
     if len(taskGroupsCmdInt):
         gitExecWindow.execTaskGroups(descCheckoutInt, taskGroupsCmdInt)
 
-
     return True
 
-# TODO: group branch by number of repositories
-# TODO: show names of the repositories when grouping
+
+def doGitCheckoutTag(parent: QWidget, dialog: MgDialogGitSwitchDeleteBranch) -> None:
+    dbg('doGitCheckoutTag')
+    tagName = dialog.getSwitchTargetBranchTag()
+
+    descCheckout = f'Checkouting tag {tagName}'
+    taskGroupsCmdBranchTag = []
+    autostash = dialog.ui.checkBoxAutoStash.isChecked()
+
+    # TODO: when tag does not exist and we know it in advance, display a message instead of trying to checkout it
+    for repo in dialog.getTargetedRepoList():
+        tasks: List[MgExecTask] = []
+
+        if autostash:
+            if repo.hasModifiedFiles():
+                tasks.append(MgExecTaskGit('', repo, ['stash', 'push', '--']))
+            else:
+                tasks.append(MgTaskComment('No need to stash, no files modified', repo))
+
+        # we force git to checkout another version first, so that it reflects the tag name in git status
+        # if we checkout a tag on which git is already pointing through another tag, it will not update the HEAD
+        # reference and continue to display the old tag. That's why we force a change of HEAD
+        # Note that this will fail on repositories with only one commit. We accept this limitation because this
+        # is very rare
+        tasks.extend([
+            MgExecTaskGit(f'Checkout one commit before {tagName} (to force git to update its HEAD)',
+                          repo, ['checkout', f'{tagName}~1', '--'], ignore_failure=True),
+            MgExecTaskGit(f'Checkout tag {tagName}', repo, ['checkout', tagName, '--']),
+        ])
+
+        if autostash and repo.hasModifiedFiles():
+            tasks.append( MgExecTaskGit('', repo, ['stash', 'pop', '--'] ) )
+
+        taskGroupsCmdBranchTag.append(MgExecTaskGroup(descCheckout, repo, tasks))
+
+    # show window for executing git
+    gitExecWindow = MgExecWindow(parent)
+    if len(taskGroupsCmdBranchTag):
+        gitExecWindow.execTaskGroups(descCheckout, taskGroupsCmdBranchTag)
+
+
+
+def doGitDeleteTag(parent: QWidget, dialog: MgDialogGitSwitchDeleteBranch) -> None:
+    dbg('doGitDeleteBranch')
+    # switch branch/tag
+    deleteTagNames = dialog.getDeleteTargetedBranchTag()
+
+    descDeleteTag = f'Deleting tag(s) {" ".join(deleteTagNames)}'
+    taskGroupsCmdDeleteTag = []
+
+    # TODO: when tag does not exist and we know it in advance, display a message instead of trying to checkout it
+    for repo in dialog.getTargetedRepoList():
+        taskGroupsCmdDeleteTag.append(
+            MgExecTaskGroup(descDeleteTag, repo, [
+                MgExecTaskGit(f'{descDeleteTag}', repo, ['tag', '-d'] + deleteTagNames),
+            ]))
+
+    # show window for executing git
+    gitExecWindow = MgExecWindow(parent)
+    if len(taskGroupsCmdDeleteTag):
+        gitExecWindow.execTaskGroups(descDeleteTag, taskGroupsCmdDeleteTag)
+
+

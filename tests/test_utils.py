@@ -17,8 +17,10 @@
 
 import unittest, os
 
+from PySide6.QtWidgets import QApplication, QTreeWidget, QTreeWidgetItem
+
 from src.mg_utils import htmlize_diff, handle_cr_in_text, set_username_on_git_url, add_suffix_if_missing, extractInt, \
-    hasGitAuthFailureMsg, isGitCommandRequiringAuth, anonymise_git_url
+    hasGitAuthFailureMsg, isGitCommandRequiringAuth, anonymise_git_url, strip_protocol_from_url, collectColumnText
 from src.mg_config import MgConfig
 from src.mg_const import MSG_BIG_DIFF
 from src.mg_repo_info import match_ahead_behind, is_not_sha1, MgRepoInfo
@@ -92,6 +94,67 @@ class TestUtilityFunctions(unittest.TestCase):
         self.assertEqual( set_username_on_git_url('', "ssh://some.server.com:29418/some/path/to/repo.git"),
              "ssh://some.server.com:29418/some/path/to/repo.git")
 
+
+    def test_strip_protocol_from_git_url(self):
+
+        test_data = [
+            ("ssh://fremy@some.server.com:29418/some/path/to/repo.git",
+             "some.server.com:29418/some/path/to/repo.git"),
+            ("ssh://some.server.com:29418/some/path/to/repo.git",
+             "some.server.com:29418/some/path/to/repo.git"),
+            ("https://fremy@some.server.com:29418/some/path/to/repo.git",
+             "some.server.com:29418/some/path/to/repo.git"),
+            ("https://some.server.com:29418/some/path/to/repo.git",
+             "some.server.com:29418/some/path/to/repo.git"),
+            ("http://fremy@some.server.com:29418/some/path/to/repo.git",
+             "some.server.com:29418/some/path/to/repo.git"),
+            ("http://some.server.com:29418/some/path/to/repo.git",
+             "some.server.com:29418/some/path/to/repo.git"),
+            (r"c:\cloned\from\filesystem",
+             r"c:\cloned\from\filesystem",),
+            (r"c:\cloned\from\filesystem",
+             r"c:\cloned\from\filesystem",),
+            ("file://fremy@C:/work/Multigit/Sandbox/",
+             "C:/work/Multigit/Sandbox/"),
+            ("file://C:/work/Multigit/Sandbox/",
+             "C:/work/Multigit/Sandbox/"),
+            (None,''),
+            ('', ''),
+        ]
+
+        for before, after in test_data:
+            with self.subTest(before) as _:
+                self.assertEqual( strip_protocol_from_url(before), after)
+
+
+    def test_anonymise_git_url(self):
+
+        test_data = [
+            ("ssh://fremy@some.server.com:29418/some/path/to/repo.git",
+             "ssh://username@some.server.com:29418/some/path/to/repo.git"),
+            ("ssh://some.server.com:29418/some/path/to/repo.git",
+             "ssh://username@some.server.com:29418/some/path/to/repo.git"),
+            ("https://fremy@some.server.com:29418/some/path/to/repo.git",
+             "https://some.server.com:29418/some/path/to/repo.git"),
+            ("https://some.server.com:29418/some/path/to/repo.git",
+             "https://some.server.com:29418/some/path/to/repo.git"),
+            ("http://fremy@some.server.com:29418/some/path/to/repo.git",
+             "http://some.server.com:29418/some/path/to/repo.git"),
+            ("http://some.server.com:29418/some/path/to/repo.git",
+             "http://some.server.com:29418/some/path/to/repo.git"),
+            (r"c:\cloned\from\filesystem",
+             r"c:\cloned\from\filesystem",),
+            (r"c:\cloned\from\filesystem",
+             r"c:\cloned\from\filesystem",),
+            ("file://C:/work/Multigit/Sandbox/",
+             "file://C:/work/Multigit/Sandbox/"),
+        ]
+
+        for before, after in test_data:
+            with self.subTest(before) as _:
+                self.assertEqual( anonymise_git_url(before), after)
+
+
     def test_handle_cr_in_text(self):
         self.assertEqual( handle_cr_in_text('abc\n'),               'abc\n')
         self.assertEqual( handle_cr_in_text('abc\ndef\r'),          'abc\ndef')
@@ -136,6 +199,45 @@ class TestUtilityFunctions(unittest.TestCase):
         mo = MgRepoInfo.re_status_mod_files.match('AD toto -> titi')
         assert mo
         self.assertEqual(mo.group(2), 'toto -> titi')
+
+
+        # conflict
+        mo = MgRepoInfo.re_status_mod_files.match('AA  toto')
+        assert mo
+        mo = MgRepoInfo.re_status_mod_files.match('DD  toto')
+        assert mo
+        mo = MgRepoInfo.re_status_mod_files.match('UA  toto')
+        assert mo
+        mo = MgRepoInfo.re_status_mod_files.match('DU  toto')
+        assert mo
+        mo = MgRepoInfo.re_status_mod_files.match('UU  toto')
+        assert mo
+
+    def test_re_conflict_files(self):
+
+        # not a conflict
+        mo = MgRepoInfo.re_status_conflict_files.match('A  toto')
+        assert not mo
+
+        mo = MgRepoInfo.re_status_conflict_files.match('D  toto')
+        assert not mo
+
+        mo = MgRepoInfo.re_status_conflict_files.match('AD  toto')
+        assert not mo
+
+        # conflict
+        mo = MgRepoInfo.re_status_conflict_files.match('AA  toto')
+        assert mo
+        mo = MgRepoInfo.re_status_conflict_files.match('DD  toto')
+        assert mo
+        mo = MgRepoInfo.re_status_conflict_files.match('UA  toto')
+        assert mo
+        mo = MgRepoInfo.re_status_conflict_files.match('DU  toto')
+        assert mo
+        mo = MgRepoInfo.re_status_conflict_files.match('UU  toto')
+        assert mo
+
+
 
     def test_add_suffix_if_missing(self):
         self.assertEqual(add_suffix_if_missing('toto', '.mgit'), 'toto.mgit')
@@ -340,3 +442,63 @@ p, li { white-space: pre-wrap;font-family:'Courier New'; font-size:8pt; font-wei
 
         sout = htmlize_diff(sin, 1000)
         self.assertEqual(sout, sout_ref)
+
+
+
+class TestUtilityFunctionsWithTree(unittest.TestCase):
+
+    def setUp(self):
+        if QApplication.instance():
+            self.app = QApplication.instance()
+            return
+
+        self.app = QApplication([])
+
+
+    def tearDown(self):
+        self.app = None
+
+
+    def testCollectColumnText(self):
+        t = QTreeWidget()
+        item = QTreeWidgetItem([])
+        self.assertEqual(collectColumnText(0, item), [''])
+
+        item = QTreeWidgetItem([''])
+        self.assertEqual(collectColumnText(0, item), [''])
+
+        item = QTreeWidgetItem(['toto', 'titi'])
+        self.assertEqual(collectColumnText(0, item), ['toto'])
+
+        item = QTreeWidgetItem(['', 'titi'])
+        self.assertEqual(collectColumnText(0, item), [''])
+
+        item = QTreeWidgetItem(['', 'titi'])
+        self.assertEqual(collectColumnText(0, item, True), ['titi'])
+
+        item = QTreeWidgetItem(['toto', 'titi'])
+        item2 = QTreeWidgetItem(item, ['tutu'])
+        self.assertEqual(collectColumnText(0, item), ['toto', '    tutu'])
+
+
+        item = QTreeWidgetItem(['toto', 'titi'])
+        item2 = QTreeWidgetItem(item, ['tutu', 'tata'])
+        self.assertEqual(collectColumnText(0, item), ['toto', '    tutu'])
+
+
+        item = QTreeWidgetItem(['toto', 'titi'])
+        item2 = QTreeWidgetItem(item, ['', 'tata'])
+        self.assertEqual(collectColumnText(0, item), ['toto', '    '])
+
+        item = QTreeWidgetItem(['toto', 'titi'])
+        item2 = QTreeWidgetItem(item, ['', 'tata'])
+        self.assertEqual(collectColumnText(0, item, True), ['toto', '    tata'])
+
+        item = QTreeWidgetItem(['toto', 'titi'])
+        item2 = QTreeWidgetItem(item, ['', ''])
+        self.assertEqual(collectColumnText(0, item, True), ['toto', '    '])
+
+        item = QTreeWidgetItem(['  toto', 'titi'])
+        item2 = QTreeWidgetItem(item, ['', '  tata  '])
+        self.assertEqual(collectColumnText(0, item, True), ['toto', '    tata'])
+

@@ -221,6 +221,20 @@ class Ui_Preferences(object):
 
         self.verticalLayout_4.addWidget(self.groupBox_8)
 
+        self.groupBox_9 = QGroupBox(self.tab_ui)
+        self.groupBox_9.setObjectName(u"groupBox_9")
+        self.groupBox_9.setFont(font)
+        self.verticalLayout_6 = QVBoxLayout(self.groupBox_9)
+        self.verticalLayout_6.setObjectName(u"verticalLayout_6")
+        self.checkBoxConfirmWhenQuitting = QCheckBox(self.groupBox_9)
+        self.checkBoxConfirmWhenQuitting.setObjectName(u"checkBoxConfirmWhenQuitting")
+        self.checkBoxConfirmWhenQuitting.setFont(font1)
+
+        self.verticalLayout_6.addWidget(self.checkBoxConfirmWhenQuitting)
+
+
+        self.verticalLayout_4.addWidget(self.groupBox_9)
+
         self.verticalSpacer_2 = QSpacerItem(20, 17, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Expanding)
 
         self.verticalLayout_4.addItem(self.verticalSpacer_2)
@@ -968,6 +982,8 @@ class Ui_Preferences(object):
 
         self.groupBox_8.setTitle(QCoreApplication.translate("Preferences", u"Startup behavior", None))
         self.checkBoxFetchOnStartup.setText(QCoreApplication.translate("Preferences", u"Fetch all repositories when starting Multigit", None))
+        self.groupBox_9.setTitle(QCoreApplication.translate("Preferences", u"Quitting confirmation dialog", None))
+        self.checkBoxConfirmWhenQuitting.setText(QCoreApplication.translate("Preferences", u"Confirm before quitting", None))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_ui), QCoreApplication.translate("Preferences", u"Behavior", None))
         self.groupBoxSublimemerge.setTitle(QCoreApplication.translate("Preferences", u"SublimeMerge", None))
         self.checkBoxSublimeMerge.setText(QCoreApplication.translate("Preferences", u"Activate SublimeMerge  in the Git Program menu", None))

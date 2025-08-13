@@ -119,3 +119,12 @@ class TestMgitImportExport(unittest.TestCase):
         self.assertEqual(proj.repos[2].head, '3333')
 
 
+    def testEmptyExportImport(self):
+        exportToMgit(self.mgitFname, '', [])
+        proj = ProjectStructure()
+        proj.fill_from_json_file(self.mgitFname, '.')
+        self.assertEqual(proj.description, '')
+        self.assertEqual(proj.repos, [])
+
+
+
