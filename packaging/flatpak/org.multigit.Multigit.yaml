@@ -7,6 +7,8 @@ command: multigit.sh
 
 modules:
   - python3-requirements-release.json
+
+  ### Build from sources
   - name: multigit
     buildsystem: simple
     build-commands:
@@ -22,6 +24,20 @@ modules:
 
       - type: dir
         path: /home/osboxes/work/multigit/multigit-gh-idemia 
+
+
+  ### Release build        
+  # - name: multigit
+  #   buildsystem: simple
+  #   build-commands:
+  #     - pip3 install --verbose --exists-action=i --no-index --find-links=file://${PWD} --prefix=${FLATPAK_DEST} multigit_gx --no-build-isolation
+
+  #   sources: 
+  #     - type: file
+  #       url: https://files.pythonhosted.org/packages/fe/c5/c96c7337a2d1242de5fade71b29494f0438def39617cf658c1b7758b6f1d/multigit_gx-1.7.1-py3-none-any.whl
+  #       sha256: ada16d1ab3450b8f845719d0acbc4ad99dc69150d3d19020124f93236517bcb7
+  
+
   
 
 finish-args:
