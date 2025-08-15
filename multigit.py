@@ -115,13 +115,13 @@ def configure_logpath(debug_activated: bool = False, run_from_tests: bool = Fals
         multigit_log_dir = pathlib.Path(os.environ['USERPROFILE']) / 'AppData/Local/MultiGit/'
     else:
         # See https://specifications.freedesktop.org/basedir-spec/basedir-spec-latest.html
-        xdg_state_home: str
-        if os.environ.get('XDG_STATE_HOME', ''):
-            xdg_state_home = os.environ['XDG_STATE_HOME']
+        xdg_config_home: str
+        if os.environ.get('XDG_CONFIG_HOME', ''):
+            xdg_config_home = os.environ['XDG_CONFIG_HOME']
         else:
-            xdg_state_home = os.path.expanduser('~/.local/state')
+            xdg_config_home = os.path.expanduser('~/.config')
 
-        multigit_log_dir = pathlib.Path(xdg_state_home) / 'MultiGit'
+        multigit_log_dir = pathlib.Path(xdg_config_home) / 'MultiGit'
 
     # Make sure we are actually logging to a file which can be written
     try:
@@ -213,7 +213,7 @@ def init_logging(debug_activated: bool = False, run_from_tests: bool = False) ->
     logger.addHandler(shandler_err)
     shandler_err.setFormatter(formatter)
 
-    logging.info('log dirs: ')
+    logging.info('log paths: ')
     logging.info(mg_const.PATH_LOG_DEBUG)
     logging.info(mg_const.PATH_LOG_NORMAL)
 
