@@ -32,6 +32,7 @@ from src.mg_auth_failure_mgr import MgAuthFailureMgr
 logger = logging.getLogger('mg_tools')
 dbg = logger.debug
 warn = logger.warning
+error = logger.error
 log_git_cmd = logging.getLogger(mg_const.LOGGER_GIT_CMD).info
 
 GIT_EXIT_CODE_SEGFAULT_OF_GIT_WITH_STACKTRACE = -1
@@ -142,7 +143,7 @@ class ExecTool:
         '''
         if not cls.platform_supported():
             return ''
-        
+
         config = mg_config.get_config_instance()
         if config[cls.CONFIG_ENTRY_AUTODETECT] in (None, True):
             result = cls.autodetect_executable()
@@ -282,7 +283,7 @@ class ExecGit(ExecTool):
         Path('/usr/local/bin'),
         Path('/usr/bin'),
     ]
-    
+
     DARWIN_PATH_CANDIDATES = [
         Path('/usr/local/bin'),
         Path('/usr/bin'),
@@ -631,8 +632,8 @@ class RunProcess(QObject):
         assert self.process
         btext = bytes(self.process.readAllStandardOutput())
         self.partial_stdout += btext.decode('utf8', errors='replace')
-        logger.debug('%s - partial git output:' % self.nice_cmdline())
-        logger.debug(b'"%r"' % btext)
+        dbg('%s - partial git output:' % self.nice_cmdline())
+        dbg(b'"%r"' % btext)
         if self.emit_output:
             self.sigProcessOutput.emit(self.partial_stdout)
 
@@ -670,7 +671,7 @@ class RunProcess(QObject):
         else:
             finished = self.process.waitForFinished(-1)
             if not finished:
-                logger.warning('Process returned before being finished...')
+                warning('Process returned before being finished...')
                 raise AssertionError('process not yet finished...')
 
             cmd_out = self.process_finished(self.process.exitCode(), self.process.exitStatus())
@@ -738,7 +739,7 @@ class RunProcess(QObject):
         self.partial_stdout = ''
         cmd_out_dbg = cmd_out if len(cmd_out) < mg_const.MAX_GIT_DBG_OUT_CHAR else \
             cmd_out[:mg_const.MAX_GIT_DBG_OUT_CHAR] + '\n<output truncated to {} characters>'.format(mg_const.MAX_GIT_DBG_OUT_CHAR)
-        logger.debug('stdout: {}'.format(cmd_out_dbg))
+        dbg('stdout: {}'.format(cmd_out_dbg))
 
         log_git_cmd(self.nice_cmdline())
         log_git_cmd('\t' + '\n\t'.join(cmd_out_dbg.split('\n')))
@@ -759,11 +760,11 @@ class RunProcess(QObject):
             # usually, the error is not reported in git exit code, probably because it is not git-fetch
             # who is failing but a sub-program
             # so force exit code
-            logger.error('Git segfault detected, forcing exit code to -1 for: %s' % self.nice_cmdline())
+            error('Git segfault detected, forcing exit code to -1 for: %s' % self.nice_cmdline())
             self.last_exit_code = GIT_EXIT_CODE_SEGFAULT_OF_GIT_WITH_STACKTRACE
 
         elif process.exitStatus() != QProcess.ExitStatus.NormalExit and self.last_exit_code == 0:
-            logger.error('Git segfault detected, forcing exit code to -2 for: %s' % self.nice_cmdline())
+            error('Git segfault detected, forcing exit code to -2 for: %s' % self.nice_cmdline())
             self.last_exit_code = GIT_EXIT_CODE_SEGFAULT_OF_GIT_NO_STACKTRACE
 
         if self.last_exit_code != 0 and not self.allow_errors:
@@ -776,7 +777,7 @@ class RunProcess(QObject):
 
         # to avoid recursion, don't leave any pending callbacks
         if cb_done:
-            logger.debug('Calling process done callback')
+            dbg('Calling process done callback')
             cb_done(self.last_exit_code, cmd_out)
 
         return cmd_out
