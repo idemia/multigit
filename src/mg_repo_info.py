@@ -145,7 +145,7 @@ class MultiRepo:
 
     def __init__(self, base_dir: str = ''):
         self.base_path = pathlib.Path(base_dir)
-        dbg('MultiRepo with dir: %s, %d' % (self.base_path, self.base_path.is_dir()))
+        dbg('MultiRepo with dir: %s, %s' % (self.base_path, self.base_path.is_dir()))
         self.base_dir = base_dir
         self.repo_dict = {}
         self.repo_list = []
