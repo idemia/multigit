@@ -83,7 +83,7 @@ def main_gui() -> None:
     w.setWindowIcon(icon)
     w.show()
 
-    app.exec_()
+    app.exec()
 
 def is_writeable(fname: pathlib.Path) -> bool:
     '''Return true if file may be written'''
