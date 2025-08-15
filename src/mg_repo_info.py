@@ -15,16 +15,15 @@
 #
 
 
-from typing import Dict, Tuple, Optional, List, Callable, Any, Sequence, Generator
+from typing import Dict, Tuple, Optional, List, Callable, Any, Sequence
 import logging, re, csv, pathlib, os
-from collections import deque
 
 from PySide6.QtCore import Signal, QObject, QCoreApplication
 from PySide6.QtWidgets import QMessageBox
 
 from src.mg_const import MSG_NO_COMMIT, MSG_REMOTE_TOPUSH_TOPULL, MSG_REMOTE_SYNCHRO_OK, MSG_REMOTE_TOPULL, \
     MSG_REMOTE_TOPUSH, MSG_REMOTE_BRANCH_GONE, MSG_LOCAL_BRANCH, SHORT_SHA1_NB_DIGITS, MSG_EMPTY_REPO, MSG_REMOTE_NA
-from src.mg_tools import RunProcess, ExecGit
+from src.mg_tools import RunProcess, ExecGit, scan_git_dirs
 from src.mg_utils import anonymise_git_url
 
 logger = logging.getLogger('mg_repo_info')
@@ -33,29 +32,6 @@ warn = logger.warning
 
 def dbg_var(var_name: str, var_value: str) -> None:
     logger.debug('{}="{}"'.format(var_name, var_value))
-
-RECYCLE_BIN=pathlib.Path(r'\$Recycle.Bin')
-
-def is_git_repo(repo: pathlib.Path) -> bool:
-    '''Return True if directory is actually a git repo.
-    Checks for the presence of .git directory and other mandatory files.
-    '''
-    git_dir = repo/'.git'
-    try:
-        rec_bin = pathlib.Path(git_dir.drive)/RECYCLE_BIN
-        _ = git_dir.relative_to(rec_bin)
-        # No exception raised, we are in the recycle bin
-        # we don't want to return git repo from the recycle bin
-        return False
-    except ValueError:
-        # good, git_dir is not in the Recycle Bin...
-        pass
-
-    for subd in [ 'objects', 'refs' ]:
-        subd_path = git_dir/subd
-        if not subd_path.exists() or not subd_path.is_dir():
-            return False
-    return True
 
 re_ahead_behind = re.compile('(ahead (?P<ahead2>\\d+), behind (?P<behind2>\\d+))|(ahead (?P<ahead>\\d+))|(behind (?P<behind>\\d+))')
 def match_ahead_behind(s: str) -> Tuple[int, int]:
@@ -94,34 +70,6 @@ def is_not_sha1(ref: str) -> bool:
 
     # we don't know
     return False
-
-def scan_git_dirs(base_path: str) -> Generator[str, str, None]:
-    '''Return the list of Git directories (.git) within the given directory tree
-    The traversal goes from top to bottom and it follows the symbolic links
-    '''
-    visited = set()
-    # make sure to have absolute resolved path to get started
-    path_to_visit = deque([base_path])
-    while path_to_visit:
-        dirpath = path_to_visit.popleft()
-
-        resolved_path = str(pathlib.Path(dirpath).resolve())
-        if resolved_path in visited:
-            # already visited, cycle created by symbolic links
-            continue
-
-        visited.add(resolved_path)
-        for entry in os.scandir(dirpath):
-            if not entry.is_dir(follow_symlinks=True):
-                continue
-
-            if entry.name == '.git':
-                yield entry.path
-                continue
-
-            path_to_visit.append(entry.path)
-
-
 
 
 class MultiRepo:
@@ -176,15 +124,14 @@ class MultiRepo:
         self.base_path = pathlib.Path(self.base_dir)
         for d in scan_git_dirs(str(self.base_path)):
             repo = pathlib.Path(d).parent
-            if is_git_repo(repo):
-                repo_name = str(repo.relative_to(self.base_path))
-                self.repo_names.append(repo_name)
+            repo_name = str(repo.relative_to(self.base_path))
+            self.repo_names.append(repo_name)
 
-                repo_path = str(repo.resolve())
-                repo_info = MgRepoInfo(repo_name, repo_path, repo_name)
-                self.repo_dict[repo_name] = repo_info
-                self.repo_list.append(repo_info)
-                repo_info.repo_deleted.connect(self.slotRepoDeleted)
+            repo_path = str(repo.resolve())
+            repo_info = MgRepoInfo(repo_name, repo_path, repo_name)
+            self.repo_dict[repo_name] = repo_info
+            self.repo_list.append(repo_info)
+            repo_info.repo_deleted.connect(self.slotRepoDeleted)
 
         self.repo_names.sort(key=lambda name: name.lower())
         self.repo_list.sort(key=lambda repo: repo.name.lower())
@@ -216,9 +163,8 @@ class MultiRepo:
         self.base_path = pathlib.Path(self.base_dir)
         for d in scan_git_dirs(str(self.base_path)):
             repo = pathlib.Path(d).parent
-            if is_git_repo(repo):
-                repo_name = str(repo.relative_to(self.base_path))
-                new_repo_names.append(repo_name)
+            repo_name = str(repo.relative_to(self.base_path))
+            new_repo_names.append(repo_name)
 
         added_repo_names = set(new_repo_names) - set(self.repo_names)
         rm_repo_names = set(self.repo_names) - set(new_repo_names)

@@ -1,12 +1,12 @@
 #    Copyright (c) 2019-2023 IDEMIA
 #    Author: IDEMIA (Philippe Fremy, Florent Oulieres)
-# 
+#
 #     Licensed under the Apache License, Version 2.0 (the "License");
 #     you may not use this file except in compliance with the License.
 #     You may obtain a copy of the License at
-# 
+#
 #         http://www.apache.org/licenses/LICENSE-2.0
-# 
+#
 #     Unless required by applicable law or agreed to in writing, software
 #     distributed under the License is distributed on an "AS IS" BASIS,
 #     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -15,10 +15,11 @@
 #
 
 
-from typing import Sequence, Union, Optional, Callable, Tuple, Any, List, Dict, Type
+from typing import Sequence, Union, Optional, Callable, Tuple, Any, List, Dict, Type, Generator
 
 import logging, subprocess, sys, os
 from pathlib import Path
+from collections import deque
 
 from PySide6.QtCore import QObject, QProcess, Signal
 from PySide6.QtWidgets import QMessageBox, QApplication
@@ -794,3 +795,58 @@ class RunProcess(QObject):
 
 
 
+RECYCLE_BIN=Path(r'\$Recycle.Bin')
+GIT_MANDATORY_SUBDIRS = ['objects', 'refs']
+
+
+def is_git_repo(git_dir: Path) -> bool:
+    '''Return True if .git directory is actually a git repo.
+    Checks for the presence of .git directory and other mandatory files.
+    '''
+    if git_dir.name != '.git':
+        return False
+
+    if sys.platform == 'win32':
+        # we don't want to scan the recycle bin
+        try:
+            rec_bin = Path(git_dir.drive) / RECYCLE_BIN
+            _ = git_dir.relative_to(rec_bin)
+            # No exception raised, we are in the recycle bin
+            # we don't want to return git repo from the recycle bin
+            return False
+        except ValueError:
+            # good, git_dir is not in the Recycle Bin...
+            pass
+
+    for subd in GIT_MANDATORY_SUBDIRS:
+        subd_path = git_dir / subd
+        if not subd_path.exists() or not subd_path.is_dir():
+            return False
+    return True
+
+def scan_git_dirs(base_path: str) -> Generator[str, str, None]:
+    '''Return the list of Git directories (.git) within the given directory tree
+    The traversal goes from top to bottom and it follows the symbolic links
+    '''
+
+    visited = set()
+    # make sure to have absolute resolved path to get started
+    path_to_visit = deque([base_path])
+    while path_to_visit:
+        dirpath = path_to_visit.popleft()
+
+        resolved_path = str(Path(dirpath).resolve())
+        if resolved_path in visited:
+            # already visited, cycle created by symbolic links
+            continue
+
+        visited.add(resolved_path)
+        for entry in os.scandir(dirpath):
+            if not entry.is_dir(follow_symlinks=True):
+                continue
+
+            if entry.name == '.git' and is_git_repo(Path(entry.path)):
+                yield entry.path
+                continue
+
+            path_to_visit.append(entry.path)

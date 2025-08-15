@@ -24,9 +24,9 @@ import os.path
 
 from multigit import init_logging
 import src.mg_tools
-from src.mg_tools import ExecGit
+from src.mg_tools import ExecGit, scan_git_dirs
 from src.mg_const import MSG_EMPTY_REPO, MSG_NO_COMMIT, MSG_LOCAL_BRANCH, MSG_REMOTE_SYNCHRO_OK, SHORT_SHA1_NB_DIGITS
-from src.mg_repo_info import MgRepoInfo, MultiRepo, scan_git_dirs
+from src.mg_repo_info import MgRepoInfo, MultiRepo
 
 # More tests to write
 # * detached head from a remote branch
