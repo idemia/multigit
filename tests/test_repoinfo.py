@@ -24,7 +24,7 @@ import os.path
 
 from multigit import init_logging
 import src.mg_tools
-from src.mg_tools import ExecGit, scan_git_dirs
+from src.mg_tools import ExecGit
 from src.mg_const import MSG_EMPTY_REPO, MSG_NO_COMMIT, MSG_LOCAL_BRANCH, MSG_REMOTE_SYNCHRO_OK, SHORT_SHA1_NB_DIGITS
 from src.mg_repo_info import MgRepoInfo, MultiRepo
 
@@ -111,17 +111,17 @@ def to_named_tuple(ric: MgRepoInfo) -> RepoInfoTuple:
         )
 
 
-def git_init_repo(repo: str) -> None:
+def git_init_repo(repo: str | pathlib.Path) -> None:
     '''Init the repository and creates commit config'''
     if GIT_SUPPORTS_SETTING_BRANCH_NAME:
         branch_args = ['-b', 'main']
     else:
         branch_args = []
-    git_exec(*(['init'] + branch_args + [repo]))
+    git_exec(*(['init'] + branch_args + [str(repo)]))
     git_set_commit_author(repo)
 
 
-def git_set_commit_author(repo: str) -> None:
+def git_set_commit_author(repo: str | pathlib.Path) -> None:
     git_exec('config', 'user.email', AUTHOR_EMAIL , gitdir=repo)
     git_exec('config', 'user.name', AUTHOR_NAME , gitdir=repo)
 
@@ -180,8 +180,40 @@ def tearDownModule() -> None:
     src.mg_tools.FORCE_ASYNC_TO_BLOCKING_CALLS = old_FORCE_ASYNC_TO_BLOCKING_CALLS
 
 
+class TempGitDirReady(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls) -> None:
+        cls.tempdir_setUp()
+        cls.init_dir = os.getcwd()
+
+    @classmethod
+    def tearDownClass(cls) -> None:
+        cls.tempdir_tearDown()
+        os.chdir(cls.init_dir)
+
+    @classmethod
+    def tempdir_setUp(cls) -> None:
+        cls.tempdir = pathlib.Path(tempfile.gettempdir()) / 'test_multigit'
+        cls.tempdir.mkdir(exist_ok=True)
+        cls.gitdir = cls.tempdir / make_unique_tmp_name()
+        cls.gitdir.mkdir()
+        print('Creating test git directory: %s' % cls.gitdir)
+
+
+    @classmethod
+    def tempdir_tearDown(cls: 'TestRepoInfo') -> None:
+        if not os.path.exists(cls.tempdir):
+            return
+        # try to remove our own stuff
+        rmtree_failsafe(cls.gitdir)
+
+        # try to remove leftofers from previous tests as well
+        rmtree_failsafe(cls.tempdir)
+
+
+
 # noinspection PyArgumentList,PyBroadException
-class TestRepoInfo(unittest.TestCase):
+class TestRepoInfo(TempGitDirReady):
     '''This test creates git repositories in TEMP/test_multigit/YYYYMMDD_HHMMSS
 
     The tests are serialized. We tried to make them independant but it was too messy
@@ -207,35 +239,6 @@ class TestRepoInfo(unittest.TestCase):
     * run_clone_test_on_origin_main_more_commits(self.dir1, self.dir3)
 
     '''
-
-    @classmethod
-    def setUpClass(cls: 'TestRepoInfo') -> None:
-        cls.tempdir_setUp()
-        cls.init_dir = os.getcwd()
-
-    @classmethod
-    def tearDownClass(cls: 'TestRepoInfo') -> None:
-        cls.tempdir_tearDown()
-        os.chdir(cls.init_dir)
-
-    @classmethod
-    def tempdir_setUp(cls: 'TestRepoInfo') -> None:
-        cls.tempdir = pathlib.Path(tempfile.gettempdir()) / 'test_multigit'
-        cls.tempdir.mkdir(exist_ok=True)
-        cls.gitdir = cls.tempdir / make_unique_tmp_name()
-        cls.gitdir.mkdir()
-        print('Creating test git directory: %s' % cls.gitdir)
-
-
-    @classmethod
-    def tempdir_tearDown(cls: 'TestRepoInfo') -> None:
-        if not os.path.exists(cls.tempdir):
-            return
-        # try to remove our own stuff
-        rmtree_failsafe(cls.gitdir)
-
-        # try to remove leftofers from previous tests as well
-        rmtree_failsafe(cls.tempdir)
 
     def test_repo_info_fill_branch(self) -> None:
         ri = MgRepoInfo('toto', '.', '.')
