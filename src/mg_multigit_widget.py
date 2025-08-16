@@ -28,7 +28,6 @@ from src.mg_utils import htmlize_diff
 from src import mg_config as mgc
 from src.mg_const import COL_REPO_NAME, MAX_DIFF_LINES
 from src.gui.ui_multigit_widget import Ui_MultigitWidget
-from src.mg_tools import isRunningInsideFlatpak
 
 logger = logging.getLogger('mg_multigit_widget')
 dbg = logger.debug
@@ -81,12 +80,9 @@ class MgMultigitWidget(QWidget, Ui_MultigitWidget):
         '''Set the base directory from which all git repos are searched.'''
         dbg('setBaseDir( %s )' % str(baseDir) )
 
-        if baseDir:
-            if not isRunningInsideFlatpak():
-                # we can not check for directory existence in flatpak
-                if not pathlib.Path(baseDir).exists():
-                    QMessageBox.warning(self, 'Could not open path', 'Error: could not open path: %s' % baseDir)
-                    return
+        if baseDir and not pathlib.Path(baseDir).exists():
+            QMessageBox.warning(self, 'Could not open path', 'Error: could not open path: %s' % baseDir)
+            return
 
         self.sig_dir_changed.emit( baseDir or '' )
         self.repoTree.clear()

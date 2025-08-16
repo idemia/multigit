@@ -15,6 +15,12 @@ modules:
       - install -Dm 755 -t /app/bin/ multigit.sh
       - mkdir -p /app/multigit
       - cp -r * /app/multigit
+      - rm -rf /app/multigit/.env
+      - rm -rf /app/multigit/.idea
+      - rm -rf /app/multigit/.git
+      - rm -rf /app/multigit/.mypy_cache
+      - rm -rf /app/multigit/.pytest_cache
+      - rm -rf /app/multigit/.__pycache__
 
     sources: 
       - type: script
@@ -49,12 +55,14 @@ finish-args:
 
   # Ability to launch programs on the host
   - --talk-name=org.freedesktop.Flatpak
+  - --talk-name=org.freedesktop.portal.Desktop
 
   # Specific to multigit, to check a file's presence
   - --filesystem=/opt/sublime_merge/sublime_merge:ro
   - --filesystem=/usr/local/bin:ro
   - --filesystem=/usr/bin:ro
   - --filesystem=/usr/lib/git-core:ro
+  - --filesystem=home:ro  # needed to interact with the user development directories
 
 
 

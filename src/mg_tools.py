@@ -41,12 +41,9 @@ GIT_EXIT_CODE_COULD_NOT_START_PROCESS = -3
 GIT_EXIT_CODE_STOPPED_BECAUSE_AUTH_FAILURE = -4
 
 
-FLATPAK_SPAWN = ['flatpak-spawn', '--host']
-
 def isRunningInsideFlatpak() -> bool:
-    """Return TTrue if running inside a flatpak container.
-
-    Used to use proper flatpak launcher when launching an external program"""
+    """Return True if running inside a flatpak container.
+    """
     return 'FLATPAK_ID' in os.environ
 
 
@@ -102,8 +99,6 @@ class ExecTool:
         if cls.INNOCUOUS_COMMAND:
             # first, try on the command-line
             innocuous_command = [cls.get_exec_name()] + cls.INNOCUOUS_COMMAND
-            if isRunningInsideFlatpak():
-                innocuous_command = FLATPAK_SPAWN + innocuous_command
 
             try:
                 exit_code, output = RunProcess().exec_blocking(innocuous_command, allow_errors=True)
@@ -230,8 +225,6 @@ class ExecTool:
 
         rp = RunProcess()
         cmdline = [prog_to_run] + cmd_args
-        if isRunningInsideFlatpak():
-            cmdline = FLATPAK_SPAWN + cmdline
         rp.exec_async(cmdline=cmdline, cb_done=cb_done, working_dir=workdir, allow_errors=allow_errors)
 
 
@@ -245,8 +238,6 @@ class ExecTool:
             raise FileNotFoundError(f'Could not locate {cls.get_exec_name()}')
 
         cmdline = [prog_to_run] + list(cmd_args)
-        if isRunningInsideFlatpak():
-            cmdline = FLATPAK_SPAWN + cmdline
         exitCode, output = RunProcess().exec_blocking(cmdline, allow_errors=allow_errors, working_dir=workdir)
         if exitCode != 0 and not allow_errors:
             raise subprocess.CalledProcessError(cmd=cmdline, returncode=exitCode, output=output)
@@ -830,8 +821,6 @@ def scan_git_dirs(base_path: str) -> Generator[str, str, None]:
     The traversal goes from top to bottom and it follows the symbolic links
     '''
     dbg(f'scan_git_dirs({base_path})')
-    if isRunningInsideFlatpak():
-        yield from scan_git_dirs_flatpak(base_path)
 
     visited = set()
     # make sure to have absolute resolved path to get started
@@ -855,67 +844,6 @@ def scan_git_dirs(base_path: str) -> Generator[str, str, None]:
 
             path_to_visit.append(entry.path)
 
-
-def scan_git_dirs_flatpak(base_path: str) -> Generator[str, str, None]:
-    '''When running inside flatpak, we can not use os.scandir() so we must
-    use a different strategy for checking presence of .git directories'''
-    dbg(f'scan_git_dirs_flatpak({base_path})')
-    find_cmd = ['find', base_path, '-type', 'd', '-name', '.git', '-or', '-name', GIT_MANDATORY_SUBDIRS[0],
-                '-or', '-name', GIT_MANDATORY_SUBDIRS[1]]
-    log_git_cmd(' '.join(find_cmd))
-    exitCode, output = RunProcess().exec_blocking(FLATPAK_SPAWN + find_cmd)
-    if exitCode != 0:
-        error('Error returned when scanning git directories with flatpak')
-
-    yield from extract_valid_git_directories(output)
-
-
-def extract_valid_git_directories(output: str) -> Generator[str, str, None]:
-    '''Parse the output of find to locate valid .git directories'''
-    lines = output.split('\n')
-    git_repo_candidates: set[str] = set()
-    def check_is_git_repo(p: str) -> tuple[bool, str]:
-        '''Return True if this is part of .git directory and return the actual .git direcory as 2nd argument'''
-        nonlocal git_repo_candidates
-        if p == '.git' or p.endswith('/.git'):
-            expected_dirs = {f'{p}/{GIT_MANDATORY_SUBDIRS[0]}', f'{p}/{GIT_MANDATORY_SUBDIRS[1]}' }
-            return_value = p
-        else:
-            # examples: refs .git/refs   toto/.git/refs toto/refs toto/titi/refs
-            if '/' not in p:
-                # case "refs", we can not check whether parent directory is a .git
-                return False, ''
-
-            dotgit = p.rsplit('/', 1)[0]
-            if dotgit != '.git' and not dotgit.endswith('/.git'):
-                # parent directory is not named .git
-                return False, ''
-            return_value = dotgit
-
-            if p.endswith('/' + GIT_MANDATORY_SUBDIRS[0]):
-                expected_dirs = { dotgit, f'{dotgit}/{GIT_MANDATORY_SUBDIRS[1]}'}
-            elif p.endswith('/' + GIT_MANDATORY_SUBDIRS[1]):
-                expected_dirs = { dotgit, f'{dotgit}/{GIT_MANDATORY_SUBDIRS[0]}'}
-            else:
-                warn(f'check_git_repo() - rejecting directory {p}')
-                return False, ''
-
-        if expected_dirs <= git_repo_candidates:
-            # we already have the other two directories, that's a triple. Return it!
-            git_repo_candidates -= expected_dirs
-            return True, return_value
-
-        # maybe later!
-        git_repo_candidates.add(p)
-        return False, ''
-
-    for l in lines:
-        l = l.strip()
-        if not l:
-            continue
-        is_git_repo, git_repo = check_is_git_repo(l)
-        if is_git_repo:
-            yield git_repo
 
 
 
