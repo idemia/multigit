@@ -671,7 +671,7 @@ class RunProcess(QObject):
         else:
             finished = self.process.waitForFinished(-1)
             if not finished:
-                warning('Process returned before being finished...')
+                warn('Process returned before being finished...')
                 raise AssertionError('process not yet finished...')
 
             cmd_out = self.process_finished(self.process.exitCode(), self.process.exitStatus())

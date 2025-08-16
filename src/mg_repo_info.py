@@ -118,6 +118,7 @@ class MultiRepo:
 
     def find_git_repos(self) -> List[str]:
         '''Return a list of git repos contained in base_dir, including base_dir itself, sorted by name'''
+        dbg(f'MultiRepo.find_git_repos() - self.base_dir={self.base_dir}')
         self.repo_dict = {}
         self.repo_list = []
         self.repo_names = []
