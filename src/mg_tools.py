@@ -47,7 +47,7 @@ def isRunningInsideFlatpak() -> bool:
     """Return TTrue if running inside a flatpak container.
 
     Used to use proper flatpak launcher when launching an external program"""
-    return 'FLATPAK_SANDBOX' in os.environ
+    return 'FLATPAK_ID' in os.environ
 
 
 
@@ -829,8 +829,9 @@ def scan_git_dirs(base_path: str) -> Generator[str, str, None]:
     '''Return the list of Git directories (.git) within the given directory tree
     The traversal goes from top to bottom and it follows the symbolic links
     '''
+    dbg(f'scan_git_dirs({base_path})')
     if isRunningInsideFlatpak():
-        return scan_git_dirs_flatpak(base_path)
+        yield from scan_git_dirs_flatpak(base_path)
 
     visited = set()
     # make sure to have absolute resolved path to get started
@@ -872,7 +873,7 @@ def scan_git_dirs_flatpak(base_path: str) -> Generator[str, str, None]:
 def extract_valid_git_directories(output: str) -> Generator[str, str, None]:
     '''Parse the output of find to locate valid .git directories'''
     lines = output.split('\n')
-    git_repo_candidates = set()
+    git_repo_candidates: set[str] = set()
     def check_is_git_repo(p: str) -> tuple[bool, str]:
         '''Return True if this is part of .git directory and return the actual .git direcory as 2nd argument'''
         nonlocal git_repo_candidates
