@@ -427,7 +427,6 @@ class MgDialogGitSwitchDeleteBranch(MgDialogWithRepoList):
             self.setWindowTitle('Git Delete Branch')
             self.ui.labelBranchOrTag.setText('Choose branch(es) to delete')
             self.ui.groupBoxBranchOrTagSelection.setTitle('Branch selection')
-            self.ui.checkBoxDefaultForNotExist.setVisible(False)
             self.ui.checkBoxDeleteLocalBranch.setVisible(True)
             self.ui.checkBoxDeleteLocalBranch.setChecked(True)
             self.ui.checkBoxDeleteRemoteBranch.setVisible(True)
@@ -442,7 +441,6 @@ class MgDialogGitSwitchDeleteBranch(MgDialogWithRepoList):
             self.setWindowTitle('Git Delete Tag')
             self.ui.labelBranchOrTag.setText('Choose (local) tag(s) to delete')
             self.ui.groupBoxBranchOrTagSelection.setTitle('Tag selection')
-            self.ui.checkBoxDefaultForNotExist.setVisible(False)
             self.ui.checkBoxDeleteLocalBranch.setVisible(False)
             self.ui.checkBoxDeleteRemoteBranch.setVisible(False)
             self.ui.checkBoxAutoStash.setVisible(False)
@@ -455,7 +453,6 @@ class MgDialogGitSwitchDeleteBranch(MgDialogWithRepoList):
             self.setWindowTitle('Git Switch Branch')
             self.ui.labelBranchOrTag.setText('Choose branch to switch to')
             self.ui.groupBoxBranchOrTagSelection.setTitle('Branch selection')
-            self.ui.checkBoxDefaultForNotExist.setVisible(True)
             self.ui.checkBoxDeleteRemoteBranch.setVisible(False)
             self.ui.checkBoxDeleteLocalBranch.setVisible(False)
             self.ui.treeWidgetBranches.setColumnHidden(COL_BRANCH_TYPE, False)
@@ -466,7 +463,6 @@ class MgDialogGitSwitchDeleteBranch(MgDialogWithRepoList):
             self.setWindowTitle('Git Checkout Tag')
             self.ui.labelBranchOrTag.setText('Choose tag to checkout')
             self.ui.groupBoxBranchOrTagSelection.setTitle('Tag selection')
-            self.ui.checkBoxDefaultForNotExist.setVisible(False)
             self.ui.checkBoxDeleteRemoteBranch.setVisible(False)
             self.ui.checkBoxDeleteLocalBranch.setVisible(False)
             self.ui.treeWidgetBranches.setColumnHidden(COL_BRANCH_TYPE, True)
@@ -953,16 +949,6 @@ def doGitSwitchBranch(parent: QWidget, dialog: MgDialogGitSwitchDeleteBranch) ->
                 tasks.extend([ MgExecTaskGit(f'Checkouting branch {remoteBranch}', repo, ['checkout', '--track', remoteBranch, '--']) ])
                 taskGroupsCmdBranchTag.append( MgExecTaskGroup(f'Checkouting branch {remoteBranch}', repo, tasks ) )
 
-
-        elif dialog.ui.checkBoxDefaultForNotExist.isChecked():
-            # branch not found and default branch specified
-            tasks.extend([MgExecTaskGit(descCheckoutInt, repo, cmdLine)
-                          for cmdLine in gitCheckoutBranchInt])
-
-            taskGroupsCmdInt.append(MgExecTaskGroup(descCheckoutInt, repo, tasks) )
-
-            # else:
-            #    do Nothing
 
         if autostash and repo.hasModifiedFiles():
             tasks.append( MgExecTaskGit('', repo, ['stash', 'pop', '--'] ) )

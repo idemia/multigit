@@ -3,7 +3,7 @@
 ################################################################################
 ## Form generated from reading UI file 'ui_git_switch_branch.ui'
 ##
-## Created by: Qt User Interface Compiler version 6.8.2
+## Created by: Qt User Interface Compiler version 6.9.1
 ##
 ## WARNING! All changes made in this file will be lost when recompiling UI file!
 ################################################################################
@@ -56,11 +56,6 @@ class Ui_GitSwitchBranch(object):
         self.widget_2.setSizePolicy(sizePolicy1)
 
         self.gridLayout.addWidget(self.widget_2, 0, 3, 1, 1)
-
-        self.checkBoxDefaultForNotExist = QCheckBox(GitSwitchBranch)
-        self.checkBoxDefaultForNotExist.setObjectName(u"checkBoxDefaultForNotExist")
-
-        self.gridLayout.addWidget(self.checkBoxDefaultForNotExist, 2, 2, 1, 1)
 
         self.checkBoxDeleteLocalBranch = QCheckBox(GitSwitchBranch)
         self.checkBoxDeleteLocalBranch.setObjectName(u"checkBoxDeleteLocalBranch")
@@ -245,8 +240,7 @@ class Ui_GitSwitchBranch(object):
 
         self.verticalLayout_2.addLayout(self.horizontalLayout_4)
 
-        QWidget.setTabOrder(self.comboBoxBranchTagName, self.checkBoxDefaultForNotExist)
-        QWidget.setTabOrder(self.checkBoxDefaultForNotExist, self.checkBoxDeleteLocalBranch)
+        QWidget.setTabOrder(self.comboBoxBranchTagName, self.checkBoxDeleteLocalBranch)
         QWidget.setTabOrder(self.checkBoxDeleteLocalBranch, self.checkBoxDeleteRemoteBranch)
         QWidget.setTabOrder(self.checkBoxDeleteRemoteBranch, self.lineEditBranchFilter)
         QWidget.setTabOrder(self.lineEditBranchFilter, self.pushButtonGrouping)
@@ -263,7 +257,6 @@ class Ui_GitSwitchBranch(object):
 
     def retranslateUi(self, GitSwitchBranch: QDialog) -> None:
         GitSwitchBranch.setWindowTitle(QCoreApplication.translate("GitSwitchBranch", u"Git Switch branch", None))
-        self.checkBoxDefaultForNotExist.setText(QCoreApplication.translate("GitSwitchBranch", u"If selected branch does not exist, switch to branch int", None))
         self.checkBoxDeleteLocalBranch.setText(QCoreApplication.translate("GitSwitchBranch", u"Delete local branch", None))
         self.labelBranchOrTag.setText(QCoreApplication.translate("GitSwitchBranch", u"Choose branch", None))
         self.checkBoxDeleteRemoteBranch.setText(QCoreApplication.translate("GitSwitchBranch", u"Delete remote branch", None))

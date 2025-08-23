@@ -44,13 +44,6 @@
        </property>
       </widget>
      </item>
-     <item row="2" column="2">
-      <widget class="QCheckBox" name="checkBoxDefaultForNotExist">
-       <property name="text">
-        <string>If selected branch does not exist, switch to branch int</string>
-       </property>
-      </widget>
-     </item>
      <item row="3" column="2">
       <widget class="QCheckBox" name="checkBoxDeleteLocalBranch">
        <property name="text">
@@ -405,7 +398,6 @@
  </customwidgets>
  <tabstops>
   <tabstop>comboBoxBranchTagName</tabstop>
-  <tabstop>checkBoxDefaultForNotExist</tabstop>
   <tabstop>checkBoxDeleteLocalBranch</tabstop>
   <tabstop>checkBoxDeleteRemoteBranch</tabstop>
   <tabstop>lineEditBranchFilter</tabstop>
