@@ -31,6 +31,7 @@ from src.mg_dialog_utils import reBranchTagValues
 from src.mg_utils import set_username_on_git_url
 from src.mg_plugin_mgr import pluginMgrInstance
 from src.mg_clone_execution import cloneFromDialog, CloneExistDirBehavior
+from src.mg_tools import resolve_flatpak_host_path_if_needed
 
 logger = logging.getLogger('mg_dialog_clone_from_mgit')
 dbg = logger.debug
@@ -210,11 +211,15 @@ class MgDialogCloneFromMgitFile(QDialog):
         mgitFile, _ = QFileDialog.getOpenFileName(self,
                                                         "Select Multigit File",
                                                         mgitFile,
-                                                        "Multigit files (*.mgit);;Project Configuration File (*.json)")
+                                                        "Multigit files (*.mgit);;Project Configuration File (*.json)",
+                                                # options=QFileDialog.Option.DontUseNativeDialog
+        )
 
         if not mgitFile:
             # dialog canceled, do nothing
             return
+
+        mgitFile = resolve_flatpak_host_path_if_needed(mgitFile)
 
         self.ui.lineEditMgitFile.setText(mgitFile)
         self.propagateMgitFileUpdated(True, True)

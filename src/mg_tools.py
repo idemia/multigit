@@ -23,6 +23,7 @@ from collections import deque
 
 from PySide6.QtCore import QObject, QProcess, Signal
 from PySide6.QtWidgets import QMessageBox, QApplication
+from PySide6.QtDBus import QDBusInterface, QDBusConnection, QDBusMessage
 
 from src import mg_config
 from src.mg_utils import hasGitAuthFailureMsg
@@ -853,6 +854,61 @@ def scan_git_dirs(base_path: str) -> Generator[str, str, None]:
             path_to_visit.append(entry.path)
 
 
+def resolve_flatpak_host_path_if_needed(doc_path: str) -> str:
+    '''If not running inside flatpak sandbox, just return the same doc_path (this is a no-op)
 
+    If running inside flatpak, tries to resolve to an actual host path. If success, returns the host path.
+    If failure, return the regular doc_path'''
+    if isRunningInsideFlatpak():
+        resolved_path = resolve_flatpak_host_path(doc_path)
+        return resolved_path or doc_path
+    return doc_path
+
+
+def resolve_flatpak_host_path(doc_path: str) -> str:
+    """
+    Resolve a /run/user/$UID/doc/... portal path to the real host path
+    using xdg-document-portal over D-Bus.
+
+    Returns an empty string if the path can not be resolved for any reason
+    """
+    dbg(f'resolve_flatpak_host_path({doc_path})')
+
+    # Extract document ID (basename of the /doc/ path)
+    doc_id = os.path.basename(doc_path)
+
+    # Connect to the session bus
+    bus = QDBusConnection.sessionBus()
+
+    # Build interface to the Documents portal
+    iface = QDBusInterface(
+        "org.freedesktop.portal.Documents",  # service
+        "/org/freedesktop/portal/documents",  # object path
+        "org.freedesktop.portal.Documents",  # interface
+        bus
+    )
+
+    if not iface.isValid():
+        error("resolve_flatpak_host_path() - Could not connect to DBUS org.freedesktop.portal.Documents")
+        return ''
+
+    # Call GetHostPaths with a list of doc IDs
+    reply: QDBusMessage = iface.call("GetHostPaths", [doc_id])
+    # reply: QDBusMessage = iface.call("Info", doc_id)
+    dbg(f'resolve_flatpak_host_path() - reply={reply}')
+
+    if reply.type() != QDBusMessage.MessageType.ReplyMessage:
+        error(f'resolve_flatpak_host_path() - wrong reply type: {reply.type()}')
+        error(f'{reply.errorName()}: {reply.errorMessage()}')
+        return ''
+
+    result = reply.arguments()
+    dbg(f'resolve_flatpak_host_path() - reply arguments={result}')
+    try:
+        host_path = bytes(result[0]).decode('utf8')
+        return host_path
+    except Exception as e:
+        error(e)
+        return ''
 
 
