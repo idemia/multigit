@@ -41,9 +41,12 @@ GIT_EXIT_CODE_COULD_NOT_START_PROCESS = -102
 GIT_EXIT_CODE_STOPPED_BECAUSE_AUTH_FAILURE = -103
 
 
+FLATPAK_SPAWN = ['flatpak-spawn', '--host']
+
 def isRunningInsideFlatpak() -> bool:
-    """Return True if running inside a flatpak container.
-    """
+    """Return TTrue if running inside a flatpak container.
+
+    Used to use proper flatpak launcher when launching an external program"""
     return 'FLATPAK_ID' in os.environ
 
 
@@ -593,14 +596,18 @@ class RunProcess(QObject):
         return ' '.join(self.cmdline)
 
 
-    def create_process(self, cmdline: Sequence[str], working_dir: str = '',
+    def create_process(self, cmdline: list[str], working_dir: str = '',
                        allow_errors: bool = False, emit_output: bool = False) -> None:
-        '''Creates a QProcess for running a git command
+        '''Creates a QProcess for running a command
 
-        cmdline: argument to git to execute.
+        cmdline: argument to execute.
 
-        May block while a git process is currently under execution
+        May block while a process is currently under execution
         '''
+        dbg(f'create_process(f{cmdline}, {working_dir})')
+        if isRunningInsideFlatpak():
+            cmdline = FLATPAK_SPAWN + cmdline
+            dbg(f'create_process(), add flatpak launcher: {cmdline}')
         self.cmdline = cmdline
         self.emit_output = emit_output
         self.process = QProcess(self)
@@ -632,7 +639,7 @@ class RunProcess(QObject):
             MgAuthFailureMgr.gitAuthFailed(self.nice_cmdline())
 
 
-    def exec_blocking(self, cmdline: Sequence[str], allow_errors: bool = False, working_dir: str = '') -> Tuple[int, str]:
+    def exec_blocking(self, cmdline: list[str], allow_errors: bool = False, working_dir: str = '') -> Tuple[int, str]:
         '''Execute a git command in blocking mode.
 
         args: the arguments to git.
