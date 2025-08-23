@@ -35,10 +35,10 @@ warn = logger.warning
 error = logger.error
 log_git_cmd = logging.getLogger(mg_const.LOGGER_GIT_CMD).info
 
-GIT_EXIT_CODE_SEGFAULT_OF_GIT_WITH_STACKTRACE = -1
-GIT_EXIT_CODE_SEGFAULT_OF_GIT_NO_STACKTRACE = -2
-GIT_EXIT_CODE_COULD_NOT_START_PROCESS = -3
-GIT_EXIT_CODE_STOPPED_BECAUSE_AUTH_FAILURE = -4
+GIT_EXIT_CODE_SEGFAULT_OF_GIT_WITH_STACKTRACE = -100
+GIT_EXIT_CODE_SEGFAULT_OF_GIT_NO_STACKTRACE = -101
+GIT_EXIT_CODE_COULD_NOT_START_PROCESS = -102
+GIT_EXIT_CODE_STOPPED_BECAUSE_AUTH_FAILURE = -103
 
 
 def isRunningInsideFlatpak() -> bool:
@@ -658,6 +658,7 @@ class RunProcess(QObject):
         if (self.process.state() not in (QProcess.ProcessState.Starting, QProcess.ProcessState.Running)
                 or not self.process.waitForStarted(-1)):
             # could not start the process...
+            dbg('exec_blocking() - could not start the process')
             cmd_out = self.process_finished(GIT_EXIT_CODE_COULD_NOT_START_PROCESS, QProcess.ExitStatus.CrashExit)
         else:
             finished = self.process.waitForFinished(-1)
@@ -751,11 +752,11 @@ class RunProcess(QObject):
             # usually, the error is not reported in git exit code, probably because it is not git-fetch
             # who is failing but a sub-program
             # so force exit code
-            error('Git segfault detected, forcing exit code to -1 for: %s' % self.nice_cmdline())
+            error(f'Git segfault detected, forcing exit code to {GIT_EXIT_CODE_SEGFAULT_OF_GIT_WITH_STACKTRACE} for: {self.nice_cmdline()}')
             self.last_exit_code = GIT_EXIT_CODE_SEGFAULT_OF_GIT_WITH_STACKTRACE
 
         elif process.exitStatus() != QProcess.ExitStatus.NormalExit and self.last_exit_code == 0:
-            error('Git segfault detected, forcing exit code to -2 for: %s' % self.nice_cmdline())
+            error(f'Git segfault detected, forcing exit code to {GIT_EXIT_CODE_SEGFAULT_OF_GIT_NO_STACKTRACE} for: {self.nice_cmdline()}')
             self.last_exit_code = GIT_EXIT_CODE_SEGFAULT_OF_GIT_NO_STACKTRACE
 
         if self.last_exit_code != 0 and not self.allow_errors:
