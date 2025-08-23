@@ -679,7 +679,7 @@ class RunProcess(QObject):
         return self.last_exit_code, cmd_out
 
 
-    def exec_async(self, cmdline: Sequence[str],
+    def exec_async(self, cmdline: list[str],
                    cb_done: Optional[Callable[[int, str], Any]],
                    force_blocking: bool = False,
                    allow_errors: bool = False,
