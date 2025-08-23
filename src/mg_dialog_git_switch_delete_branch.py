@@ -894,7 +894,6 @@ def doGitSwitchBranch(parent: QWidget, dialog: MgDialogGitSwitchDeleteBranch) ->
     descCheckout = f'Switching to branch {branchName}'
     descCheckoutInt = 'Switching to backup branch int'
     taskGroupsCmdBranchTag = []
-    taskGroupsCmdInt = []
 
     for repo in dialog.getTargetedRepoList():
 
@@ -957,8 +956,6 @@ def doGitSwitchBranch(parent: QWidget, dialog: MgDialogGitSwitchDeleteBranch) ->
     gitExecWindow = MgExecWindow(parent)
     if len(taskGroupsCmdBranchTag):
         gitExecWindow.execTaskGroups(descCheckout, taskGroupsCmdBranchTag)
-    if len(taskGroupsCmdInt):
-        gitExecWindow.execTaskGroups(descCheckoutInt, taskGroupsCmdInt)
 
     return True
 
