@@ -241,7 +241,8 @@ class MgDialogSettings(QDialog):
     def slotEditPrefBrowseForGit(self) -> None:
         '''Browse for git executable and set the result in the ui dialog'''
         current_git_exe = str(self.ui.lineEditGitManual.text())
-        result, _ = QFileDialog.getOpenFileName(self, "Select Git Executable", current_git_exe, ExecGit.get_exec_name())
+        result, _ = QFileDialog.getOpenFileName(self, "Select Git Executable", current_git_exe, ExecGit.get_exec_name(),
+                                                options=QFileDialog.Option.DontUseNativeDialog)
         if result:
             self.ui.lineEditGitManual.setText(result)
 
@@ -249,7 +250,8 @@ class MgDialogSettings(QDialog):
     def slotEditPrefBrowseForTortoiseGit(self) -> None:
         '''Browse for TortoiseGitProc executable and set the result in the ui dialog'''
         current_tgit_exe = str(self.ui.lineEditTGitManual.text())
-        result, _ = QFileDialog.getOpenFileName(self, "Select the TortoiseGitProc Executable", current_tgit_exe, ExecTortoiseGit.get_exec_name())
+        result, _ = QFileDialog.getOpenFileName(self, "Select the TortoiseGitProc Executable", current_tgit_exe, ExecTortoiseGit.get_exec_name(),
+                                                options = QFileDialog.Option.DontUseNativeDialog)
         if result:
             self.ui.lineEditTGitManual.setText(result)
 
@@ -257,7 +259,8 @@ class MgDialogSettings(QDialog):
     def slotEditPrefBrowseForSourcetree(self) -> None:
         '''Browse for Sourcetree executable and set the result in the ui dialog'''
         current_st_exe = str(self.ui.lineEditSourcetreeManual.text())
-        result, _ = QFileDialog.getOpenFileName(self, "Select Sourcetree Executable", current_st_exe, ExecSourceTree.get_exec_name())
+        result, _ = QFileDialog.getOpenFileName(self, "Select Sourcetree Executable", current_st_exe, ExecSourceTree.get_exec_name(),
+                                                options = QFileDialog.Option.DontUseNativeDialog)
         if result:
             self.ui.lineEditSourcetreeManual.setText(result)
 
@@ -265,7 +268,8 @@ class MgDialogSettings(QDialog):
     def slotEditPrefBrowseForSublime(self) -> None:
         '''Browse for SublimeMerge executable and set the result in the ui dialog'''
         current_exe = str(self.ui.lineEditSublimemergeManual.text())
-        result, _ = QFileDialog.getOpenFileName(self, "Select SublimeMerge Executable", current_exe, ExecSublimeMerge.get_exec_name())
+        result, _ = QFileDialog.getOpenFileName(self, "Select SublimeMerge Executable", current_exe, ExecSublimeMerge.get_exec_name(),
+                                                options=QFileDialog.Option.DontUseNativeDialog)
         if result:
             self.ui.lineEditSublimemergeManual.setText(result)
 
@@ -273,7 +277,8 @@ class MgDialogSettings(QDialog):
     def slotEditPrefBrowseForGitBash(self) -> None:
         '''Browse for git-bash executable and set the result in the ui dialog'''
         current_exe = str(self.ui.lineEditGitBashManual.text())
-        result, _ = QFileDialog.getOpenFileName(self, "Select git-bash Executable", current_exe, ExecGitBash.get_exec_name())
+        result, _ = QFileDialog.getOpenFileName(self, "Select git-bash Executable", current_exe, ExecGitBash.get_exec_name(),
+                                                options=QFileDialog.Option.DontUseNativeDialog)
         if result:
             self.ui.lineEditGitBashManual.setText(result)
 
@@ -281,7 +286,8 @@ class MgDialogSettings(QDialog):
     def slotEditPrefBrowseForGitGui(self) -> None:
         '''Browse for git-gui executable and set the result in the ui dialog'''
         current_exe = str(self.ui.lineEditGitGuiManual.text())
-        result, _ = QFileDialog.getOpenFileName(self, "Select git-gui Executable", current_exe, ExecGitGui.get_exec_name())
+        result, _ = QFileDialog.getOpenFileName(self, "Select git-gui Executable", current_exe, ExecGitGui.get_exec_name(),
+                                                options=QFileDialog.Option.DontUseNativeDialog)
         if result:
             self.ui.lineEditGitGuiManual.setText(result)
 
@@ -289,7 +295,8 @@ class MgDialogSettings(QDialog):
     def slotEditPrefBrowseForGitK(self) -> None:
         '''Browse for gitk executable and set the result in the ui dialog'''
         current_exe = str(self.ui.lineEditGitKManual.text())
-        result, _ = QFileDialog.getOpenFileName(self, "Select gitk Executable", current_exe, ExecGitK.get_exec_name())
+        result, _ = QFileDialog.getOpenFileName(self, "Select gitk Executable", current_exe, ExecGitK.get_exec_name(),
+                                                options=QFileDialog.Option.DontUseNativeDialog)
         if result:
             self.ui.lineEditGitKManual.setText(result)
 
@@ -300,7 +307,8 @@ class MgDialogSettings(QDialog):
         pattern = ''
         if sys.platform == 'win32':
             pattern = '.exe'
-        result, _ = QFileDialog.getOpenFileName(self, "Select a directory explorer program", current_st_exe, pattern)
+        result, _ = QFileDialog.getOpenFileName(self, "Select a directory explorer program", current_st_exe, pattern,
+                                                options=QFileDialog.Option.DontUseNativeDialog)
         if result:
             self.ui.lineEditExplorerManual.setText(result)
 

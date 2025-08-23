@@ -89,7 +89,7 @@ class MgDialogExportMgit(QDialog):
         lastdir = mgc.get_config_instance().lruGetFirst(mgc.CONFIG_LAST_OPENED) or ''
 
         mgitFile, _ = QFileDialog.getSaveFileName(self, "Select destination multigit file",
-                    mgitFile or lastdir, "Multigit files (*.mgit)")
+                    mgitFile or lastdir, "Multigit files (*.mgit)", options=QFileDialog.Option.DontUseNativeDialog)
 
         if not mgitFile:
             # dialog canceled, do nothing
