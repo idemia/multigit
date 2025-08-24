@@ -98,8 +98,14 @@ def get_config_instance() -> 'MgConfig':
     else:
         # See https://specifications.freedesktop.org/basedir-spec/basedir-spec-latest.html
         xdg_config_home: str
-        if os.environ.get('XDG_CONFIG_HOME', ''):
-            xdg_config_home = os.environ['XDG_CONFIG_HOME']
+        if 'FLATPAK_ID' in os.environ:
+            # running inside flatpak
+            xdg_config_home_var = 'XDG_HOST_CONFIG_HOME'
+        else:
+            xdg_config_home_var = 'XDG_CONFIG_HOME'
+
+        if os.environ.get(xdg_config_home_var, ''):
+            xdg_config_home = os.environ[xdg_config_home_var]
         else:
             xdg_config_home = os.path.expanduser('~/.config')
 
