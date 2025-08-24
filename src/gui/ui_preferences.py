@@ -3,7 +3,7 @@
 ################################################################################
 ## Form generated from reading UI file 'ui_preferences.ui'
 ##
-## Created by: Qt User Interface Compiler version 6.8.2
+## Created by: Qt User Interface Compiler version 6.9.1
 ##
 ## WARNING! All changes made in this file will be lost when recompiling UI file!
 ################################################################################
@@ -988,7 +988,7 @@ class Ui_Preferences(object):
         self.groupBoxSublimemerge.setTitle(QCoreApplication.translate("Preferences", u"SublimeMerge", None))
         self.checkBoxSublimeMerge.setText(QCoreApplication.translate("Preferences", u"Activate SublimeMerge  in the Git Program menu", None))
         self.label_8.setText("")
-        self.labelExecSublimemergeChoose.setText(QCoreApplication.translate("Preferences", u"Choose sublime_merge.exe executable location :", None))
+        self.labelExecSublimemergeChoose.setText(QCoreApplication.translate("Preferences", u"Choose SublimeMerge executable location :", None))
         self.radioSublimemergeAutoDetect.setText(QCoreApplication.translate("Preferences", u"Auto-detected", None))
         self.radioSublimemergeManual.setText(QCoreApplication.translate("Preferences", u"Manual path", None))
         self.pushButtonSublimemergeManualBrowse.setText(QCoreApplication.translate("Preferences", u"...", None))
@@ -998,14 +998,14 @@ class Ui_Preferences(object):
         self.label_15.setText("")
         self.checkBoxGitGui.setText(QCoreApplication.translate("Preferences", u"Activate Git GUI  in the Git Program menu", None))
         self.radioGitGuiManual.setText(QCoreApplication.translate("Preferences", u"Manual path", None))
-        self.label_16.setText(QCoreApplication.translate("Preferences", u"Choose git-gui.exe executable location :", None))
+        self.label_16.setText(QCoreApplication.translate("Preferences", u"Choose git-gui executable location :", None))
         self.groupBoxGitK.setTitle(QCoreApplication.translate("Preferences", u"GitK", None))
         self.radioGitKManual.setText(QCoreApplication.translate("Preferences", u"Manual path", None))
         self.radioGitKAutoDetect.setText(QCoreApplication.translate("Preferences", u"Auto-detected", None))
         self.checkBoxGitK.setText(QCoreApplication.translate("Preferences", u"Activate GitK in the Git Program menu", None))
         self.pushButtonGitKManualBrowse.setText(QCoreApplication.translate("Preferences", u"...", None))
         self.label_17.setText("")
-        self.labelExecGitkChoose.setText(QCoreApplication.translate("Preferences", u"Choose gitk.exe executable location :", None))
+        self.labelExecGitkChoose.setText(QCoreApplication.translate("Preferences", u"Choose gitk executable location :", None))
         self.groupBoxTGit.setTitle(QCoreApplication.translate("Preferences", u"TortoiseGit", None))
         self.label_9.setText("")
         self.label_2.setText(QCoreApplication.translate("Preferences", u"Choose TortoiseGitProc.exe executable location :", None))
@@ -1028,7 +1028,7 @@ class Ui_Preferences(object):
         self.groupBoxGit.setTitle(QCoreApplication.translate("Preferences", u"Git executable", None))
         self.radioGitManual.setText(QCoreApplication.translate("Preferences", u"Manual path", None))
         self.radioGitAutoDetect.setText(QCoreApplication.translate("Preferences", u"Auto-detected", None))
-        self.labelExecGitChoose.setText(QCoreApplication.translate("Preferences", u"Choose git.exe executable location :", None))
+        self.labelExecGitChoose.setText(QCoreApplication.translate("Preferences", u"Choose git executable location :", None))
         self.pushButtonGitManualBrowse.setText(QCoreApplication.translate("Preferences", u"...", None))
         self.groupBoxSourceTree.setTitle(QCoreApplication.translate("Preferences", u"SourceTree", None))
         self.checkBoxSourceTree.setText(QCoreApplication.translate("Preferences", u"Activate SourceTree in the Git Program menu", None))

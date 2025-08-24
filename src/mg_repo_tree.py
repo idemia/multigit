@@ -623,7 +623,7 @@ class MgRepoTree(QTreeWidget):
                 ExecGitBash.exec_non_blocking([], workdir=repo.fullpath, callback=repo.deepRefresh)
         except FileNotFoundError:
             # Git Bash was not located
-            QMessageBox.warning(self, 'Unable to execute Git Bash', 'Warning: could not locate the git-bash.exe program.\n' +
+            QMessageBox.warning(self, 'Unable to execute Git Bash', 'Warning: could not locate the git-bash program.\n' +
                                 'Can not execute any Git Bash command..\nPlease configure the location in the settings dialog.\n')
             self.mgActions.actionGitBash.setEnabled(False)
 
@@ -761,7 +761,7 @@ class MgRepoTree(QTreeWidget):
                 # allow errors needed because git-gui never returns 0
                 ExecGitGui.exec_non_blocking([], workdir=str(repo.fullpath), allow_errors=True, callback=repo.refresh)
         except FileNotFoundError:
-            QMessageBox.warning(self, 'Unable to execute Git GUI', 'Warning: could not locate the git-gui.exe program.\n' +
+            QMessageBox.warning(self, 'Unable to execute Git GUI', 'Warning: could not locate the git-gui program.\n' +
                                 'Can not execute any git-gui command..\nPlease configure the location in the settings dialog.\n')
             self.mgActions.actionGitGui.setEnabled(False)
 
@@ -778,7 +778,7 @@ class MgRepoTree(QTreeWidget):
                 ExecSublimeMerge.exec_non_blocking([str(repo.fullpath)], callback=repo.refresh)
         except FileNotFoundError:
             # TortoiseGit was not located
-            QMessageBox.warning(self, 'Unable to execute SublimeMerge', 'Warning: could not locate the SublimeMerge.exe program.\n' +
+            QMessageBox.warning(self, 'Unable to execute SublimeMerge', 'Warning: could not locate the SublimeMerge program.\n' +
                                 'Can not execute any SublimeMerge command..\nPlease configure the location in the settings dialog.\n')
             self.mgActions.actionSublimeMerge.setEnabled(False)
 
@@ -795,7 +795,7 @@ class MgRepoTree(QTreeWidget):
                 # ExecGitK.exec_non_blocking([], workdir=str(repo.fullpath), callback=repo.refresh)
                 ExecGitK.exec_non_blocking([], workdir=str(repo.fullpath), allow_errors=True,callback=repo.refresh)
         except FileNotFoundError:
-            QMessageBox.warning(self, 'Unable to execute GitK', 'Warning: could not locate the gitk.exe program.\n' +
+            QMessageBox.warning(self, 'Unable to execute GitK', 'Warning: could not locate the gitk program.\n' +
                                 'Can not execute any GitK command..\nPlease configure the location in the settings dialog.\n')
             self.mgActions.actionSublimeMerge.setEnabled(False)
 

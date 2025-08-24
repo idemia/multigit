@@ -520,7 +520,7 @@
              </font>
             </property>
             <property name="text">
-             <string>Choose sublime_merge.exe executable location :</string>
+             <string>Choose SublimeMerge executable location :</string>
             </property>
             <property name="buddy">
              <cstring>radioSublimemergeAutoDetect</cstring>
@@ -772,7 +772,7 @@
              </font>
             </property>
             <property name="text">
-             <string>Choose git-gui.exe executable location :</string>
+             <string>Choose git-gui executable location :</string>
             </property>
             <property name="buddy">
              <cstring>radioGitGuiAutoDetect</cstring>
@@ -928,7 +928,7 @@
              </font>
             </property>
             <property name="text">
-             <string>Choose gitk.exe executable location :</string>
+             <string>Choose gitk executable location :</string>
             </property>
             <property name="buddy">
              <cstring>radioGitKAutoDetect</cstring>
@@ -1501,7 +1501,7 @@
              </font>
             </property>
             <property name="text">
-             <string>Choose git.exe executable location :</string>
+             <string>Choose git executable location :</string>
             </property>
             <property name="buddy">
              <cstring>radioGitAutoDetect</cstring>
