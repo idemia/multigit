@@ -602,7 +602,7 @@ class RunProcess(QObject):
         return ' '.join(self.cmdline)
 
 
-    def create_process(self, cmdline: list[str], working_dir: str = '',
+    def create_process(self, cmdline: List[str], working_dir: str = '',
                        allow_errors: bool = False, emit_output: bool = False) -> None:
         '''Creates a QProcess for running a command
 
@@ -645,7 +645,7 @@ class RunProcess(QObject):
             MgAuthFailureMgr.gitAuthFailed(self.nice_cmdline())
 
 
-    def exec_blocking(self, cmdline: list[str], allow_errors: bool = False, working_dir: str = '') -> Tuple[int, str]:
+    def exec_blocking(self, cmdline: List[str], allow_errors: bool = False, working_dir: str = '') -> Tuple[int, str]:
         '''Execute a git command in blocking mode.
 
         args: the arguments to git.
@@ -684,7 +684,7 @@ class RunProcess(QObject):
         return self.last_exit_code, cmd_out
 
 
-    def exec_async(self, cmdline: list[str],
+    def exec_async(self, cmdline: List[str],
                    cb_done: Optional[Callable[[int, str], Any]],
                    force_blocking: bool = False,
                    allow_errors: bool = False,
