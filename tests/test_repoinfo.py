@@ -111,7 +111,7 @@ def to_named_tuple(ric: MgRepoInfo) -> RepoInfoTuple:
         )
 
 
-def git_init_repo(repo: str | pathlib.Path) -> None:
+def git_init_repo(repo: Union[str, pathlib.Path]) -> None:
     '''Init the repository and creates commit config'''
     if GIT_SUPPORTS_SETTING_BRANCH_NAME:
         branch_args = ['-b', 'main']
@@ -121,7 +121,7 @@ def git_init_repo(repo: str | pathlib.Path) -> None:
     git_set_commit_author(repo)
 
 
-def git_set_commit_author(repo: str | pathlib.Path) -> None:
+def git_set_commit_author(repo: Union[str, pathlib.Path]) -> None:
     git_exec('config', 'user.email', AUTHOR_EMAIL , gitdir=repo)
     git_exec('config', 'user.name', AUTHOR_NAME , gitdir=repo)
 
