@@ -233,7 +233,7 @@ class MgMultigitWidget(QWidget, Ui_MultigitWidget):
 
 
     def slotRefreshAll(self) -> None:
-        dbg('refreshAll()')
+        dbg('slotRefreshAll()')
         self.repoTree.setFocus(Qt.FocusReason.OtherFocusReason)
         try:
             self.setCursor(Qt.CursorShape.WaitCursor)

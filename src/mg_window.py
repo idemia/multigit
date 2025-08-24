@@ -417,16 +417,22 @@ class MgMainWindow(QMainWindow, Ui_MainWindow):
     def slotExportCsv(self) -> None:
         '''Export to a CSV file'''
         dbg('slotExportCsv()')
+        # force refresh to calculate git dirs added or removed in the meantime
+        self.currentMultigit().slotRefreshAll()
         runDialogExportCsv(self, self.currentMultigit().multiRepo)
 
 
     def slotExportToMgit(self) -> None:
         dbg('slotExportToMgit()')
+        # force refresh to calculate git dirs added or removed in the meantime
+        self.currentMultigit().slotRefreshAll()
         runDialogExportMgit(self, self.currentMultigit().multiRepo.repo_list)
 
 
     def slotApplyMgitFile(self) -> None:
         dbg('slotApplyMgitFile()')
+        # force refresh to calculate git dirs added or removed in the meantime
+        self.currentMultigit().slotRefreshAll()
         baseDir = self.currentMultigit().multiRepo.base_dir
         allRepos = self.currentMultigit().multiRepo.repo_list[:]
         runDialogApplyMgitFile(self, baseDir, allRepos)
