@@ -16,7 +16,7 @@
 
 
 from typing import cast, Match, Any, Iterable, Sequence, Union, List, Iterator, Optional
-import html, os, pathlib, re, shutil, stat, logging, time, subprocess
+import html, os, pathlib, re, shutil, stat, logging, time, subprocess, sys
 
 from PySide6.QtWidgets import QTreeWidget, QTreeWidgetItem
 
@@ -227,10 +227,12 @@ def tryHardDeletingDirList(dirIter: Iterable[str]) -> str:
 
     Returns an error message when something goes wrong, an empty string when everything is empty
     '''
-    # kill tgitcache before anything. If it was running, it would prevent deletion of directories
-    subprocess.call(['taskkill', '/t', '/f', '/im', 'tgitcache.exe'])
-
     dirList = list(dirIter)
+    dbg(f'tryHardDeletingDirList({list(dirIter)})')
+
+    if sys.platform == 'win32':
+        # kill tgitcache before anything. If it was running, it would prevent deletion of directories
+        subprocess.call(['taskkill', '/t', '/f', '/im', 'tgitcache.exe'])
 
     # delete subdirs before deleting main dir
     dirList.sort(reverse=True)
@@ -287,6 +289,7 @@ def deleteDir(folder: str) -> str:
         * empty string when everything goes fine.
         * error description when something fails
     '''
+    dbg(f'deleteDir({folder})')
     pth = pathlib.Path(folder)
 
     # check if .git directory is present and unhide it to help deletion
