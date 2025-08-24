@@ -58,11 +58,9 @@ finish-args:
   - --talk-name=org.freedesktop.portal.Desktop
 
   # Specific to multigit, to check a file's presence
-  - --filesystem=/opt/sublime_merge/sublime_merge:ro
-  - --filesystem=/usr/local/bin:ro
-  - --filesystem=/usr/bin:ro
-  - --filesystem=/usr/lib/git-core:ro
-  - --filesystem=home:ro  # needed to interact with the user development directories
+  - --filesystem=home  # Multigit interacts with user directory: check existence of directories, of files
+                       # add directory when user requests it through the file dialog, removes directories
+                       # when they stand in the way of a clone
 
 
 

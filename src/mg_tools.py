@@ -177,14 +177,19 @@ class ExecTool:
 
             find_prog_exec( path_candidates )
         '''
-        dbg(f'find_prog_exec({cls}, {path_candidates})')
+        dbg(f'find_prog_exec({cls.__name__}, {path_candidates})')
         exec_name = cls.get_exec_name()
         dbg(f'find_prog_exec() - exec_name={exec_name}')
         for possible_path in path_candidates:
             candidate_path = Path(possible_path) / exec_name
             dbg('Looking at: {}'.format(str(candidate_path)))
-            if not candidate_path.exists():
-                continue
+
+            if isRunningInsideFlatpak():
+                if not flatpak_host_file_exists(candidate_path):
+                    continue
+            else:
+                if not candidate_path.exists():
+                    continue
             # ok, we have it !
             dbg('Found program at: {}'.format(str(candidate_path)))
             return str(candidate_path)
@@ -912,3 +917,9 @@ def resolve_flatpak_host_path(doc_path: str) -> str:
         return ''
 
 
+def flatpak_host_file_exists(fpath: Path) -> bool:
+    # assumption here: sh is on the path on the host. Very very likely
+    # If it turns out to be a wrong assumption we can always organise a search for a shell or a python
+    USE_SH_TO_CHECK_THAT_FILE_EXISTS = ['sh', '-c', f'[ -e "{fpath}" ]']
+    exit_code, output = RunProcess().exec_blocking(USE_SH_TO_CHECK_THAT_FILE_EXISTS, allow_errors=True)
+    return exit_code == 0
