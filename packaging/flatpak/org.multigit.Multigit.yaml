@@ -61,6 +61,9 @@ finish-args:
   - --filesystem=home  # Multigit interacts with user directory: check existence of directories, of files
                        # add directory when user requests it through the file dialog, removes directories
                        # when they stand in the way of a clone
+  - --filesystem=/media 
+  - --filesystem=/tmp  
+
 
 
 
