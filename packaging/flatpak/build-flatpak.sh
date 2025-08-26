@@ -1,0 +1,2 @@
+appstreamcli validate org.multigit.Multigit.metainfo.xml && desktop-file-validate org.multigit.Multigit.desktop && flatpak-builder --user --force-clean --install builddir org.multigit.Multigit.yaml && flatpak run org.multigit.Multigit --debug
+	

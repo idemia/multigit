@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component type="desktop-application">
+  <id>org.multigit.Multigit</id>
+  
+  <name>Multigit</name>
+  <summary>Multigit is a graphical tool for working with projects composed of multiple git repositories</summary>
+  
+  <metadata_license>MIT</metadata_license>
+  <project_license>Apache-2.0</project_license>
+  
+  <description>
+    <p>
+      Multigit is a graphical tool for working with projects composed of multiple git repositories.
+    </p>
+    <p>
+      If you think that <em>submodules</em>, <em>subtree</em> or <em>Google repo</em> are not for you, you are probably at the right place.
+    </p>
+    <p>
+      Typically, it lets you: <em> fetch or pull on many repositories at the same time </em> identify visually which repositories are modified or need an update (push or pull) <em> create a new branch in a subset of repositories </em> switch to a branch existing only in some repositories (but you don&apos;t remember which one) <em> perform a commit on multiple repositories at the same time, and push it </em> launch your preferred git frontend on an interesting repository <em> export your repositories state to a file, for reproducing it on a colleagues computer </em> and more...
+    </p>
+  </description>
+  
+  <launchable type="desktop-id">org.multigit.Multigit.desktop</launchable>
+  <screenshots>
+    <screenshot type="default">
+      <image>
+        https://github.com/idemia/multigit/blob/main/doc/screenshot/screenshot-multigit-creating-branch-on-4-repositories.jpg?raw=true      
+      </image>
+    </screenshot>
+    <screenshot>
+      <image>
+        https://github.com/idemia/multigit/blob/main/doc/screenshot/screenshot-multigit-fetching-repositories.jpg?raw=true
+      </image>
+    </screenshot>
+    <screenshot>
+      <image>
+        https://raw.githubusercontent.com/idemia/multigit/refs/heads/main/doc/screenshot/screenshot-multigit-creating-branch-on-4-repositories.jpg
+      </image>
+    </screenshot>
+  </screenshots>
+</component>
