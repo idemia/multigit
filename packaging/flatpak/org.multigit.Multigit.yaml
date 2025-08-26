@@ -3,6 +3,7 @@ runtime: org.kde.Platform
 runtime-version: '6.8'
 sdk: org.kde.Sdk
 command: multigit.sh
+version: 1.8
 
 
 modules:
@@ -21,6 +22,20 @@ modules:
       - rm -rf /app/multigit/.mypy_cache
       - rm -rf /app/multigit/.pytest_cache
       - rm -rf /app/multigit/.__pycache__
+      - mkdir -p /app/share/metainfo
+      - mkdir -p /app/share/applications
+      - mkdir -p /app/share/hicolor/256x256/apps
+      - mkdir -p /app/share/hicolor/64x64/apps
+      - mkdir -p /app/share/hicolor/48x48/apps
+      - mkdir -p /app/share/hicolor/32x32/apps
+      - mkdir -p /app/share/hicolor/16x16/apps
+      - cp -a packaging/flatpak/org.multigit.Multigit.metainfo.xml /app/share/metainfo
+      - cp -a packaging/flatpak/org.multigit.Multigit.desktop /app/share/applications
+      - cp -a images/multigit-logo-256.png /app/share/hicolor/256x256/apps/org.multigit.Multigit.png
+      - cp -a images/multigit-logo-64.png /app/share/hicolor/64x64/apps/org.multigit.Multigit.png
+      - cp -a images/multigit-logo-48.png /app/share/hicolor/48x48/apps/org.multigit.Multigit.png
+      - cp -a images/multigit-logo-32.png /app/share/hicolor/32x32/apps/org.multigit.Multigit.png
+      - cp -a images/multigit-logo-16.png /app/share/hicolor/16x16/apps/org.multigit.Multigit.png
 
     sources: 
       - type: script
