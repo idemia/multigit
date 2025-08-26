@@ -7,6 +7,7 @@
    * packaging/multigit.iss
    * packaging/multigit_version_info.txt
    * packaging/flatpak/org.multigit.Multigit.metainfo.xml
+   * packaging/flatpak/org.multigit.Multigit.yaml
 
 * run: python generate_html_whatsnew.py
 
