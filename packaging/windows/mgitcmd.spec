@@ -32,13 +32,18 @@ def exclude_from_toc(toc: 'TOC', exclude_list: 'List[str]') -> 'TOC':
             print('\t\t\t\tExcluding:', dst)
         else:
             print('Keeping:', dst)
+
+    # this is needed for some versions of pyinstaller
+    if getattr(toc, '__sub__', None):
         return toc - rm_toc
+    else:
+        return [v for v in toc if v not in rm_toc]
 
 
 block_cipher = None
 
 a = Analysis(
-    ['..\\mgitcmd.py'],
+    ['..\\..\\mgitcmd.py'],
     pathex=[],
     binaries=[],
     datas=[],
@@ -75,7 +80,7 @@ exe = EXE(
     codesign_identity=None,
     entitlements_file=None,
     # a bit heavy-weight but pyinstaller does not like relative path when running directory and spec file directory differ
-    icon = str((pathlib.Path(SPECPATH).parent / 'images' / 'multigit-logo.ico').absolute())
+    icon = str((pathlib.Path(SPECPATH).parent.parent / 'images' / 'multigit-logo.ico').absolute())
 )
 coll = COLLECT(
     exe,

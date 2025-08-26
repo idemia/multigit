@@ -176,7 +176,7 @@ block_cipher = None
 
 
 a = Analysis(
-    ['..\\multigit.py'],
+    ['..\\..\\multigit.py'],
     pathex=[],
     binaries=[],
     datas=[],
@@ -213,7 +213,7 @@ exe = EXE(
     codesign_identity=None,
     entitlements_file=None,
     # a bit heavy-weight but pyinstaller does not like relative path when running directory and spec file directory differ
-    icon=str((pathlib.Path(SPECPATH).parent / 'images' / 'multigit-logo.ico').absolute())
+    icon=str((pathlib.Path(SPECPATH).parent.parent / 'images' / 'multigit-logo.ico').absolute())
 )
 coll = COLLECT(
     exe,

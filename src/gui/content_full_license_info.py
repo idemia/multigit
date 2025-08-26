@@ -244,7 +244,7 @@ END OF TERMS AND CONDITIONS
 
 <h2>PySide / Qt6 for Python</h2>
 
-<p>See <a href="https://doc.qt.io/qt-5/licenses-used-in-qt.html">Qt's detailed licensing information</a> for software
+<p>See <a href="https://doc.qt.io/qt-6/licenses-used-in-qt.html">Qt's detailed licensing information</a> for software
 used by Qt6.</p>
 
 <p>Qt/PySide6 is available under LGPLv3.</p>

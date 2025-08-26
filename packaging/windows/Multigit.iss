@@ -13,7 +13,7 @@
 EnableISX=false
 
 [Setup]
-SourceDir=..
+SourceDir=..\..
 SetupIconFile=images\multigit-logo.ico
 UninstallDisplayIcon=images\multigit-logo.ico
 AppCopyright=Copyright © 2020-2023 {#COMPANY}

@@ -1,14 +1,52 @@
-# Generated from CHANGELOG.md on 2025-02-05 22:32:00.447749
+# Generated from CHANGELOG.md on 2025-08-26 18:03:41.128648
 
 
 content_html = '''
 <h1 align="center">MultiGit</h1>
 
-<p><em>by Phlipppe Fremy <a href="&#109;&#x61;i&#x6c;&#116;&#x6f;&#58;&#112;&#x68;&#x69;&#x6c;&#105;&#x70;&#112;&#x65;&#46;&#x66;&#114;&#x65;&#x6d;&#121;&#x40;&#105;d&#x65;&#x6d;&#105;&#97;&#46;&#x63;&#111;&#109;">&#112;&#x68;&#x69;&#x6c;&#105;&#x70;&#112;&#x65;&#46;&#x66;&#114;&#x65;&#x6d;&#121;&#x40;&#105;d&#x65;&#x6d;&#105;&#97;&#46;&#x63;&#111;&#109;</a></em></p>
+<p><em>by Phlipppe Fremy <a href="&#x6d;&#x61;&#x69;l&#x74;&#111;&#x3a;&#112;h&#105;&#108;&#x69;&#112;&#x70;&#x65;&#46;&#x66;&#x72;&#x65;&#109;&#x79;&#64;&#105;&#x64;&#101;&#x6d;&#x69;&#x61;&#x2e;&#99;&#111;&#109;">&#112;h&#105;&#108;&#x69;&#112;&#x70;&#x65;&#46;&#x66;&#x72;&#x65;&#109;&#x79;&#64;&#105;&#x64;&#101;&#x6d;&#x69;&#x61;&#x2e;&#99;&#111;&#109;</a></em></p>
 
 <h2>Introduction</h2>
 
 <p>Multigit help users to manage many Git repositories simultaneously.</p>
+
+<h2>Version 1.8 (in progress)</h2>
+
+<p>Synchronize with IDEMIA internal version</p>
+
+<p>New features</p>
+
+<ul>
+<li>Add auto-stash capabilities to all operations involving branch merging</li>
+<li>configure the displayed columns with a context menu</li>
+</ul>
+
+<p>Improvements</p>
+
+<ul>
+<li>on the repository tab bar, duplicate, close or rename a tab with a context menu</li>
+<li>on the repository tab bar, middle-click on a tab button closes the current tab</li>
+<li>add history button for selecting a branch in the dialog switch/checkout/delete tag/branch</li>
+<li>when deleting a remote branch, validate with a confirmation dialog</li>
+<li>in the git execution window, allow to copy the logs with a context menu</li>
+<li>in the dialogs git switch branch, delete branch, checkout tag, add context menu to copy the repository list</li>
+<li>Multigit now detects conflicted files</li>
+<li>Porting to MacOs X (thank to Boyaquotes)</li>
+<li>cloning now supports multiple git repository targeting the same directory</li>
+<li>deleting directories is now a visible task in the execution window</li>
+<li>When applying a Multigit file, ask the user if he wants to delete the missing repositories</li>
+<li>When quitting add posibility of a confirmation dialog</li>
+</ul>
+
+<p>Bugfix</p>
+
+<ul>
+<li>deals correctly with symlinks creating cycles when looking for git directories (thank to cedric-chadaleux)</li>
+<li>Multigit was too agressive in detecting git repository, do not mandate existence of <code><span style="background-color:#f5f5f5;">hooks</span></code> and <code><span style="background-color:#f5f5f5;">info</span></code></li>
+<li>Field SHA1 was not updated sometimes after a fetch</li>
+<li>First line of git output was not included in the display</li>
+<li>when doing commit + push, sometimes, push was done before the commit</li>
+</ul>
 
 <h2>Version 1.7.1 (2025-02-05)</h2>
 
