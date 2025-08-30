@@ -1,13 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <component type="desktop-application">
   <id>org.multigit.Multigit</id>
-  
   <name>Multigit</name>
-  <summary>Multigit is a graphical tool for working with projects composed of multiple git repositories</summary>
-  
+  <summary>Multigit is a graphical tool for working with multiple git repositories at the same time</summary>
+  <url type="homepage">https://github.com/idemia/multigit/</url> 
+  <url type="bugtracker">https://github.com/idemia/multigit/issues</url>
   <metadata_license>MIT</metadata_license>
   <project_license>Apache-2.0</project_license>
-  
+  <content_rating type="oars-1.1" />
+  <developer_name>Philippe Fremy at IDEMIA</developer_name>
+ 
   <description>
     <p>
       Multigit is a graphical tool for working with projects composed of multiple git repositories.
