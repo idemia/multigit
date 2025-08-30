@@ -69,6 +69,23 @@ to use `pipx` to install it:
 * (future) flatpak
 
 
+*Note on Ubuntu:*
+
+If you are getting the following error when running Multigit:
+
+	qt.qpa.plugin: From 6.5.0, xcb-cursor0 or libxcb-cursor0 is needed to load the Qt xcb platform plugin.
+	qt.qpa.plugin: Could not load the Qt platform plugin "xcb" in "" even though it was found.
+	This application failed to start because no Qt platform plugin could be initialized. Reinstalling the application may fix this problem.
+
+	Available platform plugins are: offscreen, wayland-egl, vnc, eglfs, minimal, vkkhrdisplay, linuxfb, wayland, minimalegl, xcb.
+
+	Aborted
+
+You need to install libxcb-cursor0:
+
+	sudo apt install libxcb-cursor0
+
+Then it works.
 
 
 License
