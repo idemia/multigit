@@ -8,7 +8,9 @@
   <metadata_license>MIT</metadata_license>
   <project_license>Apache-2.0</project_license>
   <content_rating type="oars-1.1" />
-  <developer_name>Philippe Fremy at IDEMIA</developer_name>
+  <developer id="com.idemia">
+    <name>Philippe Fremy</name>
+  </developer>
  
   <description>
     <p>
