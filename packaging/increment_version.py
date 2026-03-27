@@ -16,17 +16,20 @@
 
 import re, pathlib
 here = pathlib.Path(__file__).parent.resolve()
+windows_dir = here / 'windows'
+chocolatey_dir = here / 'chocolatey'
 
 reVersion = r'([\d.][\w\-_.]+)'
 
 files = [
     (here.parent / 'src/mg_const.py',          re.compile(f"VERSION = '{reVersion}'"), 'Free string'),
-    (here / 'multigit_version_info.txt',  re.compile(fr"StringStruct\('FileVersion', '{reVersion}'\),"), 'Free string'),
-    (here / 'multigit_version_info.txt',  re.compile(fr"StringStruct\('ProductVersion', '{reVersion}'\),"), 'Free string'),
-    (here / 'Multigit.iss',                re.compile(r'#define VERSION "([\d\.]+)"'), 'Only digits and dots allowed'),
-    (here / 'Multigit.iss',                re.compile(f'#define VERSIONSTR "{reVersion}"'), 'Free text'),
-    (here / 'multigit_version_info.txt',  re.compile(r'filevers=(\([\d \,]+\)),'),  'Tuple of 4 digits'),
-    (here / 'multigit_version_info.txt',  re.compile(r'prodvers=(\([\d \,]+\)),'), 'Tuple of 4 digits'),
+    (windows_dir / 'multigit_version_info.txt',  re.compile(fr"StringStruct\('FileVersion', '{reVersion}'\),"), 'Free string'),
+    (windows_dir / 'multigit_version_info.txt',  re.compile(fr"StringStruct\('ProductVersion', '{reVersion}'\),"), 'Free string'),
+    (windows_dir / 'Multigit.iss',               re.compile(r'#define VERSION "([\d\.]+)"'), 'Only digits and dots allowed'),
+    (windows_dir / 'Multigit.iss',               re.compile(f'#define VERSIONSTR "{reVersion}"'), 'Free text'),
+    (windows_dir / 'multigit_version_info.txt',  re.compile(r'filevers=(\([\d \,,]+\)),'),  'Tuple of 4 digits'),
+    (windows_dir / 'multigit_version_info.txt',  re.compile(r'prodvers=(\([\d \,,]+\)),'), 'Tuple of 4 digits'),
+    (chocolatey_dir / 'multigit.nuspec',      re.compile(r'<version>([^<]+)</version>'), 'Free string'),
 ]
 
 for fpath, re_version, comment in files:
