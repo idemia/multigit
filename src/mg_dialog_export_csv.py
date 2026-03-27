@@ -63,6 +63,9 @@ def runDialogExportCsv(window: QWidget, multiRepo: MultiRepo) -> None:
     if not csvFname:
         return
 
+    if not csvFname.endswith('.csv'):
+        csvFname += ('.csv')
+
     dbg('slotExportCsv() - processing events')
     QApplication.processEvents()  # give a chance to asynchronous jobs to complete
 
