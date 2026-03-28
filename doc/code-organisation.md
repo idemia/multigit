@@ -40,11 +40,13 @@ Files:
                              This is typically done during the release process
 
 (packageing related stuff)
-* packaging/multigit.spec: file used by pyinstaller to generate the .exe
+* packaging/windows/multigit.spec: file used by pyinstaller to generate the .exe
                  This file is modified from the default spec file to remove some unneeded DLL
-* packaing/Multigit.iss: used by InnoSetup to generate the installer
-* packaing/package_exe.bat: generate a .exe using pyinstaller in dist/multigit/
-* packaing/package_installer.bat: generate an installer from the content of dist/multigit
+* packaging/windows/Multigit.iss: used by InnoSetup to generate the installer
+* packaging/windows/package_exe.bat: generate a .exe using pyinstaller in dist/multigit/
+* packaging/windows/package_installer.bat: generate an installer from the content of dist/multigit
+* packaging/chocolatey/package_chocolatey.py: stage the Windows installer into a Chocolatey package and optionally build the `.nupkg`
+* packaging/chocolatey/multigit.nuspec: metadata of the Chocolatey package
 
 
 
