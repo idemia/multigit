@@ -17,7 +17,7 @@ The package id is `multigit`.
 python packaging\chocolatey\package_chocolatey.py
 ```
 
-This command stages the Chocolatey package under `build\chocolatey\package` and, when `choco` is available in `PATH`, creates the package in `build\chocolatey\out`.
+This command stages the Chocolatey package under `build\chocolatey\package` and, when `choco` is available in `PATH`, creates the package in `dist`.
 
 If you only want to prepare the staged content without calling Chocolatey:
 
@@ -28,7 +28,7 @@ python packaging\chocolatey\package_chocolatey.py --skip-pack
 ## Local installation test
 
 ```powershell
-choco install multigit --source build\chocolatey\out
+choco install multigit --source dist
 choco uninstall multigit
 ```
 

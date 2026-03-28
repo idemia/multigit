@@ -95,7 +95,7 @@ def parse_args(argv: list[str]) -> argparse.Namespace:
     parser.add_argument(
         '--output-dir',
         type=pathlib.Path,
-        default=ROOT_DIR / 'build' / 'chocolatey' / 'out',
+        default=ROOT_DIR / 'dist',
         help='Directory receiving the final .nupkg output.',
     )
     parser.add_argument(

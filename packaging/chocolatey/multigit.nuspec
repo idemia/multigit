@@ -11,6 +11,7 @@
     <docsUrl>https://github.com/idemia/multigit#readme</docsUrl>
     <bugTrackerUrl>https://github.com/idemia/multigit/issues</bugTrackerUrl>
     <licenseUrl>https://github.com/idemia/multigit/blob/main/LICENSE.txt</licenseUrl>
+    <iconUrl>https://cdn.jsdelivr.net/gh/idemia/multigit@main/images/multigit-logo.png</iconUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <summary>Graphical tool for multi-repository Git projects.</summary>
     <description>Multigit is a graphical tool for working with projects composed of multiple Git repositories. This Chocolatey package embeds the official Windows installer generated from this repository.</description>
