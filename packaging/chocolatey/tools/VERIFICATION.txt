@@ -1,0 +1,16 @@
+VERIFICATION
+Verification is intended to assist the Chocolatey moderators and community
+in verifying that this package's binaries are obtained from the official source.
+
+Installer file:
+  tools\multigit-install.exe
+
+Source:
+  https://github.com/idemia/multigit
+
+Notes:
+  - This package embeds the official Multigit Windows installer built from this repository.
+  - The installer is copied into the package during packaging with
+    packaging\chocolatey\package_chocolatey.py.
+  - LICENSE.txt is also included in tools\LICENSE.txt from the repository root.
+

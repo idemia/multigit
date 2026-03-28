@@ -14,7 +14,8 @@
     <iconUrl>https://cdn.jsdelivr.net/gh/idemia/multigit@main/images/multigit-logo.png</iconUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <summary>Graphical tool for multi-repository Git projects.</summary>
-    <description>Multigit is a graphical tool for working with projects composed of multiple Git repositories. This Chocolatey package embeds the official Windows installer generated from this repository.</description>
+    <description>Multigit is a graphical tool for working with projects composed of multiple Git repositories.
+    This Chocolatey package embeds the official Windows installer generated from this repository.</description>
     <releaseNotes>https://github.com/idemia/multigit/blob/main/CHANGELOG.md</releaseNotes>
     <tags>git gui repositories qt pyside6</tags>
     <copyright>Copyright IDEMIA</copyright>

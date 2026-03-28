@@ -19,6 +19,11 @@ python packaging\chocolatey\package_chocolatey.py
 
 This command stages the Chocolatey package under `build\chocolatey\package` and, when `choco` is available in `PATH`, creates the package in `dist`.
 
+The staged `tools` directory includes:
+- `multigit-install.exe` (embedded installer)
+- `LICENSE.txt` (copied from repository root)
+- `VERIFICATION.txt` (from `packaging\chocolatey\tools`)
+
 If you only want to prepare the staged content without calling Chocolatey:
 
 ```powershell

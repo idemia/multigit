@@ -16,6 +16,8 @@ NUSPEC_PATH = PACKAGE_DIR / f'{PACKAGE_ID}.nuspec'
 VERSION_RE = re.compile(r"VERSION = '([^']+)'")
 NUSPEC_VERSION_RE = re.compile(r'<version>([^<]+)</version>')
 TOOL_FILES = ('chocolateyinstall.ps1', 'chocolateyuninstall.ps1')
+ROOT_TOOL_FILES = ('LICENSE.txt',)
+PACKAGE_TOOL_FILES = ('VERIFICATION.txt',)
 
 
 def read_project_version() -> str:
@@ -57,6 +59,12 @@ def stage_package(installer_path: pathlib.Path, stage_dir: pathlib.Path) -> path
 
     shutil.copy2(NUSPEC_PATH, stage_dir / NUSPEC_PATH.name)
     for tool_file in TOOL_FILES:
+        shutil.copy2(TOOLS_DIR / tool_file, tools_output_dir / tool_file)
+
+    for tool_file in ROOT_TOOL_FILES:
+        shutil.copy2(ROOT_DIR / tool_file, tools_output_dir / tool_file)
+
+    for tool_file in PACKAGE_TOOL_FILES:
         shutil.copy2(TOOLS_DIR / tool_file, tools_output_dir / tool_file)
 
     shutil.copy2(installer_path, tools_output_dir / STAGED_INSTALLER_NAME)
