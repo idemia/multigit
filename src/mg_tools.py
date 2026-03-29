@@ -859,17 +859,6 @@ def scan_git_dirs(base_path: str) -> Generator[str, str, None]:
             path_to_visit.append(entry.path)
 
 
-def resolve_flatpak_host_path_if_needed(doc_path: str) -> str:
-    '''If not running inside flatpak sandbox, just return the same doc_path (this is a no-op)
-
-    If running inside flatpak, tries to resolve to an actual host path. If success, returns the host path.
-    If failure, return the regular doc_path'''
-    if isRunningInsideFlatpak():
-        resolved_path = resolve_flatpak_host_path(doc_path)
-        return resolved_path or doc_path
-    return doc_path
-
-
 def resolve_flatpak_host_path(doc_path: str) -> str:
     """
     Resolve a /run/user/$UID/doc/... portal path to the real host path
