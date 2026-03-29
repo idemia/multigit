@@ -58,8 +58,7 @@ def runDialogExportCsv(window: QWidget, multiRepo: MultiRepo) -> None:
         return
 
     lastdir = mgc.get_config_instance().lruGetFirst(mgc.CONFIG_LAST_OPENED) or ''
-    csvFname, _filter = QFileDialog.getSaveFileName(window, 'Choose CSV file to export', lastdir, '*.csv',
-                                                    options=QFileDialog.Option.DontUseNativeDialog)
+    csvFname, _filter = QFileDialog.getSaveFileName(window, 'Choose CSV file to export', lastdir, '*.csv')
     if not csvFname:
         return
 

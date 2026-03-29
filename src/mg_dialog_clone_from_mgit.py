@@ -211,9 +211,7 @@ class MgDialogCloneFromMgitFile(QDialog):
         mgitFile, _ = QFileDialog.getOpenFileName(self,
                                                         "Select Multigit File",
                                                         mgitFile,
-                                                        "Multigit files (*.mgit);;Project Configuration File (*.json)",
-                                                options=QFileDialog.Option.DontUseNativeDialog
-        )
+                                                        "Multigit files (*.mgit);;Project Configuration File (*.json)")
 
         if not mgitFile:
             # dialog canceled, do nothing
@@ -304,8 +302,7 @@ class MgDialogCloneFromMgitFile(QDialog):
         # default directory
         destDir = self.ui.lineEditDestDir.text()
         # ask user to select a destination directory for the user
-        destDir = QFileDialog.getExistingDirectory(self, 'Choose directory where project will be cloned', destDir,
-                                                   options=QFileDialog.Option.DontUseNativeDialog)
+        destDir = QFileDialog.getExistingDirectory(self, 'Choose directory where project will be cloned', destDir)
         if destDir == '':
             return
 

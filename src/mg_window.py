@@ -358,8 +358,7 @@ class MgMainWindow(QMainWindow, Ui_MainWindow):
     def slotOpenDir(self) -> None:
         dbg('openDirTriggered()')
         lastdir = self.config.lruGetFirst(mgc.CONFIG_LAST_OPENED) or ''
-        newDir = QFileDialog.getExistingDirectory(self, 'Open directory containing git repositories', lastdir,
-                                                options=QFileDialog.Option.DontUseNativeDialog)
+        newDir = QFileDialog.getExistingDirectory(self, 'Open directory containing git repositories', lastdir)
         if not newDir:
             return
 

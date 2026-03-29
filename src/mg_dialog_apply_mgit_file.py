@@ -173,8 +173,7 @@ class MgDialogApplyMgitFile(QDialog):
         mgitFile, _ = QFileDialog.getOpenFileName(self,
                                                         "Select Multigit File",
                                                         mgitFile,
-                                                        "Multigit files (*.mgit);;Project Configuration File (*.json)",
-                                                  options=QFileDialog.Option.DontUseNativeDialog)
+                                                        "Multigit files (*.mgit);;Project Configuration File (*.json)")
 
         if not mgitFile:
             # dialog canceled, do nothing
