@@ -1,0 +1,3 @@
+
+Linux / pipx :
+- the multigit icon does not show in the taskbar, it's the default ypthon icon instead

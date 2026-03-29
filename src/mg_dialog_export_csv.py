@@ -45,7 +45,7 @@ def runDialogExportCsv(window: QWidget, multiRepo: MultiRepo) -> None:
         repo_info.ensure_head_and_url_and_commit_date(blocking=False)
 
     dlg = QDialog(window)
-    dlg.setWindowFlags(dlg.windowFlags() & ~Qt.WindowType.WindowContextHelpButtonHint)
+    dlg.setWindowFlag(Qt.WindowType.WindowContextHelpButtonHint, False)
     dlg.setWindowTitle('Choose CSV fields')
     ui = Ui_dialogCsvExport()
     ui.setupUi(dlg)

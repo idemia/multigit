@@ -35,8 +35,7 @@ class MgAboutDialog(QDialog):
     def __init__(self, parent: Optional[QWidget]) -> None:
         super().__init__(parent)
         self.setModal(False)
-        # noinspection PyTypeChecker
-        self.setWindowFlags(self.windowFlags() & ~Qt.WindowType.WindowContextHelpButtonHint)
+        self.setWindowFlag(Qt.WindowType.WindowContextHelpButtonHint, False)
         self.ui = Ui_dialogAbout()
         self.ui.setupUi(self)
 
@@ -57,7 +56,7 @@ class MgAboutDialog(QDialog):
 
     def showFullLicenseInfo(self) -> None:
         dlg = QDialog(self)
-        dlg.setWindowFlags(self.windowFlags() & ~Qt.WindowType.WindowContextHelpButtonHint)
+        dlg.setWindowFlag(Qt.WindowType.WindowContextHelpButtonHint, False)
         ui = Ui_FullLicenseInfoDialog()
         ui.setupUi(dlg)
         ui.textBrowser.setHtml(content_html)

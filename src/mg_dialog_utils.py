@@ -92,7 +92,7 @@ class MgDialogWithRepoList(QDialog):
         selectedRepos = selectedRepos or []
 
         assert parent is not None
-        self.setWindowFlags(self.windowFlags() & ~Qt.WindowType.WindowContextHelpButtonHint)
+        self.setWindowFlag(Qt.WindowType.WindowContextHelpButtonHint, False)
 
         # prepare repository list
         prepareTreeWidgetRepoList(self.ui.treeWidgetRepoList)

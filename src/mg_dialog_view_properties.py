@@ -34,8 +34,7 @@ def runDialogGitProperties(parent: QWidget, currentRepo: MgRepoInfo) -> None:
 
     currentRepo.ensure_all_filled()
     dlg = QDialog(parent)
-    dlg.setWindowFlags(
-        dlg.windowFlags() & ~Qt.WindowType.WindowContextHelpButtonHint)
+    dlg.setWindowFlag(Qt.WindowType.WindowContextHelpButtonHint, False)
     dlg.setWindowTitle('Properties of {}'.format(currentRepo.name))
     ui_rp = Ui_RepoProperties()
     ui_rp.setupUi(dlg)

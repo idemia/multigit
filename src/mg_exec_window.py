@@ -79,8 +79,7 @@ class MgExecWindow(QDialog):
     def __init__(self, parent: QWidget, delta_between_concurrent_git_run: float = DELTA_BETWEEN_CONCURRENT_GIT_RUN) -> None:
         super().__init__(parent)
         self.setModal(False)
-        # noinspection PyTypeChecker
-        self.setWindowFlags(self.windowFlags() & ~Qt.WindowType.WindowContextHelpButtonHint)
+        self.setWindowFlag(Qt.WindowType.WindowContextHelpButtonHint, False)
         self.ui = Ui_GitExecDialog()
         self.ui.setupUi(self)
         self.ui.treeGitJobs.itemExpanded.connect(self.autoAdjustColumnSize)
