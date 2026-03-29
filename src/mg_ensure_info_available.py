@@ -50,7 +50,8 @@ class MgEnsureInfoAvailable(QObject):
             self.progressDialog.setMinimumDuration(1000)    # 1s before showing the dialog
             self.progressDialog.setWindowTitle('Progress')
             self.progressDialog.setLabelText('Collecting repository information')
-            self.progressDialog.setWindowFlags(self.progressDialog.windowFlags() & ~Qt.WindowType.WindowContextHelpButtonHint & ~Qt.WindowType.WindowCloseButtonHint)
+            self.progressDialog.setWindowFlag(Qt.WindowType.WindowContextHelpButtonHint, False)
+            self.progressDialog.setWindowFlag(Qt.WindowType.WindowCloseButtonHint, False)
             self.progressDialog.setMinimumWidth(300)
             self.progressDialog.setMinimumHeight(50)
         self.repoList = repoList

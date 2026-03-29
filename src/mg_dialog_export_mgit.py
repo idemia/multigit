@@ -40,8 +40,7 @@ class MgDialogExportMgit(QDialog):
 
     def __init__(self, window: QWidget, allRepos: List[MgRepoInfo]) -> None:
         super().__init__(window)
-        # noinspection PyTypeChecker
-        self.setWindowFlags( self.windowFlags() & ~Qt.WindowType.WindowContextHelpButtonHint)
+        self.setWindowFlag(Qt.WindowType.WindowContextHelpButtonHint, False)
         self.ui = Ui_ExportMgit()
         self.ui.setupUi(self)
 

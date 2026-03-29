@@ -53,8 +53,7 @@ class MgDialogCloneFromMgitFile(QDialog):
 
     def __init__(self, window: QWidget) -> None:
         super().__init__(window)
-        # noinspection PyTypeChecker
-        self.setWindowFlags( self.windowFlags() & ~Qt.WindowType.WindowContextHelpButtonHint)
+        self.setWindowFlag(Qt.WindowType.WindowContextHelpButtonHint, False)
         self.ui = Ui_CloneFromMgitFile()
         self.ui.setupUi(self)
         self.ui.labelProjDesc.setVisible(False)

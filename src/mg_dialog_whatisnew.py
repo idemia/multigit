@@ -37,7 +37,7 @@ def showWhatIsNew(parent: Optional[QWidget] = None) -> None:
     '''Show what's new dialog'''
     dialog = QDialog(parent)
     dialog.setWindowTitle("What's New")
-    dialog.setWindowFlags( dialog.windowFlags() & ~Qt.WindowType.WindowContextHelpButtonHint)
+    dialog.setWindowFlag(Qt.WindowType.WindowContextHelpButtonHint, False)
 
     text = QTextEdit(dialog)
     text.setReadOnly(True)

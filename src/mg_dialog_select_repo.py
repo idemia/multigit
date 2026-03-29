@@ -35,8 +35,7 @@ class MgDialogSelectRepos(QDialog):
                  allRepoList: List[MgRepoInfo]) -> None:
         super().__init__(parent)
 
-        # noinspection PyTypeChecker
-        self.setWindowFlags(self.windowFlags() & ~Qt.WindowType.WindowContextHelpButtonHint)
+        self.setWindowFlag(Qt.WindowType.WindowContextHelpButtonHint, False)
         self.ui = Ui_SelectRepos()
         self.ui.setupUi(self)
         prepareTreeWidgetRepoList(self.ui.treeWidgetSelectedRepos)

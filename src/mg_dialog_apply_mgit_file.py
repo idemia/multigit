@@ -54,8 +54,7 @@ class MgDialogApplyMgitFile(QDialog):
 
     def __init__(self, window: QWidget, destDir: str, currentRepos: List[MgRepoInfo]) -> None:
         super().__init__(window)
-        # noinspection PyTypeChecker
-        self.setWindowFlags( self.windowFlags() & ~Qt.WindowType.WindowContextHelpButtonHint)
+        self.setWindowFlag(Qt.WindowType.WindowContextHelpButtonHint, False)
         self.ui = Ui_ApplyMgitFile()
         self.ui.setupUi(self)
         self.ui.lineEditDestDir.setText(destDir)

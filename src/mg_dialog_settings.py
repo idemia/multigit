@@ -33,7 +33,7 @@ class MgDialogSettings(QDialog):
 
     def __init__(self, parent: QWidget) -> None:
         super().__init__(parent)
-        self.setWindowFlags( self.windowFlags() & ~Qt.WindowType.WindowContextHelpButtonHint )
+        self.setWindowFlag(Qt.WindowType.WindowContextHelpButtonHint, False)
         self.ui = Ui_Preferences()
         self.ui.setupUi(self)
 
