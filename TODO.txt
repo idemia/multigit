@@ -1,6 +1,7 @@
 # Windows
     - launch multigit after installation
     - bug: freeze when selecting a double-click action ?
+    - use native file dialogs on Windows. Reserve non native file dialogs to flatpak ?
 
 # Future:
 - git-gui + gitk
