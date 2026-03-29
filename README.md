@@ -50,26 +50,43 @@ Installation
 ------------
 Multigit is installation is possible through different formats and on different platforms:
 
-* Windows / Graphical Installer: just run `setup_multigit-v1.6.1.exe` and look for Multigit in your Applications
-* Windows / Chocolatey package: 
+### Windows
+
+#### Classic installer
+
+Classic Windows installer is available on the GitHub release page as `Multigit.OpenSource.X.Y.Z.exe`. 
+Just run it and look for Multigit in your Applications.
+
+#### Chocolatey package
+
+Multigit is available as a Chocolatey package, which is the recommended way to install it on Windows. Just run:
+
 ```
     choco install multigit
 ```
-* Linux / with a python package manager:
+
+### Linux
+
+#### Python package
+
+Multigit is available as a Python package on PyPi, but it is recommended to use `pipx` to install it, as it will be installed 
+in an isolated environment and will not interfere with your system Python or other Python packages.
 
 ```
-    $ sudo apt install python-pipx
+    $ sudo apt install pipx
     $ pipx install multigit_gx
+    $ pipx ensurepath
+    (open a new terminal to have pipx in PATH)
     $ multigit
 ```
 
 *Note: on PyPi, Multigit is registered as multigit_gx because there is already a multigit software* . The recommended way is
 to use `pipx` to install it:
 
-* (future) flatpak
 
+#### Adjustments when running on Linux
 
-*Note on Ubuntu:*
+##### On Ubuntu: 
 
 If you are getting the following error when running Multigit:
 
@@ -86,6 +103,22 @@ You need to install libxcb-cursor0:
 	sudo apt install libxcb-cursor0
 
 Then it works.
+
+##### On a Gnome desktop (typically Ubuntu or Linux Mint)
+
+By default, Qt application have no window borders or decorations, making them difficult to spot. The fix is to
+install Qt theme or Qt plugin to your desktop environment. 
+
+This worked for me by for example:
+
+
+	sudo apt install libxcb-cursor0 libxcb-composite0 
+    export QT_QPA_PLATFORM=xcb
+
+
+#### Future
+
+We are working on providing multigit as a snap and as a flatpak, but it is not available yet. 
 
 
 License
