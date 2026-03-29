@@ -97,6 +97,7 @@ def exportToMgit(mgitFname: str, desc: str, repos: List['MgRepoInfo'], snapshotM
 
     with open(mgitFname, 'w', newline='', encoding='utf8', errors='replace') as jsonf:
         json.dump(mgit_content, jsonf, indent=4, sort_keys=True)
+        jsonf.write('\n')
 
 
 
