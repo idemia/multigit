@@ -2,6 +2,24 @@
     - launch multigit after installation
     - bug: freeze when selecting a double-click action ?
 
+# Flatpak
+- sublime merge is not autodetected (because it is installed as a flatpak)
+    => add flatak + snap autodetection
+    => add flatak + snap launcher
+- see if we can create a directory from a native open file dialog instead of regualar file dialog
+- default dialog size are too big
+- show last commit _+ show modified files is not activatee by default
+
+
+- clean-up the build dir to reduce the size of the final program
+
+
+- icon should be provided with command: rename-icom
+
+
+- create a metainfo.xml file and install it properly
+- export to a flatpak repository
+- sign with gpg key
 # Future:
 - git-gui + gitk
     - harmonize the "not found" messages for running git-gui and others
