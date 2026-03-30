@@ -20,6 +20,7 @@ from typing import Sequence, Union, Optional, Callable, Tuple, Any, List, Dict, 
 import logging, subprocess, sys, os
 from pathlib import Path
 from collections import deque
+from enum import Enum, auto
 
 from PySide6.QtCore import QObject, QProcess, Signal
 from PySide6.QtWidgets import QMessageBox, QApplication
@@ -41,16 +42,21 @@ GIT_EXIT_CODE_SEGFAULT_OF_GIT_NO_STACKTRACE = -101
 GIT_EXIT_CODE_COULD_NOT_START_PROCESS = -102
 GIT_EXIT_CODE_STOPPED_BECAUSE_AUTH_FAILURE = -103
 
-
 FLATPAK_SPAWN = ['flatpak-spawn', '--host']
+
+class CmdType(Enum):
+    NoCmd = auto
+    DirectCmd = auto
+    FlatpakSpawnCmd = auto
+    FlatpakProgram = auto
+    Automatic = auto        # deduce from the environment which command type to use
+
 
 def isRunningInsideFlatpak() -> bool:
     """Return TTrue if running inside a flatpak container.
 
     Used to use proper flatpak launcher when launching an external program"""
     return 'FLATPAK_ID' in os.environ
-
-
 
 class ExecTool:
     # List of platform (as returned by sys.platform()) where we can run this tool
@@ -60,9 +66,11 @@ class ExecTool:
     LINUX_PATH_CANDIDATES: List[Path] = []
     DARWIN_PATH_CANDIDATES: List[Path] = []
 
-    EXEC_NAME_LINUX: str
-    EXEC_NAME_DARWIN: str
     EXEC_NAME_WIN32: str
+    EXEC_NAME_DARWIN: str
+    EXEC_NAME_LINUX: str
+    # Flatpak application ID (for example org.gnome.gitg). Empty means "no Flatpak app".
+    EXEC_NAME_FLATPAK: str = ''
 
     # if not None, this is a command which we can run to detect the program. Typically, this is ['--version']
     INNOCUOUS_COMMAND: Optional[List[str]] = None
@@ -78,7 +86,7 @@ class ExecTool:
 
     DOUBLE_CLICK_ACTIONS: List[str] = []
 
-    SESSION_CACHE: Dict[Type['ExecTool'], str] = {
+    SESSION_CACHE: Dict[Type['ExecTool'], Tuple[CmdType, str]] = {
     }
 
 
@@ -89,16 +97,22 @@ class ExecTool:
 
 
     @classmethod
-    def autodetect_executable(cls) -> str:
-        '''Autodetect the executable location according to a few heuristics and return the result.
-        Returns an empty string when nothing found.
+    def autodetect_executable(cls) -> Tuple[CmdType, str]:
+        '''Autodetect the executable location according to the command defintions and return (CmdType, str)
+
+        CmdType:
+        * NoCmd : the program could not be found
+        * DirectCmd : the program can be launched with a regular execution
+        * FlatpakSpawnCmd: the program can be launched with flatpak spawn
+        * FlatpakProgram: the program can be launched directly using flatpak
         '''
         if not cls.platform_supported():
-            return ''
+            return (CmdType.NoCmd, '')
 
         # check if we have it in cache
         if cls in cls.SESSION_CACHE:
             return cls.SESSION_CACHE[cls]
+
 
         if cls.INNOCUOUS_COMMAND:
             # first, try on the command-line
@@ -108,40 +122,29 @@ class ExecTool:
                 exit_code, output = RunProcess().exec_blocking(innocuous_command, allow_errors=True)
                 if exit_code == 0:
                     # program is on the path, use it
-                    cls.SESSION_CACHE[cls] = cls.get_exec_name()
-                    return cls.get_exec_name()
+                    cls.SESSION_CACHE[cls] = (CmdType.DirectCmd, cls.get_exec_name())
+                    return cls.SESSION_CACHE[cls]
             except FileNotFoundError:
                 # program is not on the path
                 pass
 
-
-        # Look in some standards locations
-        if sys.platform == 'win32':
-            path_candidates = cls.WIN32_PATH_CANDIDATES
-        elif sys.platform == 'linux':
-            path_candidates = cls.LINUX_PATH_CANDIDATES
-        elif sys.platform == 'darwin':
-            path_candidates = cls.DARWIN_PATH_CANDIDATES
-        else:
-            raise ValueError(f'Unsupported platform: {sys.platform}')
-
-        cmd = cls.find_prog_exec(path_candidates)
+        cmdType, cmd = cls.find_prog_exec()
 
         # put it in cash for next time
-        if cmd:
-            cls.SESSION_CACHE[cls] = cmd
+        if cmdType != CmdType.NoCmd:
+            cls.SESSION_CACHE[cls] = (cmdType, cmd)
 
         # return the result even if we could not find anything
-        return cmd
+        return (cmdType, cmd)
 
 
     @classmethod
-    def get_executable(cls) -> str:
+    def get_executable(cls) -> Tuple[CmdType, str]:
         '''Check if the configuration `autodetect` is True or None and in this case,
         auto-detects the program location. Else, simply return the value defined in `config_entry_manual_path`
         '''
         if not cls.platform_supported():
-            return ''
+            return (CmdType.NoCmd, '')
 
         config = mg_config.get_config_instance()
         if config[cls.CONFIG_ENTRY_AUTODETECT] in (None, True):
@@ -164,38 +167,72 @@ class ExecTool:
 
 
     @classmethod
-    def find_prog_exec(cls, path_candidates: Sequence[Union[str, Path]]) -> str:
+    def find_prog_exec(cls) -> Tuple[CmdType, str]:
         '''Scans locations path_candidates to see if the expected program exists. Return the program at this location if found or an empty string.
-
-        The path_candidates are a list of directory location where one can find exec_name
-
-        Example:
-            path_candidates: List[Path] = [
-                Path(os.environ["ProgramFiles(x86)"])/"Git"/"bin",
-                Path(os.environ["ProgramFiles"])/"Git"/"bin",
-            ]
-
-            find_prog_exec( path_candidates )
         '''
-        dbg(f'find_prog_exec({cls.__name__}, {path_candidates})')
+        
+        # Look in some standards locations
+        path_candidates: Sequence[Union[str, Path]]
+        if sys.platform == 'win32':
+            path_candidates = cls.WIN32_PATH_CANDIDATES
+        elif sys.platform == 'linux':
+            path_candidates = cls.LINUX_PATH_CANDIDATES
+        elif sys.platform == 'darwin':
+            path_candidates = cls.DARWIN_PATH_CANDIDATES
+        else:
+            raise ValueError(f'Unsupported platform for find_prog_exed(): {sys.platform}')
+
         exec_name = cls.get_exec_name()
-        dbg(f'find_prog_exec() - exec_name={exec_name}')
+        
+        dbg(f'find_prog_exec({cls.__name__}) - exec_name={exec_name}, path_candidates={path_candidates}')
+        
         for possible_path in path_candidates:
             candidate_path = Path(possible_path) / exec_name
-            dbg('Looking at: {}'.format(str(candidate_path)))
+            dbg('find_prog_exec() - looking at: {}'.format(str(candidate_path)))
 
             if isRunningInsideFlatpak():
                 if not flatpak_host_file_exists(candidate_path):
                     continue
+                dbg('Found program at flatpak host: {}'.format(str(candidate_path)))
+                return (CmdType.FlatpakSpawnCmd, str(candidate_path))
             else:
                 if not candidate_path.exists():
                     continue
+                dbg('Found program at: {}'.format(str(candidate_path)))
+                return (CmdType.DirectCmd, str(candidate_path))
+            
+        # not found on the path candidates
+
+        result = (CmdType.NoCmd, '')
+        if cls.EXEC_NAME_FLATPAK:
+            # look for program in flatpak list of program
             # ok, we have it !
-            dbg('Found program at: {}'.format(str(candidate_path)))
-            return str(candidate_path)
+            result = cls.find_flatpak_program()
 
         # could not find the wanted program
-        return ''
+        return result
+
+
+    @classmethod
+    def find_flatpak_program(cls) -> Tuple[CmdType, str]:
+        '''Detect a Flatpak app by ID and return (CmdType.FlatpakProgram, app_id) if found.'''
+        app_id = cls.EXEC_NAME_FLATPAK.strip()
+        if not app_id:
+            return (CmdType.NoCmd, '')
+
+        cmdline = ['flatpak', 'info', '--show-ref', app_id]
+        try:
+            exit_code, _output = RunProcess().exec_blocking(cmdline, allow_errors=True)
+        except FileNotFoundError:
+            dbg('find_flatpak_program() - flatpak command not found')
+            return (CmdType.NoCmd, '')
+
+        if exit_code == 0:
+            dbg(f'find_flatpak_program() - found flatpak app: {app_id}')
+            return (CmdType.FlatpakProgram, app_id)
+
+        dbg(f'find_flatpak_program() - flatpak app not found: {app_id}')
+        return (CmdType.NoCmd, '')
 
 
     @classmethod
@@ -223,8 +260,8 @@ class ExecTool:
         '''Run the program with the arguments listed in cmd_args, in the working directory.
         Raises an exception if the command did not return with 0 status and allow_errors is False.
         '''
-        prog_to_run = cls.get_executable()
-        if prog_to_run == '':
+        cmd_type, prog_to_run = cls.get_executable()
+        if prog_to_run == '' or cmd_type == CmdType.NoCmd:
             raise FileNotFoundError(f'Could not locate {cls.get_exec_name()}')
 
         cb_done = None
@@ -234,7 +271,7 @@ class ExecTool:
 
         rp = RunProcess()
         cmdline = [prog_to_run] + cmd_args
-        rp.exec_async(cmdline=cmdline, cb_done=cb_done, working_dir=workdir, allow_errors=allow_errors)
+        rp.exec_async(cmdline=cmdline, cb_done=cb_done, working_dir=workdir, allow_errors=allow_errors, cmd_type=cmd_type)
 
 
     @classmethod
@@ -242,12 +279,12 @@ class ExecTool:
         '''Run the program with the arguments listed in cmd_args, in the working directory.
         Raises an exception if the command did not return with 0 status.
         '''
-        prog_to_run = cls.get_executable()
-        if prog_to_run == '':
+        cmd_type, prog_to_run = cls.get_executable()
+        if prog_to_run == '' or cmd_type == CmdType.NoCmd:
             raise FileNotFoundError(f'Could not locate {cls.get_exec_name()}')
 
         cmdline = [prog_to_run] + list(cmd_args)
-        exitCode, output = RunProcess().exec_blocking(cmdline, allow_errors=allow_errors, working_dir=workdir)
+        exitCode, output = RunProcess().exec_blocking(cmdline, allow_errors=allow_errors, working_dir=workdir, cmd_type=cmd_type)
         if exitCode != 0 and not allow_errors:
             raise subprocess.CalledProcessError(cmd=cmdline, returncode=exitCode, output=output)
         return output
@@ -603,7 +640,7 @@ class RunProcess(QObject):
 
 
     def create_process(self, cmdline: List[str], working_dir: str = '',
-                       allow_errors: bool = False, emit_output: bool = False) -> None:
+                       allow_errors: bool = False, emit_output: bool = False, cmd_type: CmdType = CmdType.Automatic) -> None:
         '''Creates a QProcess for running a command
 
         cmdline: argument to execute.
@@ -611,9 +648,9 @@ class RunProcess(QObject):
         May block while a process is currently under execution
         '''
         dbg(f'create_process(f{cmdline}, {working_dir})')
-        if isRunningInsideFlatpak():
+        if cmd_type == CmdType.Automatic and isRunningInsideFlatpak() or cmd_type == CmdType.FlatpakSpawnCmd:
             cmdline = FLATPAK_SPAWN + cmdline
-            dbg(f'create_process(), add flatpak launcher: {cmdline}')
+            dbg(f'create_process(), add flatpak spawn: {cmdline}')
         self.cmdline = cmdline
         self.emit_output = emit_output
         self.process = QProcess(self)
@@ -645,7 +682,8 @@ class RunProcess(QObject):
             MgAuthFailureMgr.gitAuthFailed(self.nice_cmdline())
 
 
-    def exec_blocking(self, cmdline: List[str], allow_errors: bool = False, working_dir: str = '') -> Tuple[int, str]:
+    def exec_blocking(self, cmdline: List[str], allow_errors: bool = False, working_dir: str = '',
+                      cmd_type: CmdType = CmdType.Automatic) -> Tuple[int, str]:
         '''Execute a git command in blocking mode.
 
         args: the arguments to git.
@@ -654,8 +692,16 @@ class RunProcess(QObject):
 
         If allow_errors is False (the default) a message box reports the git error. If it is True, nothing
         is done. In both cases, the git exit code is returned.
+
+        If cmd_type is:
+            CmdType.DirectCmd: the command is run directly
+            CmdType.FlatpakSpawnCmd: the command is with flatpak spawn
+            CmdType.Automatic: the command is run with a flatpak spawn command if Multigit is running inside a flatpak
+                               sandbox else it is run with CmdType.DirectCmd
+
+                               This is the default mode
         '''
-        self.create_process(cmdline, working_dir=working_dir, allow_errors=allow_errors)
+        self.create_process(cmdline, working_dir=working_dir, allow_errors=allow_errors, cmd_type=cmd_type)
 
         if MgAuthFailureMgr.shouldStopBecauseAuthFailureInProgress(cmdline):
             self.last_exit_code = GIT_EXIT_CODE_STOPPED_BECAUSE_AUTH_FAILURE
@@ -689,7 +735,8 @@ class RunProcess(QObject):
                    force_blocking: bool = False,
                    allow_errors: bool = False,
                    working_dir: str = '',
-                   emit_output: bool = False) -> None:
+                   emit_output: bool = False,
+                   cmd_type: CmdType = CmdType.Automatic) -> None:
         '''Execute a git command asynchronously and calls cb_git_done() when the command completes.
 
         cmdline: the full command-line including the program. When running over a repo, the first argument
@@ -705,6 +752,14 @@ class RunProcess(QObject):
 
         If emit_output is True, the signal sigProcessOutput is emitted progressively
         as the process emits output.
+
+        If cmd_type is:
+            CmdType.DirectCmd: the command is run directly
+            CmdType.FlatpakSpawnCmd: the command is with flatpak spawn
+            CmdType.Automatic: the command is run with a flatpak spawn command if Multigit is running inside a flatpak
+                               sandbox else it is run with CmdType.DirectCmd
+
+                               This is the default mode
         '''
         self.cb_done = cb_done
         if FORCE_ASYNC_TO_BLOCKING_CALLS or force_blocking:
@@ -712,7 +767,7 @@ class RunProcess(QObject):
             return
 
         self.create_process(cmdline, working_dir=working_dir, allow_errors=allow_errors,
-                            emit_output=emit_output)
+                            emit_output=emit_output, cmd_type=cmd_type)
 
         assert self.process
 
