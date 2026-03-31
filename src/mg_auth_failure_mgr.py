@@ -51,13 +51,13 @@ class MgAuthFailureMgr(QObject):
 
 
     @staticmethod
-    def shouldStopBecauseAuthFailureInProgress(cmdline: Sequence[str]) -> bool:
+    def shouldStopBecauseGitAuthFailureInProgress(cmdline: Sequence[str]) -> bool:
         if not isGitCommandRequiringAuth(cmdline):
             ret = False
         else:
             ret = (MgAuthFailureMgr.instance().actionAfterManyAuthFailure == ActionAfterManyAuthFailure.BlockFutureGitcommand)
 
-        dbg(f'shouldStopBecauseAuthFailureInProgress() -> {ret}')
+        dbg(f'shouldStopBecauseGitAuthFailureInProgress() -> {ret}')
         return ret
 
 
