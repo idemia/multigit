@@ -364,7 +364,6 @@ class ExecTool:
         return cls.DOUBLE_CLICK_ACTIONS
 
 
-
 #######################################################
 #       Git Stuff
 #######################################################
@@ -716,6 +715,8 @@ class RunProcess(QObject):
             or exec.cmd_type == CmdType.FlatpakProgram:
             cmd_args = FLATPAK_SPAWN + cmd_args
             dbg(f'create_process(), add flatpak spawn: {cmd_args}')
+        if exec.cmd_type == CmdType.DirectCmd:
+            cmd_args = [exec.path] + cmd_args
         self.cmd_line = cmd_args
         self.emit_output = emit_output
         self.process = QProcess(self)

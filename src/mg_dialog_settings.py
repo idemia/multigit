@@ -100,7 +100,7 @@ class MgDialogSettings(QDialog):
                            else config[mgc.CONFIG_GIT_AUTODETECT])
         self.ui.labelExecGitChoose.setText(f'Choose {ExecGit.get_exec_name()} executable location')
         self.ui.radioGitAutoDetect.setChecked(git_auto_detect)
-        self.ui.lineEditGitAutoDetect.setText(ExecGit.autodetect_executable())
+        self.ui.lineEditGitAutoDetect.setText(ExecGit.autodetect_executable().path)
         self.ui.radioGitManual.setChecked(not git_auto_detect)
         self.ui.lineEditGitManual.setText(config[mgc.CONFIG_GIT_MANUAL_PATH] or '')
         self.ui.lineEditGitManual.setEnabled(not git_auto_detect)
@@ -112,7 +112,7 @@ class MgDialogSettings(QDialog):
             self.ui.checkBoxTortoiseGit.setChecked(ExecTortoiseGit.shouldShow())
             tgit_auto_detect = True if config[mgc.CONFIG_TORTOISEGIT_AUTODETECT] is None else config[mgc.CONFIG_TORTOISEGIT_AUTODETECT]
             self.ui.radioTGitAutoDetect.setChecked(tgit_auto_detect)
-            self.ui.lineEditTGitAutoDetect.setText(ExecTortoiseGit.autodetect_executable())
+            self.ui.lineEditTGitAutoDetect.setText(ExecTortoiseGit.autodetect_executable().path)
             self.ui.radioTGitManual.setChecked(not tgit_auto_detect)
             self.ui.lineEditTGitManual.setText(config[mgc.CONFIG_TORTOISEGIT_MANUAL_PATH] or '')
             self.ui.lineEditTGitManual.setEnabled(not tgit_auto_detect)
@@ -128,7 +128,7 @@ class MgDialogSettings(QDialog):
             self.ui.checkBoxSourceTree.setChecked(ExecSourceTree.shouldShow())
             stree_auto_detect = True if config[mgc.CONFIG_SOURCETREE_AUTODETECT] is None else config[mgc.CONFIG_SOURCETREE_AUTODETECT]
             self.ui.radioSourcetreeAutoDetect.setChecked(stree_auto_detect)
-            self.ui.lineEditSourcetreeAutoDetect.setText(ExecSourceTree.autodetect_executable())
+            self.ui.lineEditSourcetreeAutoDetect.setText(ExecSourceTree.autodetect_executable().path)
             self.ui.radioSourcetreeManual.setChecked(not stree_auto_detect)
             self.ui.lineEditSourcetreeManual.setText(config[mgc.CONFIG_SOURCETREE_MANUAL_PATH] or '')
             self.ui.lineEditSourcetreeManual.setEnabled(not stree_auto_detect)
@@ -145,7 +145,7 @@ class MgDialogSettings(QDialog):
             self.ui.checkBoxSublimeMerge.setChecked(ExecSublimeMerge.shouldShow())
             smerge_auto_detect = True if config[mgc.CONFIG_SUBLIMEMERGE_AUTODETECT] is None else config[mgc.CONFIG_SUBLIMEMERGE_AUTODETECT]
             self.ui.radioSublimemergeAutoDetect.setChecked(smerge_auto_detect)
-            self.ui.lineEditSublimemergeAutoDetect.setText(ExecSublimeMerge.autodetect_executable())
+            self.ui.lineEditSublimemergeAutoDetect.setText(ExecSublimeMerge.autodetect_executable().path)
             self.ui.radioSublimemergeManual.setChecked(not smerge_auto_detect)
             self.ui.lineEditSublimemergeManual.setText(config[mgc.CONFIG_SUBLIMEMERGE_MANUAL_PATH] or '')
             self.ui.lineEditSublimemergeManual.setEnabled(not smerge_auto_detect)
@@ -161,7 +161,7 @@ class MgDialogSettings(QDialog):
             self.ui.checkBoxGitBash.setChecked(ExecGitBash.shouldShow())
             gitbash_auto_detect = True if config[mgc.CONFIG_GITBASH_AUTODETECT] is None else config[mgc.CONFIG_GITBASH_AUTODETECT]
             self.ui.radioGitBashAutoDetect.setChecked(gitbash_auto_detect)
-            self.ui.lineEditGitBashAutoDetect.setText(ExecGitBash.autodetect_executable())
+            self.ui.lineEditGitBashAutoDetect.setText(ExecGitBash.autodetect_executable().path)
             self.ui.radioGitBashManual.setChecked(not gitbash_auto_detect)
             self.ui.lineEditGitBashManual.setText(config[mgc.CONFIG_GIT_MANUAL_PATH] or '')
             self.ui.lineEditGitBashManual.setEnabled(not gitbash_auto_detect)
@@ -177,7 +177,7 @@ class MgDialogSettings(QDialog):
             self.ui.checkBoxGitGui.setChecked(ExecGitGui.shouldShow())
             gitgui_auto_detect = True if config[mgc.CONFIG_GITGUI_AUTODETECT] is None else config[mgc.CONFIG_GITGUI_AUTODETECT]
             self.ui.radioGitGuiAutoDetect.setChecked(gitgui_auto_detect)
-            self.ui.lineEditGitGuiAutoDetect.setText(ExecGitGui.autodetect_executable())
+            self.ui.lineEditGitGuiAutoDetect.setText(ExecGitGui.autodetect_executable().path)
             self.ui.radioGitGuiManual.setChecked(not gitgui_auto_detect)
             self.ui.lineEditGitGuiManual.setText(config[mgc.CONFIG_GITGUI_MANUAL_PATH] or '')
             self.ui.lineEditGitGuiManual.setEnabled(not gitgui_auto_detect)
@@ -194,7 +194,7 @@ class MgDialogSettings(QDialog):
             self.ui.checkBoxGitK.setChecked(ExecGitK.shouldShow())
             gitk_auto_detect = True if config[mgc.CONFIG_GITK_AUTODETECT] is None else config[mgc.CONFIG_GITK_AUTODETECT]
             self.ui.radioGitKAutoDetect.setChecked(gitk_auto_detect)
-            self.ui.lineEditGitKAutoDetect.setText(ExecGitK.autodetect_executable())
+            self.ui.lineEditGitKAutoDetect.setText(ExecGitK.autodetect_executable().path)
             self.ui.radioGitKManual.setChecked(not gitk_auto_detect)
             self.ui.lineEditGitKManual.setText(config[mgc.CONFIG_GITK_MANUAL_PATH] or '')
             self.ui.lineEditGitKManual.setEnabled(not gitk_auto_detect)
@@ -208,7 +208,7 @@ class MgDialogSettings(QDialog):
 
         explorer_auto_detect = True if config[mgc.CONFIG_EXPLORER_AUTODETECT] is None else config[mgc.CONFIG_EXPLORER_AUTODETECT]
         self.ui.radioExplorerAutoDetect.setChecked(explorer_auto_detect)
-        self.ui.lineEditExplorerAutoDetect.setText(ExecExplorer.autodetect_executable())
+        self.ui.lineEditExplorerAutoDetect.setText(ExecExplorer.autodetect_executable().path)
         self.ui.radioExplorerManual.setChecked(not explorer_auto_detect)
         self.ui.lineEditExplorerManual.setText(config[mgc.CONFIG_GIT_MANUAL_PATH] or '')
         self.ui.lineEditExplorerManual.setEnabled(not explorer_auto_detect)

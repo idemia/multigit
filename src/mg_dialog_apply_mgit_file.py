@@ -392,7 +392,7 @@ def runDialogApplyMgitFile(window: 'MgMainWindow', baseDir: str, allRepos: List[
             if pathlib.Path(repo.fullpath).exists():
                 taskGroup = MgExecTaskGroup(f'Deleting repository no longer present', repo)
                 taskGroup.tasks.append(
-                    MgTaskDelDirectory(f'Deleting repository no longer present',
+                    MgTaskDelDirectory(f'Deleting repository {repo.name} no longer present',
                                        repo,
                                        repo.fullpath,
                                        )

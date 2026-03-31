@@ -1182,7 +1182,8 @@ class MgRepoInfo(QObject):
         if not ExecGit.checkFound():
             return
 
-        git_cmd = [ExecGit.get_executable(), '-C', self.fullpath] + list(args)
+        exec = ExecGit.get_executable()
+        git_args = ['-C', self.fullpath] + list(args)
 
         cb_process_done = None
         if cb_git_done:
@@ -1191,7 +1192,7 @@ class MgRepoInfo(QObject):
                 cb_git_done(self.name, git_exit_code, git_output)
 
         # our pool process does not handle force blocking, launch directly
-        RunProcess().exec_async(git_cmd, cb_process_done, force_blocking=self.force_blocking_git, allow_errors=allow_errors)
+        RunProcess().exec_async(exec, git_args, cb_process_done, force_blocking=self.force_blocking_git, allow_errors=allow_errors)
 
 
     def show_error_message_bad_git_exit_code(self, git_exit_code: int, git_output: str) -> None:
