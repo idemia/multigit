@@ -3,7 +3,7 @@
 ################################################################################
 ## Form generated from reading UI file 'ui_multigit_widget.ui'
 ##
-## Created by: Qt User Interface Compiler version 6.8.2
+## Created by: Qt User Interface Compiler version 6.11.0
 ##
 ## WARNING! All changes made in this file will be lost when recompiling UI file!
 ################################################################################
@@ -145,10 +145,10 @@ class Ui_MultigitWidget(object):
 #endif // QT_CONFIG(tooltip)
         self.buttonOpenBaseDir.setText("")
         ___qtreewidgetitem = self.repoTree.headerItem()
-        ___qtreewidgetitem.setText(4, QCoreApplication.translate("MultigitWidget", u"Last Remote Synchro", None));
-        ___qtreewidgetitem.setText(3, QCoreApplication.translate("MultigitWidget", u"Status", None));
-        ___qtreewidgetitem.setText(2, QCoreApplication.translate("MultigitWidget", u"Head", None));
-        ___qtreewidgetitem.setText(1, QCoreApplication.translate("MultigitWidget", u"Git Repo Path", None));
+        ___qtreewidgetitem.setText(4, QCoreApplication.translate("MultigitWidget", u"Last Remote Synchro", None))
+        ___qtreewidgetitem.setText(3, QCoreApplication.translate("MultigitWidget", u"Status", None))
+        ___qtreewidgetitem.setText(2, QCoreApplication.translate("MultigitWidget", u"Head", None))
+        ___qtreewidgetitem.setText(1, QCoreApplication.translate("MultigitWidget", u"Git Repo Path", None))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tabLastCommit), QCoreApplication.translate("MultigitWidget", u"Last Commit", None))
         self.textEditModFiles.setHtml(QCoreApplication.translate("MultigitWidget", u"<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
 "<html><head><meta name=\"qrichtext\" content=\"1\" /><meta charset=\"utf-8\" /><style type=\"text/css\">\n"

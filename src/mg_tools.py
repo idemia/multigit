@@ -124,6 +124,18 @@ class ExecTool:
 
 
     @classmethod
+    def flatpak_supported(cls) -> bool:
+        '''Return whether the current platform supports Flatpak'''
+        return sys.platform == 'linux'
+
+
+    @classmethod
+    def snap_supported(cls) -> bool:
+        '''Return whether the current platform supports Snap'''
+        return sys.platform == 'linux'
+
+
+    @classmethod
     def config_read(cls, suffix: str) -> Any:
         '''Read the configuration entry CONFIG_ENTRY_EXECUTABLE + suffix and return its value'''
         config = mg_config.get_config_instance()

@@ -33,7 +33,7 @@ class MgDialogSettings(QDialog):
 
     def __init__(self, parent: QWidget) -> None:
         super().__init__(parent)
-        self.setWindowFlags( self.windowFlags() & ~Qt.WindowType.WindowContextHelpButtonHint )
+        # self.setWindowFlags( self.windowFlags() & ~Qt.WindowType.WindowContextHelpButtonHint )
         self.ui = Ui_Preferences()
         self.ui.setupUi(self)
 
@@ -152,6 +152,12 @@ class MgDialogSettings(QDialog):
             self.ui.pushButtonSublimemergeManualBrowse.setEnabled(not smerge_auto_detect)
             self.ui.pushButtonSublimemergeManualBrowse.clicked.connect(self.slotEditPrefBrowseForSublime)
             self.enableSublimeIfActivated()
+            if not ExecSublimeMerge.flatpak_supported():
+                self.ui.radioSublimemergeFlatpak.setVisible(False)
+                self.ui.lineEditSublimemergeFlatpak.setVisible(False)
+            if not ExecSublimeMerge.snap_supported():
+                self.ui.radioSublimemergeSnap.setVisible(False)
+                self.ui.lineEditSublimemergeSnap.setVisible(False)
         else:
             self.ui.groupBoxSublimemerge.setVisible(False)
 
@@ -214,6 +220,12 @@ class MgDialogSettings(QDialog):
         self.ui.lineEditExplorerManual.setEnabled(not explorer_auto_detect)
         self.ui.pushButtonExplorerManualBrowse.setEnabled(not explorer_auto_detect)
         self.ui.pushButtonExplorerManualBrowse.clicked.connect( self.slotEditPrefBrowseForExplorer )
+        if not ExecExplorer.flatpak_supported():
+            self.ui.radioExplorerFlatpak.setVisible(False)
+            self.ui.lineEditExplorerFlatpak.setVisible(False)
+        if not ExecExplorer.snap_supported():
+            self.ui.radioExplorerSnap.setVisible(False)
+            self.ui.lineEditExplorerSnap.setVisible(False)
 
 
 

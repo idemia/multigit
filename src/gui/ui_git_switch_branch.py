@@ -3,7 +3,7 @@
 ################################################################################
 ## Form generated from reading UI file 'ui_git_switch_branch.ui'
 ##
-## Created by: Qt User Interface Compiler version 6.9.1
+## Created by: Qt User Interface Compiler version 6.11.0
 ##
 ## WARNING! All changes made in this file will be lost when recompiling UI file!
 ################################################################################
@@ -153,7 +153,7 @@ class Ui_GitSwitchBranch(object):
 
         self.treeWidgetBranches = QTreeWidget(self.groupBoxBranchOrTagSelection)
         __qtreewidgetitem = QTreeWidgetItem()
-        __qtreewidgetitem.setTextAlignment(0, Qt.AlignLeading|Qt.AlignVCenter);
+        __qtreewidgetitem.setTextAlignment(0, Qt.AlignLeading|Qt.AlignVCenter)
         self.treeWidgetBranches.setHeaderItem(__qtreewidgetitem)
         QTreeWidgetItem(self.treeWidgetBranches)
         QTreeWidgetItem(self.treeWidgetBranches)
@@ -266,30 +266,30 @@ class Ui_GitSwitchBranch(object):
         self.label.setText("")
         self.pushButtonGrouping.setText(QCoreApplication.translate("GitSwitchBranch", u"    Group          ", None))
         ___qtreewidgetitem = self.treeWidgetBranches.headerItem()
-        ___qtreewidgetitem.setText(2, QCoreApplication.translate("GitSwitchBranch", u"Type of branch", None));
-        ___qtreewidgetitem.setText(1, QCoreApplication.translate("GitSwitchBranch", u"Present in repositories", None));
-        ___qtreewidgetitem.setText(0, QCoreApplication.translate("GitSwitchBranch", u"Possible names", None));
+        ___qtreewidgetitem.setText(2, QCoreApplication.translate("GitSwitchBranch", u"Type of branch", None))
+        ___qtreewidgetitem.setText(1, QCoreApplication.translate("GitSwitchBranch", u"Present in repositories", None))
+        ___qtreewidgetitem.setText(0, QCoreApplication.translate("GitSwitchBranch", u"Possible names", None))
 
         __sortingEnabled = self.treeWidgetBranches.isSortingEnabled()
         self.treeWidgetBranches.setSortingEnabled(False)
         ___qtreewidgetitem1 = self.treeWidgetBranches.topLevelItem(0)
-        ___qtreewidgetitem1.setText(0, QCoreApplication.translate("GitSwitchBranch", u"sdfk", None));
+        ___qtreewidgetitem1.setText(0, QCoreApplication.translate("GitSwitchBranch", u"sdfk", None))
         ___qtreewidgetitem2 = self.treeWidgetBranches.topLevelItem(1)
-        ___qtreewidgetitem2.setText(1, QCoreApplication.translate("GitSwitchBranch", u"(in all 15)", None));
-        ___qtreewidgetitem2.setText(0, QCoreApplication.translate("GitSwitchBranch", u"master", None));
+        ___qtreewidgetitem2.setText(1, QCoreApplication.translate("GitSwitchBranch", u"(in all 15)", None))
+        ___qtreewidgetitem2.setText(0, QCoreApplication.translate("GitSwitchBranch", u"master", None))
         ___qtreewidgetitem3 = self.treeWidgetBranches.topLevelItem(2)
-        ___qtreewidgetitem3.setText(1, QCoreApplication.translate("GitSwitchBranch", u"(in 13)", None));
-        ___qtreewidgetitem3.setText(0, QCoreApplication.translate("GitSwitchBranch", u"feat/toto", None));
+        ___qtreewidgetitem3.setText(1, QCoreApplication.translate("GitSwitchBranch", u"(in 13)", None))
+        ___qtreewidgetitem3.setText(0, QCoreApplication.translate("GitSwitchBranch", u"feat/toto", None))
         self.treeWidgetBranches.setSortingEnabled(__sortingEnabled)
 
         self.groupBox_2.setTitle(QCoreApplication.translate("GitSwitchBranch", u"Targeted repositories", None))
         self.labelRepoSelected.setText(QCoreApplication.translate("GitSwitchBranch", u"3 repositories selected", None))
         self.pushButtonAdjustRepoList.setText(QCoreApplication.translate("GitSwitchBranch", u"Adjust Repository list", None))
         ___qtreewidgetitem4 = self.treeWidgetRepoList.headerItem()
-        ___qtreewidgetitem4.setText(4, QCoreApplication.translate("GitSwitchBranch", u"Last Remote Syncho", None));
-        ___qtreewidgetitem4.setText(3, QCoreApplication.translate("GitSwitchBranch", u"Status", None));
-        ___qtreewidgetitem4.setText(2, QCoreApplication.translate("GitSwitchBranch", u"Head", None));
-        ___qtreewidgetitem4.setText(1, QCoreApplication.translate("GitSwitchBranch", u"Git Repo Path", None));
-        ___qtreewidgetitem4.setText(0, QCoreApplication.translate("GitSwitchBranch", u"hidden", None));
+        ___qtreewidgetitem4.setText(4, QCoreApplication.translate("GitSwitchBranch", u"Last Remote Syncho", None))
+        ___qtreewidgetitem4.setText(3, QCoreApplication.translate("GitSwitchBranch", u"Status", None))
+        ___qtreewidgetitem4.setText(2, QCoreApplication.translate("GitSwitchBranch", u"Head", None))
+        ___qtreewidgetitem4.setText(1, QCoreApplication.translate("GitSwitchBranch", u"Git Repo Path", None))
+        ___qtreewidgetitem4.setText(0, QCoreApplication.translate("GitSwitchBranch", u"hidden", None))
     # retranslateUi
 

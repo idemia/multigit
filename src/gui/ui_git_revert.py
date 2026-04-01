@@ -3,7 +3,7 @@
 ################################################################################
 ## Form generated from reading UI file 'ui_git_revert.ui'
 ##
-## Created by: Qt User Interface Compiler version 6.8.2
+## Created by: Qt User Interface Compiler version 6.11.0
 ##
 ## WARNING! All changes made in this file will be lost when recompiling UI file!
 ################################################################################
@@ -127,10 +127,10 @@ class Ui_GitRevert(object):
         self.labelRepoSelected.setText(QCoreApplication.translate("GitRevert", u"3 repositories selected", None))
         self.pushButtonAdjustRepoList.setText(QCoreApplication.translate("GitRevert", u"Adjust Repository list", None))
         ___qtreewidgetitem = self.treeWidgetRepoList.headerItem()
-        ___qtreewidgetitem.setText(4, QCoreApplication.translate("GitRevert", u"Last Remote Syncho", None));
-        ___qtreewidgetitem.setText(3, QCoreApplication.translate("GitRevert", u"Status", None));
-        ___qtreewidgetitem.setText(2, QCoreApplication.translate("GitRevert", u"Head", None));
-        ___qtreewidgetitem.setText(1, QCoreApplication.translate("GitRevert", u"Git Repo Path", None));
-        ___qtreewidgetitem.setText(0, QCoreApplication.translate("GitRevert", u"hidden", None));
+        ___qtreewidgetitem.setText(4, QCoreApplication.translate("GitRevert", u"Last Remote Syncho", None))
+        ___qtreewidgetitem.setText(3, QCoreApplication.translate("GitRevert", u"Status", None))
+        ___qtreewidgetitem.setText(2, QCoreApplication.translate("GitRevert", u"Head", None))
+        ___qtreewidgetitem.setText(1, QCoreApplication.translate("GitRevert", u"Git Repo Path", None))
+        ___qtreewidgetitem.setText(0, QCoreApplication.translate("GitRevert", u"hidden", None))
     # retranslateUi
 

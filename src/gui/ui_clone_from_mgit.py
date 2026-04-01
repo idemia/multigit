@@ -3,7 +3,7 @@
 ################################################################################
 ## Form generated from reading UI file 'ui_clone_from_mgit.ui'
 ##
-## Created by: Qt User Interface Compiler version 6.8.2
+## Created by: Qt User Interface Compiler version 6.11.0
 ##
 ## WARNING! All changes made in this file will be lost when recompiling UI file!
 ################################################################################
@@ -371,10 +371,10 @@ class Ui_CloneFromMgitFile(object):
 "</style></head><body style=\" font-family:'Segoe UI'; font-size:9pt; font-weight:400; font-style:normal;\">\n"
 "<p style=\"-qt-paragraph-type:empty; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:'MS Shell Dlg 2'; font-size:8.25pt;\"><br /></p></body></html>", None))
         ___qtreewidgetitem = self.treeWidgetRepoList.headerItem()
-        ___qtreewidgetitem.setText(3, QCoreApplication.translate("CloneFromMgitFile", u"URL", None));
-        ___qtreewidgetitem.setText(2, QCoreApplication.translate("CloneFromMgitFile", u"Path", None));
-        ___qtreewidgetitem.setText(1, QCoreApplication.translate("CloneFromMgitFile", u"HEAD target", None));
-        ___qtreewidgetitem.setText(0, QCoreApplication.translate("CloneFromMgitFile", u"Repository", None));
+        ___qtreewidgetitem.setText(3, QCoreApplication.translate("CloneFromMgitFile", u"URL", None))
+        ___qtreewidgetitem.setText(2, QCoreApplication.translate("CloneFromMgitFile", u"Path", None))
+        ___qtreewidgetitem.setText(1, QCoreApplication.translate("CloneFromMgitFile", u"HEAD target", None))
+        ___qtreewidgetitem.setText(0, QCoreApplication.translate("CloneFromMgitFile", u"Repository", None))
         self.tabWidgetProject.setTabText(self.tabWidgetProject.indexOf(self.tabProject), QCoreApplication.translate("CloneFromMgitFile", u"Repositories", None))
         self.tabWidgetProject.setTabText(self.tabWidgetProject.indexOf(self.tabConfFile), QCoreApplication.translate("CloneFromMgitFile", u"Multigit file content", None))
         self.groupBox_3.setTitle("")
