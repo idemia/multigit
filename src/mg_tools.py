@@ -44,6 +44,7 @@ EXIT_CODE_COULD_NOT_START_PROCESS = -102
 GIT_EXIT_CODE_STOPPED_BECAUSE_AUTH_FAILURE = -103
 
 FLATPAK_SPAWN = ['flatpak-spawn', '--host']
+SNAP_BIN_DIR = Path('/snap/bin')
 
 class CmdType(Enum):
     NoCmd               = 'NoCmd'         # empty value, means that the program could not be found
@@ -97,6 +98,8 @@ class ExecTool:
     EXEC_NAME_WIN32: str = ''
     EXEC_NAME_DARWIN: str = ''
     EXEC_NAME_LINUX: str = ''
+    # Snap executable name under /snap/bin 
+    EXEC_NAME_SNAP: str = ''
     # Flatpak application ID (for example org.gnome.gitg). Empty means "no Flatpak app".
     EXEC_NAME_FLATPAK: str = ''
 
@@ -174,11 +177,10 @@ class ExecTool:
 
 
         if cls.INNOCUOUS_COMMAND:
-            # first, try on the command-line
-            exec = MgExecutable(CmdType.DirectCmd, path=cls.get_exec_name())
+            exec = MgExecutable(CmdType.CmdWithAutoFlatpak, path=cls.get_exec_name())
 
             try:
-                exit_code, output = RunProcess().exec_blocking(exec, cmd_args=cls.INNOCUOUS_COMMAND, allow_errors=True)
+                exit_code, _output = RunProcess().exec_blocking(exec, cmd_args=cls.INNOCUOUS_COMMAND, allow_errors=True)
                 if exit_code == 0:
                     # program is on the path, use it
                     cls.SESSION_CACHE[cls] = exec
@@ -227,32 +229,54 @@ class ExecTool:
 
 
     @classmethod
+    def get_candidate_exec_names(cls) -> List[str]:
+        exec_names = [cls.get_exec_name()]
+
+        if sys.platform == 'linux':
+            snap_exec_name = cls.EXEC_NAME_SNAP.strip() or cls.EXEC_NAME_LINUX
+            if snap_exec_name and snap_exec_name not in exec_names:
+                exec_names.append(snap_exec_name)
+
+        return exec_names
+
+
+    @classmethod
+    def get_path_candidates(cls) -> List[Path]:
+        if sys.platform == 'win32':
+            path_candidates = list(cls.WIN32_PATH_CANDIDATES)
+        elif sys.platform == 'linux':
+            path_candidates = list(cls.LINUX_PATH_CANDIDATES)
+        elif sys.platform == 'darwin':
+            path_candidates = list(cls.DARWIN_PATH_CANDIDATES)
+        else:
+            raise ValueError(f'Unsupported platform for find_prog_exed(): {sys.platform}')
+
+        return path_candidates
+
+
+    @classmethod
     def find_prog_exec(cls) -> MgExecutable:
         '''Scans locations path_candidates to see if the expected program exists. When running inside a flatpak sandbox,
         looks for the program on the host file system with flatpak-spawn.
+
+        If not found, and if EXEC_NAME_SNAP is defined, looks for a an executable with this name in /snap/bin.
 
         If not found, and if EXEC_NAME_FLATPAK is defined, looks for a Flatpak app with this ID.
         
         Return the program at this location if found or an empty MgExecutable
         '''
-        
-        # Look in some standards locations
-        path_candidates: Sequence[Union[str, Path]]
-        if sys.platform == 'win32':
-            path_candidates = cls.WIN32_PATH_CANDIDATES
-        elif sys.platform == 'linux':
-            path_candidates = cls.LINUX_PATH_CANDIDATES
-        elif sys.platform == 'darwin':
-            path_candidates = cls.DARWIN_PATH_CANDIDATES
-        else:
-            raise ValueError(f'Unsupported platform for find_prog_exed(): {sys.platform}')
-
+        path_candidates = cls.get_path_candidates()
         exec_name = cls.get_exec_name()
         
         dbg(f'find_prog_exec({cls.__name__}) - exec_name={exec_name}, path_candidates={path_candidates}')
+
+        possible_full_paths = [
+            Path(possible_path) / exec_name for possible_path in path_candidates
+        ]
+        if cls.EXEC_NAME_SNAP:
+            possible_full_paths.append(Path(SNAP_BIN_DIR) / cls.EXEC_NAME_SNAP)
         
-        for possible_path in path_candidates:
-            candidate_path = Path(possible_path) / exec_name
+        for candidate_path in possible_full_paths:
             dbg('find_prog_exec() - looking at: {}'.format(str(candidate_path)))
 
             if isRunningInsideFlatpak():
@@ -479,6 +503,7 @@ class ExecSublimeMerge(ExecTool):
 
     EXEC_NAME_WIN32 = "sublime_merge.exe"
     EXEC_NAME_LINUX = "sublime_merge"
+    EXEC_NAME_SNAP = 'sublime-merge'
     EXEC_NAME_FLATPAK = "com.sublimemerge.App"
 
     CONFIG_ENTRY_EXECUTABLE = 'CONFIG_SUBLIMEMERGE'
