@@ -51,6 +51,7 @@ class CmdType(Enum):
     DirectCmd           = 'DirectCmd'
     FlatpakSpawnCmd     = 'FlatpakSpawnCmd'
     FlatpakProgram      = 'FlatpakProgram'
+    SnapProgram         = 'SnapProgram'
     # deduce from the environment which command type to use between FlatpakSpawnCmd and DirectCmd
     CmdWithAutoFlatpak  = 'CmdWithAutoFlatpak'
                                                                   
@@ -109,7 +110,7 @@ class ExecTool:
     # name of the configuration entry to store the executable configuration
     # information (path, auto-detection, flatpak app name, ...). The prefix 
     # is completed with CONFIG_SUFFIX_* to store the different information.
-    CONFIG_ENTRY_EXECUTABLE: str
+    CONFIG_ENTRY_BASE: str
 
     DOUBLE_CLICK_ACTIONS: List[str] = []
 
@@ -126,47 +127,90 @@ class ExecTool:
     @classmethod
     def flatpak_supported(cls) -> bool:
         '''Return whether the current platform supports Flatpak'''
+        return True
         return sys.platform == 'linux'
 
 
     @classmethod
     def snap_supported(cls) -> bool:
         '''Return whether the current platform supports Snap'''
+        return True
         return sys.platform == 'linux'
 
 
     @classmethod
-    def config_read(cls, suffix: str) -> Any:
-        '''Read the configuration entry CONFIG_ENTRY_EXECUTABLE + suffix and return its value'''
+    def config_read_entry(cls, suffix: str, default_value: Any = None) -> Any:
+        '''Read the configuration entry CONFIG_ENTRY_BASE + suffix and return its value'''
         config = mg_config.get_config_instance()
-        return config.get(cls.CONFIG_ENTRY_EXECUTABLE + suffix)
+        return config.get(cls.CONFIG_ENTRY_BASE + suffix, default_value=default_value)
 
 
     @classmethod
-    def config_write(cls, suffix: str, value: Any) -> None:
-        '''Write the value in the configuration entry CONFIG_ENTRY_EXECUTABLE + suffix'''
+    def config_write_entry(cls, suffix: str, value: Any) -> None:
+        '''Write the value in the configuration entry CONFIG_ENTRY_BASE + suffix'''
         config = mg_config.get_config_instance()
-        config[cls.CONFIG_ENTRY_EXECUTABLE + suffix] = value
+        config[cls.CONFIG_ENTRY_BASE + suffix] = value
 
 
     @classmethod
     def config_read_exec(cls) -> MgExecutable:
-        '''Read the configuration entry and return an MgExecutanble with the stored information'''
+        '''Read the configuration entry and return an MgExecutanble with the stored information.
+
+        A default empty exec is returned if:
+        - the config entry does not exist
+        - the config entry for cmd_type has an unknown value
+        - the config entry declares flatpak but this is not supported on this platform
+        - the config entry declares snap but this is not supported on this platform
+        '''
         config = mg_config.get_config_instance()
-        cmd_type_str = config.get(cls.CONFIG_ENTRY_EXECUTABLE + mg_config.CONFIG_SUFFIX_CMD_TYPE)
+        cmd_type_config_entry = cls.CONFIG_ENTRY_BASE + mg_config.SUFFIX_CMD_TYPE
+        cmd_type_str = config.get(cmd_type_config_entry)
         if cmd_type_str is None:
             return MgExecutable()
-        name = config.get(cls.CONFIG_ENTRY_EXECUTABLE + mg_config.CONFIG_SUFFIX_APP_NAME, '')
-        path = config.get(cls.CONFIG_ENTRY_EXECUTABLE + mg_config.CONFIG_SUFFIX_MANUAL_PATH, '')
-        return MgExecutable(cmd_type=CmdType(cmd_type_str), name=name, path=path)
+        name = config.get(cls.CONFIG_ENTRY_BASE + mg_config.SUFFIX_APP_NAME, '')
+        path = config.get(cls.CONFIG_ENTRY_BASE + mg_config.SUFFIX_MANUAL_PATH, '')
+        try:
+            exec = MgExecutable(cmd_type=CmdType(cmd_type_str), name=name, path=path)
+        except ValueError:
+            warn(f'Unsupported config value for {cmd_type_config_entry} : {cmd_type_str}')
+            return MgExecutable()
+
+        if (not cls.flatpak_supported()) and exec.cmd_type in (CmdType.FlatpakSpawnCmd, CmdType.FlatpakProgram) \
+                or (not cls.snap_supported()) and exec.cmd_type == CmdType.SnapProgram:
+            # config is inconsistent, fix it
+            return MgExecutable()
+
+        return exec
 
 
     @classmethod
-    def config_write_exec(cls, exec: MgExecutable) -> None:
-        '''Write the MgExecutable information to the configuration entry'''
-        cls.config_write(mg_config.CONFIG_SUFFIX_CMD_TYPE, exec.cmd_type.value)
-        cls.config_write(mg_config.CONFIG_SUFFIX_APP_NAME, exec.name)
-        cls.config_write(mg_config.CONFIG_SUFFIX_MANUAL_PATH, exec.path)
+    def config_write(cls,
+                     activated: bool,
+                     autodetect_checked: bool,
+                     manual_checked: bool,
+                     flatpak_checked: bool,
+                     snap_checked: bool,
+                     snap_name: str,
+                     flatpak_name: str,
+                     manual_path: str,
+                     ) -> None:
+        '''Write all the executable related config '''
+        cls.config_write_entry(mg_config.SUFFIX_AUTODETECT, autodetect_checked)
+        cls.config_write_entry(mg_config.SUFFIX_ACTIVATED, activated)
+
+        cmd_type, path, name = '', '', ''
+        if manual_checked:
+            cmd_type = CmdType.DirectCmd.value
+        elif flatpak_checked:
+            cmd_type = CmdType.FlatpakProgram.value
+            name = flatpak_name
+        elif snap_checked:
+            cmd_type = CmdType.SnapProgram.value
+            name = snap_name
+
+        cls.config_write_entry(mg_config.SUFFIX_CMD_TYPE, cmd_type)
+        cls.config_write_entry(mg_config.SUFFIX_APP_NAME, flatpak_name)
+        cls.config_write_entry(mg_config.SUFFIX_MANUAL_PATH, manual_path)
 
 
     @classmethod
@@ -221,7 +265,7 @@ class ExecTool:
         if not cls.platform_supported():
             return MgExecutable()
 
-        if cls.config_read(mg_config.CONFIG_SUFFIX_AUTODETECT) in (None, True):
+        if cls.config_read_entry(mg_config.SUFFIX_AUTODETECT) in (None, True):
             result = cls.autodetect_executable()
         else:
             result = cls.config_read_exec()
@@ -238,18 +282,6 @@ class ExecTool:
             return cls.EXEC_NAME_DARWIN
         else:
             raise ValueError('Platform not supported: ', sys.platform)
-
-
-    @classmethod
-    def get_candidate_exec_names(cls) -> List[str]:
-        exec_names = [cls.get_exec_name()]
-
-        if sys.platform == 'linux':
-            snap_exec_name = cls.EXEC_NAME_SNAP.strip() or cls.EXEC_NAME_LINUX
-            if snap_exec_name and snap_exec_name not in exec_names:
-                exec_names.append(snap_exec_name)
-
-        return exec_names
 
 
     @classmethod
@@ -343,7 +375,7 @@ class ExecTool:
         - for first run, we show if the program is autodetected on the computer
         - for non first run, we show according to config
         '''
-        if cls.config_read(mg_config.CONFIG_SUFFIX_ACTIVATED) is None:
+        if cls.config_read_entry(mg_config.SUFFIX_ACTIVATED) is None:
             # configuration entry does not exist, this is our first run
             if not cls.get_executable().is_empty():
                 # program is not configured and but is autodetected
@@ -351,9 +383,9 @@ class ExecTool:
             else:
                 # program is not configured and not autodetected
                 showProgram = False
-            cls.config_write(mg_config.CONFIG_SUFFIX_ACTIVATED, showProgram)
+            cls.config_write_entry(mg_config.SUFFIX_ACTIVATED, showProgram)
         else:
-            showProgram = cls.config_read(mg_config.CONFIG_SUFFIX_ACTIVATED)
+            showProgram = cls.config_read_entry(mg_config.SUFFIX_ACTIVATED)
         return showProgram
 
 
@@ -433,7 +465,7 @@ class ExecGit(ExecTool):
 
     INNOCUOUS_COMMAND = ['--version']
 
-    CONFIG_ENTRY_EXECUTABLE = 'CONFIG_GIT'
+    CONFIG_ENTRY_BASE = 'CONFIG_GIT'
 
     @classmethod
     def checkFound(cls) -> bool:
@@ -460,7 +492,7 @@ class ExecTortoiseGit(ExecTool):
 
     EXEC_NAME_WIN32 = "TortoiseGitProc.exe"
 
-    CONFIG_ENTRY_EXECUTABLE = 'CONFIG_TORTOISEGIT'
+    CONFIG_ENTRY_BASE = 'CONFIG_TORTOISEGIT'
 
     DOUBLE_CLICK_ACTIONS = [
         mg_const.DBC_TORTOISEGITSHOWLOG,
@@ -490,7 +522,7 @@ class ExecSourceTree(ExecTool):
 
     EXEC_NAME_WIN32 = "SourceTree.exe"
 
-    CONFIG_ENTRY_EXECUTABLE = 'CONFIG_SOURCETREE'
+    CONFIG_ENTRY_BASE = 'CONFIG_SOURCETREE'
 
     DOUBLE_CLICK_ACTIONS = [
         mg_const.DBC_RUNSOURCETREE,
@@ -518,7 +550,7 @@ class ExecSublimeMerge(ExecTool):
     EXEC_NAME_SNAP = 'sublime-merge'
     EXEC_NAME_FLATPAK = "com.sublimemerge.App"
 
-    CONFIG_ENTRY_EXECUTABLE = 'CONFIG_SUBLIMEMERGE'
+    CONFIG_ENTRY_BASE = 'CONFIG_SUBLIMEMERGE'
 
     DOUBLE_CLICK_ACTIONS = [
         mg_const.DBC_RUNSUBLIMEMERGE,
@@ -542,7 +574,7 @@ class ExecGitBash(ExecTool):
 
     EXEC_NAME_WIN32 = "git-bash.exe"
 
-    CONFIG_ENTRY_EXECUTABLE = 'CONFIG_GITBASH'
+    CONFIG_ENTRY_BASE = 'CONFIG_GITBASH'
 
     DOUBLE_CLICK_ACTIONS = [
         mg_const.DBC_RUNGITBASH,
@@ -569,7 +601,7 @@ class ExecGitGui(ExecTool):
     EXEC_NAME_WIN32 = "git-gui.exe"
     EXEC_NAME_LINUX = "git-gui"
 
-    CONFIG_ENTRY_EXECUTABLE = 'CONFIG_GITGUI'
+    CONFIG_ENTRY_BASE = 'CONFIG_GITGUI'
 
     DOUBLE_CLICK_ACTIONS = [
         mg_const.DBC_RUNGITGUI,
@@ -602,7 +634,7 @@ class ExecGitK(ExecTool):
     EXEC_NAME_LINUX = "gitk"
     EXEC_NAME_DARWIN = "gitk"
 
-    CONFIG_ENTRY_EXECUTABLE = 'CONFIG_GITK'
+    CONFIG_ENTRY_BASE = 'CONFIG_GITK'
 
     DOUBLE_CLICK_ACTIONS = [
         mg_const.DBC_RUNGITK,
@@ -633,7 +665,7 @@ class ExecExplorer(ExecTool):
     EXEC_NAME_DARWIN = 'open'
 
     # name of the configuration entry to store auto-detection behavior
-    CONFIG_ENTRY_EXECUTABLE = 'CONFIG_EXPLORER'
+    CONFIG_ENTRY_BASE = 'CONFIG_EXPLORER'
 
 
     @classmethod

@@ -24,7 +24,7 @@ if TYPE_CHECKING:
     from src.mg_repo_tree import MgRepoTree
 from src.gui.ui_preferences import Ui_Preferences
 from src.mg_tools import ExecGit, ExecTortoiseGit, ExecSourceTree, ExecSublimeMerge, ExecGitBash, ExecExplorer, \
-    ExecGitGui, ExecGitK
+    ExecGitGui, ExecGitK, CmdType, MgExecutable
 import src.mg_const as mg_const
 import src.mg_config as mgc
 
@@ -33,7 +33,6 @@ class MgDialogSettings(QDialog):
 
     def __init__(self, parent: QWidget) -> None:
         super().__init__(parent)
-        # self.setWindowFlags( self.windowFlags() & ~Qt.WindowType.WindowContextHelpButtonHint )
         self.ui = Ui_Preferences()
         self.ui.setupUi(self)
 
@@ -139,28 +138,64 @@ class MgDialogSettings(QDialog):
             self.ui.groupBoxSourceTree.setVisible(False)
 
 
+        # Case 1: autodetect works, with either direct command output, snap in a direct command, flatapak id through flatpak,
+        #         direct command through flatpak-spawn, snap command through flatpak-spawn (last two when running inside flatpak)
+        # Case 2: autodetect does not work, command must be manually specified by user
+        #      2.1: direct path
+        #      2.2: snap name 
+        #      2.3: flatpak id
+
+
         if ExecSublimeMerge.platform_supported():
-            self.ui.labelExecSublimemergeChoose.setText(f'Choose {ExecSublimeMerge.get_exec_name()} executable location')
+            exec = ExecSublimeMerge.config_read_exec()
+            smerge_auto_detect = ExecSublimeMerge.config_read_entry(mgc.SUFFIX_AUTODETECT, True)
+            auto_detect_exec = ExecSublimeMerge.autodetect_executable()
+
+            # if config is invalid, switch back to auto-detect
+            smerge_auto_detect = smerge_auto_detect or exec.is_empty()
+
+            self.ui.labelExecSublimemergeChoose.setText(f'Choose {ExecSublimeMerge.get_exec_name()} executable')
             self.ui.checkBoxSublimeMerge.toggled.connect(self.enableSublimeIfActivated)
             self.ui.checkBoxSublimeMerge.setChecked(ExecSublimeMerge.shouldShow())
-            smerge_auto_detect = True if config[mgc.CONFIG_SUBLIMEMERGE_AUTODETECT] is None else config[mgc.CONFIG_SUBLIMEMERGE_AUTODETECT]
+
             self.ui.radioSublimemergeAutoDetect.setChecked(smerge_auto_detect)
-            self.ui.lineEditSublimemergeAutoDetect.setText(ExecSublimeMerge.autodetect_executable().path)
-            self.ui.radioSublimemergeManual.setChecked(not smerge_auto_detect)
-            self.ui.lineEditSublimemergeManual.setText(config[mgc.CONFIG_SUBLIMEMERGE_MANUAL_PATH] or '')
-            self.ui.lineEditSublimemergeManual.setEnabled(not smerge_auto_detect)
-            self.ui.pushButtonSublimemergeManualBrowse.setEnabled(not smerge_auto_detect)
+            self.ui.lineEditSublimemergeAutoDetect.setText(auto_detect_exec.path or auto_detect_exec.name)
+
+            self.ui.radioSublimemergeManual.setChecked(exec.cmd_type == CmdType.DirectCmd)
+            self.ui.lineEditSublimemergeManual.setText(exec.path)
+            self.ui.lineEditSublimemergeManual.setEnabled(exec.cmd_type == CmdType.DirectCmd)
+            self.ui.pushButtonSublimemergeManualBrowse.setEnabled(exec.cmd_type == CmdType.DirectCmd)
             self.ui.pushButtonSublimemergeManualBrowse.clicked.connect(self.slotEditPrefBrowseForSublime)
-            self.enableSublimeIfActivated()
-            if not ExecSublimeMerge.flatpak_supported():
+
+            if ExecSublimeMerge.flatpak_supported():
+                self.ui.radioSublimemergeFlatpak.setVisible(True)
+                self.ui.lineEditSublimemergeFlatpak.setVisible(True)
+                if exec.cmd_type == CmdType.FlatpakProgram:
+                    self.ui.radioSublimemergeFlatpak.setChecked(True)
+                    self.ui.lineEditSublimemergeFlatpak.setText(exec.name)
+                else:
+                    self.ui.radioSublimemergeFlatpak.setChecked(False)
+                    self.ui.lineEditSublimemergeFlatpak.setText('')
+            else:
                 self.ui.radioSublimemergeFlatpak.setVisible(False)
                 self.ui.lineEditSublimemergeFlatpak.setVisible(False)
-            if not ExecSublimeMerge.snap_supported():
+
+            if ExecSublimeMerge.snap_supported():
+                self.ui.radioSublimemergeSnap.setVisible(True)
+                self.ui.lineEditSublimemergeSnap.setVisible(True)
+                if exec.cmd_type == CmdType.SnapProgram:
+                    self.ui.radioSublimemergeSnap.setChecked(True)
+                    self.ui.lineEditSublimemergeSnap.setText(exec.name)
+                else:
+                    self.ui.radioSublimemergeSnap.setChecked(False)
+                    self.ui.lineEditSublimemergeSnap.setText('')
+            else:
                 self.ui.radioSublimemergeSnap.setVisible(False)
                 self.ui.lineEditSublimemergeSnap.setVisible(False)
         else:
             self.ui.groupBoxSublimemerge.setVisible(False)
 
+        self.enableSublimeIfActivated()
 
         if ExecGitBash.platform_supported():
             self.ui.checkBoxGitBash.toggled.connect(self.enableGitBashIfActivated)
@@ -341,10 +376,18 @@ class MgDialogSettings(QDialog):
         enable_sublime_stuff = self.ui.checkBoxSublimeMerge.isChecked() 
         self.ui.radioSublimemergeManual.setEnabled(enable_sublime_stuff)
         self.ui.radioSublimemergeAutoDetect.setEnabled(enable_sublime_stuff)
+        self.ui.radioSublimemergeFlatpak.setEnabled(enable_sublime_stuff)
+        self.ui.radioSublimemergeSnap.setEnabled(enable_sublime_stuff)
 
         enable_manual_widgets = enable_sublime_stuff and self.ui.radioSublimemergeManual.isChecked()
         self.ui.lineEditSublimemergeManual.setEnabled( enable_manual_widgets )
         self.ui.pushButtonSublimemergeManualBrowse.setEnabled( enable_manual_widgets )
+
+        enable_flatpak_widgets = enable_sublime_stuff and self.ui.radioSublimemergeFlatpak.isChecked()
+        self.ui.lineEditSublimemergeFlatpak.setEnabled( enable_flatpak_widgets )
+
+        enable_snap_widgets = enable_sublime_stuff and self.ui.radioSublimemergeSnap.isChecked()
+        self.ui.lineEditSublimemergeSnap.setEnabled( enable_snap_widgets )
 
 
     def enableGitBashIfActivated(self) -> None:
@@ -409,9 +452,16 @@ def runDialogEditSettings(parent: QWidget, tabPage: Union[Literal[0], Literal[1]
     config[mgc.CONFIG_SOURCETREE_ACTIVATED] = dlg.ui.checkBoxSourceTree.isChecked()
     config[mgc.CONFIG_SOURCETREE_AUTODETECT] = dlg.ui.radioSourcetreeAutoDetect.isChecked()
     config[mgc.CONFIG_SOURCETREE_MANUAL_PATH] = dlg.ui.lineEditSourcetreeManual.text()
-    config[mgc.CONFIG_SUBLIMEMERGE_ACTIVATED] = dlg.ui.checkBoxSublimeMerge.isChecked()
-    config[mgc.CONFIG_SUBLIMEMERGE_AUTODETECT] = dlg.ui.radioSublimemergeAutoDetect.isChecked()
-    config[mgc.CONFIG_SUBLIMEMERGE_MANUAL_PATH] = dlg.ui.lineEditSublimemergeManual.text()
+    ExecSublimeMerge.config_write(
+        activated=dlg.ui.checkBoxSublimeMerge.isChecked(),
+        autodetect_checked=dlg.ui.radioSublimemergeAutoDetect.isChecked(),
+        manual_checked=dlg.ui.radioSublimemergeManual.isChecked(),
+        flatpak_checked=dlg.ui.radioSublimemergeFlatpak.isChecked(),
+        snap_checked=dlg.ui.radioSublimemergeSnap.isChecked(),
+        flatpak_name=dlg.ui.lineEditSublimemergeFlatpak.text(),
+        snap_name=dlg.ui.lineEditSublimemergeSnap.text(),
+        manual_path=dlg.ui.lineEditSublimemergeManual.text(),
+    )
     config[mgc.CONFIG_GITBASH_ACTIVATED] = dlg.ui.checkBoxGitBash.isChecked()
     config[mgc.CONFIG_GITBASH_AUTODETECT] = dlg.ui.radioGitBashAutoDetect.isChecked()
     config[mgc.CONFIG_GITBASH_MANUAL_PATH] = dlg.ui.lineEditGitBashManual.text()
