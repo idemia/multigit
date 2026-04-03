@@ -25,7 +25,6 @@ from dataclasses import dataclass
 
 from PySide6.QtCore import QObject, QProcess, Signal
 from PySide6.QtWidgets import QMessageBox, QApplication
-from PySide6.QtDBus import QDBusInterface, QDBusConnection, QDBusMessage
 
 from src import mg_config
 from src.mg_utils import hasGitAuthFailureMsg
@@ -44,17 +43,14 @@ EXIT_CODE_COULD_NOT_START_PROCESS = -102
 GIT_EXIT_CODE_STOPPED_BECAUSE_AUTH_FAILURE = -103
 
 FLATPAK_SPAWN = ['flatpak-spawn', '--host']
-SNAP_BIN_DIR = Path('/snap/bin')
+SNAP_BIN_DIR = '/snap/bin'
 
 class CmdType(Enum):
     NoCmd               = 'NoCmd'         # empty value, means that the program could not be found
     DirectCmd           = 'DirectCmd'
-    FlatpakSpawnCmd     = 'FlatpakSpawnCmd'
     FlatpakProgram      = 'FlatpakProgram'
     SnapProgram         = 'SnapProgram'
-    # deduce from the environment which command type to use between FlatpakSpawnCmd and DirectCmd
-    CmdWithAutoFlatpak  = 'CmdWithAutoFlatpak'
-                                                                  
+
 
 @dataclass
 class MgExecutable:
@@ -127,14 +123,12 @@ class ExecTool:
     @classmethod
     def flatpak_supported(cls) -> bool:
         '''Return whether the current platform supports Flatpak'''
-        return True
         return sys.platform == 'linux'
 
 
     @classmethod
     def snap_supported(cls) -> bool:
         '''Return whether the current platform supports Snap'''
-        return True
         return sys.platform == 'linux'
 
 
@@ -175,7 +169,7 @@ class ExecTool:
             warn(f'Unsupported config value for {cmd_type_config_entry} : {cmd_type_str}')
             return MgExecutable()
 
-        if (not cls.flatpak_supported()) and exec.cmd_type in (CmdType.FlatpakSpawnCmd, CmdType.FlatpakProgram) \
+        if (not cls.flatpak_supported()) and exec.cmd_type == CmdType.FlatpakProgram \
                 or (not cls.snap_supported()) and exec.cmd_type == CmdType.SnapProgram:
             # config is inconsistent, fix it
             return MgExecutable()
@@ -233,7 +227,7 @@ class ExecTool:
 
 
         if cls.INNOCUOUS_COMMAND:
-            exec = MgExecutable(CmdType.CmdWithAutoFlatpak, path=cls.get_exec_name())
+            exec = MgExecutable(CmdType.DirectCmd, path=cls.get_exec_name())
 
             try:
                 exit_code, _output = RunProcess().exec_blocking(exec, cmd_args=cls.INNOCUOUS_COMMAND, allow_errors=True)
@@ -327,7 +321,7 @@ class ExecTool:
                 if not flatpak_host_file_exists(candidate_path):
                     continue
                 dbg('Found program at flatpak host: {}'.format(str(candidate_path)))
-                return MgExecutable(CmdType.FlatpakSpawnCmd, str(candidate_path))
+                return MgExecutable(CmdType.DirectCmd, str(candidate_path))
             else:
                 if not candidate_path.exists():
                     continue
@@ -353,7 +347,7 @@ class ExecTool:
         if not app_id:
             return MgExecutable()
 
-        exec = MgExecutable(CmdType.FlatpakSpawnCmd, path='flatpak')
+        exec = MgExecutable(CmdType.DirectCmd, path='flatpak')
         cmd_args = ['info', '--show-ref', app_id]
         try:
             exit_code, _output = RunProcess().exec_blocking(exec, cmd_args, allow_errors=True)
@@ -753,7 +747,7 @@ class RunProcess(QObject):
         super().__init__(QApplication.instance())
 
         self.executable: Optional[MgExecutable] = None
-        self.cmd_line: Sequence[str] = []
+        self.cmd_line: List[str] = []
         self.process_working_dir = None
         self.process = None
         self.cb_done = None
@@ -771,22 +765,37 @@ class RunProcess(QObject):
                        allow_errors: bool = False, emit_output: bool = False) -> None:
         '''Creates a QProcess for running a command
 
-        exec: the executable to run, with the information to run it properly (flatpak spawn, direct command, ...)
+        exec: the executable to run, with the information to run it properly (path for a direct command, snap name for a snap
+         program, flatpak app id for a flatpak program
         cmd_args: arguments to execute.
+
+        If running inside a flatpak container, the command is executed on the host with flatpak-spawn
 
         May block while a process is currently under execution
         '''
         dbg(f'create_process({exec} {cmd_args}, working_dir={working_dir})')
-        if exec.cmd_type == CmdType.FlatpakProgram:
-            cmd_args = ['flatpak', 'run', exec.name] + cmd_args
-        if exec.cmd_type == CmdType.CmdWithAutoFlatpak and isRunningInsideFlatpak() \
-            or exec.cmd_type == CmdType.FlatpakSpawnCmd \
-            or exec.cmd_type == CmdType.FlatpakProgram:
-            cmd_args = FLATPAK_SPAWN + cmd_args
-            dbg(f'create_process(), add flatpak spawn: {cmd_args}')
-        if exec.cmd_type == CmdType.DirectCmd:
-            cmd_args = [exec.path] + cmd_args
+        cmd_type = exec.cmd_type
+
+        assert not exec.is_empty(), f'Can not execute: {exec}'
+
         self.cmd_line = cmd_args
+
+        # Direct cmd, with exec.path
+
+        if exec.cmd_type in [CmdType.DirectCmd]:
+            self.cmd_line = [exec.path] + self.cmd_line
+
+        if cmd_type == CmdType.FlatpakProgram:
+            self.cmd_line = ['flatpak', 'run', exec.name] + self.cmd_line
+
+        if cmd_type == CmdType.SnapProgram:
+            self.cmd_line = [f'{SNAP_BIN_DIR}/{exec.name}'] + self.cmd_line
+
+        if isRunningInsideFlatpak():
+            self.cmd_line = FLATPAK_SPAWN + self.cmd_line
+
+        dbg(f'create_process() cmd_line={self.cmd_line}')
+
         self.emit_output = emit_output
         self.process = QProcess(self)
         self.process.setProgram(self.cmd_line[0])
@@ -1042,6 +1051,6 @@ def flatpak_host_file_exists(fpath: Path) -> bool:
     # If it turns out to be a wrong assumption we can always organise a search for a shell or a python
     assert isRunningInsideFlatpak(), 'flatpak_host_file_exists() should only be called when running inside flatpak'
     USE_SH_TO_CHECK_THAT_FILE_EXISTS = ['sh', '-c', f'[ -e "{fpath}" ]']
-    exec = MgExecutable(CmdType.FlatpakSpawnCmd, USE_SH_TO_CHECK_THAT_FILE_EXISTS[0])
+    exec = MgExecutable(CmdType.DirectCmd, path=USE_SH_TO_CHECK_THAT_FILE_EXISTS[0])
     exit_code, output = RunProcess().exec_blocking(exec, cmd_args=USE_SH_TO_CHECK_THAT_FILE_EXISTS[1:], allow_errors=True)
     return exit_code == 0
