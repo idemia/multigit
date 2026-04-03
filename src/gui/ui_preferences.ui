@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>862</width>
-    <height>916</height>
+    <width>812</width>
+    <height>808</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -1856,33 +1856,20 @@
   </layout>
  </widget>
  <tabstops>
+  <tabstop>checkBoxFetchOnStartup</tabstop>
+  <tabstop>comboBoxDoubleClickAction</tabstop>
+  <tabstop>pushButtonColorBranch</tabstop>
+  <tabstop>pushButtonColorTag</tabstop>
+  <tabstop>radioButtonGitProcUnlimited</tabstop>
+  <tabstop>radioButtonGitProcLimit</tabstop>
+  <tabstop>spinBoxLimitValue</tabstop>
+  <tabstop>comboUpdateFrequency</tabstop>
+  <tabstop>checkBoxConfirmWhenQuitting</tabstop>
   <tabstop>radioGitAutoDetect</tabstop>
   <tabstop>lineEditGitAutoDetect</tabstop>
   <tabstop>radioGitManual</tabstop>
   <tabstop>lineEditGitManual</tabstop>
   <tabstop>pushButtonGitManualBrowse</tabstop>
-  <tabstop>checkBoxTortoiseGit</tabstop>
-  <tabstop>radioTGitAutoDetect</tabstop>
-  <tabstop>lineEditTGitAutoDetect</tabstop>
-  <tabstop>radioTGitManual</tabstop>
-  <tabstop>lineEditTGitManual</tabstop>
-  <tabstop>pushButtonTGitManualBrowse</tabstop>
-  <tabstop>checkBoxSourceTree</tabstop>
-  <tabstop>radioSourcetreeAutoDetect</tabstop>
-  <tabstop>lineEditSourcetreeAutoDetect</tabstop>
-  <tabstop>radioSourcetreeManual</tabstop>
-  <tabstop>lineEditSourcetreeManual</tabstop>
-  <tabstop>pushButtonSourcetreeManualBrowse</tabstop>
-  <tabstop>checkBoxSublimeMerge</tabstop>
-  <tabstop>radioSublimemergeAutoDetect</tabstop>
-  <tabstop>lineEditSublimemergeAutoDetect</tabstop>
-  <tabstop>radioSublimemergeManual</tabstop>
-  <tabstop>lineEditSublimemergeManual</tabstop>
-  <tabstop>pushButtonSublimemergeManualBrowse</tabstop>
-  <tabstop>radioSublimemergeSnap</tabstop>
-  <tabstop>lineEditSublimemergeSnap</tabstop>
-  <tabstop>radioSublimemergeFlatpak</tabstop>
-  <tabstop>lineEditSublimemergeFlatpak</tabstop>
   <tabstop>radioExplorerAutoDetect</tabstop>
   <tabstop>lineEditExplorerAutoDetect</tabstop>
   <tabstop>radioExplorerManual</tabstop>
@@ -1892,12 +1879,6 @@
   <tabstop>lineEditExplorerSnap</tabstop>
   <tabstop>radioExplorerFlatpak</tabstop>
   <tabstop>lineEditExplorerFlatpak</tabstop>
-  <tabstop>checkBoxGitBash</tabstop>
-  <tabstop>radioGitBashAutoDetect</tabstop>
-  <tabstop>lineEditGitBashAutoDetect</tabstop>
-  <tabstop>radioGitBashManual</tabstop>
-  <tabstop>lineEditGitBashManual</tabstop>
-  <tabstop>pushButtonGitBashManualBrowse</tabstop>
   <tabstop>checkBoxGitGui</tabstop>
   <tabstop>radioGitGuiAutoDetect</tabstop>
   <tabstop>lineEditGitGuiAutoDetect</tabstop>
@@ -1910,13 +1891,35 @@
   <tabstop>radioGitKManual</tabstop>
   <tabstop>lineEditGitKManual</tabstop>
   <tabstop>pushButtonGitKManualBrowse</tabstop>
-  <tabstop>comboUpdateFrequency</tabstop>
-  <tabstop>checkBoxFetchOnStartup</tabstop>
-  <tabstop>spinBoxLimitValue</tabstop>
-  <tabstop>radioButtonGitProcLimit</tabstop>
-  <tabstop>pushButtonColorBranch</tabstop>
-  <tabstop>pushButtonColorTag</tabstop>
-  <tabstop>radioButtonGitProcUnlimited</tabstop>
+  <tabstop>checkBoxSublimeMerge</tabstop>
+  <tabstop>radioSublimemergeAutoDetect</tabstop>
+  <tabstop>lineEditSublimemergeAutoDetect</tabstop>
+  <tabstop>radioSublimemergeManual</tabstop>
+  <tabstop>lineEditSublimemergeManual</tabstop>
+  <tabstop>pushButtonSublimemergeManualBrowse</tabstop>
+  <tabstop>radioSublimemergeFlatpak</tabstop>
+  <tabstop>lineEditSublimemergeFlatpak</tabstop>
+  <tabstop>radioSublimemergeSnap</tabstop>
+  <tabstop>lineEditSublimemergeSnap</tabstop>
+  <tabstop>checkBoxTortoiseGit</tabstop>
+  <tabstop>radioTGitAutoDetect</tabstop>
+  <tabstop>lineEditTGitAutoDetect</tabstop>
+  <tabstop>radioTGitManual</tabstop>
+  <tabstop>lineEditTGitManual</tabstop>
+  <tabstop>pushButtonTGitManualBrowse</tabstop>
+  <tabstop>checkBoxSourceTree</tabstop>
+  <tabstop>radioSourcetreeAutoDetect</tabstop>
+  <tabstop>lineEditSourcetreeAutoDetect</tabstop>
+  <tabstop>radioSourcetreeManual</tabstop>
+  <tabstop>lineEditSourcetreeManual</tabstop>
+  <tabstop>pushButtonSourcetreeManualBrowse</tabstop>
+  <tabstop>checkBoxGitBash</tabstop>
+  <tabstop>radioGitBashAutoDetect</tabstop>
+  <tabstop>lineEditGitBashAutoDetect</tabstop>
+  <tabstop>radioGitBashManual</tabstop>
+  <tabstop>lineEditGitBashManual</tabstop>
+  <tabstop>pushButtonGitBashManualBrowse</tabstop>
+  <tabstop>tabWidget</tabstop>
  </tabstops>
  <resources/>
  <connections>
