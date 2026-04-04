@@ -1033,12 +1033,22 @@ def scan_git_dirs(base_path: str) -> Generator[str, str, None]:
             continue
 
         visited.add(resolved_path)
-        for entry in os.scandir(dirpath):
-            if not entry.is_dir(follow_symlinks=True):
-                continue
+        try:
+            dir_content = os.scandir(dirpath)
+        except PermissionError:
+            dbg(f'scan_git_dirs() - PermissionError when trying to access {dirpath}, skipping it')
+            continue
 
-            if entry.name == '.git' and is_git_repo(Path(entry.path)):
-                yield entry.path
+        for entry in dir_content:
+            try:
+                if not entry.is_dir(follow_symlinks=True):
+                    continue
+
+                if entry.name == '.git' and is_git_repo(Path(entry.path)):
+                    yield entry.path
+                    continue
+            except OSError:
+                # we could not access the entry for some reason, it's ok,just continue scanning
                 continue
 
             path_to_visit.append(entry.path)
