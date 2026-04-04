@@ -19,6 +19,7 @@
 import os
 import platform
 import sys, logging, datetime, tempfile, pathlib
+import ctypes
 import logging.handlers
 import traceback as tb_module
 from typing import Type, Optional
@@ -73,8 +74,27 @@ Please include the file log_multigit_debug.log which you can find in the menu Ab
 # mandatory to avoid Python crashing on exceptions raised inside slots
 app: Optional[ QApplication ] = None
 
+
+def set_windows_app_id(app_id: str = 'Multigit') -> None:
+    """Force an explicit AppUserModelID on Windows for correct taskbar icon/grouping.
+
+    This allows to set a taskbar icon different from the launcher program (Python, PyCharm, ...)
+
+    """
+    if sys.platform != 'win32':
+        return
+
+    try:
+        result = ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(app_id)
+        if result != 0:
+            logging.warning('Could not set Windows AppUserModelID %s (HRESULT=%s)', app_id, result)
+    except Exception:
+        logging.warning('Could not set Windows AppUserModelID', exc_info=True)
+
+
 def main_gui() -> None:
     global app
+    set_windows_app_id()
     app = QApplication([])
     app.setDesktopFileName('org.multigit.Multigit')
     icon = QtGui.QIcon()
