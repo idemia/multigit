@@ -3,9 +3,19 @@
     - bug: freeze when selecting a double-click action ?
 
 # Flatpak
+- ability to detect & launch flatpak:
+    - modify code using autodetect_executable
 - sublime merge is not autodetected (because it is installed as a flatpak)
     => add flatak + snap autodetection
     => add flatak + snap launcher
+    - work in progress:
+        - modify the config reading/writing
+        - modify the doc for create_process
+        - createProcess should switch to cmd_args instead of cmdLine
+        - MgGitAuthFailure should be moved to ExecGit
+        - backward compability with manual config entry must be preserved
+        - check why repo info git exec non blocking does not use gitexec
+        - mg_task.move_directory is windows specific
 - see if we can create a directory from a native open file dialog instead of regualar file dialog
 - default dialog size are too big
 - show last commit _+ show modified files is not activatee by default
