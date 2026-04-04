@@ -1,3 +1,7 @@
+# Linux
+- os.scandir() can face directories where it has no access, ignore it
+
+
 # Windows
     - launch multigit after installation
     - bug: freeze when selecting a double-click action ?
