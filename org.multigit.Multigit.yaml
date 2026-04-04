@@ -68,6 +68,7 @@ modules:
 finish-args:
   # Qt
   - --share=ipc
+  - --env=QT_QPA_PLATFORM=xcb
   - --socket=fallback-x11
   - --socket=wayland
   - --device=dri
