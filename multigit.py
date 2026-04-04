@@ -76,6 +76,7 @@ app: Optional[ QApplication ] = None
 def main_gui() -> None:
     global app
     app = QApplication([])
+    app.setDesktopFileName('org.multigit.Multigit')
     icon = QtGui.QIcon()
     icon.addPixmap(QtGui.QPixmap(":/img/multigit-logo-256.png"), QtGui.QIcon.Mode.Normal, QtGui.QIcon.State.Off)
     icon.addPixmap(QtGui.QPixmap(":/img/multigit-logo-16.png"),  QtGui.QIcon.Mode.Normal, QtGui.QIcon.State.Off)
