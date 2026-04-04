@@ -203,7 +203,7 @@ class ExecTool:
             name = snap_name
 
         cls.config_write_entry(mg_config.SUFFIX_CMD_TYPE, cmd_type)
-        cls.config_write_entry(mg_config.SUFFIX_APP_NAME, flatpak_name)
+        cls.config_write_entry(mg_config.SUFFIX_APP_NAME, name)
         cls.config_write_entry(mg_config.SUFFIX_MANUAL_PATH, manual_path)
 
 
