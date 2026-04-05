@@ -1,5 +1,6 @@
 # Linux
-- os.scandir() can face directories where it has no access, ignore it
+- QProcess() should catch errors because it does not detect launching a non-exeisting exectuable
+- check why it works with git-gui though (interactions with flatpak or snap ?)
 
 
 # Windows

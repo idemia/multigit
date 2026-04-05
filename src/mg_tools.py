@@ -168,20 +168,25 @@ class ExecTool:
         cmd_type_config_entry = cls.CONFIG_ENTRY_BASE + mg_config.SUFFIX_CMD_TYPE
         cmd_type_str = config.get(cmd_type_config_entry)
         if cmd_type_str is None:
+            dbg(f'config_read_exec() - no config entry for cmd type: {cmd_type_config_entry}, returning empty MgExecutable')
             return MgExecutable()
         name = config.get(cls.CONFIG_ENTRY_BASE + mg_config.SUFFIX_APP_NAME, '')
         path = config.get(cls.CONFIG_ENTRY_BASE + mg_config.SUFFIX_MANUAL_PATH, '')
         try:
             exec = MgExecutable(cmd_type=CmdType(cmd_type_str), name=name, path=path)
         except ValueError:
-            warn(f'Unsupported config value for {cmd_type_config_entry} : {cmd_type_str}')
+            warn(f'config_read_exec() - Unsupported config value for {cmd_type_config_entry} : {cmd_type_str}')
+            dbg('config_read_exec() - Returning empty MgExecutable')
             return MgExecutable()
 
         if (not cls.flatpak_supported()) and exec.cmd_type == CmdType.FlatpakProgram \
                 or (not cls.snap_supported()) and exec.cmd_type == CmdType.SnapProgram:
             # config is inconsistent, fix it
+            warn(f'config_read_exec() - Config inconsistent with platform capabilities: cmd_type={exec.cmd_type}')
+            dbg('config_read_exec() - Returning empty MgExecutable')
             return MgExecutable()
 
+        dbg(f'config_read_exec() - Returning {exec}')
         return exec
 
 
