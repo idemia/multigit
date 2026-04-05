@@ -186,36 +186,6 @@ class ExecTool:
 
 
     @classmethod
-    def config_write(cls,
-                     activated: bool,
-                     autodetect_checked: bool,
-                     manual_checked: bool,
-                     flatpak_checked: bool,
-                     snap_checked: bool,
-                     snap_name: str,
-                     flatpak_name: str,
-                     manual_path: str,
-                     ) -> None:
-        '''Write all the executable related config '''
-        cls.config_write_entry(mg_config.SUFFIX_AUTODETECT, autodetect_checked)
-        cls.config_write_entry(mg_config.SUFFIX_ACTIVATED, activated)
-
-        cmd_type, path, name = '', '', ''
-        if manual_checked:
-            cmd_type = CmdType.DirectCmd.value
-        elif flatpak_checked:
-            cmd_type = CmdType.FlatpakProgram.value
-            name = flatpak_name
-        elif snap_checked:
-            cmd_type = CmdType.SnapProgram.value
-            name = snap_name
-
-        cls.config_write_entry(mg_config.SUFFIX_CMD_TYPE, cmd_type)
-        cls.config_write_entry(mg_config.SUFFIX_APP_NAME, name)
-        cls.config_write_entry(mg_config.SUFFIX_MANUAL_PATH, manual_path)
-
-
-    @classmethod
     def autodetect_executable(cls) -> MgExecutable:
         '''Autodetect the executable location according to the command defintions and return a MgExecutable.
 

@@ -118,7 +118,7 @@ class ProgramUiAdjuster:
         else:
             self.ui.groupBoxProgram.setVisible(False)
 
-        self.enable_if_activated(self.ui.checkBoxActivated.isChecked() if self.ui.checkBoxActivated else False)
+        self.enable_if_activated(self.ui.checkBoxActivated.isChecked() if self.ui.checkBoxActivated else True)
 
 
     def enable_if_activated(self, activated: bool) -> None:
@@ -155,6 +155,37 @@ class ProgramUiAdjuster:
         result, _ = QFileDialog.getOpenFileName(None, f"Select {self.execClass.DISPLAY_NAME} Executable", current_exe, filter)
         if result:
             self.ui.lineEditManual.setText(result)
+
+
+    def write_config(self) -> None:
+        '''Write the configuration according to the current state of the UI'''
+        activated = self.ui.checkBoxActivated.isChecked() if self.ui.checkBoxActivated else False
+        autodetect_checked = self.ui.radioAutoDetect.isChecked()
+        manual_checked = self.ui.radioManual.isChecked()
+        flatpak_checked = self.ui.radioFlatpak.isChecked() if self.ui.radioFlatpak else False
+        snap_checked = self.ui.radioSnap.isChecked() if self.ui.radioSnap else False
+        manual_path = self.ui.lineEditManual.text()
+        flatpak_name = self.ui.lineEditFlatpak.text() if self.ui.lineEditFlatpak else ''
+        snap_name = self.ui.lineEditSnap.text() if self.ui.lineEditSnap else ''
+
+        self.execClass.config_write_entry(mgc.SUFFIX_AUTODETECT, autodetect_checked)
+        self.execClass.config_write_entry(mgc.SUFFIX_ACTIVATED, activated)
+
+        cmd_type, path, name = '', '', ''
+        if manual_checked:
+            cmd_type = CmdType.DirectCmd.value
+        elif flatpak_checked:
+            cmd_type = CmdType.FlatpakProgram.value
+            name = flatpak_name
+        elif snap_checked:
+            cmd_type = CmdType.SnapProgram.value
+            name = snap_name
+
+        self.execClass.config_write_entry(mgc.SUFFIX_CMD_TYPE, cmd_type)
+        self.execClass.config_write_entry(mgc.SUFFIX_APP_NAME, name)
+        self.execClass.config_write_entry(mgc.SUFFIX_MANUAL_PATH, manual_path)
+
+
 
 
 class MgDialogSettings(QDialog):
@@ -223,7 +254,7 @@ class MgDialogSettings(QDialog):
 
         ### Second tab stuff
 
-        self.adjusterGit = ProgramUiAdjuster(ExecGit, ProgramUiElements(
+        self.ui_adjuster_git = ProgramUiAdjuster(ExecGit, ProgramUiElements(
             groupBoxProgram=self.ui.groupBoxGit,
             labelChoose=self.ui.labelExecGitChoose,
             checkBoxActivated=None,
@@ -237,9 +268,9 @@ class MgDialogSettings(QDialog):
             radioSnap=None, # git does not support snap execution
             lineEditSnap=None
         ))
-        self.adjusterGit.setup_ui()
+        self.ui_adjuster_git.setup_ui()
 
-        self.adjusterTortoiseGit = ProgramUiAdjuster(ExecTortoiseGit, ProgramUiElements(
+        self.ui_adjuster_tortoise_git = ProgramUiAdjuster(ExecTortoiseGit, ProgramUiElements(
             groupBoxProgram=self.ui.groupBoxTGit,
             labelChoose=self.ui.labelExecTGitChoose,
             checkBoxActivated=self.ui.checkBoxTortoiseGit,
@@ -253,9 +284,9 @@ class MgDialogSettings(QDialog):
             radioSnap=None, # TortoiseGit does not support snap execution
             lineEditSnap=None
         ))
-        self.adjusterTortoiseGit.setup_ui()
+        self.ui_adjuster_tortoise_git.setup_ui()
 
-        self.adjusterSourceTree = ProgramUiAdjuster(ExecSourceTree, ProgramUiElements(
+        self.ui_adjuster_sourcetree = ProgramUiAdjuster(ExecSourceTree, ProgramUiElements(
             groupBoxProgram=self.ui.groupBoxSourcetree,
             labelChoose=self.ui.labelExecSourcetreeChoose,
             checkBoxActivated=self.ui.checkBoxSourcetree,
@@ -269,9 +300,9 @@ class MgDialogSettings(QDialog):
             radioSnap=None, # SourceTree does not support snap execution
             lineEditSnap=None
         ))
-        self.adjusterSourceTree.setup_ui()
+        self.ui_adjuster_sourcetree.setup_ui()
 
-        self.adjusterSublime = ProgramUiAdjuster(ExecSublimeMerge, ProgramUiElements(
+        self.ui_adjuster_sublime = ProgramUiAdjuster(ExecSublimeMerge, ProgramUiElements(
             groupBoxProgram=self.ui.groupBoxSublimemerge,
             labelChoose=self.ui.labelExecSublimemergeChoose,
             checkBoxActivated=self.ui.checkBoxSublimeMerge,
@@ -285,9 +316,9 @@ class MgDialogSettings(QDialog):
             radioSnap=self.ui.radioSublimemergeSnap,
             lineEditSnap=self.ui.lineEditSublimemergeSnap
         ))
-        self.adjusterSublime.setup_ui()
+        self.ui_adjuster_sublime.setup_ui()
 
-        self.adjusterGitBash = ProgramUiAdjuster(ExecGitBash, ProgramUiElements(
+        self.ui_adjuster_gitbash = ProgramUiAdjuster(ExecGitBash, ProgramUiElements(
             groupBoxProgram=self.ui.groupBoxGitBash,
             labelChoose=self.ui.labelExecGitBashChoose,
             checkBoxActivated=self.ui.checkBoxGitBash,
@@ -301,9 +332,9 @@ class MgDialogSettings(QDialog):
             radioSnap=None, # git-bash does not support snap execution
             lineEditSnap=None
         ))
-        self.adjusterGitBash.setup_ui()
+        self.ui_adjuster_gitbash.setup_ui()
 
-        self.adjusterGitGui = ProgramUiAdjuster(ExecGitGui, ProgramUiElements(
+        self.ui_adjuster_git = ProgramUiAdjuster(ExecGitGui, ProgramUiElements(
             groupBoxProgram=self.ui.groupBoxGitGui,
             labelChoose=self.ui.labelExecGitGuiChoose,
             checkBoxActivated=self.ui.checkBoxGitGui,
@@ -317,9 +348,9 @@ class MgDialogSettings(QDialog):
             radioSnap=None, # git-gui does not support snap execution
             lineEditSnap=None
         ))
-        self.adjusterGitGui.setup_ui()
+        self.ui_adjuster_git.setup_ui()
 
-        self.adjusterGitK = ProgramUiAdjuster(ExecGitK, ProgramUiElements(
+        self.ui_adjuster_gitk = ProgramUiAdjuster(ExecGitK, ProgramUiElements(
             groupBoxProgram=self.ui.groupBoxGitK,
             labelChoose=self.ui.labelExecGitkChoose,
             checkBoxActivated=self.ui.checkBoxGitK,
@@ -333,9 +364,9 @@ class MgDialogSettings(QDialog):
             radioSnap=None, # gitk does not support snap execution
             lineEditSnap=None
         ))
-        self.adjusterGitK.setup_ui()
+        self.ui_adjuster_gitk.setup_ui()
 
-        self.adjusterExplorer = ProgramUiAdjuster(ExecExplorer, ProgramUiElements(
+        self.ui_adjuster_explorer = ProgramUiAdjuster(ExecExplorer, ProgramUiElements(
             groupBoxProgram=self.ui.groupBoxExplorer,
             labelChoose=self.ui.labelExecExplorerChoose,
             checkBoxActivated=None, # explorer is always activated, no checkbox
@@ -344,12 +375,12 @@ class MgDialogSettings(QDialog):
             radioManual=self.ui.radioExplorerManual,
             lineEditManual=self.ui.lineEditExplorerManual,
             pushButtonManualBrowse=self.ui.pushButtonExplorerManualBrowse,
-            radioFlatpak=None, # we do not support flatpak execution for explorer
-            lineEditFlatpak=None,
-            radioSnap=None, # we do not support snap execution for explorer
-            lineEditSnap=None
+            radioFlatpak=self.ui.radioExplorerFlatpak,
+            lineEditFlatpak=self.ui.lineEditExplorerFlatpak,
+            radioSnap=self.ui.radioExplorerSnap,
+            lineEditSnap=self.ui.lineEditExplorerSnap,
         ))
-
+        self.ui_adjuster_explorer.setup_ui()
 
 
     ### First tab stuff
@@ -394,34 +425,16 @@ def runDialogEditSettings(parent: QWidget, tabPage: Union[Literal[0], Literal[1]
     config[mgc.CONFIG_CONFIRM_BEFORE_QUIT] = dlg.ui.checkBoxConfirmWhenQuitting.isChecked()
 
     ### Second tab stuff
-    config[mgc.CONFIG_GIT_AUTODETECT] = dlg.ui.radioGitAutoDetect.isChecked()
-    config[mgc.CONFIG_GIT_MANUAL_PATH] = dlg.ui.lineEditGitManual.text()
-    config[mgc.CONFIG_TORTOISEGIT_ACTIVATED] = dlg.ui.checkBoxTortoiseGit.isChecked()
-    config[mgc.CONFIG_TORTOISEGIT_AUTODETECT] = dlg.ui.radioTGitAutoDetect.isChecked()
-    config[mgc.CONFIG_TORTOISEGIT_MANUAL_PATH] = dlg.ui.lineEditTGitManual.text()
-    config[mgc.CONFIG_SOURCETREE_ACTIVATED] = dlg.ui.checkBoxSourcetree.isChecked()
-    config[mgc.CONFIG_SOURCETREE_AUTODETECT] = dlg.ui.radioSourcetreeAutoDetect.isChecked()
-    config[mgc.CONFIG_SOURCETREE_MANUAL_PATH] = dlg.ui.lineEditSourcetreeManual.text()
-    ExecSublimeMerge.config_write(
-        activated=dlg.ui.checkBoxSublimeMerge.isChecked(),
-        autodetect_checked=dlg.ui.radioSublimemergeAutoDetect.isChecked(),
-        manual_checked=dlg.ui.radioSublimemergeManual.isChecked(),
-        flatpak_checked=dlg.ui.radioSublimemergeFlatpak.isChecked(),
-        snap_checked=dlg.ui.radioSublimemergeSnap.isChecked(),
-        flatpak_name=dlg.ui.lineEditSublimemergeFlatpak.text(),
-        snap_name=dlg.ui.lineEditSublimemergeSnap.text(),
-        manual_path=dlg.ui.lineEditSublimemergeManual.text(),
-    )
-    config[mgc.CONFIG_GITBASH_ACTIVATED] = dlg.ui.checkBoxGitBash.isChecked()
-    config[mgc.CONFIG_GITBASH_AUTODETECT] = dlg.ui.radioGitBashAutoDetect.isChecked()
-    config[mgc.CONFIG_GITBASH_MANUAL_PATH] = dlg.ui.lineEditGitBashManual.text()
-    config[mgc.CONFIG_GITGUI_ACTIVATED] = dlg.ui.checkBoxGitGui.isChecked()
-    config[mgc.CONFIG_GITGUI_AUTODETECT] = dlg.ui.radioGitGuiAutoDetect.isChecked()
-    config[mgc.CONFIG_GITGUI_MANUAL_PATH] = dlg.ui.lineEditGitGuiManual.text()
-    config[mgc.CONFIG_GITK_ACTIVATED] = dlg.ui.checkBoxGitK.isChecked()
-    config[mgc.CONFIG_GITK_AUTODETECT] = dlg.ui.radioGitKAutoDetect.isChecked()
-    config[mgc.CONFIG_GITK_MANUAL_PATH] = dlg.ui.lineEditGitKManual.text()
-    config[mgc.CONFIG_EXPLORER_AUTODETECT] = dlg.ui.radioExplorerAutoDetect.isChecked()
-    config[mgc.CONFIG_EXPLORER_MANUAL_PATH] = dlg.ui.lineEditExplorerManual.text()
+    for ui_adjuster in [
+        dlg.ui_adjuster_explorer,
+        dlg.ui_adjuster_git,
+        dlg.ui_adjuster_sublime,
+        dlg.ui_adjuster_gitk,
+        dlg.ui_adjuster_git,
+        dlg.ui_adjuster_gitbash,
+        dlg.ui_adjuster_sourcetree,
+        dlg.ui_adjuster_tortoise_git
+    ]:
+        ui_adjuster.write_config()
     config.save()
 
