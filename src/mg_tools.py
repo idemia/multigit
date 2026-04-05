@@ -85,6 +85,9 @@ def isRunningInsideFlatpak() -> bool:
 
 
 class ExecTool:
+    # Program display name to use when presenting to the user
+    DISPLAY_NAME: str = ''
+
     # List of platform (as returned by sys.platform()) where we can run this tool
     SUPPORTED_PLATFORMS: List[str]
 
@@ -99,6 +102,11 @@ class ExecTool:
     EXEC_NAME_SNAP: str = ''
     # Flatpak application ID (for example org.gnome.gitg). Empty means "no Flatpak app".
     EXEC_NAME_FLATPAK: str = ''
+
+    # When False,the program we are looking for is specific and we can filter the browse dialog with
+    # the program executable name. If True, the program is generic and we will not filter the the browse
+    # dialog box.
+    GENERIC_PROGRAM: bool = False
 
     # if not None, this is a command which we can run to detect the program. Typically, this is ['--version']
     INNOCUOUS_COMMAND: Optional[List[str]] = None
@@ -657,6 +665,8 @@ class ExecExplorer(ExecTool):
     EXEC_NAME_WIN32 = 'explorer.exe'
     EXEC_NAME_LINUX = 'xdg-open'
     EXEC_NAME_DARWIN = 'open'
+
+    GENERIC_PROGRAM = True
 
     # name of the configuration entry to store auto-detection behavior
     CONFIG_ENTRY_BASE = 'CONFIG_EXPLORER'

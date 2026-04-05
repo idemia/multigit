@@ -775,7 +775,7 @@
            </widget>
           </item>
           <item row="2" column="0" colspan="2">
-           <widget class="QLabel" name="label_16">
+           <widget class="QLabel" name="labelExecGitGuiChoose">
             <property name="font">
              <font>
               <bold>false</bold>
@@ -1036,7 +1036,7 @@
          </property>
          <layout class="QGridLayout" name="gridLayout_2">
           <item row="2" column="0" colspan="3">
-           <widget class="QLabel" name="label_2">
+           <widget class="QLabel" name="labelExecTGitChoose">
             <property name="font">
              <font>
               <bold>false</bold>
@@ -1192,7 +1192,7 @@
          </property>
          <layout class="QGridLayout" name="gridLayout_5">
           <item row="0" column="0" colspan="3">
-           <widget class="QLabel" name="label_11">
+           <widget class="QLabel" name="labelExecExplorerChoose">
             <property name="sizePolicy">
              <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
               <horstretch>0</horstretch>
@@ -1522,7 +1522,7 @@
            </widget>
           </item>
           <item row="2" column="0" colspan="2">
-           <widget class="QLabel" name="label_13">
+           <widget class="QLabel" name="labelExecGitBashChoose">
             <property name="font">
              <font>
               <bold>false</bold>
@@ -1684,7 +1684,7 @@
         </widget>
        </item>
        <item row="3" column="0">
-        <widget class="QGroupBox" name="groupBoxSourceTree">
+        <widget class="QGroupBox" name="groupBoxSourcetree">
          <property name="sizePolicy">
           <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
            <horstretch>0</horstretch>
@@ -1786,7 +1786,7 @@
            </widget>
           </item>
           <item row="0" column="0" colspan="2">
-           <widget class="QCheckBox" name="checkBoxSourceTree">
+           <widget class="QCheckBox" name="checkBoxSourcetree">
             <property name="font">
              <font>
               <bold>false</bold>
@@ -1798,7 +1798,7 @@
            </widget>
           </item>
           <item row="2" column="0" colspan="3">
-           <widget class="QLabel" name="label_4">
+           <widget class="QLabel" name="labelExecSourcetreeChoose">
             <property name="font">
              <font>
               <bold>false</bold>
@@ -1907,7 +1907,7 @@
   <tabstop>radioTGitManual</tabstop>
   <tabstop>lineEditTGitManual</tabstop>
   <tabstop>pushButtonTGitManualBrowse</tabstop>
-  <tabstop>checkBoxSourceTree</tabstop>
+  <tabstop>checkBoxSourcetree</tabstop>
   <tabstop>radioSourcetreeAutoDetect</tabstop>
   <tabstop>lineEditSourcetreeAutoDetect</tabstop>
   <tabstop>radioSourcetreeManual</tabstop>
@@ -2084,7 +2084,7 @@
    </hints>
   </connection>
   <connection>
-   <sender>checkBoxSourceTree</sender>
+   <sender>checkBoxSourcetree</sender>
    <signal>toggled(bool)</signal>
    <receiver>radioSourcetreeAutoDetect</receiver>
    <slot>setEnabled(bool)</slot>
@@ -2100,7 +2100,7 @@
    </hints>
   </connection>
   <connection>
-   <sender>checkBoxSourceTree</sender>
+   <sender>checkBoxSourcetree</sender>
    <signal>toggled(bool)</signal>
    <receiver>radioSourcetreeManual</receiver>
    <slot>setEnabled(bool)</slot>
@@ -2116,9 +2116,9 @@
    </hints>
   </connection>
   <connection>
-   <sender>checkBoxSourceTree</sender>
+   <sender>checkBoxSourcetree</sender>
    <signal>toggled(bool)</signal>
-   <receiver>label_4</receiver>
+   <receiver>labelExecSourcetreeChoose</receiver>
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
@@ -2182,7 +2182,7 @@
   <connection>
    <sender>checkBoxTortoiseGit</sender>
    <signal>toggled(bool)</signal>
-   <receiver>label_2</receiver>
+   <receiver>labelExecTGitChoose</receiver>
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
@@ -2358,7 +2358,7 @@
   <connection>
    <sender>checkBoxGitBash</sender>
    <signal>toggled(bool)</signal>
-   <receiver>label_13</receiver>
+   <receiver>labelExecGitBashChoose</receiver>
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
