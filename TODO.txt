@@ -1,4 +1,5 @@
 # Linux
+- check that config files from previous multigit versions are properly migrated
 - QProcess() should catch errors because it does not detect launching a non-exeisting exectuable
 - check why it works with git-gui though (interactions with flatpak or snap ?)
 
@@ -9,16 +10,8 @@
 
 
 # Flatpak
-- propose the name by default
-- ability to detect & launch flatpak
-    - modify code using autodetect_executable
 - sublime merge is not autodetected (because it is installed as a flatpak)
-    => add flatak + snap autodetection
-    => add flatak + snap launcher
     - work in progress:
-        - modify the config reading/writing
-        - modify the doc for create_process
-        - createProcess should switch to cmd_args instead of cmdLine
         - MgGitAuthFailure should be moved to ExecGit
         - backward compability with manual config entry must be preserved
         - check why repo info git exec non blocking does not use gitexec
@@ -33,8 +26,6 @@
 
 - icon should be provided with command: rename-icom
 
-
-- create a metainfo.xml file and install it properly
 - export to a flatpak repository
 - sign with gpg key
 # Future:
