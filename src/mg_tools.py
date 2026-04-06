@@ -1036,6 +1036,10 @@ def scan_git_dirs(base_path: str) -> Generator[str, str, None]:
                 # we could not access the entry for some reason, it's ok,just continue scanning
                 continue
 
+            if entry.name.startswith('.'):
+                # directries starting with . are often not relevant, don't scan them
+                continue
+
             path_to_visit.append(entry.path)
 
 
