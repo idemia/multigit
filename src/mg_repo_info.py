@@ -1164,10 +1164,6 @@ class MgRepoInfo(QObject):
         if allow_errors is False, a message box is displayed if git returns an exit code different than 0. If you
         have your own handling of git errors, set allow_errors to True.
         '''
-        if not ExecGit.checkFound():
-            return
-
-        exec = ExecGit.get_executable()
         git_args = ['-C', self.fullpath] + list(args)
 
         cb_process_done = None
@@ -1176,9 +1172,10 @@ class MgRepoInfo(QObject):
             def cb_process_done(git_exit_code: int, git_output: str) -> None:
                 cb_git_done(self.name, git_exit_code, git_output)
 
-        # our pool process does not handle force blocking, launch directly
-        RunProcess().exec_async(exec, git_args, cb_process_done, force_blocking=self.force_blocking_git, allow_errors=allow_errors)
-
+        if self.force_blocking_git:
+            ExecGit.exec_blocking(git_args, allow_errors=allow_errors, callback=cb_process_done)
+        else:
+            ExecGit.exec_non_blocking(git_args, allow_errors=allow_errors, callback=cb_process_done)
 
 
 
