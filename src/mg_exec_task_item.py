@@ -347,7 +347,6 @@ class MgTaskMoveDirectory(MgExecTask):
         exec = MgExecutable(CmdType.DirectCmd, self.cmd[0])
         self.run_process.exec_async(exec, self.cmd[1:],
                                     self.move_task_done,
-                                    allow_errors=True,  # to avoid dialog
                                     emit_output=True)
 
 
@@ -444,15 +443,12 @@ class MgExecTaskGit(MgExecTask):
 
     def _do_run(self) -> None:
         exec = ExecGit.get_executable()
-        if exec.is_empty():
-            raise FileNotFoundError('Can not execute git with empty executable!')
-
         dbg(f'MgExecTaskGit.run() - {exec} {self.short_desc}')
 
         self.run_process = RunProcess()
         self.run_process.sigProcessOutput.connect(self.sig_partial_output)
         # We allow error in git because we have our own way of handling it
-        self.run_process.exec_async(exec, self.git_args, self.git_task_done, allow_errors=True,
+        self.run_process.exec_async(exec, self.git_args, self.git_task_done,
                                     emit_output=True)
 
 

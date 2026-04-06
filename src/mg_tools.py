@@ -52,6 +52,13 @@ class CmdType(Enum):
     SnapProgram         = 'SnapProgram'
 
 
+class ExecStatus(Enum):
+    Ok            = 'Ok'
+    FailedToStart = 'Failed to start'
+    Crashed       = 'Crash'
+    OtherError    = 'Other error'
+
+
 @dataclass
 class MgExecutable:
     '''Class to represent an executable program with its type and path'''
@@ -208,19 +215,14 @@ class ExecTool:
         if cls in cls.SESSION_CACHE:
             return cls.SESSION_CACHE[cls]
 
-
         if cls.INNOCUOUS_COMMAND:
             exec = MgExecutable(CmdType.DirectCmd, path=cls.get_exec_name())
 
-            try:
-                exit_code, _output = RunProcess().exec_blocking(exec, cmd_args=cls.INNOCUOUS_COMMAND, allow_errors=True)
-                if exit_code == 0:
-                    # program is on the path, use it
-                    cls.SESSION_CACHE[cls] = exec
-                    return exec
-            except FileNotFoundError:
-                # program is not on the path
-                pass
+            exec_status, exit_code, _output = RunProcess().exec_blocking(exec, cmd_args=cls.INNOCUOUS_COMMAND)
+            if exec_status == ExecStatus.Ok and exit_code == 0:
+                # program is on the path, use it
+                cls.SESSION_CACHE[cls] = exec
+                return exec
 
         exec = cls.find_prog_exec()
 
@@ -332,13 +334,9 @@ class ExecTool:
 
         exec = MgExecutable(CmdType.DirectCmd, path='flatpak')
         cmd_args = ['info', '--show-ref', app_id]
-        try:
-            exit_code, _output = RunProcess().exec_blocking(exec, cmd_args, allow_errors=True)
-        except FileNotFoundError:
-            dbg('find_flatpak_program() - flatpak command not found')
-            return MgExecutable()
+        exec_status, exit_code, _output = RunProcess().exec_blocking(exec, cmd_args)
 
-        if exit_code == 0:
+        if exec_status == ExecStatus.Ok and exit_code == 0:
             dbg(f'find_flatpak_program() - found flatpak app: {app_id}')
             return MgExecutable(CmdType.FlatpakProgram, name=app_id)
 
@@ -1067,5 +1065,5 @@ def flatpak_host_file_exists(fpath: Path) -> bool:
     assert isRunningInsideFlatpak(), 'flatpak_host_file_exists() should only be called when running inside flatpak'
     USE_SH_TO_CHECK_THAT_FILE_EXISTS = ['sh', '-c', f'[ -e "{fpath}" ]']
     exec = MgExecutable(CmdType.DirectCmd, path=USE_SH_TO_CHECK_THAT_FILE_EXISTS[0])
-    exit_code, output = RunProcess().exec_blocking(exec, cmd_args=USE_SH_TO_CHECK_THAT_FILE_EXISTS[1:], allow_errors=True)
-    return exit_code == 0
+    exec_status, exit_code, output = RunProcess().exec_blocking(exec, cmd_args=USE_SH_TO_CHECK_THAT_FILE_EXISTS[1:])
+    return exec_status == ExecStatus.Ok and exit_code == 0
