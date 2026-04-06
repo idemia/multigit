@@ -7,8 +7,10 @@
     - launch multigit after installation
     - bug: freeze when selecting a double-click action ?
 
+
 # Flatpak
-- ability to detect & launch flatpak:
+- propose the name by default
+- ability to detect & launch flatpak
     - modify code using autodetect_executable
 - sublime merge is not autodetected (because it is installed as a flatpak)
     => add flatak + snap autodetection
