@@ -414,6 +414,8 @@ class ExecTool:
 #######################################################
 
 class ExecGit(ExecTool):
+    DISPLAY_NAME = 'Git'
+
     SUPPORTED_PLATFORMS = ['win32', 'linux', 'darwin']
 
     WIN32_PATH_CANDIDATES: List[Path] = [
@@ -459,6 +461,8 @@ class ExecGit(ExecTool):
 #######################################################
 
 class ExecTortoiseGit(ExecTool):
+    DISPLAY_NAME = 'TortoiseGit'
+
     SUPPORTED_PLATFORMS = ['win32']
 
     WIN32_PATH_CANDIDATES = [
@@ -489,6 +493,8 @@ class ExecTortoiseGit(ExecTool):
 #######################################################
 
 class ExecSourceTree(ExecTool):
+    DISPLAY_NAME = 'SourceTree'
+
     SUPPORTED_PLATFORMS = ['win32']
 
     WIN32_PATH_CANDIDATES = [
@@ -512,6 +518,8 @@ class ExecSourceTree(ExecTool):
 #######################################################
 
 class ExecSublimeMerge(ExecTool):
+    DISPLAY_NAME = 'SublimeMerge'
+
     SUPPORTED_PLATFORMS = ['win32', 'linux']
 
     WIN32_PATH_CANDIDATES = [
@@ -539,6 +547,8 @@ class ExecSublimeMerge(ExecTool):
 #######################################################
 
 class ExecGitBash(ExecTool):
+    DISPLAY_NAME = 'Git Bash'
+
     SUPPORTED_PLATFORMS = ['win32']
 
     WIN32_PATH_CANDIDATES = [
@@ -563,6 +573,8 @@ class ExecGitBash(ExecTool):
 #######################################################
 
 class ExecGitGui(ExecTool):
+    DISPLAY_NAME = 'Git GUI'
+
     SUPPORTED_PLATFORMS = ['win32', 'linux']
 
     WIN32_PATH_CANDIDATES = [
@@ -590,6 +602,8 @@ class ExecGitGui(ExecTool):
 #######################################################
 
 class ExecGitK(ExecTool):
+    DISPLAY_NAME = 'Gitk'
+
     SUPPORTED_PLATFORMS = ['win32', 'linux', 'darwin']
 
     WIN32_PATH_CANDIDATES = [
@@ -624,6 +638,8 @@ class ExecGitK(ExecTool):
 
 class ExecExplorer(ExecTool):
     '''Note: this program is mandatory for MultiGit to work, as it is used to open directories in the file explorer.'''
+
+    DISPLAY_NAME = 'Explorer'
 
     SUPPORTED_PLATFORMS = ['win32', 'linux', 'darwin']
 
