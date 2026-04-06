@@ -23,7 +23,7 @@ from PySide6.QtWidgets import QMessageBox
 
 from src.mg_const import MSG_NO_COMMIT, MSG_REMOTE_TOPUSH_TOPULL, MSG_REMOTE_SYNCHRO_OK, MSG_REMOTE_TOPULL, \
     MSG_REMOTE_TOPUSH, MSG_REMOTE_BRANCH_GONE, MSG_LOCAL_BRANCH, SHORT_SHA1_NB_DIGITS, MSG_EMPTY_REPO, MSG_REMOTE_NA
-from src.mg_tools import RunProcess, ExecGit, scan_git_dirs
+from src.mg_tools import ExecGit, scan_git_dirs
 from src.mg_utils import anonymise_git_url
 
 logger = logging.getLogger('mg_repo_info')
@@ -701,7 +701,7 @@ class MgRepoInfo(QObject):
 
     def cb_fill_repo_info_status_done(self, _repo_name: str, git_exit_code: int, status_out: str) -> None:
         '''Called after git status'''
-        dbg('fill_repo_info_status_done() - %s, exit_code=%d' % (self.name, git_exit_code))
+        dbg(f'fill_repo_info_status_done() - {self.name}, exit_code={git_exit_code}')
         if git_exit_code != 0:
             self.abortBecauseRepoDeleted()
             return
@@ -1150,8 +1150,8 @@ class MgRepoInfo(QObject):
         if not ExecGit.checkFound():
             return ''
 
-        git_cmd = ['-C', self.fullpath] + list(args)
-        return ExecGit.exec_blocking(git_cmd)
+        git_args = ['-C', self.fullpath] + list(args)
+        return ExecGit.exec_blocking(git_args)
 
 
     def git_exec_async_here(self, args: Sequence[str], cb_git_done: Optional[Callable[[str, int, str], Any]],
