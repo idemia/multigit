@@ -26,7 +26,7 @@ if __package__:
 
 from src import mg_const as mgc
 from src.mg_json_mgit_parser import ProjectStructure
-from src.mg_tools import RunProcess, ExecGit, MgExecutable, CmdType
+from src.mg_tools import RunProcess, ExecGit, MgExecutable, CmdType, ExecStatus
 
 HELP = '''
 mgitcmd clone path_to_mgit_file.mgit [--dest path_to_dir] [--shallow] 
@@ -105,13 +105,13 @@ def cmd_clone(fname: str, dest_dir: Optional[str], shallow: bool) -> None:
 
         task = cast(List[str], task)
 
-        # our pool process does not handle force blocking, launch directly
         print('> ' + ' '.join([exec.path, *task]))
-        exit_code, cmd_out = RunProcess().exec_blocking(exec, cmd_args=task, allow_errors=True)
+        exec_status, exit_code, cmd_out = RunProcess().exec_blocking(exec, cmd_args=task)
         print(cmd_out)
 
-        if exit_code != 0:
-            print('Git failure (exit code %d)' % exit_code)
+        ExecGit.handle_process_return(exec_status, exit_code, cmd_out, allow_errors=False, with_msg_box=False)
+
+        if exec_status != ExecStatus.Ok or exit_code != 0:
             sys.exit(-1)
 
     print('Clone successful.')

@@ -27,7 +27,7 @@ from PySide6.QtCore import Signal, QObject, Qt, QThread
 from PySide6.QtGui import QIcon, QPixmap, QFont
 from PySide6.QtWidgets import QWidget, QPushButton, QLabel, QHBoxLayout, QVBoxLayout, QTreeWidgetItem, QApplication
 
-from src.mg_tools import CmdType, MgExecutable, RunProcess, ExecGit
+from src.mg_tools import CmdType, MgExecutable, RunProcess, ExecGit, ExecStatus
 from src.mg_repo_info import MgRepoInfo
 from src.mg_utils import handle_cr_in_text, ignoreCppObjectDeletedError, tryHardDeletingDirList
 
@@ -350,12 +350,12 @@ class MgTaskMoveDirectory(MgExecTask):
                                     emit_output=True)
 
 
-    def move_task_done(self, exit_code: int, stdout: str) -> None:
+    def move_task_done(self, exec_status: ExecStatus,exit_code: int, stdout: str) -> None:
         dbg(f'MgExecTaskMoveDirectory.move_task_done(exit_code={exit_code}) - "{self}"')
 
         # for exit code analysis, see https://learn.microsoft.com/en-us/windows-server/administration/windows-commands/robocopy
         success = True
-        if exit_code >= 8:
+        if exec_status != ExecStatus.Ok or exit_code >= 8:
             if len(stdout) != 0:
                 stdout += '\n'
             stdout += 'Robocopy did not complete successfully.'
@@ -452,10 +452,10 @@ class MgExecTaskGit(MgExecTask):
                                     emit_output=True)
 
 
-    def git_task_done(self, git_exit_code: int, git_stdout: str) -> None:
-        dbg(f'MgExecTaskGit.git_task_done(git_exit_code={git_exit_code}) - "{self}"')
+    def git_task_done(self, exec_status: ExecStatus, git_exit_code: int, git_stdout: str) -> None:
+        dbg(f'MgExecTaskGit.git_task_done(exec_status={exec_status} git_exit_code={git_exit_code}) - "{self}"')
 
-        if git_exit_code != 0:
+        if exec_status != ExecStatus.Ok or git_exit_code != 0:
             if len(git_stdout) != 0:
                 git_stdout += '\n'
             git_stdout += 'Git did not complete successfully.'
