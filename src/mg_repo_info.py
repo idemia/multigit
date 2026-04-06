@@ -537,9 +537,8 @@ class MgRepoInfo(QObject):
 
         def local_cb_fill_diff_done(repo_name: str, exit_code: int, diff_out: str) -> None:
             if exit_code != 0:
-                if self.abortBecauseRepoDeleted():
-                    return
-                self.show_error_message_bad_git_exit_code(exit_code, diff_out)
+                self.abortBecauseRepoDeleted()
+                return
             self.diff = diff_out
             if cb_fill_diff:
                 cb_fill_diff(repo_name, self.diff)
@@ -564,9 +563,7 @@ class MgRepoInfo(QObject):
 
             def local_cb_git_diff_stat_done(repo_name: str, exit_code: int, diff_out: str) -> None:
                 if exit_code != 0:
-                    if self.abortBecauseRepoDeleted():
-                        return
-                    self.show_error_message_bad_git_exit_code(exit_code, diff_out)
+                    self.abortBecauseRepoDeleted()
                     return
 
                 self.diff_summary = diff_out
@@ -656,8 +653,7 @@ class MgRepoInfo(QObject):
         or more lines if there are multiple remotes
         '''
         if git_exit_code != 0:
-            if not self.abortBecauseRepoDeleted():
-                self.show_error_message_bad_git_exit_code(git_exit_code, remote_out)
+            self.abortBecauseRepoDeleted()
             return
 
         # We give priority to origin and (fetch)
@@ -707,8 +703,7 @@ class MgRepoInfo(QObject):
         '''Called after git status'''
         dbg('fill_repo_info_status_done() - %s, exit_code=%d' % (self.name, git_exit_code))
         if git_exit_code != 0:
-            if not self.abortBecauseRepoDeleted():
-                self.show_error_message_bad_git_exit_code(git_exit_code, status_out)
+            self.abortBecauseRepoDeleted()
             return
 
         '''git status output:
@@ -905,16 +900,9 @@ class MgRepoInfo(QObject):
                 self.last_commit = MSG_NO_COMMIT
                 self.commit_date = ''
                 self.commit_sha1 = ''
-            else:
-                if self.abortBecauseRepoDeleted():
-                    return
 
-                nice_git_cmd = '> "git" "-C" "%s" "log" "-1"' % self.fullpath
-                # noinspection PyTypeChecker
-                msg = nice_git_cmd + '\n' + git_log_out
-
-                self.show_error_message_bad_git_exit_code(git_exit_code, msg)
-            return
+            if self.abortBecauseRepoDeleted():
+                return
 
         self.last_commit = git_log_out
         log_out_lines = git_log_out.split('\n')
@@ -1026,8 +1014,7 @@ class MgRepoInfo(QObject):
         '''
 
         if git_exit_code != 0:
-            if not self.abortBecauseRepoDeleted():
-                self.show_error_message_bad_git_exit_code(git_exit_code, git_output)
+            self.abortBecauseRepoDeleted()
             return
 
         self.branches_local = []
@@ -1073,8 +1060,7 @@ class MgRepoInfo(QObject):
 
     def cb_fill_all_tags_done(self, _repo_name: str, git_exit_code: int, git_output: str) -> None:
         if git_exit_code != 0:
-            if not self.abortBecauseRepoDeleted():
-                self.show_error_message_bad_git_exit_code(git_exit_code, git_output)
+            self.abortBecauseRepoDeleted()
             return
 
         self.all_tags = []
@@ -1131,8 +1117,7 @@ class MgRepoInfo(QObject):
 
     def cb_fill_files_sha1_done(self, _repo_name: str, git_exit_code: int, git_output: str) -> None:
         if git_exit_code != 0:
-            if not self.abortBecauseRepoDeleted():
-                self.show_error_message_bad_git_exit_code(git_exit_code, git_output)
+            self.abortBecauseRepoDeleted()
             return
 
         self.files_sha1 = []
@@ -1195,8 +1180,5 @@ class MgRepoInfo(QObject):
         RunProcess().exec_async(exec, git_args, cb_process_done, force_blocking=self.force_blocking_git, allow_errors=allow_errors)
 
 
-    def show_error_message_bad_git_exit_code(self, git_exit_code: int, git_output: str) -> None:
-        QMessageBox.warning(None, 'Error when running git',
-                            f'Git bad exit code {git_exit_code}.\n\nError message:\n{git_output}')
 
 
