@@ -398,7 +398,6 @@ class MgTaskComment(MgExecTask):
         '''
         super().__init__(comment, repo)
         self.short_desc = short_desc
-        self.run_process: Optional[RunProcess] = None
         self.icon_success_hint = IconSet.Comment
 
 
@@ -436,7 +435,6 @@ class MgExecTaskGit(MgExecTask):
             desc = 'git ' + ' '.join(git_args)
         super().__init__(desc=desc, repo=repo, ignore_failure=ignore_failure)
         self.git_args = git_args
-        self.run_process: Optional[RunProcess] = None
         self.run_inside_git_repo = run_inside_git_repo
 
         if self.run_inside_git_repo:
@@ -447,27 +445,24 @@ class MgExecTaskGit(MgExecTask):
         self.short_desc = 'git ' + ' '.join(git_args)
 
     def _do_run(self) -> None:
-        exec = ExecGit.get_executable()
-        dbg(f'MgExecTaskGit.run() - {exec} {self.short_desc}')
+        dbg(f'MgExecTaskGit.run() - {self.short_desc}')
 
-        self.run_process = RunProcess()
-        self.run_process.sigProcessOutput.connect(self.sig_partial_output)
         # We allow error in git because we have our own way of handling it
-        self.run_process.exec_async(exec, self.git_args, self.git_task_done,
-                                    emit_output=True)
+        ExecGit.exec_non_blocking(self.git_args, allow_errors=True,
+                                  callback=self.git_task_done,
+                                  output_callback=self.sig_partial_output)
 
 
-    def git_task_done(self, exec_status: ExecStatus, git_exit_code: int, git_stdout: str) -> None:
-        dbg(f'MgExecTaskGit.git_task_done(exec_status={exec_status} git_exit_code={git_exit_code}) - "{self}"')
+    def git_task_done(self, git_exit_code: int, git_stdout: str) -> None:
+        dbg(f'MgExecTaskGit.git_task_done(git_exit_code={git_exit_code}) - "{self}"')
 
-        if exec_status != ExecStatus.Ok or git_exit_code != 0:
+        if git_exit_code != 0:
             if len(git_stdout) != 0:
                 git_stdout += '\n'
             git_stdout += 'Git did not complete successfully.'
             if self.ignore_failure:
                 git_stdout += '\nIgnoring non relevant git error'
 
-        self.run_process = None
         self.task_done(git_exit_code == 0, git_stdout)
 
 
