@@ -24,7 +24,7 @@ from enum import Enum, auto
 from dataclasses import dataclass
 
 from PySide6.QtCore import QObject, QProcess, Signal
-from PySide6.QtWidgets import QMessageBox, QApplication
+from PySide6.QtWidgets import QMessageBox, QApplication, QWidget
 
 from src import mg_config
 from src.mg_utils import hasGitAuthFailureMsg
@@ -41,6 +41,7 @@ GIT_EXIT_CODE_SEGFAULT_OF_GIT_WITH_STACKTRACE = -100
 GIT_EXIT_CODE_SEGFAULT_OF_GIT_NO_STACKTRACE = -101
 EXIT_CODE_COULD_NOT_START_PROCESS = -102
 GIT_EXIT_CODE_STOPPED_BECAUSE_AUTH_FAILURE = -103
+EXIT_CODE_CRASHED = -104
 
 FLATPAK_SPAWN = ['flatpak-spawn', '--host']
 SNAP_BIN_DIR = '/snap/bin'
@@ -365,36 +366,113 @@ class ExecTool:
 
 
     @classmethod
-    def exec_non_blocking(cls, cmd_args: List[str], workdir: str = '', allow_errors: bool = False, callback: Optional[Callable[[], Any]] = None) -> None:
-        '''Run the program with the arguments listed in cmd_args, in the working directory.
-        Raises an exception if the command did not return with 0 status and allow_errors is False.
-        callback if provided is called when the process is finished, with no argument.
+    def handle_process_return(cls, exec_status: ExecStatus, exit_code: int, output: str, allow_errors: bool, with_msg_box: bool = True) -> bool:
+        '''Handle process execution errors
+
+        allow_errors:
+            True, could not start program (== wrong path) or bad exit code are ignored
+            False, the error is reported with a message box or a message on stdout (see below)
+
+        Crash and other errors are always reported, whatever the value of allow_errors
+
+        with_msg_box: bool - if True, displays a message box when reporting errors. Else, just print an error on stdout
+
+        return True if the execution is successful or error is within the allowed errors.
         '''
-        exec = cls.get_executable()
-        if exec.is_empty():
-            raise FileNotFoundError(f'Could not locate {cls.get_exec_name()}')
+        def qmsgbox_critical(parent: Optional[QWidget], title: str, msg: str) -> None:
+            if with_msg_box:
+                QMessageBox.critical(parent, title, msg)
+            else:
+                print(msg)
 
-        cb_done = None
-        if callback is not None:
-            def cb_done(_exit_code: int, _output: str) -> None:
-                callback()
+        def qmsgbox_warning(parent: Optional[QWidget], title: str, msg: str) -> None:
+            if with_msg_box:
+                QMessageBox.warning(parent, title, msg)
+            else:
+                print(msg)
 
-        rp = RunProcess()
-        rp.exec_async(exec=exec, cmd_args=cmd_args, cb_done=cb_done, working_dir=workdir, allow_errors=allow_errors)
+        if exec_status == ExecStatus.FailedToStart and not allow_errors:
+            qmsgbox_critical(None,
+                                 f'Could not start {cls.DISPLAY_NAME}',
+                                 f'Error: Could not start {cls.DISPLAY_NAME}\n\nPlease adjust the execution information in the preference dialog')
+            return False
+
+        if exec_status == ExecStatus.Crashed:
+            qmsgbox_critical(None,
+                                 f'Execution error for {cls.DISPLAY_NAME}',
+                                 f'Error: Execution of {cls.DISPLAY_NAME} crashed.\n\nPlease check the logs and adjust the execution information in the preference dialog')
+            return False
+
+        if exec_status == ExecStatus.OtherError:
+            qmsgbox_critical(None,
+                                 f'Execution error for {cls.DISPLAY_NAME}',
+                                 f'Error: Execution of {cls.DISPLAY_NAME} failed.\n\nPlease check the logs and adjust the execution information in the preference dialog')
+            return False
+
+        if exit_code != 0 and not allow_errors:
+            qmsgbox_warning(None, f'Execution error for {cls.DISPLAY_NAME}',
+                                f'Error: {cls.DISPLAY_NAME} returned with exit code {exit_code}.\n\nOutput:\n{output}')
+            return False
+
+        # ok, execution was successful
+        assert exec_status == ExecStatus.Ok, exec_status
+
+        return True
+
 
 
     @classmethod
-    def exec_blocking(cls, cmd_args: List[str], workdir: str = '', allow_errors: bool = False) -> str:
+    def exec_non_blocking(cls, cmd_args: List[str], workdir: str = '',
+                          allow_errors: bool = False,
+                          callback: Optional[Callable[[int, str], Any]] = None,
+                          output_callback: Optional[Callable[[str], Any]] = None,
+                          ) -> None:
+        '''Run the program with the arguments listed in cmd_args, in the working directory.
+
+        If the execution is successful and the exit code is 0, callback is called with the exit code and the output of the command.
+        The callback is also called if exit_code is not zero but allow_errors is True.
+
+        If allow_errors is False and the process does not start or return with non zero exit code, an error message is displayed.
+        If the process crashes or reports another kind of error, an error message is displayed.
+
+        output_callback is called with the process output whenever a new output is available.
+        '''
+        exec = cls.get_executable()
+        if exec.is_empty():
+            QMessageBox.critical(None, f'Unable to execute {cls.DISPLAY_NAME}', f'Error: Unable to execute `{cls.DISPLAY_NAME}`\n'
+                                + '\n\nPlease configure it in the preference dialog.\n')
+
+        def cb_done(exec_status: ExecStatus, exit_code: int, output: str) -> None:
+            if cls.handle_process_return(exec_status, exit_code, output, allow_errors):
+                if callback is not None:
+                    callback(exit_code, output)
+
+        rp = RunProcess()
+        if output_callback:
+            rp.sigProcessOutput.connect(output_callback)
+        rp.exec_async(exec=exec, cmd_args=cmd_args, cb_done=cb_done, working_dir=workdir,
+                      emit_output=bool(output_callback))
+
+
+
+    @classmethod
+    def exec_blocking(cls, cmd_args: List[str], workdir: str = '', allow_errors: bool = False,
+                      callback: Optional[Callable[[int, str], Any]] = None,
+                      ) -> str:
         '''Run the program with the arguments listed in cmd_args, in the working directory.
         Raises an exception if the command did not return with 0 status.
         '''
         exec = cls.get_executable()
         if exec.is_empty():
-            raise FileNotFoundError(f'Could not locate {cls.get_exec_name()}')
+            QMessageBox.critical(None, f'Unable to execute {cls.DISPLAY_NAME}', f'Error: Unable to execute `{cls.DISPLAY_NAME}`\n'
+                                 + '\n\nPlease configure it in the preference dialog.\n')
 
-        exitCode, output = RunProcess().exec_blocking(exec=exec, cmd_args=cmd_args, allow_errors=allow_errors, working_dir=workdir)
-        if exitCode != 0 and not allow_errors:
-            raise subprocess.CalledProcessError(cmd=f'{exec} {cmd_args}', returncode=exitCode, output=output)
+
+        exec_status, exit_code, output = RunProcess().exec_blocking(exec=exec, cmd_args=cmd_args, working_dir=workdir)
+        if cls.handle_process_return(exec_status, exit_code, output, allow_errors):
+            if callback is not None:
+                callback(exit_code, output)
+
         return output
 
 
@@ -676,15 +754,16 @@ class ExecExplorer(ExecTool):
 
 
     @classmethod
-    def exec_non_blocking(cls, cmd_args: List[str], workdir: str = '', allow_errors: Optional[bool] = None, callback: Optional[Callable[[], Any]] = None) -> None:
+    def exec_non_blocking(cls, cmd_args: List[str], workdir: str = '', allow_errors: bool = False,
+                          callback: Optional[Callable[[int, str], Any]] = None,
+                          output_callback: Optional[Callable[[str], Any]] = None,
+                          ) -> None:
         '''Same as default exec_non_blocking but defaults to allow_errors for Windows'''
-        if allow_errors == None:
-            if sys.platform == 'win32':
-                # on Windows, launching the explorer returns -1
-                override_allow_errors = True
-            else:
-                override_allow_errors = False
-        return super().exec_non_blocking(cmd_args, workdir, override_allow_errors, callback)
+        override_allow_errors = allow_errors
+        if sys.platform == 'win32':
+            # on Windows, launching the explorer returns -1, so make sure we ignore it
+            override_allow_errors = True
+        return super().exec_non_blocking(cmd_args, workdir, override_allow_errors, callback, output_callback)
 
 
 #######################################################
@@ -700,59 +779,33 @@ FORCE_ASYNC_TO_BLOCKING_CALLS = False
 class RunProcess(QObject):
     '''Utility class to run any process synchronously or asynchronously.
 
-    One RunProcess() only shall be created for a repository and it will ensure that only one git command
-    is running at the same time on the repository.
-
-    This class also uses the GitProcessPool to limit the number of total git processes running in parallel.
-
-    Typical usage:
-    ==============
-
-    # aysnchronous git execution
-    rp = RunProcess('some_repo')
-    rp.exec_async(callback_git_operation_finished, ['-C', 'some_repo', 'fetch'])
-
-    rp.exec_async(callback_git_operation_finished, ['-C', 'some_repo', 'fetch'], force_blocking=True)
-    rp.exec_async(callback_git_operation_finished, ['-C', 'some_repo', 'fetch'], allow_errors=True)
-
-    # synchronous git execution
-    rp = RunProcess('some_repo')
-    git_exit_code, cmd_out = rp.exec_blocking(None, ['-C', 'some_repo', 'fetch'])
-
-    # asynchronous execution of another program
-    rp = RunProcess(None)
-    rp.process_working_dir = gitdir
-    rp.cmd = prog_gitbash
-    rp.exec_async(args=[], cb_done=cb_done)
-
     The interest of this class above QProcess:
-    - limit one git execution over a given repository
-    - detects some git execution errors corner cases
-    - shows a dialog box if git executable can not be found
-    - shows a dialog box if the executable returned an error (configurable with allow_errors)
-    - asynchronous execution is slightly easier than when dealing directly with QProcess
+    - can be called to run Flatpak, Snaps or regular commands
     - the debug log captures partial stdout/stderr which eases debugging
+    - asynchronous execution is slightly easier than when dealing directly with QProcess
+    - asynchronous execution can be forced to blocking execution, convenient for testing
 
     You can use the signal sigProcessOutput to track the progressive output of the process.
 
     '''
 
     process: Optional[QProcess]
-    cb_done: Optional[ Callable[[int, str], Any]]
+    cb_done: Optional[ Callable[[ExecStatus, int, str], Any]]
     process_working_dir: Optional[str]
     sigProcessOutput = Signal(str)
+    exec_status: ExecStatus
 
     def __init__(self) -> None:
         super().__init__(QApplication.instance())
 
         self.executable: Optional[MgExecutable] = None
         self.cmd_line: List[str] = []
+        self.is_exec_blocking = False
         self.process_working_dir = None
         self.process = None
         self.cb_done = None
+        self.exec_status = ExecStatus.Ok
         self.partial_stdout = ''
-        self.last_exit_code = 0
-        self.allow_errors = False
         self.emit_output = False
 
 
@@ -761,7 +814,8 @@ class RunProcess(QObject):
 
 
     def create_process(self, exec: MgExecutable, cmd_args: List[str], working_dir: str = '',
-                       allow_errors: bool = False, emit_output: bool = False) -> None:
+                       emit_output: bool = False,
+                       ) -> None:
         '''Creates a QProcess for running a command
 
         exec: the executable to run, with the information to run it properly (path for a direct command, snap name for a snap
@@ -778,8 +832,6 @@ class RunProcess(QObject):
         assert not exec.is_empty(), f'Can not execute: {exec}'
 
         self.cmd_line = cmd_args
-
-        # Direct cmd, with exec.path
 
         if exec.cmd_type in [CmdType.DirectCmd]:
             self.cmd_line = [exec.path] + self.cmd_line
@@ -801,15 +853,13 @@ class RunProcess(QObject):
         self.process.setArguments(self.cmd_line[1:])
         if len(working_dir):
             self.process.setWorkingDirectory(working_dir)
-        self.allow_errors = allow_errors
+        self.process.errorOccurred.connect(self.slot_error_occured)
 
-        self.last_exit_code = 0
         self.process.setProcessChannelMode(QProcess.ProcessChannelMode.MergedChannels)
 
         if self.emit_output:
             # noinspection PyUnresolvedReferences
             self.process.readyReadStandardOutput.connect(self.slotReadyReadStdout)
-
 
     def slotReadyReadStdout(self) -> None:
         '''Slot called when data is available from the process stdout channel'''
@@ -825,25 +875,23 @@ class RunProcess(QObject):
             MgAuthFailureMgr.gitAuthFailed(self.nice_cmdline())
 
 
-    def exec_blocking(self, exec: MgExecutable, cmd_args: List[str], allow_errors: bool = False, working_dir: str = '') -> Tuple[int, str]:
+    def exec_blocking(self, exec: MgExecutable, cmd_args: List[str], working_dir: str = '') -> Tuple[ExecStatus, int, str]:
         '''Execute a program in blocking mode.
 
         args: the arguments to the program without the progam itself.
 
         Return the program exit code and the standard output of the command.
-
-        If allow_errors is False (the default) a message box reports the git error. If it is True, nothing
-        is done. In both cases, the git exit code is returned.
-
         '''
-        self.create_process(exec, cmd_args, working_dir=working_dir, allow_errors=allow_errors)
+        self.is_exec_blocking = True
+        self.create_process(exec, cmd_args, working_dir=working_dir)
 
-        if MgAuthFailureMgr.shouldStopBecauseGitAuthFailureInProgress(cmd_args):
-            self.last_exit_code = GIT_EXIT_CODE_STOPPED_BECAUSE_AUTH_FAILURE
-            self.partial_stdout = 'Stopped before execution because too many authentication failures.'
-            dbg('Execution canceled because of too many authentication failures: {}'.format(self.nice_cmdline()))
-            cmd_out = self.process_finished(self.last_exit_code, QProcess.ExitStatus.NormalExit)
-            return self.last_exit_code, cmd_out
+        if 0:
+            if MgAuthFailureMgr.shouldStopBecauseGitAuthFailureInProgress(cmd_args):
+                self.last_exit_code = GIT_EXIT_CODE_STOPPED_BECAUSE_AUTH_FAILURE
+                self.partial_stdout = 'Stopped before execution because too many authentication failures.'
+                dbg('Execution canceled because of too many authentication failures: {}'.format(self.nice_cmdline()))
+                cmd_out = self.process_finished(self.last_exit_code, QProcess.ExitStatus.NormalExit)
+                return self.last_exit_code, cmd_out
 
         assert self.process
         dbg('Executing blocking: {}'.format(self.nice_cmdline()))
@@ -853,23 +901,25 @@ class RunProcess(QObject):
                 or not self.process.waitForStarted(-1)):
             # could not start the process...
             dbg('exec_blocking() - could not start the process')
-            cmd_out = self.process_finished(EXIT_CODE_COULD_NOT_START_PROCESS, QProcess.ExitStatus.CrashExit)
-        else:
-            finished = self.process.waitForFinished(-1)
-            if not finished:
-                warn('Process returned before being finished...')
-                raise AssertionError('process not yet finished...')
 
-            cmd_out = self.process_finished(self.process.exitCode(), self.process.exitStatus())
+            # in case it was not caught earlier
+            if self.exec_status == ExecStatus.Ok:
+                self.exec_status = ExecStatus.FailedToStart
+            return self.process_finished(EXIT_CODE_COULD_NOT_START_PROCESS, QProcess.ExitStatus.NormalExit)
 
-        return self.last_exit_code, cmd_out
+        finished = self.process.waitForFinished(-1)
+        if not finished:
+            warn('Process returned before being finished...')
+            raise AssertionError('process not yet finished...')
+
+        # if an error occured, it was notified through slot_error_occured() and self.exec_status has been set
+        return self.process_finished(self.process.exitCode(), self.process.exitStatus())
 
 
     def exec_async(self, exec: MgExecutable,
                    cmd_args: List[str],
-                   cb_done: Optional[Callable[[int, str], Any]],
+                   cb_done: Optional[Callable[[ExecStatus, int, str], Any]],
                    force_blocking: bool = False,
-                   allow_errors: bool = False,
                    working_dir: str = '',
                    emit_output: bool = False,
                    ) -> None:
@@ -878,53 +928,72 @@ class RunProcess(QObject):
         exec: the executable to run, with the information to run it properly (flatpak spawn, direct command, ...)
         cmd_args: the arguments to the program without the program itself.
 
-        Calls: cb_done(git_exit_code, git_output)
+        Calls: cb_done(exec_status, git_exit_code, git_output)
 
         if force_blocking is True, the call is made blocking and the callback is called
         when the process completes.
 
-        If allow_errors is False (the default) a message box reports the error. If it is True, nothing
-        is done. In both cases, the exit code is passed to the callback.
-
         If emit_output is True, the signal sigProcessOutput is emitted progressively
         as the process emits output.
+
+        If output_callback is provided, it is connected to the output signal of the QProcess
         '''
         self.cb_done = cb_done
         if FORCE_ASYNC_TO_BLOCKING_CALLS or force_blocking:
-            self.exec_blocking(exec, cmd_args, allow_errors, working_dir)
+            self.exec_blocking(exec, cmd_args, working_dir)
             return
+        self.is_exec_blocking = False
 
-        self.create_process(exec, cmd_args, working_dir=working_dir, allow_errors=allow_errors,
+        self.create_process(exec, cmd_args, working_dir=working_dir,
                             emit_output=emit_output)
 
         assert self.process
 
-        if MgAuthFailureMgr.shouldStopBecauseGitAuthFailureInProgress(cmd_args):
-            self.last_exit_code = GIT_EXIT_CODE_STOPPED_BECAUSE_AUTH_FAILURE
-            self.partial_stdout = 'Stopped before execution because too many authentication failures.'
-            dbg('Execution canceled because of too many authentication failures: {}'.format(self.nice_cmdline()))
-            QApplication.processEvents()
-            self.process_finished(self.last_exit_code, QProcess.ExitStatus.NormalExit)
-            return
+        if 0:
+            if MgAuthFailureMgr.shouldStopBecauseGitAuthFailureInProgress(cmd_args):
+                self.last_exit_code = GIT_EXIT_CODE_STOPPED_BECAUSE_AUTH_FAILURE
+                self.partial_stdout = 'Stopped before execution because too many authentication failures.'
+                dbg('Execution canceled because of too many authentication failures: {}'.format(self.nice_cmdline()))
+                QApplication.processEvents()
+                self.process_finished(self.last_exit_code, QProcess.ExitStatus.NormalExit)
+                return
 
-        # noinspection PyUnresolvedReferences
         self.process.finished.connect(self.process_finished)
 
         dbg('Executing async: {}'.format(self.nice_cmdline()))
         self.process.start()
 
 
-    def process_finished(self, exit_code: int, exit_status: QProcess.ExitStatus) -> str:
-        '''Called by both blocking and async process execution, when execution is over.
+    def slot_error_occured(self, error: QProcess.ProcessError) -> None:
+        '''Slot called when an error occurs with the process'''
+        dbg('RunProcess() error occurred for "%s": %s' % (self.nice_cmdline(), str(error)))
+        if error == QProcess.ProcessError.FailedToStart:
+            self.exec_status = ExecStatus.FailedToStart
+            # in this case, we must call manually process_finished()
+            if self.is_exec_blocking == False:
+                # for async calls only. For blocking calls, we handle it later
+                self.process_finished(EXIT_CODE_COULD_NOT_START_PROCESS, QProcess.ExitStatus.NormalExit)
+        elif error == QProcess.ProcessError.Crashed:
+            self.exec_status = ExecStatus.Crashed
+        else:
+            self.exec_status = ExecStatus.OtherError
 
-        Calls the cb_done if any.
-        '''
-        dbg('Process finished for "%s" with exit status %d, exit code %d' % (self.nice_cmdline(), int(exit_status.value), exit_code))
-        assert self.process
-        cmd_out: str
+
+    def clean(self) -> None:
+        '''Clean the fields: process, cb_done, exec_status, partial_stdout'''
+        self.process = None
+        self.cb_done = None
+        self.exec_status = ExecStatus.Ok
+        self.partial_stdout = ''
+
+
+    def process_cmd_out_finished(self) -> str:
+        '''Retrieve the pending output of the process and return the complete process output'''
+        assert self.process is not None
         btext = bytes(self.process.readAllStandardOutput())
         cmd_out = self.partial_stdout + btext.decode('utf8', errors='replace').replace('\r', '\n')
         self.partial_stdout = ''
+
         cmd_out_dbg = cmd_out if len(cmd_out) < mg_const.MAX_GIT_DBG_OUT_CHAR else \
             cmd_out[:mg_const.MAX_GIT_DBG_OUT_CHAR] + '\n<output truncated to {} characters>'.format(mg_const.MAX_GIT_DBG_OUT_CHAR)
         dbg('stdout: {}'.format(cmd_out_dbg))
@@ -932,43 +1001,51 @@ class RunProcess(QObject):
         log_git_cmd(self.nice_cmdline())
         log_git_cmd('\t' + '\n\t'.join(cmd_out_dbg.split('\n')))
 
-        # keep a local copy before final cleanup
-        process = self.process
-        cb_done = self.cb_done
-        self.process = None
-        self.cb_done = None
-
-        if hasGitAuthFailureMsg(cmd_out_dbg):
-            MgAuthFailureMgr.gitAuthFailed(self.nice_cmdline())
-
-        self.last_exit_code = exit_code
-        if  '** *fatal error - add_item' in cmd_out or 'Stack trace:' in cmd_out and self.last_exit_code == 0:
-            # this happens sometimes with git process started very closely one to another with a fetch
-            # that's why we use a delay between starting multiple git processes
-            # usually, the error is not reported in git exit code, probably because it is not git-fetch
-            # who is failing but a sub-program
-            # so force exit code
-            error(f'Git segfault detected, forcing exit code to {GIT_EXIT_CODE_SEGFAULT_OF_GIT_WITH_STACKTRACE} for: {self.nice_cmdline()}')
-            self.last_exit_code = GIT_EXIT_CODE_SEGFAULT_OF_GIT_WITH_STACKTRACE
-
-        elif process.exitStatus() != QProcess.ExitStatus.NormalExit and self.last_exit_code == 0:
-            error(f'Git segfault detected, forcing exit code to {GIT_EXIT_CODE_SEGFAULT_OF_GIT_NO_STACKTRACE} for: {self.nice_cmdline()}')
-            self.last_exit_code = GIT_EXIT_CODE_SEGFAULT_OF_GIT_NO_STACKTRACE
-
-        if self.last_exit_code != 0 and not self.allow_errors:
-            # noinspection PyTypeChecker
-            if QApplication.instance():
-                QMessageBox.warning(None, 'Error when running process',
-                                    'Bad exit code %d, see command below:\n\n%s' % ( self.last_exit_code, self.nice_cmdline()))
-            else:
-                raise ValueError('Bad exit code %d for command: %s' % (self.last_exit_code, self.nice_cmdline()))
-
-        # to avoid recursion, don't leave any pending callbacks
-        if cb_done:
-            dbg('Calling process done callback')
-            cb_done(self.last_exit_code, cmd_out)
-
         return cmd_out
+
+
+    def process_finished(self, exit_code: int, exit_status: QProcess.ExitStatus) -> Tuple[ExecStatus, int, str]:
+        '''Called by both blocking and async process execution, when execution is over.
+
+        Calls the cb_done if any.
+        '''
+        dbg('Process finished for "%s" with exit status %d, exit code %d' % (self.nice_cmdline(), int(exit_status.value), exit_code))
+        assert self.process
+
+        cmd_out = self.process_cmd_out_finished()
+        exec_status, process, cb_done = self.exec_status, self.process, self.cb_done
+        self.clean()
+
+        if process.exitStatus() == QProcess.ExitStatus.CrashExit and exec_status == ExecStatus.Ok:
+            # in case the error was not caught earlier
+            exec_status = ExecStatus.Crashed
+            if exit_code == 0:
+                exit_code = EXIT_CODE_CRASHED
+
+        if 0:
+            if hasGitAuthFailureMsg(cmd_out):
+                MgAuthFailureMgr.gitAuthFailed(self.nice_cmdline())
+
+        if 0:
+            if  '** *fatal error - add_item' in cmd_out or 'Stack trace:' in cmd_out and self.last_exit_code == 0:
+                # this happens sometimes with git process started very closely one to another with a fetch
+                # that's why we use a delay between starting multiple git processes
+                # usually, the error is not reported in git exit code, probably because it is not git-fetch
+                # who is failing but a sub-program
+                # so force exit code
+                error(f'Git segfault detected, forcing exit code to {GIT_EXIT_CODE_SEGFAULT_OF_GIT_WITH_STACKTRACE} for: {self.nice_cmdline()}')
+                self.last_exit_code = GIT_EXIT_CODE_SEGFAULT_OF_GIT_WITH_STACKTRACE
+
+        if 0:
+            if process.exitStatus() != QProcess.ExitStatus.NormalExit and self.last_exit_code == 0:
+                error(f'Git segfault detected, forcing exit code to {GIT_EXIT_CODE_SEGFAULT_OF_GIT_NO_STACKTRACE} for: {self.nice_cmdline()}')
+                self.last_exit_code = GIT_EXIT_CODE_SEGFAULT_OF_GIT_NO_STACKTRACE
+
+        if cb_done is not None:
+            dbg('Calling process done callback')
+            cb_done(exec_status, exit_code, cmd_out)
+
+        return exec_status, exit_code, cmd_out
 
 
     def abortProcessInProgress(self) -> None:
