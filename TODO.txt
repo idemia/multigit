@@ -1,6 +1,5 @@
 # Linux
 - check that config files from previous multigit versions are properly migrated
-- check how RunProcess().exec_blocking() works when it can not start the process. Is on_error called ?
 
 
 # Windows
@@ -11,7 +10,6 @@
 # Flatpak
     - work in progress:
         - MgGitAuthFailure should be moved to ExecGit
-        - mg_task.move_directory is windows specific
 - see if we can create a directory from a native open file dialog instead of regualar file dialog
 - default dialog size are too big
 - show last commit _+ show modified files is not activatee by default
@@ -25,9 +23,6 @@
 - export to a flatpak repository
 - sign with gpg key
 # Future:
-- git-gui + gitk
-    - harmonize the "not found" messages for running git-gui and others
-    - linux: when manual path is incorrect, no error message
 
 ## Nice to have
 - ensure that generate_ui and other packaging commands are run in CI and captured in dependencies
