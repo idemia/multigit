@@ -319,6 +319,9 @@ class MgRepoInfo(QObject):
         '''Called to check if repo has been deleted.
         Emits the appropriate signal and return True if repo was deleted.
         This is to be called each time git returns an error code'''
+
+        # we can use os.path.exists() here even in flatpak because we have requested access to the host
+        # home user FS
         if not os.path.exists(self.fullpath)  \
             or not os.path.exists(os.path.join(self.fullpath, '.git')):
             self.is_deleted = True
