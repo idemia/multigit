@@ -286,14 +286,15 @@ class MgRepoInfo(QObject):
     def __init__(self, name: str, fullpath: str, relpath: str = '') -> None:
         super().__init__()
 
-        self.name = name
-        self.relpath = relpath
+        # normalize the name between / and \
+        self.name = str(pathlib.Path(name))
+        self.relpath = str(pathlib.Path(relpath))
         self.force_blocking_git = False
 
         self.cb_repo_info_available: Optional[Callable[[str], Any]] = None
 
         # full path to our repo
-        self.fullpath = fullpath
+        self.fullpath = str(pathlib.Path(fullpath))
 
         self._clear_all()
 
