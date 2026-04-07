@@ -21,7 +21,7 @@ import functools
 import logging
 import enum
 import pathlib
-import shutil
+import sys
 
 from PySide6.QtCore import Signal, QObject, Qt, QThread
 from PySide6.QtGui import QIcon, QPixmap, QFont
@@ -331,9 +331,14 @@ class MgTaskMoveDirectory(MgExecTask):
         self.dest_path = pathlib.Path(dest_path)
         self.dest_path.resolve()
         self.skip_git_admin_dir = skip_git_admin_dir
-        self.cmd = ['robocopy', '/move', '/s', '/e', str(self.src_path), str(self.dest_path)]
-        if self.skip_git_admin_dir:
-            self.cmd.extend(['/xd', '.git'])
+        if sys.platform == 'win32':
+            self.cmd = ['robocopy', '/move', '/s', '/e', str(self.src_path), str(self.dest_path)]
+            if self.skip_git_admin_dir:
+                self.cmd.extend(['/xd', '.git'])
+        else:
+            self.cmd = ['rsync', '-av', str(self.src_path) + '/', str(self.dest_path) + '/']
+            if self.skip_git_admin_dir:
+                self.cmd.extend(['--exclude', '.git/'])
         self.short_desc = ' '.join(self.cmd)
         self.run_process: Optional[RunProcess] = None
 
