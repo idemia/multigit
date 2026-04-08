@@ -553,30 +553,25 @@ class ExecGit(ExecTool):
                 callback(exit_code, cmd_out)
             return None
 
-        # catch git authentication failures
+        # catch git exit code to perform more actions
         def local_callback(exit_code: int, cmd_out: str) -> None:
             if hasGitAuthFailureMsg(cmd_out):
                 MgAuthFailureMgr.gitAuthFailed()
+
+            if  ('** *fatal error - add_item' in cmd_out or 'Stack trace:' in cmd_out) and exit_code == 0:
+                # this crash happens sometimes with git process started very closely one to another with a fetch
+                # that's why we use a delay between starting multiple git processes
+                # usually, the error is not reported in git exit code, probably because it is not git-fetch
+                # who is failing but a sub-program
+                # so force exit code
+                error(f'Git segfault detected, forcing exit code to {GIT_EXIT_CODE_SEGFAULT_OF_GIT_WITH_STACKTRACE}')
+                exit_code = GIT_EXIT_CODE_SEGFAULT_OF_GIT_WITH_STACKTRACE
+
             if callback:
                 callback(exit_code, cmd_out)
 
 
         return super().exec_non_blocking(cmd_args, workdir, allow_errors, local_callback, output_callback)
-
-        # if 0:
-        #     if  '** *fatal error - add_item' in cmd_out or 'Stack trace:' in cmd_out and self.last_exit_code == 0:
-        #         # this happens sometimes with git process started very closely one to another with a fetch
-        #         # that's why we use a delay between starting multiple git processes
-        #         # usually, the error is not reported in git exit code, probably because it is not git-fetch
-        #         # who is failing but a sub-program
-        #         # so force exit code
-        #         error(f'Git segfault detected, forcing exit code to {GIT_EXIT_CODE_SEGFAULT_OF_GIT_WITH_STACKTRACE} for: {self.nice_cmdline()}')
-        #         self.last_exit_code = GIT_EXIT_CODE_SEGFAULT_OF_GIT_WITH_STACKTRACE
-        #
-        # if 0:
-        #     if process.exitStatus() != QProcess.ExitStatus.NormalExit and self.last_exit_code == 0:
-        #         error(f'Git segfault detected, forcing exit code to {GIT_EXIT_CODE_SEGFAULT_OF_GIT_NO_STACKTRACE} for: {self.nice_cmdline()}')
-        #         self.last_exit_code = GIT_EXIT_CODE_SEGFAULT_OF_GIT_NO_STACKTRACE
 
 
 #######################################################
