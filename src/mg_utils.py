@@ -366,12 +366,12 @@ GIT_CMD_WITH_NETWORK_AUTH = [ 'fetch', 'pull', 'push', 'ls-remote', 'clone']
 
 def isGitCommandRequiringAuth(cmdline: Sequence[str]) -> bool:
     '''Return True if the git command line uses a command requiring network authentication'''
-    if len(cmdline) < 2:
+    if len(cmdline) < 1:
         return False
 
-    git_cmd = cmdline[1]
-    if cmdline[1] == '-C' and len(cmdline) >= 3:
-        git_cmd = cmdline[3]
+    git_cmd = cmdline[0]
+    if cmdline[0] == '-C' and len(cmdline) >= 2:
+        git_cmd = cmdline[2]
 
     if git_cmd in GIT_CMD_WITH_NETWORK_AUTH:
         return True

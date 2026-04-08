@@ -230,6 +230,12 @@ class MgExecWindow(QDialog):
                 # we have reach our maximum
                 return
 
+            if MgAuthFailureMgr.isUserDialogShowing():
+                dbg('startNewJobs() - Avoid starting new jobs because a git authentication failure dialog is showing')
+                QTimer.singleShot(1000, self.startNewJobs)
+                return
+
+
             dbg('startNewJobs() - looking at job to start: %s' % jobItem)
             if not jobItem.isStarted:
                 if jobItem.taskGroup.is_precondition_fulfilled() == PreConditionState.NotFulfilled :

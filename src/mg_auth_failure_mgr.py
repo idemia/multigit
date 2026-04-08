@@ -42,12 +42,14 @@ class MgAuthFailureMgr(QObject):
     __instance: Optional['MgAuthFailureMgr'] = None
     nbGitAuthFail: int
     actionAfterManyAuthFailure: ActionAfterManyAuthFailure
+    userDialogShowing: bool
 
     def __init__(self) -> None:
         super().__init__()
         dbg('instance created')
         MgAuthFailureMgr.__instance = self
         MgAuthFailureMgr.newSession()
+        self.userDialogShowing = False
 
 
     @staticmethod
@@ -62,7 +64,7 @@ class MgAuthFailureMgr(QObject):
 
 
     @staticmethod
-    def gitAuthFailed(cmdline: str) -> None:
+    def gitAuthFailed() -> None:
         '''Called each time a git authentication fails for a git command'''
         self = MgAuthFailureMgr.instance()
         self.nbGitAuthFail += 1
@@ -75,6 +77,7 @@ class MgAuthFailureMgr(QObject):
             msg += '<p>To update your git login/password, open the <i>Windows Credentials Manager (in french: Gérer les mots de passe réseau</i>)'
             msg += '<p>What to you want to do next ?'
 
+            self.userDialogShowing = True
             msgBox = QMessageBox(QMessageBox.Icon.Warning, "Many authentication failures", '')
             msgBox.setTextFormat(Qt.TextFormat.RichText)
             msgBox.setText(msg)
@@ -89,6 +92,7 @@ class MgAuthFailureMgr(QObject):
                 self.actionAfterManyAuthFailure = ActionAfterManyAuthFailure.IgnoreAllAuthErrors
             elif buttonSelected == buttonContinue:
                 self.actionAfterManyAuthFailure = ActionAfterManyAuthFailure.ReportWithDialog
+            self.userDialogShowing = False
 
 
     @classmethod
@@ -107,3 +111,6 @@ class MgAuthFailureMgr(QObject):
         self.actionAfterManyAuthFailure = ActionAfterManyAuthFailure.ReportWithDialog
 
 
+    @classmethod
+    def isUserDialogShowing(cls) -> bool:
+        return cls.instance().userDialogShowing

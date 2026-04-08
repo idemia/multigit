@@ -533,6 +533,52 @@ class ExecGit(ExecTool):
         return True
 
 
+    @classmethod
+    def exec_non_blocking(cls, cmd_args: List[str], workdir: str = '',
+                          allow_errors: bool = False,
+                          callback: Optional[Callable[[int, str], Any]] = None,
+                          output_callback: Union[None, Callable[[str], Any], SignalInstance] = None,
+                          ) -> 'Optional[RunProcess]':
+
+        if MgAuthFailureMgr.shouldStopBecauseGitAuthFailureInProgress(cmd_args):
+            exit_code = GIT_EXIT_CODE_STOPPED_BECAUSE_AUTH_FAILURE
+            cmd_out = 'Multigit stopped git before execution because of too many previous git authentication failures.'
+            dbg(cmd_out)
+            if output_callback:
+                if isinstance(output_callback, Signal):
+                    output_callback.emit(cmd_out)
+                else:
+                    output_callback(cmd_out)
+            if callback:
+                callback(exit_code, cmd_out)
+            return None
+
+        # catch git authentication failures
+        def local_callback(exit_code: int, cmd_out: str) -> None:
+            if hasGitAuthFailureMsg(cmd_out):
+                MgAuthFailureMgr.gitAuthFailed()
+            if callback:
+                callback(exit_code, cmd_out)
+
+
+        return super().exec_non_blocking(cmd_args, workdir, allow_errors, local_callback, output_callback)
+
+        # if 0:
+        #     if  '** *fatal error - add_item' in cmd_out or 'Stack trace:' in cmd_out and self.last_exit_code == 0:
+        #         # this happens sometimes with git process started very closely one to another with a fetch
+        #         # that's why we use a delay between starting multiple git processes
+        #         # usually, the error is not reported in git exit code, probably because it is not git-fetch
+        #         # who is failing but a sub-program
+        #         # so force exit code
+        #         error(f'Git segfault detected, forcing exit code to {GIT_EXIT_CODE_SEGFAULT_OF_GIT_WITH_STACKTRACE} for: {self.nice_cmdline()}')
+        #         self.last_exit_code = GIT_EXIT_CODE_SEGFAULT_OF_GIT_WITH_STACKTRACE
+        #
+        # if 0:
+        #     if process.exitStatus() != QProcess.ExitStatus.NormalExit and self.last_exit_code == 0:
+        #         error(f'Git segfault detected, forcing exit code to {GIT_EXIT_CODE_SEGFAULT_OF_GIT_NO_STACKTRACE} for: {self.nice_cmdline()}')
+        #         self.last_exit_code = GIT_EXIT_CODE_SEGFAULT_OF_GIT_NO_STACKTRACE
+
+
 #######################################################
 #       TortoiseGit Stuff
 #######################################################
@@ -886,14 +932,6 @@ class RunProcess(QObject):
         self.is_exec_blocking = True
         self.create_process(exec, cmd_args, working_dir=working_dir)
 
-        if 0:
-            if MgAuthFailureMgr.shouldStopBecauseGitAuthFailureInProgress(cmd_args):
-                self.last_exit_code = GIT_EXIT_CODE_STOPPED_BECAUSE_AUTH_FAILURE
-                self.partial_stdout = 'Stopped before execution because too many authentication failures.'
-                dbg('Execution canceled because of too many authentication failures: {}'.format(self.nice_cmdline()))
-                cmd_out = self.process_finished(self.last_exit_code, QProcess.ExitStatus.NormalExit)
-                return self.last_exit_code, cmd_out
-
         assert self.process
         dbg('Executing blocking: {}'.format(self.nice_cmdline()))
         self.process.start()
@@ -949,15 +987,6 @@ class RunProcess(QObject):
                             emit_output=emit_output)
 
         assert self.process
-
-        if 0:
-            if MgAuthFailureMgr.shouldStopBecauseGitAuthFailureInProgress(cmd_args):
-                self.last_exit_code = GIT_EXIT_CODE_STOPPED_BECAUSE_AUTH_FAILURE
-                self.partial_stdout = 'Stopped before execution because too many authentication failures.'
-                dbg('Execution canceled because of too many authentication failures: {}'.format(self.nice_cmdline()))
-                QApplication.processEvents()
-                self.process_finished(self.last_exit_code, QProcess.ExitStatus.NormalExit)
-                return
 
         self.process.finished.connect(self.process_finished)
 
@@ -1022,25 +1051,6 @@ class RunProcess(QObject):
             exec_status = ExecStatus.Crashed
             if exit_code == 0:
                 exit_code = EXIT_CODE_CRASHED
-
-        if 0:
-            if hasGitAuthFailureMsg(cmd_out):
-                MgAuthFailureMgr.gitAuthFailed(self.nice_cmdline())
-
-        if 0:
-            if  '** *fatal error - add_item' in cmd_out or 'Stack trace:' in cmd_out and self.last_exit_code == 0:
-                # this happens sometimes with git process started very closely one to another with a fetch
-                # that's why we use a delay between starting multiple git processes
-                # usually, the error is not reported in git exit code, probably because it is not git-fetch
-                # who is failing but a sub-program
-                # so force exit code
-                error(f'Git segfault detected, forcing exit code to {GIT_EXIT_CODE_SEGFAULT_OF_GIT_WITH_STACKTRACE} for: {self.nice_cmdline()}')
-                self.last_exit_code = GIT_EXIT_CODE_SEGFAULT_OF_GIT_WITH_STACKTRACE
-
-        if 0:
-            if process.exitStatus() != QProcess.ExitStatus.NormalExit and self.last_exit_code == 0:
-                error(f'Git segfault detected, forcing exit code to {GIT_EXIT_CODE_SEGFAULT_OF_GIT_NO_STACKTRACE} for: {self.nice_cmdline()}')
-                self.last_exit_code = GIT_EXIT_CODE_SEGFAULT_OF_GIT_NO_STACKTRACE
 
         if cb_done is not None:
             dbg('Calling process done callback')
