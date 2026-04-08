@@ -1,24 +1,12 @@
 # Linux
 - check that config files from previous multigit versions are properly migrated
-- bug: freeze when selecting a double-click action ?
-
 
 # Windows
-
+- add a Getting started to run on the first launch and in the help menu
 
 # Flatpak packaging
-- see if we can create a directory from a native open file dialog instead of regualar file dialog
-- default dialog size are too big
-
-
-- clean-up the build dir to reduce the size of the final program
-
-
-- icon should be provided with command: rename-icom
-
 - export to a flatpak repository
 - sign with gpg key
-# Future:
 
 ## Nice to have
 - ensure that generate_ui and other packaging commands are run in CI and captured in dependencies
