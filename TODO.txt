@@ -1,18 +1,14 @@
 # Linux
 - check that config files from previous multigit versions are properly migrated
+- bug: freeze when selecting a double-click action ?
 
 
 # Windows
-    - launch multigit after installation
-    - bug: freeze when selecting a double-click action ?
 
 
-# Flatpak
-    - work in progress:
-        - MgGitAuthFailure should be moved to ExecGit
+# Flatpak packaging
 - see if we can create a directory from a native open file dialog instead of regualar file dialog
 - default dialog size are too big
-- show last commit _+ show modified files is not activatee by default
 
 
 - clean-up the build dir to reduce the size of the final program
