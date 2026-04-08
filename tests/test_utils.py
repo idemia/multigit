@@ -269,38 +269,37 @@ bla bla bla
 
 
     def test_isGitCommandRequiringAuth(self):
-        self.assertEqual(isGitCommandRequiringAuth(['git', 'push', '--verbose']), True)
-        self.assertEqual(isGitCommandRequiringAuth(['git', 'pull']), True)
-        self.assertEqual(isGitCommandRequiringAuth(['git', 'fetch', '--progress']), True)
+        self.assertEqual(isGitCommandRequiringAuth(['push', '--verbose']), True)
+        self.assertEqual(isGitCommandRequiringAuth(['pull']), True)
+        self.assertEqual(isGitCommandRequiringAuth(['fetch', '--progress']), True)
 
         for cmdline in [
-            ['git.exe', '--version'],
-            ['git.exe', '-C', r'C:\work\Multigit\Dev', 'log', '-1'],
-            ['git.exe', '-C', r'C:\work\Multigit\Dev', 'remote', '--verbose'],
-            ['git.exe', '-C', r'C:\work\Multigit\Dev', 'status', '--porcelain', '--branch'],
-            ['git.exe', '-C', r'C:\work\Multigit\Sandbox_http', 'diff', '-u', '--patience', '--stat'],
-            ['git.exe', '-C', r'C:\work\Multigit\tmp\submodule2', 'checkout', 'master'],
-            ['git.exe', '-C', r'C:\work\Multigit\tmp\toto2\subdir1\subdir1_repo1', 'merge', 'dev'],
-            ['git.exe', '-C', r'C:\work\Multigit\tmp\toto2\subdir1\subdir1_repo1', 'status', '--porcelain', '--branch'],
-            ['git.exe', '-C', r'C:\work\Multigit\tmp\toto2\subdir1\subdir1_repo1', 'tag', '--list', '--sort',
-             'creatordate'],
-            ['git.exe', '-C', r'C:\work\Multigit\tmp\toto2\subdir1\subdir1_repo2', 'branch'],
-            ['git.exe', '-C', r'C:\work\Multigit\tmp\toto2\subdir1\subdir1_repo2', 'checkout', 'dev'],
-            ['git.exe', '-C', r'C:\work\Multigit\tmp\toto2\subdir1\subdir1_repo2', 'checkout', 'int'],
-            ['git.exe', '-C', r'C:\work\Multigit\tmp\toto2\subdir1\subdir1_repo1', 'tag', 'int_112234', '-F', r'C:\Users\g582619\AppData\Local\Temp\tmp_b_uwll1']
+            [ '--version'],
+            [ '-C', r'C:\work\Multigit\Dev', 'log', '-1'],
+            [ '-C', r'C:\work\Multigit\Dev', 'remote', '--verbose'],
+            [ '-C', r'C:\work\Multigit\Dev', 'status', '--porcelain', '--branch'],
+            [ '-C', r'C:\work\Multigit\Sandbox_http', 'diff', '-u', '--patience', '--stat'],
+            [ '-C', r'C:\work\Multigit\tmp\submodule2', 'checkout', 'master'],
+            [ '-C', r'C:\work\Multigit\tmp\toto2\subdir1\subdir1_repo1', 'merge', 'dev'],
+            [ '-C', r'C:\work\Multigit\tmp\toto2\subdir1\subdir1_repo1', 'status', '--porcelain', '--branch'],
+            [ '-C', r'C:\work\Multigit\tmp\toto2\subdir1\subdir1_repo1', 'tag', '--list', '--sort', 'create'],
+            [ '-C', r'C:\work\Multigit\tmp\toto2\subdir1\subdir1_repo2', 'branch'],
+            [ '-C', r'C:\work\Multigit\tmp\toto2\subdir1\subdir1_repo2', 'checkout', 'dev'],
+            [ '-C', r'C:\work\Multigit\tmp\toto2\subdir1\subdir1_repo2', 'checkout', 'int'],
+            [ '-C', r'C:\work\Multigit\tmp\toto2\subdir1\subdir1_repo1', 'tag', 'int_112234', '-F', r'C:\Users\g582619\AppData\Local\Temp\tmp_b_uwll1']
         ]:
             with self.subTest(' '.join(cmdline)):
                 self.assertEqual(isGitCommandRequiringAuth(cmdline), False)
 
         for cmdline in [
-            ['git.exe', '-C', r'C:\work\Multigit\Sandbox_http', 'fetch', '--verbose', '--prune'],
-            ['git.exe', '-C', r'C:\work\Multigit\tmp\toto2\subdir1\subdir1_repo1', 'fetch', '--prune'],
-            ['git.exe', '-C', r'C:\work\Multigit\tmp\toto2\subdir1\subdir1_repo1', 'pull'],
-            ['git.exe', '-C', r'C:\work\Multigit\tmp\toto2\subdir1\subdir1_repo1', 'push', '-u', '--progress', 'origin', 'int:int'],
-            ['git.exe', '-C', r'C:\work\Multigit\tmp\toto2\subdir1\subdir1_repo1', 'push', 'origin', 'int_112234'],
-            ['git.exe', '-C', r'C:\work\Multigit\tmp\toto2\subdir1\subdir1_repo2', 'fetch', '--prune'],
-            ['git.exe', 'clone', '--progress file://C:/work/Multigit/Sandbox/', r'C:\work\Multigit\tmp\submodule2'],
-            ['git.exe', 'clone', '--progress file://C:/work/Multigit/Sandbox/', r'C:\work\Multigit\tmp\submodule2'],
+            [ '-C', r'C:\work\Multigit\Sandbox_http', 'fetch', '--verbose', '--prune'],
+            [ '-C', r'C:\work\Multigit\tmp\toto2\subdir1\subdir1_repo1', 'fetch', '--prune'],
+            [ '-C', r'C:\work\Multigit\tmp\toto2\subdir1\subdir1_repo1', 'pull'],
+            [ '-C', r'C:\work\Multigit\tmp\toto2\subdir1\subdir1_repo1', 'push', '-u', '--progress', 'origin', 'int:int'],
+            [ '-C', r'C:\work\Multigit\tmp\toto2\subdir1\subdir1_repo1', 'push', 'origin', 'int_112234'],
+            [ '-C', r'C:\work\Multigit\tmp\toto2\subdir1\subdir1_repo2', 'fetch', '--prune'],
+            [ 'clone', '--progress file://C:/work/Multigit/Sandbox/', r'C:\work\Multigit\tmp\submodule2'],
+            [ 'clone', '--progress file://C:/work/Multigit/Sandbox/', r'C:\work\Multigit\tmp\submodule2'],
         ]:
             with self.subTest(' '.join(cmdline)):
                 self.assertEqual(isGitCommandRequiringAuth(cmdline), True)
