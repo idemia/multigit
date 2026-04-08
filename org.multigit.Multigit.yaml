@@ -14,14 +14,7 @@ modules:
     build-commands:
       - install -Dm 755 -t /app/bin/ multigit.sh
       - mkdir -p /app/multigit
-      - cp -a * /app/multigit
-      - ls -la /app/multigit
-      - rm -rf /app/multigit/.env
-      - rm -rf /app/multigit/.idea
-      - rm -rf /app/multigit/.git
-      - rm -rf /app/multigit/.mypy_cache
-      - rm -rf /app/multigit/.pytest_cache
-      - rm -rf /app/multigit/.__pycache__
+      - cp -a multigit.py mgitcmd.py src/ images/ packaging /app/multigit
       - mkdir -p /app/share/metainfo
       - mkdir -p /app/share/applications
       - mkdir -p /app/share/icons/hicolor/256x256/apps
@@ -31,10 +24,6 @@ modules:
       - mkdir -p /app/share/icons/hicolor/16x16/apps
       - cp -a /app/multigit/packaging/flatpak/org.multigit.Multigit.metainfo.xml /app/share/metainfo
       - cp -a /app/multigit/packaging/flatpak/org.multigit.Multigit.desktop /app/share/applications
-      - ls -l /app/multigit/images
-      - ls -l /app/multigit/images/multigit-logo-256.png 
-      - ls -l /app/share/icons/hicolor/256x256
-      - ls -l /app/share/icons/hicolor/256x256/apps
       - cp -a /app/multigit/images/multigit-logo-256.png /app/share/icons/hicolor/256x256/apps/org.multigit.Multigit.png
       - cp -a /app/multigit/images/multigit-logo-64.png /app/share/icons/hicolor/64x64/apps/org.multigit.Multigit.png
       - cp -a /app/multigit/images/multigit-logo-48.png /app/share/icons/hicolor/48x48/apps/org.multigit.Multigit.png
@@ -63,12 +52,21 @@ modules:
   #       sha256: ada16d1ab3450b8f845719d0acbc4ad99dc69150d3d19020124f93236517bcb7
   
 
-  
+cleanup:
+  - /lib/python3.12/site-packages/PySide6/include
+  - /lib/python3.12/site-packages/PySide6/scripts
+  - /lib/python3.12/site-packages/PySide6/typesystems
+  - /lib/python3.12/site-packages/PySide6/assistant
+  - /lib/python3.12/site-packages/PySide6/linguist
+  - /lib/python3.12/site-packages/PySide6/lupdate
+  - /lib/python3.12/site-packages/PySide6/qmlls
+  - /lib/python3.12/site-packages/PySide6/qmlformat
+  - /lib/python3.12/site-packages/PySide6/Qt/qml
+
 
 finish-args:
   # Qt
   - --share=ipc
-  - --env=QT_QPA_PLATFORM=xcb
   - --socket=fallback-x11
   - --socket=wayland
   - --device=dri
