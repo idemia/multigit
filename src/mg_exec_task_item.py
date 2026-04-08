@@ -416,6 +416,8 @@ class MgTaskComment(MgExecTask):
 class MgExecTaskGit(MgExecTask):
     '''Task for running a git command'''
 
+    run_process: Optional[RunProcess]
+
     def __init__(self,
                  desc: str,
                  repo: MgRepoInfo,
@@ -436,6 +438,7 @@ class MgExecTaskGit(MgExecTask):
         super().__init__(desc=desc, repo=repo, ignore_failure=ignore_failure)
         self.git_args = git_args
         self.run_inside_git_repo = run_inside_git_repo
+        self.run_process = None
 
         if self.run_inside_git_repo:
             if self.repo is None:
@@ -448,7 +451,7 @@ class MgExecTaskGit(MgExecTask):
         dbg(f'MgExecTaskGit.run() - {self.short_desc}')
 
         # We allow error in git because we have our own way of handling it
-        ExecGit.exec_non_blocking(self.git_args, allow_errors=True,
+        self.run_process = ExecGit.exec_non_blocking(self.git_args, allow_errors=True,
                                   callback=self.git_task_done,
                                   output_callback=self.sig_partial_output)
 
@@ -456,6 +459,7 @@ class MgExecTaskGit(MgExecTask):
     def git_task_done(self, git_exit_code: int, git_stdout: str) -> None:
         dbg(f'MgExecTaskGit.git_task_done(git_exit_code={git_exit_code}) - "{self}"')
 
+        self.run_process = None
         if git_exit_code != 0:
             if len(git_stdout) != 0:
                 git_stdout += '\n'

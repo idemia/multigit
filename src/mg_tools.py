@@ -23,7 +23,7 @@ from collections import deque
 from enum import Enum, auto
 from dataclasses import dataclass
 
-from PySide6.QtCore import QObject, QProcess, Signal
+from PySide6.QtCore import QObject, QProcess, Signal, SignalInstance
 from PySide6.QtWidgets import QMessageBox, QApplication, QWidget
 
 from src import mg_config
@@ -425,8 +425,8 @@ class ExecTool:
     def exec_non_blocking(cls, cmd_args: List[str], workdir: str = '',
                           allow_errors: bool = False,
                           callback: Optional[Callable[[int, str], Any]] = None,
-                          output_callback: Optional[Callable[[str], Any]] = None,
-                          ) -> None:
+                          output_callback: Union[None, Callable[[str], Any], SignalInstance] = None,
+                          ) -> 'Optional[RunProcess]':
         '''Run the program with the arguments listed in cmd_args, in the working directory.
 
         If the execution is successful and the exit code is 0, callback is called with the exit code and the output of the command.
@@ -452,6 +452,7 @@ class ExecTool:
             rp.sigProcessOutput.connect(output_callback)
         rp.exec_async(exec=exec, cmd_args=cmd_args, cb_done=cb_done, working_dir=workdir,
                       emit_output=bool(output_callback))
+        return rp
 
 
 
@@ -756,8 +757,8 @@ class ExecExplorer(ExecTool):
     @classmethod
     def exec_non_blocking(cls, cmd_args: List[str], workdir: str = '', allow_errors: bool = False,
                           callback: Optional[Callable[[int, str], Any]] = None,
-                          output_callback: Optional[Callable[[str], Any]] = None,
-                          ) -> None:
+                          output_callback: Union[None, Callable[[str], Any], SignalInstance] = None,
+                          ) -> 'Optional[RunProcess]':
         '''Same as default exec_non_blocking but defaults to allow_errors for Windows'''
         override_allow_errors = allow_errors
         if sys.platform == 'win32':
