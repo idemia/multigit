@@ -3,7 +3,7 @@
 ################################################################################
 ## Form generated from reading UI file 'ui_git_exec_window.ui'
 ##
-## Created by: Qt User Interface Compiler version 6.8.2
+## Created by: Qt User Interface Compiler version 6.11.0
 ##
 ## WARNING! All changes made in this file will be lost when recompiling UI file!
 ################################################################################
@@ -29,7 +29,7 @@ class Ui_GitExecDialog(object):
         self.verticalLayout.setObjectName(u"verticalLayout")
         self.treeGitJobs = QTreeWidget(GitExecDialog)
         __qtreewidgetitem = QTreeWidgetItem()
-        __qtreewidgetitem.setText(0, u"col1");
+        __qtreewidgetitem.setText(0, u"col1")
         self.treeGitJobs.setHeaderItem(__qtreewidgetitem)
         QTreeWidgetItem(self.treeGitJobs)
         self.treeGitJobs.setObjectName(u"treeGitJobs")
@@ -105,13 +105,13 @@ class Ui_GitExecDialog(object):
     def retranslateUi(self, GitExecDialog: QDialog) -> None:
         GitExecDialog.setWindowTitle(QCoreApplication.translate("GitExecDialog", u"Running Commands", None))
         ___qtreewidgetitem = self.treeGitJobs.headerItem()
-        ___qtreewidgetitem.setText(1, QCoreApplication.translate("GitExecDialog", u"col2", None));
+        ___qtreewidgetitem.setText(1, QCoreApplication.translate("GitExecDialog", u"col2", None))
 
         __sortingEnabled = self.treeGitJobs.isSortingEnabled()
         self.treeGitJobs.setSortingEnabled(False)
         ___qtreewidgetitem1 = self.treeGitJobs.topLevelItem(0)
-        ___qtreewidgetitem1.setText(1, QCoreApplication.translate("GitExecDialog", u"toto", None));
-        ___qtreewidgetitem1.setText(0, QCoreApplication.translate("GitExecDialog", u"New Item", None));
+        ___qtreewidgetitem1.setText(1, QCoreApplication.translate("GitExecDialog", u"toto", None))
+        ___qtreewidgetitem1.setText(0, QCoreApplication.translate("GitExecDialog", u"New Item", None))
         self.treeGitJobs.setSortingEnabled(__sortingEnabled)
 
         self.progressBar.setFormat(QCoreApplication.translate("GitExecDialog", u"%v of %m done", None))

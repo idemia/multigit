@@ -1,11 +1,12 @@
-# Windows
-    - launch multigit after installation
-    - bug: freeze when selecting a double-click action ?
+# Linux
+- check that config files from previous multigit versions are properly migrated
 
-# Future:
-- git-gui + gitk
-    - harmonize the "not found" messages for running git-gui and others
-    - linux: when manual path is incorrect, no error message
+# Windows
+- add a Getting started to run on the first launch and in the help menu
+
+# Flatpak packaging
+- export to a flatpak repository
+- sign with gpg key
 
 ## Nice to have
 - ensure that generate_ui and other packaging commands are run in CI and captured in dependencies

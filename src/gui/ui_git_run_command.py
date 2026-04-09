@@ -3,7 +3,7 @@
 ################################################################################
 ## Form generated from reading UI file 'ui_git_run_command.ui'
 ##
-## Created by: Qt User Interface Compiler version 6.8.2
+## Created by: Qt User Interface Compiler version 6.11.0
 ##
 ## WARNING! All changes made in this file will be lost when recompiling UI file!
 ################################################################################
@@ -162,11 +162,11 @@ class Ui_GitRunCommand(object):
         self.labelRepoSelected.setText(QCoreApplication.translate("GitRunCommand", u"3 repositories selected", None))
         self.pushButtonAdjustRepoList.setText(QCoreApplication.translate("GitRunCommand", u"Adjust Repository list", None))
         ___qtreewidgetitem = self.treeWidgetRepoList.headerItem()
-        ___qtreewidgetitem.setText(4, QCoreApplication.translate("GitRunCommand", u"Last Remote Syncho", None));
-        ___qtreewidgetitem.setText(3, QCoreApplication.translate("GitRunCommand", u"Status", None));
-        ___qtreewidgetitem.setText(2, QCoreApplication.translate("GitRunCommand", u"Head", None));
-        ___qtreewidgetitem.setText(1, QCoreApplication.translate("GitRunCommand", u"Git Repo Path", None));
-        ___qtreewidgetitem.setText(0, QCoreApplication.translate("GitRunCommand", u"hidden", None));
+        ___qtreewidgetitem.setText(4, QCoreApplication.translate("GitRunCommand", u"Last Remote Syncho", None))
+        ___qtreewidgetitem.setText(3, QCoreApplication.translate("GitRunCommand", u"Status", None))
+        ___qtreewidgetitem.setText(2, QCoreApplication.translate("GitRunCommand", u"Head", None))
+        ___qtreewidgetitem.setText(1, QCoreApplication.translate("GitRunCommand", u"Git Repo Path", None))
+        ___qtreewidgetitem.setText(0, QCoreApplication.translate("GitRunCommand", u"hidden", None))
         self.label_3.setText("")
     # retranslateUi
 

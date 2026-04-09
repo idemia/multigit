@@ -17,6 +17,10 @@ New features
 
 * Add auto-stash capabilities to all operations involving branch merging
 * configure the displayed columns with a context menu
+* Multigit now detects conflicted files
+* Sublime Merge is detected when installed as a Snap or a Flatpak
+* Multigit is available as Flatpak for simpler installation under Linux
+* Multigit is available as a Chocolatey package for simpler installation under Windows
 
 Improvements
 
@@ -26,12 +30,12 @@ Improvements
 * when deleting a remote branch, validate with a confirmation dialog
 * in the git execution window, allow to copy the logs with a context menu
 * in the dialogs git switch branch, delete branch, checkout tag, add context menu to copy the repository list
-* Multigit now detects conflicted files
 * Porting to MacOs X (thank to Boyaquotes)
 * cloning now supports multiple git repository targeting the same directory
 * deleting directories is now a visible task in the execution window
 * When applying a Multigit file, ask the user if he wants to delete the missing repositories
 * When quitting add posibility of a confirmation dialog
+* Detect when too many authentication failures and warn the user before possibly locking his account
 
 Bugfix
   
@@ -40,6 +44,7 @@ Bugfix
 * Field SHA1 was not updated sometimes after a fetch
 * First line of git output was not included in the display
 * when doing commit + push, sometimes, push was done before the commit
+* Handle cloning multiple repositories to the same target directory (I know, this is weird)
 
 
 Version 1.7.1 (2025-02-05)

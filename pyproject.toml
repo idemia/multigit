@@ -99,4 +99,7 @@ include = [
 [tool.pytest.ini_options]
 norecursedirs = [
     "packaging",
+    "builddir",
+    'env_.*', '.env', '.venv',
+    '.flatpak-builder', 'dist', 'build', 'Setup',
 ]

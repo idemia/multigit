@@ -8,6 +8,16 @@
 Build multigit:
 ===============
 
+Notes specific to Flatpak
+-------------------------
+
+- Do not use a distro package manager such as `apt` inside the Flatpak build.
+  Flatpak builds run against the declared runtime/SDK and manifest modules, not
+  against host distribution packages.
+- If a system library is missing in Flatpak, add it through the manifest or use
+  a runtime that already provides it.
+- This manifest forces `QT_QPA_PLATFORM=xcb` for the packaged application.
+
 * General rule
 
 	$ flatpak-builder <build-dir> <manifest>

@@ -23,7 +23,7 @@ from PySide6.QtWidgets import QMessageBox
 
 from src.mg_const import MSG_NO_COMMIT, MSG_REMOTE_TOPUSH_TOPULL, MSG_REMOTE_SYNCHRO_OK, MSG_REMOTE_TOPULL, \
     MSG_REMOTE_TOPUSH, MSG_REMOTE_BRANCH_GONE, MSG_LOCAL_BRANCH, SHORT_SHA1_NB_DIGITS, MSG_EMPTY_REPO, MSG_REMOTE_NA
-from src.mg_tools import RunProcess, ExecGit, scan_git_dirs
+from src.mg_tools import ExecGit, scan_git_dirs
 from src.mg_utils import anonymise_git_url
 
 logger = logging.getLogger('mg_repo_info')
@@ -286,14 +286,15 @@ class MgRepoInfo(QObject):
     def __init__(self, name: str, fullpath: str, relpath: str = '') -> None:
         super().__init__()
 
-        self.name = name
-        self.relpath = relpath
+        # normalize the name between / and \
+        self.name = str(pathlib.Path(name))
+        self.relpath = str(pathlib.Path(relpath))
         self.force_blocking_git = False
 
         self.cb_repo_info_available: Optional[Callable[[str], Any]] = None
 
         # full path to our repo
-        self.fullpath = fullpath
+        self.fullpath = str(pathlib.Path(fullpath))
 
         self._clear_all()
 
@@ -318,6 +319,9 @@ class MgRepoInfo(QObject):
         '''Called to check if repo has been deleted.
         Emits the appropriate signal and return True if repo was deleted.
         This is to be called each time git returns an error code'''
+
+        # we can use os.path.exists() here even in flatpak because we have requested access to the host
+        # home user FS
         if not os.path.exists(self.fullpath)  \
             or not os.path.exists(os.path.join(self.fullpath, '.git')):
             self.is_deleted = True
@@ -537,9 +541,8 @@ class MgRepoInfo(QObject):
 
         def local_cb_fill_diff_done(repo_name: str, exit_code: int, diff_out: str) -> None:
             if exit_code != 0:
-                if self.abortBecauseRepoDeleted():
-                    return
-                self.show_error_message_bad_git_exit_code(exit_code, diff_out)
+                self.abortBecauseRepoDeleted()
+                return
             self.diff = diff_out
             if cb_fill_diff:
                 cb_fill_diff(repo_name, self.diff)
@@ -564,9 +567,7 @@ class MgRepoInfo(QObject):
 
             def local_cb_git_diff_stat_done(repo_name: str, exit_code: int, diff_out: str) -> None:
                 if exit_code != 0:
-                    if self.abortBecauseRepoDeleted():
-                        return
-                    self.show_error_message_bad_git_exit_code(exit_code, diff_out)
+                    self.abortBecauseRepoDeleted()
                     return
 
                 self.diff_summary = diff_out
@@ -656,8 +657,7 @@ class MgRepoInfo(QObject):
         or more lines if there are multiple remotes
         '''
         if git_exit_code != 0:
-            if not self.abortBecauseRepoDeleted():
-                self.show_error_message_bad_git_exit_code(git_exit_code, remote_out)
+            self.abortBecauseRepoDeleted()
             return
 
         # We give priority to origin and (fetch)
@@ -705,10 +705,9 @@ class MgRepoInfo(QObject):
 
     def cb_fill_repo_info_status_done(self, _repo_name: str, git_exit_code: int, status_out: str) -> None:
         '''Called after git status'''
-        dbg('fill_repo_info_status_done() - %s, exit_code=%d' % (self.name, git_exit_code))
+        dbg(f'fill_repo_info_status_done() - {self.name}, exit_code={git_exit_code}')
         if git_exit_code != 0:
-            if not self.abortBecauseRepoDeleted():
-                self.show_error_message_bad_git_exit_code(git_exit_code, status_out)
+            self.abortBecauseRepoDeleted()
             return
 
         '''git status output:
@@ -905,16 +904,9 @@ class MgRepoInfo(QObject):
                 self.last_commit = MSG_NO_COMMIT
                 self.commit_date = ''
                 self.commit_sha1 = ''
-            else:
-                if self.abortBecauseRepoDeleted():
-                    return
 
-                nice_git_cmd = '> "git" "-C" "%s" "log" "-1"' % self.fullpath
-                # noinspection PyTypeChecker
-                msg = nice_git_cmd + '\n' + git_log_out
-
-                self.show_error_message_bad_git_exit_code(git_exit_code, msg)
-            return
+            if self.abortBecauseRepoDeleted():
+                return
 
         self.last_commit = git_log_out
         log_out_lines = git_log_out.split('\n')
@@ -1026,8 +1018,7 @@ class MgRepoInfo(QObject):
         '''
 
         if git_exit_code != 0:
-            if not self.abortBecauseRepoDeleted():
-                self.show_error_message_bad_git_exit_code(git_exit_code, git_output)
+            self.abortBecauseRepoDeleted()
             return
 
         self.branches_local = []
@@ -1073,8 +1064,7 @@ class MgRepoInfo(QObject):
 
     def cb_fill_all_tags_done(self, _repo_name: str, git_exit_code: int, git_output: str) -> None:
         if git_exit_code != 0:
-            if not self.abortBecauseRepoDeleted():
-                self.show_error_message_bad_git_exit_code(git_exit_code, git_output)
+            self.abortBecauseRepoDeleted()
             return
 
         self.all_tags = []
@@ -1131,8 +1121,7 @@ class MgRepoInfo(QObject):
 
     def cb_fill_files_sha1_done(self, _repo_name: str, git_exit_code: int, git_output: str) -> None:
         if git_exit_code != 0:
-            if not self.abortBecauseRepoDeleted():
-                self.show_error_message_bad_git_exit_code(git_exit_code, git_output)
+            self.abortBecauseRepoDeleted()
             return
 
         self.files_sha1 = []
@@ -1165,8 +1154,8 @@ class MgRepoInfo(QObject):
         if not ExecGit.checkFound():
             return ''
 
-        git_cmd = ['-C', self.fullpath] + list(args)
-        return ExecGit.exec_blocking(git_cmd)
+        git_args = ['-C', self.fullpath] + list(args)
+        return ExecGit.exec_blocking(git_args)
 
 
     def git_exec_async_here(self, args: Sequence[str], cb_git_done: Optional[Callable[[str, int, str], Any]],
@@ -1179,10 +1168,7 @@ class MgRepoInfo(QObject):
         if allow_errors is False, a message box is displayed if git returns an exit code different than 0. If you
         have your own handling of git errors, set allow_errors to True.
         '''
-        if not ExecGit.checkFound():
-            return
-
-        git_cmd = [ExecGit.get_executable(), '-C', self.fullpath] + list(args)
+        git_args = ['-C', self.fullpath] + list(args)
 
         cb_process_done = None
         if cb_git_done:
@@ -1190,12 +1176,10 @@ class MgRepoInfo(QObject):
             def cb_process_done(git_exit_code: int, git_output: str) -> None:
                 cb_git_done(self.name, git_exit_code, git_output)
 
-        # our pool process does not handle force blocking, launch directly
-        RunProcess().exec_async(git_cmd, cb_process_done, force_blocking=self.force_blocking_git, allow_errors=allow_errors)
+        if self.force_blocking_git:
+            ExecGit.exec_blocking(git_args, allow_errors=allow_errors, callback=cb_process_done)
+        else:
+            ExecGit.exec_non_blocking(git_args, allow_errors=allow_errors, callback=cb_process_done)
 
-
-    def show_error_message_bad_git_exit_code(self, git_exit_code: int, git_output: str) -> None:
-        QMessageBox.warning(None, 'Error when running git',
-                            f'Git bad exit code {git_exit_code}.\n\nError message:\n{git_output}')
 
 

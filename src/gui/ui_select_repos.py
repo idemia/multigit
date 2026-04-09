@@ -3,7 +3,7 @@
 ################################################################################
 ## Form generated from reading UI file 'ui_select_repos.ui'
 ##
-## Created by: Qt User Interface Compiler version 6.8.2
+## Created by: Qt User Interface Compiler version 6.11.0
 ##
 ## WARNING! All changes made in this file will be lost when recompiling UI file!
 ################################################################################
@@ -95,7 +95,7 @@ class Ui_SelectRepos(object):
 
         self.treeWidgetAvailRepos = MgRepoTree(SelectRepos)
         __qtreewidgetitem = QTreeWidgetItem()
-        __qtreewidgetitem.setText(0, u"1");
+        __qtreewidgetitem.setText(0, u"1")
         self.treeWidgetAvailRepos.setHeaderItem(__qtreewidgetitem)
         self.treeWidgetAvailRepos.setObjectName(u"treeWidgetAvailRepos")
         sizePolicy2 = QSizePolicy(QSizePolicy.Policy.MinimumExpanding, QSizePolicy.Policy.MinimumExpanding)
@@ -176,7 +176,7 @@ class Ui_SelectRepos(object):
 
         self.treeWidgetSelectedRepos = MgRepoTree(SelectRepos)
         __qtreewidgetitem1 = QTreeWidgetItem()
-        __qtreewidgetitem1.setText(0, u"1");
+        __qtreewidgetitem1.setText(0, u"1")
         self.treeWidgetSelectedRepos.setHeaderItem(__qtreewidgetitem1)
         self.treeWidgetSelectedRepos.setObjectName(u"treeWidgetSelectedRepos")
         sizePolicy3 = QSizePolicy(QSizePolicy.Policy.MinimumExpanding, QSizePolicy.Policy.MinimumExpanding)

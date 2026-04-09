@@ -46,6 +46,9 @@ Source: Doc\multigit-json-schema.json; DestDir: {app}
 Name: {group}\{#NAME} {#VERSIONSTR}; Filename: {app}\{#NAME}.exe;
 Name: {group}\{cm:UninstallProgram,{#NAME} {#VERSIONSTR}}; Filename: "{uninstallexe}";WorkingDir: {app};
 
+[Run]
+Filename: {app}\{#NAME}.exe; Description: "Launch Multigit"; Flags: postinstall nowait skipifsilent
+
 
 [Code]
 { Code below is for triggering automatic uninstall of previous version before install of new version }

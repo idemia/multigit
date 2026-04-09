@@ -174,9 +174,9 @@ class MgMainWindow(QMainWindow, Ui_MainWindow):
         ### menu View
 
         # Submenu Show
-        self.actionViewLastCommit.setChecked(mgc.get_config_instance().get(mgc.CONFIG_VIEW_TAB_LAST_COMMIT, False))
+        self.actionViewLastCommit.setChecked(mgc.get_config_instance().get(mgc.CONFIG_VIEW_TAB_LAST_COMMIT, True))
         self.actionViewLastCommit.changed.connect(self.slotViewTabChanged)
-        self.actionViewModifiedFiles.setChecked(mgc.get_config_instance().get(mgc.CONFIG_VIEW_TAB_MOD_FILES, False))
+        self.actionViewModifiedFiles.setChecked(mgc.get_config_instance().get(mgc.CONFIG_VIEW_TAB_MOD_FILES, True))
         self.actionViewModifiedFiles.changed.connect(self.slotViewTabChanged)
 
         # Submenu: show columns

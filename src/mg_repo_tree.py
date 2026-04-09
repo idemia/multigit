@@ -616,17 +616,11 @@ class MgRepoTree(QTreeWidget):
         if not self.confirmIfNoOrTooManySelectedItems('Git bash'):
             return
 
-        try:
-            for item in self.selectedRepoItems():
-                repo = item.repoInfo
-                # after git bash, we also want to refresh the URL
-                ExecGitBash.exec_non_blocking([], workdir=repo.fullpath, callback=repo.deepRefresh)
-        except FileNotFoundError:
-            # Git Bash was not located
-            QMessageBox.warning(self, 'Unable to execute Git Bash', 'Warning: could not locate the git-bash program.\n' +
-                                'Can not execute any Git Bash command..\nPlease configure the location in the settings dialog.\n')
-            self.mgActions.actionGitBash.setEnabled(False)
-
+        for item in self.selectedRepoItems():
+            repo = item.repoInfo
+            # after git bash, we also want to refresh the URL
+            ExecGitBash.exec_non_blocking([], workdir=repo.fullpath,
+                callback = lambda _1, _2: repo.deepRefresh())
 
     def slotGitRunCommand(self) -> None:
         '''Run a custom git command'''
@@ -663,15 +657,11 @@ class MgRepoTree(QTreeWidget):
 
     def tortoiseGitCommandOnItems(self, cmd: str, items: List[MgRepoTreeItem]) -> None:
         '''Run a Tortoise Git command on all repos passed in argument'''
-        try:
-            for item in items:
-                repo = item.repoInfo
-                # put the path parameter in a separate argument, see: https://gitlab.com/tortoisegit/tortoisegit/-/issues/3518
-                ExecTortoiseGit.exec_non_blocking(['/path', repo.fullpath, '/command:%s' % cmd], callback=repo.refresh)
-        except FileNotFoundError:
-            # TortoiseGit was not located
-            QMessageBox.warning(self, 'Unable to execute TortoiseGit', 'Warning: could not locate the TortoiseGitProc.exe program.\n' +
-                                'Can not execute any TortoiseGit command..\nPlease configure the location in the settings dialog.\n')
+        for item in items:
+            repo = item.repoInfo
+            # put the path parameter in a separate argument, see: https://gitlab.com/tortoisegit/tortoisegit/-/issues/3518
+            ExecTortoiseGit.exec_non_blocking(['/path', repo.fullpath, '/command:%s' % cmd],
+                                              callback=lambda _1, _2: repo.refresh())
 
 
     def slotTGitShowLog(self) -> None:
@@ -737,17 +727,11 @@ class MgRepoTree(QTreeWidget):
         if not self.confirmIfNoOrTooManySelectedItems('SourceTree'):
             return
 
-        try:
-            for item in self.selectedRepoItems():
-                repo = item.repoInfo
-                # run sourcetree
-                ExecSourceTree.exec_non_blocking(['-t', str(repo.fullpath)], callback=repo.refresh)
-        except FileNotFoundError:
-            # TortoiseGit was not located
-            QMessageBox.warning(self, 'Unable to execute SourceTree', 'Warning: could not locate the SourceTree.exe program.\n' +
-                                'Can not execute any SourceTree command..\nPlease configure the location in the settings dialog.\n')
-            self.mgActions.actionSourceTree.setEnabled(False)
-
+        for item in self.selectedRepoItems():
+            repo = item.repoInfo
+            # run sourcetree
+            ExecSourceTree.exec_non_blocking(['-t', str(repo.fullpath)],
+                callback = lambda _1, _2: repo.refresh())
 
     def slotGitGui(self) -> None:
         '''Run git Gui on the current repos'''
@@ -755,16 +739,11 @@ class MgRepoTree(QTreeWidget):
         if not self.confirmIfNoOrTooManySelectedItems('Git GUI'):
             return
 
-        try:
-            for item in self.selectedRepoItems():
-                repo = item.repoInfo
-                # allow errors needed because git-gui never returns 0
-                ExecGitGui.exec_non_blocking([], workdir=str(repo.fullpath), allow_errors=True, callback=repo.refresh)
-        except FileNotFoundError:
-            QMessageBox.warning(self, 'Unable to execute Git GUI', 'Warning: could not locate the git-gui program.\n' +
-                                'Can not execute any git-gui command..\nPlease configure the location in the settings dialog.\n')
-            self.mgActions.actionGitGui.setEnabled(False)
-
+        for item in self.selectedRepoItems():
+            repo = item.repoInfo
+            # allow errors needed because git-gui never returns 0
+            ExecGitGui.exec_non_blocking([], workdir=str(repo.fullpath), allow_errors=True,
+                callback = lambda _1, _2: repo.refresh())
 
     def slotSublimemerge(self) -> None:
         '''Run SublimeMewrge on the current repos'''
@@ -772,16 +751,10 @@ class MgRepoTree(QTreeWidget):
         if not self.confirmIfNoOrTooManySelectedItems('Sublime Merge'):
             return
 
-        try:
-            for item in self.selectedRepoItems():
-                repo = item.repoInfo
-                ExecSublimeMerge.exec_non_blocking([str(repo.fullpath)], callback=repo.refresh)
-        except FileNotFoundError:
-            # TortoiseGit was not located
-            QMessageBox.warning(self, 'Unable to execute SublimeMerge', 'Warning: could not locate the SublimeMerge program.\n' +
-                                'Can not execute any SublimeMerge command..\nPlease configure the location in the settings dialog.\n')
-            self.mgActions.actionSublimeMerge.setEnabled(False)
-
+        for item in self.selectedRepoItems():
+            repo = item.repoInfo
+            ExecSublimeMerge.exec_non_blocking([str(repo.fullpath)],
+                callback = lambda _1, _2: repo.refresh())
 
     def slotGitK(self) -> None:
         '''Run GitK on the current repos'''
@@ -789,13 +762,8 @@ class MgRepoTree(QTreeWidget):
         if not self.confirmIfNoOrTooManySelectedItems('GitK'):
             return
 
-        try:
-            for item in self.selectedRepoItems():
-                repo = item.repoInfo
-                # ExecGitK.exec_non_blocking([], workdir=str(repo.fullpath), callback=repo.refresh)
-                ExecGitK.exec_non_blocking([], workdir=str(repo.fullpath), allow_errors=True,callback=repo.refresh)
-        except FileNotFoundError:
-            QMessageBox.warning(self, 'Unable to execute GitK', 'Warning: could not locate the gitk program.\n' +
-                                'Can not execute any GitK command..\nPlease configure the location in the settings dialog.\n')
-            self.mgActions.actionSublimeMerge.setEnabled(False)
-
+        for item in self.selectedRepoItems():
+            repo = item.repoInfo
+            # ExecGitK.exec_non_blocking([], workdir=str(repo.fullpath), callback=repo.refresh)
+            ExecGitK.exec_non_blocking([], workdir=str(repo.fullpath), allow_errors=True,
+                        callback = lambda _1, _2: repo.refresh())

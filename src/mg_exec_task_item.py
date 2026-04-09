@@ -21,13 +21,13 @@ import functools
 import logging
 import enum
 import pathlib
-import shutil
+import sys
 
 from PySide6.QtCore import Signal, QObject, Qt, QThread
 from PySide6.QtGui import QIcon, QPixmap, QFont
 from PySide6.QtWidgets import QWidget, QPushButton, QLabel, QHBoxLayout, QVBoxLayout, QTreeWidgetItem, QApplication
 
-from src.mg_tools import RunProcess, ExecGit
+from src.mg_tools import CmdType, MgExecutable, RunProcess, ExecGit, ExecStatus
 from src.mg_repo_info import MgRepoInfo
 from src.mg_utils import handle_cr_in_text, ignoreCppObjectDeletedError, tryHardDeletingDirList
 
@@ -111,13 +111,13 @@ class MgExecTask(QObject):
         self.desc = desc
         self.repo = repo
         self.task_state = TaskState.NotStarted
-        self.cmd_line = ''
+        self.short_desc = ''
         self.ignore_failure = ignore_failure
         self.icon_success_hint = icon_success_hint
 
 
     def __str__(self) -> str:
-        return f'MgExecTask<repo={(self.repo.name if self.repo else "")}, cmd={self.cmd_line}, state={str(self.task_state)}>'
+        return f'MgExecTask<repo={(self.repo.name if self.repo else "")}, short_desc={self.short_desc}, state={str(self.task_state)}>'
 
 
     def is_task_done(self) -> bool:
@@ -202,7 +202,7 @@ class MgExecTaskCollectRemoteUrl(MgExecTask):
         '''Run a function on the repo
         '''
         super().__init__(desc=desc, repo=repo)
-        self.cmd_line = 'git remote --verbose'
+        self.short_desc = 'git remote --verbose'
 
 
     def _do_run(self) -> None:
@@ -245,6 +245,7 @@ class ThreadRunningPythonCode(QThread):
         '''
         super().__init__()
         self.desc = desc
+        self.short_desc = f'Calling {func.__name__}()'
         self.func = func
         self.output_lines: List[str] = []
         self.success = True
@@ -295,7 +296,7 @@ class MgTaskDelDirectory(MgTaskExecPythonCode):
         super().__init__(desc, repo, self.delDirectory)
         self.dir_path = pathlib.Path(dir_path)
         self.dir_path.resolve()
-        self.cmd_line = f'Deleting {self.dir_path}'
+        self.short_desc = f'Deleting {self.dir_path}'
 
 
     def delDirectory(self, thread: ThreadRunningPythonCode) -> None:
@@ -330,10 +331,15 @@ class MgTaskMoveDirectory(MgExecTask):
         self.dest_path = pathlib.Path(dest_path)
         self.dest_path.resolve()
         self.skip_git_admin_dir = skip_git_admin_dir
-        self.cmd = ['robocopy', '/move', '/s', '/e', str(self.src_path), str(self.dest_path)]
-        if self.skip_git_admin_dir:
-            self.cmd.extend(['/xd', '.git'])
-        self.cmd_line = ' '.join(self.cmd)
+        if sys.platform == 'win32':
+            self.cmd = ['robocopy', '/move', '/s', '/e', str(self.src_path), str(self.dest_path)]
+            if self.skip_git_admin_dir:
+                self.cmd.extend(['/xd', '.git'])
+        else:
+            self.cmd = ['rsync', '-av', str(self.src_path) + '/', str(self.dest_path) + '/']
+            if self.skip_git_admin_dir:
+                self.cmd.extend(['--exclude', '.git/'])
+        self.short_desc = ' '.join(self.cmd)
         self.run_process: Optional[RunProcess] = None
 
 
@@ -343,18 +349,18 @@ class MgTaskMoveDirectory(MgExecTask):
         self.run_process = RunProcess()
         self.run_process.sigProcessOutput.connect(self.sig_partial_output)
         # We allow error in git because we have our own way of handling it
-        self.run_process.exec_async(self.cmd,
+        exec = MgExecutable(CmdType.DirectCmd, self.cmd[0])
+        self.run_process.exec_async(exec, self.cmd[1:],
                                     self.move_task_done,
-                                    allow_errors=True,  # to avoid dialog
                                     emit_output=True)
 
 
-    def move_task_done(self, exit_code: int, stdout: str) -> None:
+    def move_task_done(self, exec_status: ExecStatus,exit_code: int, stdout: str) -> None:
         dbg(f'MgExecTaskMoveDirectory.move_task_done(exit_code={exit_code}) - "{self}"')
 
         # for exit code analysis, see https://learn.microsoft.com/en-us/windows-server/administration/windows-commands/robocopy
         success = True
-        if exit_code >= 8:
+        if exec_status != ExecStatus.Ok or exit_code >= 8:
             if len(stdout) != 0:
                 stdout += '\n'
             stdout += 'Robocopy did not complete successfully.'
@@ -386,30 +392,31 @@ class MgTaskComment(MgExecTask):
     def __init__(self,
                  comment: str,
                  repo: MgRepoInfo,
-                 more_comment: str = '',
+                 short_desc: str = '',
                  ) -> None:
         '''Display a comment
         '''
         super().__init__(comment, repo)
-        self.more_comment = more_comment
-        self.run_process: Optional[RunProcess] = None
+        self.short_desc = short_desc
         self.icon_success_hint = IconSet.Comment
 
 
     def _do_run(self) -> None:
         dbg('MgExecTaskComment._do_run() - %s' % self.desc)
-        self.task_done(True, self.more_comment)
+        self.task_done(True, self.short_desc)
 
 
     def _do_abort(self) -> None:
         '''Abort the current task and call self.task_done() appropriately'''
         assert self.task_state == TaskState.Started
-        self.task_done(True, self.more_comment)
+        self.task_done(True, self.short_desc)
 
 
 
 class MgExecTaskGit(MgExecTask):
     '''Task for running a git command'''
+
+    run_process: Optional[RunProcess]
 
     def __init__(self,
                  desc: str,
@@ -430,37 +437,29 @@ class MgExecTaskGit(MgExecTask):
             desc = 'git ' + ' '.join(git_args)
         super().__init__(desc=desc, repo=repo, ignore_failure=ignore_failure)
         self.git_args = git_args
-        self.cmd_line = 'git ' + ' '.join(git_args)
-        self.run_process: Optional[RunProcess] = None
         self.run_inside_git_repo = run_inside_git_repo
-
-
-    def _do_run(self) -> None:
-        prog_git = ExecGit.get_executable()
-        if prog_git is None or len(prog_git) == 0:
-            raise FileNotFoundError('Can not execute git with empty executable!')
+        self.run_process = None
 
         if self.run_inside_git_repo:
             if self.repo is None:
                 raise ValueError('Missing mandatory argument repo in _do_run()')
-            git_args_repo_path = ['-C', self.repo.fullpath]
-        else:
-            # when cloning, we don't want to specify the directory in which to run the command
-            git_args_repo_path = []
+            self.git_args = ['-C', self.repo.fullpath] + self.git_args
 
-        git_cmd = [prog_git] + git_args_repo_path + list(self.git_args)
-        dbg('MgExecTaskGit.run() - %s' % git_cmd)
+        self.short_desc = 'git ' + ' '.join(git_args)
 
-        self.run_process = RunProcess()
-        self.run_process.sigProcessOutput.connect(self.sig_partial_output)
+    def _do_run(self) -> None:
+        dbg(f'MgExecTaskGit.run() - {self.short_desc}')
+
         # We allow error in git because we have our own way of handling it
-        self.run_process.exec_async(git_cmd, self.git_task_done, allow_errors=True,
-                                    emit_output=True)
+        self.run_process = ExecGit.exec_non_blocking(self.git_args, allow_errors=True,
+                                  callback=self.git_task_done,
+                                  output_callback=self.sig_partial_output)
 
 
     def git_task_done(self, git_exit_code: int, git_stdout: str) -> None:
         dbg(f'MgExecTaskGit.git_task_done(git_exit_code={git_exit_code}) - "{self}"')
 
+        self.run_process = None
         if git_exit_code != 0:
             if len(git_stdout) != 0:
                 git_stdout += '\n'
@@ -468,7 +467,6 @@ class MgExecTaskGit(MgExecTask):
             if self.ignore_failure:
                 git_stdout += '\nIgnoring non relevant git error'
 
-        self.run_process = None
         self.task_done(git_exit_code == 0, git_stdout)
 
 
@@ -704,8 +702,8 @@ class MgExecItemOneCmd(MgExecItemBase):
         has diminished, add items for new lines being added.
         '''
         output = ''
-        if self.task.cmd_line:
-            output += f"> {self.task.cmd_line}\n"
+        if self.task.short_desc:
+            output += f"> {self.task.short_desc}\n"
         output += task_output
         output = handle_cr_in_text(output)
         out_lines = output.split('\n')

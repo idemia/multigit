@@ -247,11 +247,11 @@ class MgDialogApplyMgitFile(QDialog):
             # there are errors, can not accept the dialog
             return
 
-        targetRepoSet = set(repo.destination for repo in self.proj.repos)
-        currentRepoSet = set(repo.name for repo in self.currentRepos)
+        targetRepoSet = set(str(pathlib.Path(repo.destination)) for repo in self.proj.repos)
+        currentRepoSet = set(str(pathlib.Path(repo.name)) for repo in self.currentRepos)
 
         repoNameToCreate = targetRepoSet - currentRepoSet
-        repoPathToCreateDirExists = set(repo.dest_fullpath for repo in self.proj.repos
+        repoPathToCreateDirExists = set(str(pathlib.Path(repo.dest_fullpath)) for repo in self.proj.repos
                                             if repo.destination in repoNameToCreate and os.path.exists(repo.dest_fullpath))
         repoNameToRemove = currentRepoSet - targetRepoSet
         self.reposToDelete = list(sorted(repoNameToRemove))
@@ -348,7 +348,7 @@ def runDialogApplyMgitFile(window: 'MgMainWindow', baseDir: str, allRepos: List[
     reposToAdjust.sort(key=lambda r: r.destination)
 
     for repoDictInfo in reposToAdjust:
-        repoName = repoDictInfo.destination
+        repoName = str(pathlib.Path(repoDictInfo.destination))
         repoDestPath = repoDictInfo.dest_fullpath
 
         if repoName in dialogApplyMgitFile.reposToClone:
@@ -391,7 +391,7 @@ def runDialogApplyMgitFile(window: 'MgMainWindow', baseDir: str, allRepos: List[
             if pathlib.Path(repo.fullpath).exists():
                 taskGroup = MgExecTaskGroup(f'Deleting repository no longer present', repo)
                 taskGroup.tasks.append(
-                    MgTaskDelDirectory(f'Deleting repository no longer present',
+                    MgTaskDelDirectory(f'Deleting repository {repo.name} no longer present',
                                        repo,
                                        repo.fullpath,
                                        )

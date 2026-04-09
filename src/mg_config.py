@@ -22,10 +22,18 @@ from pathlib import Path
 from pprint import pformat
 import logging, traceback
 import datetime, shutil
+from functools import lru_cache
 
 from PySide6.QtCore import Qt
 from PySide6.QtWidgets import QMessageBox, QApplication
 from PySide6.QtGui import QColor
+
+SUFFIX_ACTIVATED        = '_ACTIVATED'
+SUFFIX_AUTODETECT       = '_AUTODETECT'
+SUFFIX_MANUAL_PATH      = '_MANUAL_PATH'
+SUFFIX_CMD_TYPE         = '_CMD_TYPE'
+SUFFIX_APP_NAME         = '_APP_NAME'
+
 
 # keys for the configuration file
 CONFIG_MAINWINDOW_GEOMETRY = 'MAINWINDOW_GEOMETRY'
@@ -89,6 +97,7 @@ __CONFIG_INSTANCE = None
 
 T = TypeVar('T')
 
+@lru_cache(maxsize=1)
 def get_config_instance() -> 'MgConfig':
     '''Return an instance of the configuration of Multigit, with the default configuration path'''
     global __CONFIG_INSTANCE
