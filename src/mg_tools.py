@@ -545,7 +545,7 @@ class ExecGit(ExecTool):
             cmd_out = 'Multigit stopped git before execution because of too many previous git authentication failures.'
             dbg(cmd_out)
             if output_callback:
-                if isinstance(output_callback, Signal):
+                if isinstance(output_callback, SignalInstance):
                     output_callback.emit(cmd_out)
                 else:
                     output_callback(cmd_out)
@@ -914,7 +914,7 @@ class RunProcess(QObject):
             self.sigProcessOutput.emit(self.partial_stdout)
 
         if hasGitAuthFailureMsg(self.partial_stdout):
-            MgAuthFailureMgr.gitAuthFailed(self.nice_cmdline())
+            MgAuthFailureMgr.gitAuthFailed()
 
 
     def exec_blocking(self, exec: MgExecutable, cmd_args: List[str], working_dir: str = '') -> Tuple[ExecStatus, int, str]:
