@@ -1,10 +1,10 @@
-# Generated from CHANGELOG.md on 2025-08-26 18:03:41.128648
+# Generated from CHANGELOG.md on 2026-04-11 07:56:46.891449
 
 
 content_html = '''
 <h1 align="center">MultiGit</h1>
 
-<p><em>by Phlipppe Fremy <a href="&#x6d;&#x61;&#x69;l&#x74;&#111;&#x3a;&#112;h&#105;&#108;&#x69;&#112;&#x70;&#x65;&#46;&#x66;&#x72;&#x65;&#109;&#x79;&#64;&#105;&#x64;&#101;&#x6d;&#x69;&#x61;&#x2e;&#99;&#111;&#109;">&#112;h&#105;&#108;&#x69;&#112;&#x70;&#x65;&#46;&#x66;&#x72;&#x65;&#109;&#x79;&#64;&#105;&#x64;&#101;&#x6d;&#x69;&#x61;&#x2e;&#99;&#111;&#109;</a></em></p>
+<p><em>by Phlipppe Fremy <a href="&#x6d;&#x61;&#105;&#x6c;&#x74;&#x6f;&#x3a;&#112;&#104;&#x69;&#x6c;&#x69;&#x70;&#112;&#x65;&#46;f&#x72;&#101;&#x6d;&#121;&#64;&#x69;&#100;&#x65;&#x6d;&#105;&#x61;&#x2e;&#x63;&#111;m">&#112;&#104;&#x69;&#x6c;&#x69;&#x70;&#112;&#x65;&#46;f&#x72;&#101;&#x6d;&#121;&#64;&#x69;&#100;&#x65;&#x6d;&#105;&#x61;&#x2e;&#x63;&#111;m</a></em></p>
 
 <h2>Introduction</h2>
 
@@ -19,6 +19,10 @@ content_html = '''
 <ul>
 <li>Add auto-stash capabilities to all operations involving branch merging</li>
 <li>configure the displayed columns with a context menu</li>
+<li>Multigit now detects conflicted files</li>
+<li>Sublime Merge is detected when installed as a Snap or a Flatpak</li>
+<li>Multigit is available as Flatpak for simpler installation under Linux</li>
+<li>Multigit is available as a Chocolatey package for simpler installation under Windows</li>
 </ul>
 
 <p>Improvements</p>
@@ -30,12 +34,12 @@ content_html = '''
 <li>when deleting a remote branch, validate with a confirmation dialog</li>
 <li>in the git execution window, allow to copy the logs with a context menu</li>
 <li>in the dialogs git switch branch, delete branch, checkout tag, add context menu to copy the repository list</li>
-<li>Multigit now detects conflicted files</li>
 <li>Porting to MacOs X (thank to Boyaquotes)</li>
 <li>cloning now supports multiple git repository targeting the same directory</li>
 <li>deleting directories is now a visible task in the execution window</li>
 <li>When applying a Multigit file, ask the user if he wants to delete the missing repositories</li>
 <li>When quitting add posibility of a confirmation dialog</li>
+<li>Detect when too many authentication failures and warn the user before possibly locking his account</li>
 </ul>
 
 <p>Bugfix</p>
@@ -46,6 +50,7 @@ content_html = '''
 <li>Field SHA1 was not updated sometimes after a fetch</li>
 <li>First line of git output was not included in the display</li>
 <li>when doing commit + push, sometimes, push was done before the commit</li>
+<li>Handle cloning multiple repositories to the same target directory (I know, this is weird)</li>
 </ul>
 
 <h2>Version 1.7.1 (2025-02-05)</h2>
