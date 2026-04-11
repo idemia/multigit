@@ -24,7 +24,7 @@ from PySide6.QtWidgets import QMessageBox
 from src.mg_const import MSG_NO_COMMIT, MSG_REMOTE_TOPUSH_TOPULL, MSG_REMOTE_SYNCHRO_OK, MSG_REMOTE_TOPULL, \
     MSG_REMOTE_TOPUSH, MSG_REMOTE_BRANCH_GONE, MSG_LOCAL_BRANCH, SHORT_SHA1_NB_DIGITS, MSG_EMPTY_REPO, MSG_REMOTE_NA
 from src.mg_tools import ExecGit, scan_git_dirs
-from src.mg_utils import anonymise_git_url
+from src.mg_utils import anonymise_git_url, normalize_path
 
 logger = logging.getLogger('mg_repo_info')
 dbg = logger.debug
@@ -125,7 +125,7 @@ class MultiRepo:
         self.base_path = pathlib.Path(self.base_dir)
         for d in scan_git_dirs(str(self.base_path)):
             repo = pathlib.Path(d).parent
-            repo_name = str(repo.relative_to(self.base_path))
+            repo_name = normalize_path(repo.relative_to(self.base_path))
             self.repo_names.append(repo_name)
 
             repo_path = str(repo.resolve())
@@ -164,14 +164,14 @@ class MultiRepo:
         self.base_path = pathlib.Path(self.base_dir)
         for d in scan_git_dirs(str(self.base_path)):
             repo = pathlib.Path(d).parent
-            repo_name = str(repo.relative_to(self.base_path))
+            repo_name = normalize_path(repo.relative_to(self.base_path))
             new_repo_names.append(repo_name)
 
         added_repo_names = set(new_repo_names) - set(self.repo_names)
         rm_repo_names = set(self.repo_names) - set(new_repo_names)
         added_repo = []
         for repo_name in added_repo_names:
-            repo_path = str((self.base_path / repo_name).resolve())
+            repo_path = normalize_path((self.base_path / repo_name).resolve())
             repo_info = MgRepoInfo(repo_name, repo_path, repo_name)
             added_repo.append(repo_info)
 
@@ -287,14 +287,14 @@ class MgRepoInfo(QObject):
         super().__init__()
 
         # normalize the name between / and \
-        self.name = str(pathlib.Path(name))
-        self.relpath = str(pathlib.Path(relpath))
+        self.name = normalize_path(name)
+        self.relpath = normalize_path(relpath)
         self.force_blocking_git = False
 
         self.cb_repo_info_available: Optional[Callable[[str], Any]] = None
 
         # full path to our repo
-        self.fullpath = str(pathlib.Path(fullpath))
+        self.fullpath = normalize_path(pathlib.Path(fullpath).resolve())
 
         self._clear_all()
 

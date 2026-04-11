@@ -15,12 +15,14 @@
 #
 
 
-import unittest, os
+import unittest, os, sys, pathlib
 
 from PySide6.QtWidgets import QApplication, QTreeWidget, QTreeWidgetItem
 
 from src.mg_utils import htmlize_diff, handle_cr_in_text, set_username_on_git_url, add_suffix_if_missing, extractInt, \
-    hasGitAuthFailureMsg, isGitCommandRequiringAuth, anonymise_git_url, strip_protocol_from_url, collectColumnText
+    hasGitAuthFailureMsg, isGitCommandRequiringAuth, anonymise_git_url, strip_protocol_from_url, collectColumnText, \
+    normalize_path
+
 from src.mg_config import MgConfig
 from src.mg_const import MSG_BIG_DIFF
 from src.mg_repo_info import match_ahead_behind, is_not_sha1, MgRepoInfo
@@ -442,7 +444,29 @@ p, li { white-space: pre-wrap;font-family:'Courier New'; font-size:8pt; font-wei
         sout = htmlize_diff(sin, 1000)
         self.assertEqual(sout, sout_ref)
 
+    def test_normalize_path(self) -> None:
+        assert normalize_path(r'toto\titi\tutu', 'win32') == r'toto\titi\tutu'
+        assert normalize_path(r'toto/titi/tutu', 'win32') == r'toto\titi\tutu'
+        assert normalize_path(r'toto/titi\tutu', 'win32') == r'toto\titi\tutu'
 
+        assert normalize_path(pathlib.Path(r'toto\titi\tutu'), 'win32') == r'toto\titi\tutu'
+        assert normalize_path(pathlib.Path(r'toto/titi/tutu'), 'win32') == r'toto\titi\tutu'
+        assert normalize_path(pathlib.Path(r'toto/titi\tutu'), 'win32') == r'toto\titi\tutu'
+
+        assert normalize_path(r'toto\titi\tutu', 'linux') == r'toto/titi/tutu'
+        assert normalize_path(r'toto/titi/tutu', 'linux') == r'toto/titi/tutu'
+        assert normalize_path(r'toto/titi\tutu', 'linux') == r'toto/titi/tutu'
+
+        assert normalize_path(pathlib.Path(r'toto\titi\tutu'), 'linux') == r'toto/titi/tutu'
+        assert normalize_path(pathlib.Path(r'toto/titi/tutu'), 'linux') == r'toto/titi/tutu'
+        assert normalize_path(pathlib.Path(r'toto/titi\tutu'), 'linux') == r'toto/titi/tutu'
+
+        if sys.platform == 'win32':
+            assert normalize_path(r'toto/titi\tutu') == r'toto\titi\tutu'
+        else:
+            assert normalize_path(r'toto/titi\tutu', 'linux') == r'toto/titi/tutu'
+
+        
 
 class TestUtilityFunctionsWithTree(unittest.TestCase):
 
