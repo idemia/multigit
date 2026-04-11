@@ -3,7 +3,7 @@
 ################################################################################
 ## Form generated from reading UI file 'ui_main_window.ui'
 ##
-## Created by: Qt User Interface Compiler version 6.8.2
+## Created by: Qt User Interface Compiler version 6.11.0
 ##
 ## WARNING! All changes made in this file will be lost when recompiling UI file!
 ################################################################################
@@ -82,6 +82,8 @@ class Ui_MainWindow(object):
         self.actionShow_Columns.setMenuRole(QAction.MenuRole.NoRole)
         self.actionShow_Columns.setShortcutVisibleInContextMenu(False)
         self.actionShow_Columns.setPriority(QAction.Priority.LowPriority)
+        self.actionGettingStarted = QAction(MainWindow)
+        self.actionGettingStarted.setObjectName(u"actionGettingStarted")
         self.centralwidget = QWidget(MainWindow)
         self.centralwidget.setObjectName(u"centralwidget")
         self.horizontalLayout_2 = QHBoxLayout(self.centralwidget)
@@ -95,7 +97,7 @@ class Ui_MainWindow(object):
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QMenuBar(MainWindow)
         self.menubar.setObjectName(u"menubar")
-        self.menubar.setGeometry(QRect(0, 0, 290, 33))
+        self.menubar.setGeometry(QRect(0, 0, 290, 22))
         self.menuFile = QMenu(self.menubar)
         self.menuFile.setObjectName(u"menuFile")
         self.menuFile.setToolTipsVisible(True)
@@ -149,6 +151,7 @@ class Ui_MainWindow(object):
         self.menuColumns.addSeparator()
         self.menuColumns.addAction(self.actionViewColSha1)
         self.menuColumns.addAction(self.actionViewColURL)
+        self.menuAbout.addAction(self.actionGettingStarted)
         self.menuAbout.addAction(self.actionWhatIsNew)
         self.menuAbout.addAction(self.actionShowMultiGitLogFiles)
         self.menuAbout.addAction(self.actionAbout)
@@ -233,6 +236,7 @@ class Ui_MainWindow(object):
 #endif // QT_CONFIG(shortcut)
         self.actionViewColURL.setText(QCoreApplication.translate("MainWindow", u"Remote URL", None))
         self.actionShow_Columns.setText(QCoreApplication.translate("MainWindow", u"Show Columns", None))
+        self.actionGettingStarted.setText(QCoreApplication.translate("MainWindow", u"Getting Started", None))
         self.menuFile.setTitle(QCoreApplication.translate("MainWindow", u"File", None))
         self.menuOpenRecentDirectory.setTitle(QCoreApplication.translate("MainWindow", u"Open recent directory", None))
         self.menuView.setTitle(QCoreApplication.translate("MainWindow", u"View", None))

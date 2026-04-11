@@ -25,7 +25,7 @@ from PySide6.QtGui import QCloseEvent, QAction
 from src.gui.ui_main_window import Ui_MainWindow
 from src.gui.ui_dialog_quit import Ui_quitConfirmDialog
 from src.mg_actions import MgActions
-from src.mg_dialog_whatisnew import showWhatIsNew, showWhatisnewIfAppropriate
+from src.mg_dialog_whatisnew import showWhatIsNew, showWhatisnewIfAppropriate, showGettingStarted
 from src.mg_dialog_export_mgit import runDialogExportMgit
 from src.mg_dialog_export_csv import runDialogExportCsv
 from src.mg_dialog_clone_from_mgit import runDialogCloneFromMgitFile
@@ -240,6 +240,7 @@ class MgMainWindow(QMainWindow, Ui_MainWindow):
         self.mgActions.actionConfigureGitProgram.triggered.connect(self.slotEditSettingsGitProgram)
 
         # menu About
+        self.actionGettingStarted.triggered.connect( self.slotGettingStarted )
         self.actionWhatIsNew.triggered.connect( self.slotWhatIsNew )
         self.actionAbout.triggered.connect( self.slotAbout )
         self.actionShowMultiGitLogFiles.triggered.connect(self.slotShowLogFileDirectory)
@@ -462,6 +463,12 @@ class MgMainWindow(QMainWindow, Ui_MainWindow):
     def slotWhatIsNew(self) -> None:
         '''Show what's new dialog'''
         showWhatIsNew(self)
+
+
+    def slotGettingStarted(self) -> None:
+        '''Show what's new dialog'''
+        showGettingStarted(self)
+
 
 
     # noinspection PyMethodMayBeStatic

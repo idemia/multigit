@@ -75,6 +75,10 @@ if __name__ == '__main__':
                        pathlib.Path(__file__).parent/'src/gui/content_full_license_info.py',
                        )
 
+    markdown_to_python(pathlib.Path(__file__).parent / 'doc/getting_started.md',
+                       pathlib.Path(__file__).parent/'src/gui/content_getting_started.py',
+                       )
+
     if '--show' in sys.argv:
         from src.mg_dialog_whatisnew import showWhatIsNew
         from src.mg_dialog_about import showDialogAbout

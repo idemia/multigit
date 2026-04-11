@@ -20,7 +20,8 @@ from typing import Optional
 from PySide6.QtWidgets import QWidget, QDialog, QTextEdit, QPushButton, QVBoxLayout, QHBoxLayout, QFrame
 from PySide6.QtCore import Qt
 
-from src.gui.content_whatisnew import content_html
+from src.gui.content_whatisnew import content_html as whatsnew_html_content
+from src.gui.content_getting_started import content_html as getting_started_html_content
 from src.mg_const import *
 import src.mg_config as mgc
 
@@ -34,6 +35,14 @@ def showWhatisnewIfAppropriate() -> None:
 
 
 def showWhatIsNew(parent: Optional[QWidget] = None) -> None:
+    showDialogWithHtmlContent(whatsnew_html_content, parent)
+
+
+def showGettingStarted(parent: Optional[QWidget] = None) -> None:
+    showDialogWithHtmlContent(getting_started_html_content, parent)
+
+
+def showDialogWithHtmlContent(html_content: str, parent: Optional[QWidget] = None) -> None:
     '''Show what's new dialog'''
     dialog = QDialog(parent)
     dialog.setWindowTitle("What's New")
@@ -41,7 +50,7 @@ def showWhatIsNew(parent: Optional[QWidget] = None) -> None:
 
     text = QTextEdit(dialog)
     text.setReadOnly(True)
-    text.setHtml(content_html)
+    text.setHtml(html_content)
     text.setFrameShape( QFrame.Shape.NoFrame )
     text.zoomIn(2)
 
