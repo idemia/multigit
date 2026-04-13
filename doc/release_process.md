@@ -7,8 +7,8 @@
    * packaging/windows/Multigit.iss
    * packaging/windows/multigit_version_info.txt
    * packaging/chocolatey/multigit.nuspec
-   * packaging/flatpak/org.multigit.Multigit.metainfo.xml
-   * packaging/flatpak/org.multigit.Multigit.yaml
+  * packaging/flatpak/io.github.idemia.Multigit.metainfo.xml
+  * io.github.idemia.Multigit.yaml
 
 * run: python generate_html.py
 

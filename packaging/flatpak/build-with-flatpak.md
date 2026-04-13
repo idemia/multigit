@@ -1,7 +1,7 @@
 
 
 # to regenerate python signed requirements
-/flatpak-pip-generator --requirements-file ../../reqs/requirements-release.txt org.multigit.Multigit.yaml 
+/flatpak-pip-generator --requirements-file ../../reqs/requirements-release.txt io.github.idemia.Multigit.yaml 
 
 
 
@@ -25,14 +25,14 @@ Notes specific to Flatpak
 
 * For us:
 	$ cd packaging/flatpak
-	$ rm -rf builddir && flatpak-builder --user --install builddir org.multigit.Multigit.yaml
+	$ rm -rf builddir && flatpak-builder --user --install builddir io.github.idemia.Multigit.yaml
 
 
 
 Run multigit
 ============
 
-$ flatpak run org.multigit.Multigit 
+$ flatpak run io.github.idemia.Multigit 
 
 
 
@@ -54,11 +54,11 @@ Tips
 
 Runs a shell inside the sandbox:
 
-	$ flatpak-builder --run build-dir org.multigit.Multigit.yaml sh
+	$ flatpak-builder --run build-dir io.github.idemia.Multigit.yaml sh
 
 Inspect portal permissions:
 
-	$ flatpak permission-show org.multigit.Multigit
+	$ flatpak permission-show io.github.idemia.Multigit
 
 All apps running inside sandboxes:
 

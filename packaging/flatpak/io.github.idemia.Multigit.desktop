@@ -3,6 +3,6 @@ Type=Application
 Name=Multigit
 Comment=Multigit is a graphical tool for working with projects composed of multiple git repositories.
 Categories=Development;Building;
-Icon=org.multigit.Multigit
+Icon=io.github.idemia.Multigit
 Exec=multigit.sh
 Terminal=false

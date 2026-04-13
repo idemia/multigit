@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <component type="desktop-application">
-  <id>org.multigit.Multigit</id>
+  <id>io.github.idemia.Multigit</id>
   <name>Multigit</name>
   <summary>Multigit is a graphical tool for working with multiple git repositories at the same time</summary>
   <url type="homepage">https://github.com/idemia/multigit/</url> 
@@ -24,7 +24,7 @@
     </p>
   </description>
   
-  <launchable type="desktop-id">org.multigit.Multigit.desktop</launchable>
+  <launchable type="desktop-id">io.github.idemia.Multigit.desktop</launchable>
   <screenshots>
     <screenshot type="default">
       <image>

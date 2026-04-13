@@ -96,7 +96,7 @@ def main_gui() -> None:
     global app
     set_windows_app_id()
     app = QApplication([])
-    app.setDesktopFileName('org.multigit.Multigit')
+    app.setDesktopFileName('io.github.idemia.Multigit')
     icon = QtGui.QIcon()
     icon.addPixmap(QtGui.QPixmap(":/img/multigit-logo-256.png"), QtGui.QIcon.Mode.Normal, QtGui.QIcon.State.Off)
     icon.addPixmap(QtGui.QPixmap(":/img/multigit-logo-16.png"),  QtGui.QIcon.Mode.Normal, QtGui.QIcon.State.Off)

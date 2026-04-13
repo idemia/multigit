@@ -1,4 +1,4 @@
-id: org.multigit.Multigit
+id: io.github.idemia.Multigit
 runtime: org.kde.Platform
 runtime-version: '6.8'
 sdk: org.kde.Sdk
@@ -22,13 +22,13 @@ modules:
       - mkdir -p /app/share/icons/hicolor/48x48/apps
       - mkdir -p /app/share/icons/hicolor/32x32/apps
       - mkdir -p /app/share/icons/hicolor/16x16/apps
-      - cp -a /app/multigit/packaging/flatpak/org.multigit.Multigit.metainfo.xml /app/share/metainfo
-      - cp -a /app/multigit/packaging/flatpak/org.multigit.Multigit.desktop /app/share/applications
-      - cp -a /app/multigit/images/multigit-logo-256.png /app/share/icons/hicolor/256x256/apps/org.multigit.Multigit.png
-      - cp -a /app/multigit/images/multigit-logo-64.png /app/share/icons/hicolor/64x64/apps/org.multigit.Multigit.png
-      - cp -a /app/multigit/images/multigit-logo-48.png /app/share/icons/hicolor/48x48/apps/org.multigit.Multigit.png
-      - cp -a /app/multigit/images/multigit-logo-32.png /app/share/icons/hicolor/32x32/apps/org.multigit.Multigit.png
-      - cp -a /app/multigit/images/multigit-logo-16.png /app/share/icons/hicolor/16x16/apps/org.multigit.Multigit.png
+      - cp -a /app/multigit/packaging/flatpak/io.github.idemia.Multigit.metainfo.xml /app/share/metainfo
+      - cp -a /app/multigit/packaging/flatpak/io.github.idemia.Multigit.desktop /app/share/applications
+      - cp -a /app/multigit/images/multigit-logo-256.png /app/share/icons/hicolor/256x256/apps/io.github.idemia.Multigit.png
+      - cp -a /app/multigit/images/multigit-logo-64.png /app/share/icons/hicolor/64x64/apps/io.github.idemia.Multigit.png
+      - cp -a /app/multigit/images/multigit-logo-48.png /app/share/icons/hicolor/48x48/apps/io.github.idemia.Multigit.png
+      - cp -a /app/multigit/images/multigit-logo-32.png /app/share/icons/hicolor/32x32/apps/io.github.idemia.Multigit.png
+      - cp -a /app/multigit/images/multigit-logo-16.png /app/share/icons/hicolor/16x16/apps/io.github.idemia.Multigit.png
 
     sources: 
       - type: script
