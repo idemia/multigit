@@ -25,7 +25,7 @@ from PySide6.QtGui import QCloseEvent, QAction
 from src.gui.ui_main_window import Ui_MainWindow
 from src.gui.ui_dialog_quit import Ui_quitConfirmDialog
 from src.mg_actions import MgActions
-from src.mg_dialog_whatisnew import showWhatIsNew, showWhatisnewIfAppropriate, showGettingStarted
+from src.mg_dialog_whatisnew import showWhatIsNew, showLaunchDialog, showGettingStarted
 from src.mg_dialog_export_mgit import runDialogExportMgit
 from src.mg_dialog_export_csv import runDialogExportCsv
 from src.mg_dialog_clone_from_mgit import runDialogCloneFromMgitFile
@@ -73,7 +73,7 @@ class MgMainWindow(QMainWindow, Ui_MainWindow):
         self.setWindowTitle('MultiGit OpenSource v{}'.format(VERSION))
 
         QTimer.singleShot(0, self.checkGitOkAndOpenDefaultRepo)
-        QTimer.singleShot(0, showWhatisnewIfAppropriate)
+        QTimer.singleShot(0, showLaunchDialog)
 
 
     def currentMultigit(self) -> MgMultigitWidget:
@@ -337,12 +337,6 @@ class MgMainWindow(QMainWindow, Ui_MainWindow):
             except TypeError:
                 # invalid config value, reset it
                 self.config[mgc.CONFIG_DISPLAY_FETCH_ON_STARTUP_COUNTDOWN] = DISPLAY_FETCH_ON_STARTUP_COUNTDOWN_INIT
-
-        if self.config[mgc.CONFIG_DISPLAY_FETCH_ON_STARTUP_COUNTDOWN] == 0:
-            answer = QMessageBox.question(self, 'Activate fetch on startup ?', 'Multigit can fetch all your repositories when you launch it. '
-                                 'Do you want to activate this behavior ?\n\nNote that you can change it later in the settings dialog.\n')
-            fetchReposOnStartup = (answer == QMessageBox.StandardButton.Yes)
-            self.config[mgc.CONFIG_FETCH_ON_STARTUP] = fetchReposOnStartup
             self.config.save()
 
         if fetchReposOnStartup:

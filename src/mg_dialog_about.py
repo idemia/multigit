@@ -52,8 +52,6 @@ class MgAboutDialog(QDialog):
 
 
 
-
-
     def showFullLicenseInfo(self) -> None:
         dlg = QDialog(self)
         dlg.setWindowFlag(Qt.WindowType.WindowContextHelpButtonHint, False)
