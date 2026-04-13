@@ -169,8 +169,7 @@ class MgDialogApplyMgitFile(QDialog):
             return
 
         self.ui.lineEditMgitFile.setText(mgitFile)
-        # this will trigger a redisplay of all repos, no need for explicit call to self.updateDisplayOfMultigitFile()
-        self.slotUsernameUpdated()
+        self.propagateMgitFileUpdated(True, True)
 
 
     def propagateMgitFileUpdated(self, report_file_errors: bool = True, report_parse_errors: bool = True) -> bool:
