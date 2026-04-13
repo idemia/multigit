@@ -40,16 +40,6 @@ dbg = logger.debug
 warn = logger.warning
 
 
-# Cases:
-# 1. projConfFile and projDestDir are valid
-# 2. update projConfFile
-#       2.a -> parse the file -> valid file -> update full GUI
-#       2.b -> parse the file -> invalid file -> report error, clear the GUI
-# 3. update projDestDir
-#       3.a update proj repos destination -> update the display of repo items
-#       3.b json file was invalid -> do nothing
-
-
 class MgDialogApplyMgitFile(QDialog):
 
     def __init__(self, window: QWidget, destDir: str, currentRepos: List[MgRepoInfo]) -> None:
@@ -331,6 +321,10 @@ def runDialogApplyMgitFile(window: 'MgMainWindow', baseDir: str, allRepos: List[
     :param window: application window
     :return:
     """
+    if baseDir == '':
+        QMessageBox.warning(window, 'Apply multigit file error', 'Can not apply a multigit file if the base directory is empty')
+        return
+
     dialogApplyMgitFile = MgDialogApplyMgitFile(window, baseDir, allRepos)
 
     # display dialog

@@ -161,6 +161,8 @@ class MultiRepo:
         The content of MultiRepo is adjusted accordingly
         '''
         new_repo_names = []
+        if self.base_dir == '':
+            return [], []
         self.base_path = pathlib.Path(self.base_dir)
         for d in scan_git_dirs(str(self.base_path)):
             repo = pathlib.Path(d).parent
