@@ -10,7 +10,7 @@
    * packaging/flatpak/org.multigit.Multigit.metainfo.xml
    * packaging/flatpak/org.multigit.Multigit.yaml
 
-* run: python generate_html_whatsnew.py
+* run: python generate_html.py
 
 
 ## Create Python package
