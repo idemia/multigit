@@ -80,12 +80,13 @@ if __name__ == '__main__':
                        )
 
     if '--show' in sys.argv:
-        from src.mg_dialog_whatisnew import showWhatIsNew
+        from src.mg_dialog_whatisnew import showWhatIsNew, showGettingStarted
         from src.mg_dialog_about import showDialogAbout
         from PySide6.QtWidgets import QApplication
         _ = QApplication([])
-        showWhatIsNew()
-        showDialogAbout(None)
+        showGettingStarted()
+        #showWhatIsNew()
+        #showDialogAbout(None)
 
 
 
