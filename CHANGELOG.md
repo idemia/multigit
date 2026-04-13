@@ -8,7 +8,7 @@ Introduction
 
 Multigit help users to manage many Git repositories simultaneously.
 
-Version 1.8 (in progress)
+Version 1.7.90 (in progress)
 ----------------------------
 Synchronize with IDEMIA internal version
 
@@ -21,6 +21,7 @@ New features
 * Sublime Merge is detected when installed as a Snap or a Flatpak
 * Multigit is available as Flatpak for simpler installation under Linux
 * Multigit is available as a Chocolatey package for simpler installation under Windows
+* Add a `Getting Started` documentation, showed on the first launch
 
 Improvements
 
@@ -36,6 +37,7 @@ Improvements
 * When applying a Multigit file, ask the user if he wants to delete the missing repositories
 * When quitting add posibility of a confirmation dialog
 * Detect when too many authentication failures and warn the user before possibly locking his account
+* Normalize the path separators according to the platform
 
 Bugfix
   
@@ -44,7 +46,9 @@ Bugfix
 * Field SHA1 was not updated sometimes after a fetch
 * First line of git output was not included in the display
 * when doing commit + push, sometimes, push was done before the commit
-* Handle cloning multiple repositories to the same target directory (I know, this is weird)
+* Handle cloning multiple repositories to the same target directory
+* When applying a multigit file, the display was not updated after selecting a multigit file
+
 
 
 Version 1.7.1 (2025-02-05)

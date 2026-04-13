@@ -2,7 +2,7 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2015/06/nuspec.xsd">
   <metadata>
     <id>multigit</id>
-    <version>1.7.1</version>
+    <version>1.7.90</version>
     <title>Multigit</title>
     <authors>Philippe Fremy</authors>
     <owners>IDEMIA</owners>
