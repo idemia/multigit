@@ -1,10 +1,9 @@
 # Linux
-- check that config files from previous multigit versions are properly migrated
 
 # Windows
-- add a Getting started to run on the first launch and in the help menu
 
 # Flatpak packaging
+- use CDN for the screenshots
 - export to a flatpak repository
 - sign with gpg key
 
