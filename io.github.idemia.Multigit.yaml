@@ -75,11 +75,11 @@ finish-args:
   - --talk-name=org.freedesktop.Flatpak
   - --talk-name=org.freedesktop.portal.Desktop
 
-  # Specific to multigit, to check a file's presence
-  - --filesystem=home  # Multigit interacts with user directory: check existence of directories, of files
-                       # add directory when user requests it through the file dialog, removes directories
-                       # when they stand in the way of a clone
-  - --filesystem=/media 
+  # Multigit interacts with user directory: check existence of directories, of files
+  # add directory when user requests it through the file dialog, removes directories
+  # when they stand in the way of a clone
+  - --filesystem=home
+  - --filesystem=/media
   - --filesystem=/tmp  
 
 
