@@ -8,10 +8,8 @@ Introduction
 
 Multigit help users to manage many Git repositories simultaneously.
 
-Version 1.7.90 (in progress)
-----------------------------
-Synchronize with IDEMIA internal version
-
+Version 1.8.0 (2026-04-20)
+--------------------------
 
 New features
 
@@ -39,7 +37,7 @@ Improvements
 * Detect when too many authentication failures and warn the user before possibly locking his account
 * Normalize the path separators according to the platform
 
-Bugfix
+Bugfixes
   
 * deals correctly with symlinks creating cycles when looking for git directories (thank to cedric-chadaleux)
 * Multigit was too agressive in detecting git repository, do not mandate existence of `hooks` and `info`
