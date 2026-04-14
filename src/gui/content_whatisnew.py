@@ -1,18 +1,16 @@
-# Generated from CHANGELOG.md on 2026-04-13 09:42:48.217739
+# Generated from CHANGELOG.md on 2026-04-14 22:36:44.600805
 
 
 content_html = '''
 <h1 align="center">MultiGit</h1>
 
-<p><em>by Phlipppe Fremy <a href="&#x6d;&#x61;&#105;&#x6c;&#116;&#x6f;&#58;&#112;&#104;&#x69;&#x6c;&#105;&#x70;&#x70;&#x65;&#46;&#x66;&#x72;&#x65;&#109;y&#x40;&#x69;&#100;&#101;&#x6d;&#105;&#97;&#x2e;&#99;&#x6f;&#109;">&#112;&#104;&#x69;&#x6c;&#105;&#x70;&#x70;&#x65;&#46;&#x66;&#x72;&#x65;&#109;y&#x40;&#x69;&#100;&#101;&#x6d;&#105;&#97;&#x2e;&#99;&#x6f;&#109;</a></em></p>
+<p><em>by Phlipppe Fremy <a href="&#109;&#x61;&#105;&#x6c;&#x74;&#111;&#58;&#112;&#104;&#x69;&#x6c;&#x69;&#x70;&#112;&#101;&#x2e;&#x66;&#x72;&#101;&#109;&#121;&#64;&#105;&#100;&#101;&#109;&#x69;&#x61;&#46;&#99;&#x6f;m">&#112;&#104;&#x69;&#x6c;&#x69;&#x70;&#112;&#101;&#x2e;&#x66;&#x72;&#101;&#109;&#121;&#64;&#105;&#100;&#101;&#109;&#x69;&#x61;&#46;&#99;&#x6f;m</a></em></p>
 
 <h2>Introduction</h2>
 
 <p>Multigit help users to manage many Git repositories simultaneously.</p>
 
-<h2>Version 1.8 (in progress)</h2>
-
-<p>Synchronize with IDEMIA internal version</p>
+<h2>Version 1.8.0 (2026-04-20)</h2>
 
 <p>New features</p>
 
@@ -23,6 +21,7 @@ content_html = '''
 <li>Sublime Merge is detected when installed as a Snap or a Flatpak</li>
 <li>Multigit is available as Flatpak for simpler installation under Linux</li>
 <li>Multigit is available as a Chocolatey package for simpler installation under Windows</li>
+<li>Add a <code><span style="background-color:#f5f5f5;">Getting Started</span></code> documentation, showed on the first launch</li>
 </ul>
 
 <p>Improvements</p>
@@ -40,9 +39,10 @@ content_html = '''
 <li>When applying a Multigit file, ask the user if he wants to delete the missing repositories</li>
 <li>When quitting add posibility of a confirmation dialog</li>
 <li>Detect when too many authentication failures and warn the user before possibly locking his account</li>
+<li>Normalize the path separators according to the platform</li>
 </ul>
 
-<p>Bugfix</p>
+<p>Bugfixes</p>
 
 <ul>
 <li>deals correctly with symlinks creating cycles when looking for git directories (thank to cedric-chadaleux)</li>
@@ -50,7 +50,8 @@ content_html = '''
 <li>Field SHA1 was not updated sometimes after a fetch</li>
 <li>First line of git output was not included in the display</li>
 <li>when doing commit + push, sometimes, push was done before the commit</li>
-<li>Handle cloning multiple repositories to the same target directory (I know, this is weird)</li>
+<li>Handle cloning multiple repositories to the same target directory</li>
+<li>When applying a multigit file, the display was not updated after selecting a multigit file</li>
 </ul>
 
 <h2>Version 1.7.1 (2025-02-05)</h2>
