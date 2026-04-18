@@ -4,8 +4,9 @@
   <name>Multigit</name>
   <summary>Multigit is a graphical tool for working with multiple git repositories at the same time</summary>
   <url type="homepage">https://github.com/idemia/multigit/</url> 
+  <url type="vcs-browser">https://github.com/idemia/multigit/</url> 
   <url type="bugtracker">https://github.com/idemia/multigit/issues</url>
-  <metadata_license>MIT</metadata_license>
+  <metadata_license>CC0-1.0</metadata_license>
   <project_license>Apache-2.0</project_license>
   <content_rating type="oars-1.1" />
   <developer id="com.idemia">
@@ -20,26 +21,145 @@
       If you think that <em>submodules</em>, <em>subtree</em> or <em>Google repo</em> are not for you, you are probably at the right place.
     </p>
     <p>
-      Typically, it lets you: <em> fetch or pull on many repositories at the same time </em> identify visually which repositories are modified or need an update (push or pull) <em> create a new branch in a subset of repositories </em> switch to a branch existing only in some repositories (but you don&apos;t remember which one) <em> perform a commit on multiple repositories at the same time, and push it </em> launch your preferred git frontend on an interesting repository <em> export your repositories state to a file, for reproducing it on a colleagues computer </em> and more...
+      Typically, it lets you: 
+      <ul>
+        <li>Fetch or pull on many repositories at the same time </li> 
+        <li>Identify visually which repositories are modified or need an update (push or pull)</li>
+        <li>Create a new branch in a subset of repositories </li> 
+        <li>Switch to a branch existing only in some repositories</li> 
+        <li>perform a commit on multiple repositories at the same time, and push it </li> 
+        <li>launch your preferred git frontend on an interesting repository </li>
+        <li> export your repositories state to a file, for reproducing it on a colleagues computer </li> 
+        <li> and more... </li>
+      </ul>
     </p>
   </description>
   
   <launchable type="desktop-id">io.github.idemia.Multigit.desktop</launchable>
+  <keywords>
+    <keyword>Development</keyword>
+    <keyword>Git</keyword>
+  </keywords>
+
+  <content_rating type="oars-1.1" />
+
   <screenshots>
     <screenshot type="default">
       <image>
         https://github.com/idemia/multigit/blob/main/doc/screenshot/screenshot-multigit-creating-branch-on-4-repositories.jpg?raw=true      
       </image>
+      <caption>
+        Creating a branch on 4 repositories at the same time
+      </caption>
     </screenshot>
     <screenshot>
       <image>
         https://github.com/idemia/multigit/blob/main/doc/screenshot/screenshot-multigit-fetching-repositories.jpg?raw=true
       </image>
+      <caption>
+        Fetching multiple repositories at the same time
     </screenshot>
     <screenshot>
       <image>
         https://raw.githubusercontent.com/idemia/multigit/refs/heads/main/doc/screenshot/screenshot-multigit-creating-branch-on-4-repositories.jpg
       </image>
+      <caption>
+        Creating a branch on 4 repositories at the same time
     </screenshot>
   </screenshots>
+  <releases>
+    <release version="1.8.0" date="2026-04-20">
+      <url type="details">https://github.com/idemia/multigit/releases/tag/MULTIGIT_OPENSOURCE_v1.8.0</url>
+      <description>
+        <p>Synchronize with IDEMIA inernal version</p>
+
+        <p>*New features*</p>
+        <ul>
+          <li>Add auto-stash capabilities to all operations involving branch merging</li>
+          <li>configure the displayed columns with a context menu</li>
+          <li>Multigit now detects conflicted files</li>
+          <li>Sublime Merge is detected when installed as a Snap or a Flatpak</li>
+          <li>Multigit is available as Flatpak for simpler installation under Linux</li>
+          <li>Multigit is available as a Chocolatey package for simpler installation under Windows</li>
+          <li>Add a `Getting Started` documentation, showed on the first launch</li>
+        </ul>
+
+        <p>*Improvements*</p>
+
+        <ul>
+          <li>on the repository tab bar, duplicate, close or rename a tab with a context menu</li>
+          <li>on the repository tab bar, middle-click on a tab button closes the current tab</li>
+          <li>add history button for selecting a branch in the dialog switch/checkout/delete tag/branch</li>
+          <li>when deleting a remote branch, validate with a confirmation dialog</li>
+          <li>in the git execution window, allow to copy the logs with a context menu</li>
+          <li>in the dialogs git switch branch, delete branch, checkout tag, add context menu to copy the repository list</li>
+          <li>Porting to MacOs X (thank to Boyaquotes)</li>
+          <li>cloning now supports multiple git repository targeting the same directory</li>
+          <li>deleting directories is now a visible task in the execution window</li>
+          <li>When applying a Multigit file, ask the user if he wants to delete the missing repositories</li>
+          <li>When quitting add posibility of a confirmation dialog</li>
+          <li>Detect when too many authentication failures and warn the user before possibly locking his account</li>
+          <li>Normalize the path separators according to the platform</li>
+        </ul>
+
+        <p>*Bug fixes*</p>
+        <ul> 
+          <li>deals correctly with symlinks creating cycles when looking for git directories (thank to cedric-chadaleux)</li>
+          <li>Multigit was too agressive in detecting git repository, do not mandate existence of `hooks` and `info`</li>
+          <li>Field SHA1 was not updated sometimes after a fetch</li>
+          <li>First line of git output was not included in the display</li>
+          <li>when doing commit + push, sometimes, push was done before the commit</li>
+          <li>Handle cloning multiple repositories to the same target directory</li>
+          <li>When applying a multigit file, the display was not updated after selecting a multigit file</li>
+        </ul>
+      </description>
+    </release>
+
+    <release version="1.7.1" date="2025-02-05">
+      <url type="details">https://github.com/idemia/multigit/releases/tag/MULTIGIT_OPENSOURCE_v1.7.1</url>
+      <description>
+        <p>*Improvements*</p>
+        <ul>
+          <li>Porting to Qt6 / PySide6 for better support on recent linux</li>
+        </ul>
+      </description>
+    </release>
+
+
+    <release version="1.6.1" date="2025-02-01">
+      <url type="details">https://github.com/idemia/multigit/releases/tag/MULTIGIT_OPENSOURCE_v1.6.1</url>
+      <description>
+        <p>*Improvements*</p>
+        <ul>
+          <li>Porting to Linux</li>
+          <li>Add support for `gitk` and `git gui`</li>
+          <li>support cloning from url like: `fremy@host.xz:path/to/repo.git/`</li>
+        </ul>
+      </description>
+    </release>
+
+
+    <release version="1.6.0" date="2023-04-14">
+      <url type="details">https://github.com/idemia/multigit/releases/tag/MULTIGIT_OPENSOURCE_v1.6</url>
+      <description>
+        <p>First official release to the open source world!</p>
+        <p>*Improvements*</p>
+        <ul>
+          <li>Using `Enter` on a repository triggers the same action as double-clicking it.</li>
+          <li>Better about dialog, listing all open source components and licenses</li>
+          <li>document multigit file format with a JSON schema</li>
+        </ul>
+        <p>*Bug fixes*</p>
+        <ul>
+          <li>Fix problem in branch/tag checkout</li>
+          <li>it was impossible to create a branch with the name different only by case from another branch created in the past</li>
+          <li>Do not hide the list of repositories when filtering in dialog switch/delete branch</li>
+          <li>The settings dialog would not work when no config file exists</li>
+          <li>When cloning nested repositories, ensure that nested clone starts even if top clone fails</li>
+        </ul>
+      </description>
+    </release>
+  </releases>
+
+
 </component>
