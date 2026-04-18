@@ -18,7 +18,7 @@
       Multigit is a graphical tool for working with projects composed of multiple git repositories.
     </p>
     <p>
-      If you think that <em>submodules</em>, <em>subtree</em> or <em>Google repo</em> are not for you, you are probably at the right place.
+      If you think that <em>submodules</em>, <em>subtree</em> or <em>Google repo</em> are too complicated you, you are probably at the right place.
     </p>
     <p>
       Typically, it lets you: 
@@ -46,7 +46,7 @@
   <screenshots>
     <screenshot type="default">
       <image>
-        https://github.com/idemia/multigit/blob/main/doc/screenshot/screenshot-multigit-creating-branch-on-4-repositories.jpg?raw=true      
+        https://cdn.jsdelivr.net/gh/idemia/multigit@main/doc/screenshot/screenshot-multigit-creating-branch-on-4-repositories.jpg
       </image>
       <caption>
         Creating a branch on 4 repositories at the same time
@@ -54,26 +54,28 @@
     </screenshot>
     <screenshot>
       <image>
-        https://github.com/idemia/multigit/blob/main/doc/screenshot/screenshot-multigit-fetching-repositories.jpg?raw=true
+        https://cdn.jsdelivr.net/gh/idemia/multigit@main/doc/screenshot/screenshot-multigit-fetching-repositories.jpg
       </image>
       <caption>
         Fetching multiple repositories at the same time
+      </caption>
     </screenshot>
     <screenshot>
       <image>
-        https://raw.githubusercontent.com/idemia/multigit/refs/heads/main/doc/screenshot/screenshot-multigit-creating-branch-on-4-repositories.jpg
+        https://cdn.jsdelivr.net/gh/idemia/multigit@main/doc/screenshot/screenshot-multigit-making-a-commit-on-3-repositories.jpg
       </image>
       <caption>
-        Creating a branch on 4 repositories at the same time
+        Making a commit on # repositories at the same time
+      </caption>
     </screenshot>
   </screenshots>
   <releases>
     <release version="1.8.0" date="2026-04-20">
-      <url type="details">https://github.com/idemia/multigit/releases/tag/MULTIGIT_OPENSOURCE_v1.8.0</url>
+      <url type="details">https://github.com/idemia/multigit/releases/tag/MULTIGIT_OPENSOURCE_V1.8</url>
       <description>
         <p>Synchronize with IDEMIA inernal version</p>
 
-        <p>*New features*</p>
+        <p>**New features**</p>
         <ul>
           <li>Add auto-stash capabilities to all operations involving branch merging</li>
           <li>configure the displayed columns with a context menu</li>
@@ -84,7 +86,7 @@
           <li>Add a `Getting Started` documentation, showed on the first launch</li>
         </ul>
 
-        <p>*Improvements*</p>
+        <p>**Improvements**</p>
 
         <ul>
           <li>on the repository tab bar, duplicate, close or rename a tab with a context menu</li>
@@ -102,7 +104,7 @@
           <li>Normalize the path separators according to the platform</li>
         </ul>
 
-        <p>*Bug fixes*</p>
+        <p>**Bug fixes**</p>
         <ul> 
           <li>deals correctly with symlinks creating cycles when looking for git directories (thank to cedric-chadaleux)</li>
           <li>Multigit was too agressive in detecting git repository, do not mandate existence of `hooks` and `info`</li>
@@ -129,7 +131,7 @@
     <release version="1.6.1" date="2025-02-01">
       <url type="details">https://github.com/idemia/multigit/releases/tag/MULTIGIT_OPENSOURCE_v1.6.1</url>
       <description>
-        <p>*Improvements*</p>
+        <p>**Improvements**</p>
         <ul>
           <li>Porting to Linux</li>
           <li>Add support for `gitk` and `git gui`</li>
@@ -140,16 +142,16 @@
 
 
     <release version="1.6.0" date="2023-04-14">
-      <url type="details">https://github.com/idemia/multigit/releases/tag/MULTIGIT_OPENSOURCE_v1.6</url>
+      <url type="details">https://github.com/idemia/multigit/releases/tag/MULTIGIT_OPENSOURCE_V1.6</url>
       <description>
         <p>First official release to the open source world!</p>
-        <p>*Improvements*</p>
+        <p>**Improvements**</p>
         <ul>
           <li>Using `Enter` on a repository triggers the same action as double-clicking it.</li>
           <li>Better about dialog, listing all open source components and licenses</li>
           <li>document multigit file format with a JSON schema</li>
         </ul>
-        <p>*Bug fixes*</p>
+        <p>**Bug fixes**</p>
         <ul>
           <li>Fix problem in branch/tag checkout</li>
           <li>it was impossible to create a branch with the name different only by case from another branch created in the past</li>
@@ -160,6 +162,10 @@
       </description>
     </release>
   </releases>
-
-
+  <requires>
+    <!-- ONLY desktop supported -->
+    <control>keyboard</control>
+    <control>pointing</control>
+    <display_length compare="ge">768</display_length>
+  </requires>
 </component>
