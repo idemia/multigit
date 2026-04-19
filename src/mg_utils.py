@@ -447,7 +447,7 @@ def ignoreCppObjectDeletedError(method: Any) -> Any:
     return protected_method
 
 def normalize_path(p: Union[str, pathlib.Path], platform: Optional[str] = None) -> str:
-    '''Return the path normalized to the target platform, converting / to \ or \ to / where appropriate
+    '''Return the path normalized to the target platform, converting / to \\ or \\ to / where appropriate
 
     If platform is provided, it used for defining the platform convetion. Else, sys.platform is used
     '''
