@@ -1,10 +1,10 @@
-# Generated from CHANGELOG.md on 2026-04-19 09:58:48.739844
+# Generated from CHANGELOG.md on 2026-04-19 12:36:21.008689
 
 
 content_html = '''
 <h1 align="center">MultiGit</h1>
 
-<p><em>by Phlipppe Fremy <a href="&#x6d;a&#105;&#108;&#116;&#111;&#x3a;&#x70;&#104;&#105;&#108;&#105;&#112;&#x70;&#x65;&#x2e;&#102;&#114;&#x65;&#x6d;&#121;&#x40;&#105;&#x64;&#x65;&#x6d;&#105;&#x61;&#46;&#99;&#x6f;&#x6d;">&#x70;&#104;&#105;&#108;&#105;&#112;&#x70;&#x65;&#x2e;&#102;&#114;&#x65;&#x6d;&#121;&#x40;&#105;&#x64;&#x65;&#x6d;&#105;&#x61;&#46;&#99;&#x6f;&#x6d;</a></em></p>
+<p><em>by Phlipppe Fremy <a href="&#109;&#x61;i&#108;&#116;&#x6f;&#58;&#x70;&#x68;&#105;&#108;i&#112;&#112;&#x65;&#x2e;&#x66;&#x72;&#101;&#109;&#x79;&#x40;&#x69;&#x64;&#x65;&#109;&#x69;&#97;&#x2e;&#99;&#111;m">&#x70;&#x68;&#105;&#108;i&#112;&#112;&#x65;&#x2e;&#x66;&#x72;&#101;&#109;&#x79;&#x40;&#x69;&#x64;&#x65;&#109;&#x69;&#97;&#x2e;&#99;&#111;m</a></em></p>
 
 <h2>Introduction</h2>
 
@@ -21,7 +21,7 @@ content_html = '''
 <li>Sublime Merge is detected when installed as a Snap or a Flatpak</li>
 <li>Multigit is available as Flatpak for simpler installation under Linux</li>
 <li>Multigit is available as a Chocolatey package for simpler installation under Windows</li>
-<li>Add a <code><span style="background-color:#f5f5f5;">Getting Started</span></code> documentation, showed on the first launch</li>
+<li>Add a <code>Getting Started</code> documentation, showed on the first launch</li>
 </ul>
 
 <p><strong>Improvements</strong></p>
@@ -46,7 +46,7 @@ content_html = '''
 
 <ul>
 <li>deals correctly with symlinks creating cycles when looking for git directories (thank to cedric-chadaleux)</li>
-<li>Multigit was too agressive in detecting git repository, do not mandate existence of <code><span style="background-color:#f5f5f5;">hooks</span></code> and <code><span style="background-color:#f5f5f5;">info</span></code></li>
+<li>Multigit was too agressive in detecting git repository, do not mandate existence of <code>hooks</code> and <code>info</code></li>
 <li>Field SHA1 was not updated sometimes after a fetch</li>
 <li>First line of git output was not included in the display</li>
 <li>when doing commit + push, sometimes, push was done before the commit</li>
@@ -68,9 +68,9 @@ content_html = '''
 
 <ul>
 <li>Porting to Linux</li>
-<li>Add support for <code><span style="background-color:#f5f5f5;">gitk</span></code> and <code><span style="background-color:#f5f5f5;">git gui</span></code></li>
+<li>Add support for <code>gitk</code> and <code>git gui</code></li>
 <li>Add CI for Linux and Windows on Github</li>
-<li>support cloning from url like: <code><span style="background-color:#f5f5f5;">fremy@host.xz:path/to/repo.git/</span></code></li>
+<li>support cloning from url like: <code>fremy@host.xz:path/to/repo.git/</code></li>
 </ul>
 
 <h2>Version 1.6.0 (2023-04-14)</h2>
@@ -80,7 +80,7 @@ content_html = '''
 <p>Improvements:</p>
 
 <ul>
-<li>Using <code><span style="background-color:#f5f5f5;">Enter</span></code> on a repository triggers the same action as double-clicking it.</li>
+<li>Using <code>Enter</code> on a repository triggers the same action as double-clicking it.</li>
 <li>Better about dialog, listing all open source components and licenses</li>
 <li>document multigit file format with a JSON schema</li>
 </ul>

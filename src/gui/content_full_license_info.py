@@ -1,4 +1,4 @@
-# Generated from FULL_LICENSING_INFORMATION.md on 2026-04-19 09:58:48.768833
+# Generated from FULL_LICENSING_INFORMATION.md on 2026-04-19 12:36:21.049643
 
 
 content_html = '''
@@ -15,7 +15,7 @@ either get the approval of IDEMIA for using its logo or remove the IDEMIA logo f
 
 <p>Multigit software and source code is released under Apache 2.0 License:</p>
 
-<pre><code><span style="background-color:#f5f5f5;">                                 Apache License
+<pre><code>                                 Apache License
                            Version 2.0, January 2004
                         http://www.apache.org/licenses/
 
@@ -191,13 +191,13 @@ TERMS AND CONDITIONS FOR USE, REPRODUCTION, AND DISTRIBUTION
    of your accepting any such warranty or additional liability.
 
 END OF TERMS AND CONDITIONS
-</span></code></pre>
+</code></pre>
 
 <h2>Python</h2>
 
 <p>Python software is licensed under the PSF License Agreement.</p>
 
-<pre><code><span style="background-color:#f5f5f5;">PSF LICENSE AGREEMENT FOR PYTHON 3.8.10
+<pre><code>PSF LICENSE AGREEMENT FOR PYTHON 3.8.10
 
 1. This LICENSE AGREEMENT is between the Python Software Foundation ("PSF"), and
    the Individual or Organization ("Licensee") accessing and otherwise using Python
@@ -240,7 +240,7 @@ END OF TERMS AND CONDITIONS
 
 8. By copying, installing or otherwise using Python 3.8.10, Licensee agrees
    to be bound by the terms and conditions of this License Agreement.
-</span></code></pre>
+</code></pre>
 
 <h2>PySide / Qt6 for Python</h2>
 
@@ -249,7 +249,7 @@ used by Qt6.</p>
 
 <p>Qt/PySide6 is available under LGPLv3.</p>
 
-<pre><code><span style="background-color:#f5f5f5;">             GNU LESSER GENERAL PUBLIC LICENSE
+<pre><code>             GNU LESSER GENERAL PUBLIC LICENSE
                    Version 3, 29 June 2007
 
  Copyright (C) 2007 Free Software Foundation, Inc. &lt;https://fsf.org/&gt;
@@ -414,13 +414,13 @@ whether future versions of the GNU Lesser General Public License shall
 apply, that proxy's public statement of acceptance of any version is
 permanent authorization for you to choose that version for the
 Library.
-</span></code></pre>
+</code></pre>
 
 <h2>Concurrent-Log-Handler</h2>
 
 <p>Concurrent Log Handler is available under Apache 2.0 license.</p>
 
-<pre><code><span style="background-color:#f5f5f5;">                                 Apache License
+<pre><code>                                 Apache License
                            Version 2.0, January 2004
                         http://www.apache.org/licenses/
 
@@ -596,11 +596,11 @@ TERMS AND CONDITIONS FOR USE, REPRODUCTION, AND DISTRIBUTION
    of your accepting any such warranty or additional liability.
 
 END OF TERMS AND CONDITIONS
-</span></code></pre>
+</code></pre>
 
 <h2>PyInstaller</h2>
 
-<pre><code><span style="background-color:#f5f5f5;">================================
+<pre><code>================================
      The PyInstaller licensing terms
 ================================
 
@@ -1236,13 +1236,13 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
-</span></code></pre>
+</code></pre>
 
 <h2>Icons8</h2>
 
 <p>Icons from the Icons8 website are provided under the license for a Free Account Holder.</p>
 
-<pre><code><span style="background-color:#f5f5f5;">Using, downloading, or copying images or content from our website or that of our
+<pre><code>Using, downloading, or copying images or content from our website or that of our
 subsidiaries constitutes your acceptance of these Licensing Terms as well as any
 changes to this Agreement. Please revisit this Agreement prior to purchasing any future content licenses in order to be aware of changes.
 
@@ -1657,7 +1657,7 @@ Agreement, please contact us at:
 https://icons8.com/contact
 support@icons8.com
 Tel: + 1 929-445-2737
-</span></code></pre>
+</code></pre>
 
 <h2>Icons</h2>
 
@@ -1672,7 +1672,7 @@ Attribution 3.0 Unported License.</p>
 
 <p>See <a href="https://git-scm.com/downloads/logos">Git logos</a></p>
 
-<pre><code><span style="background-color:#f5f5f5;">Attribution 3.0 Unported (CC BY 3.0)
+<pre><code>Attribution 3.0 Unported (CC BY 3.0)
 
 This is a human-readable summary of (and not a substitute for) the license. Disclaimer.
 You are free to:
@@ -1703,6 +1703,6 @@ Notices:
 
     No warranties are given. The license may not give you all of the permissions necessary for your intended use. For 
     example, other rights such as publicity, privacy, or moral rights may limit how you use the material.
-</span></code></pre>
+</code></pre>
 
 '''
