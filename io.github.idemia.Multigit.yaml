@@ -31,26 +31,16 @@ modules:
       - cp -a /app/multigit/images/multigit-logo-16.png /app/share/icons/hicolor/16x16/apps/io.github.idemia.Multigit.png
 
     sources: 
+      - type: git 
+        url: https://github.com/idemia/multigit
+        commit: 9e1df8317c49d5f9c7509a9d9a5d5b2cad655281
+
       - type: script
         dest-filename: multigit.sh
         commands:
           - exec python3 /app/multigit/multigit.py "$@"
 
-      - type: dir
-        path: .
 
-
-  ### Release build        
-  # - name: multigit
-  #   buildsystem: simple
-  #   build-commands:
-  #     - pip3 install --verbose --exists-action=i --no-index --find-links=file://${PWD} --prefix=${FLATPAK_DEST} multigit_gx --no-build-isolation
-
-  #   sources: 
-  #     - type: file
-  #       url: https://files.pythonhosted.org/packages/fe/c5/c96c7337a2d1242de5fade71b29494f0438def39617cf658c1b7758b6f1d/multigit_gx-1.7.1-py3-none-any.whl
-  #       sha256: ada16d1ab3450b8f845719d0acbc4ad99dc69150d3d19020124f93236517bcb7
-  
 
 cleanup:
   - /lib/python3.12/site-packages/PySide6/include
