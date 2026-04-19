@@ -1,10 +1,10 @@
-# Generated from CHANGELOG.md on 2026-04-14 22:51:01.851218
+# Generated from CHANGELOG.md on 2026-04-19 09:58:48.739844
 
 
 content_html = '''
 <h1 align="center">MultiGit</h1>
 
-<p><em>by Phlipppe Fremy <a href="&#109;&#x61;&#105;l&#116;&#111;&#58;p&#104;&#105;&#108;&#105;&#112;&#x70;&#101;&#x2e;&#x66;r&#x65;&#109;&#121;&#64;&#x69;&#x64;&#x65;&#109;&#105;a&#x2e;&#x63;&#111;&#109;">p&#104;&#105;&#108;&#105;&#112;&#x70;&#101;&#x2e;&#x66;r&#x65;&#109;&#121;&#64;&#x69;&#x64;&#x65;&#109;&#105;a&#x2e;&#x63;&#111;&#109;</a></em></p>
+<p><em>by Phlipppe Fremy <a href="&#x6d;a&#105;&#108;&#116;&#111;&#x3a;&#x70;&#104;&#105;&#108;&#105;&#112;&#x70;&#x65;&#x2e;&#102;&#114;&#x65;&#x6d;&#121;&#x40;&#105;&#x64;&#x65;&#x6d;&#105;&#x61;&#46;&#99;&#x6f;&#x6d;">&#x70;&#104;&#105;&#108;&#105;&#112;&#x70;&#x65;&#x2e;&#102;&#114;&#x65;&#x6d;&#121;&#x40;&#105;&#x64;&#x65;&#x6d;&#105;&#x61;&#46;&#99;&#x6f;&#x6d;</a></em></p>
 
 <h2>Introduction</h2>
 
@@ -12,7 +12,7 @@ content_html = '''
 
 <h2>Version 1.8.0 (2026-04-20)</h2>
 
-<p>New features</p>
+<p><strong>New features</strong></p>
 
 <ul>
 <li>Add auto-stash capabilities to all operations involving branch merging</li>
@@ -24,7 +24,7 @@ content_html = '''
 <li>Add a <code><span style="background-color:#f5f5f5;">Getting Started</span></code> documentation, showed on the first launch</li>
 </ul>
 
-<p>Improvements</p>
+<p><strong>Improvements</strong></p>
 
 <ul>
 <li>on the repository tab bar, duplicate, close or rename a tab with a context menu</li>
@@ -42,7 +42,7 @@ content_html = '''
 <li>Normalize the path separators according to the platform</li>
 </ul>
 
-<p>Bugfixes</p>
+<p><strong>Bugfixes</strong></p>
 
 <ul>
 <li>deals correctly with symlinks creating cycles when looking for git directories (thank to cedric-chadaleux)</li>

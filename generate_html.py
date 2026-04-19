@@ -48,10 +48,6 @@ def markdown2qthtml(md_text: str) -> str:
     html_text: str
     html_text = markdown2.markdown(md_text)
     html_text = html_text.replace('<h1>', '<h1 align="center">')
-    html_text = html_text.replace('<code>\n', '<p style="background-color:#f5f5f5;"><blockquote><pre><code>\n')
-    html_text = html_text.replace('</code>\n', '</code></pre></blockquote></p>\n')
-    html_text = html_text.replace('<code>', '<code><span style="background-color:#f5f5f5;">')
-    html_text = html_text.replace('</code>', '</span></code>')
     return html_text
 
 

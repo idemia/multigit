@@ -1,4 +1,4 @@
-# Generated from getting_started.md on 2026-04-13 09:42:48.265738
+# Generated from getting_started.md on 2026-04-19 09:58:48.789788
 
 
 content_html = '''
