@@ -22,16 +22,15 @@
     </p>
     <p>
       Typically, it lets you: 
-      <ul>
-        <li>Fetch or pull on many repositories at the same time </li> 
-        <li>Identify visually which repositories are modified or need an update (push or pull)</li>
-        <li>Create a new branch in a subset of repositories </li> 
-        <li>Switch to a branch existing only in some repositories</li> 
-        <li>perform a commit on multiple repositories at the same time, and push it </li> 
-        <li>launch your preferred git frontend on an interesting repository </li>
-        <li> export your repositories state to a file, for reproducing it on a colleagues computer </li> 
-        <li> and more... </li>
-      </ul>
+
+      * Fetch or pull on many repositories at the same time  
+      * Identify visually which repositories are modified or need an update (push or pull)
+      * Create a new branch in a subset of repositories  
+      * Switch to a branch existing only in some repositories 
+      * perform a commit on multiple repositories at the same time, and push it  
+      * launch your preferred git frontend on an interesting repository 
+      *  export your repositories state to a file, for reproducing it on a colleagues computer  
+      *  and more... 
     </p>
   </description>
   
@@ -40,8 +39,6 @@
     <keyword>Development</keyword>
     <keyword>Git</keyword>
   </keywords>
-
-  <content_rating type="oars-1.1" />
 
   <screenshots>
     <screenshot type="default">
@@ -162,10 +159,10 @@
       </description>
     </release>
   </releases>
-  <requires>
+  <recommends>
     <!-- ONLY desktop supported -->
     <control>keyboard</control>
     <control>pointing</control>
     <display_length compare="ge">768</display_length>
-  </requires>
+  </recommends>
 </component>

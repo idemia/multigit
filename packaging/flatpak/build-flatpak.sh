@@ -2,11 +2,14 @@ scriptdir=$(dirname $(realpath $0))
 
 app_id=io.github.idemia.Multigit
 
-(cd $scriptdir 
-	&& flatpak run --command=flatpak-builder-lint org.flatpak.Builder appstream $app_id.metainfo.xml \
-	&& desktop-file-validate $app_id.desktop \
-	&& cd $scriptdir/../.. \
-	&& flatpak-builder --force-clean builddir /home/philippe/work/multigit/io.github.idemia.Multigit.yaml \
-	&& flatpak-builder --user --force-clean --install builddir io.github.idemia.Multigit.yaml -v \
-	&& flatpak run io.github.idemia.Multigit --debug)
-	
+
+(cd $scriptdir \
+    && echo "appstreamcli validate" && appstreamcli validate $app_id.metainfo.xml \
+    && echo "desktop-file-validate" && desktop-file-validate $app_id.desktop \
+    && cd $scriptdir/../.. \
+    && echo "Building flatpak" \
+    && flatpak-builder --user --force-clean --install builddir $app_id.yaml -v \
+    && flatpak run $app_id --debug)
+
+    # && flatpak run --command=flatpak-builder-lint org.flatpak.Builder appstream $app_id.metainfo.xml \
+    #&& flatpak run --command=flathub-build org.flatpak.Builder --user --install builddir $app_id.yaml \
