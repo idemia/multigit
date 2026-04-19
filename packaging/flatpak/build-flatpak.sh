@@ -3,6 +3,12 @@ basedir=$(realpath $(dirname $(realpath $0))/../../)
 
 app_id=io.github.idemia.Multigit
 
+if [ "X$1" == "X--show" ]
+then
+    gnome-software --show-metainfo $app_id.metainfo.xml
+    exit 0
+fi
+
 
 (cd $scriptdir \
     && flatpak run --command=flatpak-builder-lint org.flatpak.Builder appstream $app_id.metainfo.xml \
