@@ -239,6 +239,7 @@ def init_logging(debug_activated: bool = False, run_from_tests: bool = False) ->
         shandler_err.setLevel( logging.DEBUG )
     else:
         shandler_err.setLevel( logging.INFO )
+        shandler_err.addFilter(lambda record: record.name != mg_const.LOGGER_GIT_CMD)
     logger.addHandler(shandler_err)
     shandler_err.setFormatter(formatter)
 
