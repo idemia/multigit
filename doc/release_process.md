@@ -34,7 +34,7 @@
   * This stages the Chocolatey package in `build\chocolatey\package`
   * If `choco` is installed, it also creates `dist\multigit.<version>.nupkg`
   * Test locally with `choco install --yes multigit --source dist`
-  * Push the result with: `choco push dist\multigit.1.7.1.nupkg  --source https://push.chocolatey.org/`
+  * Push the result with: `choco push --source https://push.chocolatey.org/ dist\multigit.1.7.1.nupkg`
 
  
 ## Publish the release on GitHub

@@ -11,7 +11,7 @@ Multigit help users to manage many Git repositories simultaneously.
 Version 1.8.0 (2026-04-20)
 --------------------------
 
-New features
+**New features**
 
 * Add auto-stash capabilities to all operations involving branch merging
 * configure the displayed columns with a context menu
@@ -21,7 +21,7 @@ New features
 * Multigit is available as a Chocolatey package for simpler installation under Windows
 * Add a `Getting Started` documentation, showed on the first launch
 
-Improvements
+**Improvements**
 
 * on the repository tab bar, duplicate, close or rename a tab with a context menu
 * on the repository tab bar, middle-click on a tab button closes the current tab
@@ -37,7 +37,7 @@ Improvements
 * Detect when too many authentication failures and warn the user before possibly locking his account
 * Normalize the path separators according to the platform
 
-Bugfixes
+**Bugfixes**
   
 * deals correctly with symlinks creating cycles when looking for git directories (thank to cedric-chadaleux)
 * Multigit was too agressive in detecting git repository, do not mandate existence of `hooks` and `info`
