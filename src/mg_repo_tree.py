@@ -16,7 +16,7 @@
 
 
 from typing import List, Any, Optional, Dict, Callable, cast, Tuple
-import logging, subprocess
+import logging
 import functools
 import enum
 

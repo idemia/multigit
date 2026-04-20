@@ -16,7 +16,7 @@
 
 
 from typing import cast, List, Optional, Callable, Any, Union, Literal
-import subprocess, functools, logging, pathlib
+import logging, pathlib
 
 from PySide6.QtWidgets import QMainWindow, QFileDialog, QMessageBox, QApplication, QLineEdit, QTabBar, QMenu, QDialog
 from PySide6.QtCore import QTimer, Qt, QPoint

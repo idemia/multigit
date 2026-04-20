@@ -17,7 +17,7 @@
 
 from typing import Sequence, Union, Optional, Callable, Tuple, Any, List, Dict, Type, Generator
 
-import logging, subprocess, sys, os
+import logging, sys, os
 from pathlib import Path
 from collections import deque
 from enum import Enum, auto

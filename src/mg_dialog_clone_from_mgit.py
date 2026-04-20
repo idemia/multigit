@@ -16,7 +16,7 @@
 
 
 from typing import TYPE_CHECKING, List, Optional, cast
-import logging, pathlib, json, os, subprocess, time, sys
+import logging, pathlib, json, os
 
 from PySide6.QtGui import QRegularExpressionValidator, QColor
 from PySide6.QtWidgets import QDialog, QWidget, QFileDialog, QMessageBox, QTreeWidgetItem, QPushButton, QDialogButtonBox
