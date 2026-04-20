@@ -6,7 +6,7 @@ command: multigit.sh
 
 
 modules:
-  - packaging/flatpak/python3-requirements-release.json
+  - python3-requirements.json
 
   ### Build from sources
   - name: multigit
