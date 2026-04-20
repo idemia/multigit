@@ -15,7 +15,9 @@ fi
     && echo "desktop-file-validate" && desktop-file-validate $app_id.desktop \
     && cd $scriptdir/../../../multigit-flatpak-build \
     && echo "Building flatpak" \
-    && flatpak-builder --user --force-clean --install builddir $basedir/$app_id.yaml -v \
+    && cp -af $scriptdir/python3-requirements.json . \
+    && cp -af $basedir/$app_id.yaml . \
+    && flatpak-builder --user --force-clean --install builddir $app_id.yaml -v \
     && flatpak run $app_id --debug)
 
     # && echo "appstreamcli validate" && appstreamcli validate $app_id.metainfo.xml \
