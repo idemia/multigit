@@ -29,13 +29,8 @@ finish-args:
   # - export a multigit file, CSV file on the host filesystem
 
   # - home is the standard location for users to store their git repositories
-  # - /media is used by some users to store their projects on removable media
-  # - /tmp is used by some users to check how multigit works on an example
-  # Note that if a user stores its development work outside of its home directory, let's say in /work
-  # Multigit won't be able to access it
+  #   if any other location is needed, the user still has the option to enable it when launching multigit on the command-line
   - --filesystem=home
-  - --filesystem=/media
-  - --filesystem=/tmp
 
 build-options:
   env:
@@ -68,13 +63,13 @@ modules:
 
     sources:
       # build from git
-      #- type: git
-      #  url: https://github.com/idemia/multigit
-      #  tag: flathub/Multigit-v1.8-submission2
+      - type: git
+        url: https://github.com/idemia/multigit
+        tag: flathub/Multigit-v1.8-submission3
 
-      - type: dir
-        path: ../multigit
-
+      #- type: dir
+      #  path: ../multigit
+      #
 
       - type: script
         dest-filename: multigit.sh
