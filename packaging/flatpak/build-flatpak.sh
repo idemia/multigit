@@ -15,8 +15,7 @@ fi
     && echo "desktop-file-validate" && desktop-file-validate $app_id.desktop \
     && cd $scriptdir/../../../multigit-flatpak-build \
     && echo "Building flatpak" \
-    && cp -af $scriptdir/python3-requirements.json . \
-    && cp -af $basedir/$app_id.yaml . \
+    && cp -af $scriptdir/{multigit-requirements.json,$app_id.yaml} . \
     && flatpak-builder --user --force-clean --install builddir $app_id.yaml -v \
     && flatpak run $app_id --debug)
 

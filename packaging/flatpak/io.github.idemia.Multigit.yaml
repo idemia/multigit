@@ -68,9 +68,13 @@ modules:
 
     sources:
       # build from git
-      - type: git
-        url: https://github.com/idemia/multigit
-        tag: flathub/Multigit-v1.8-submission2
+      #- type: git
+      #  url: https://github.com/idemia/multigit
+      #  tag: flathub/Multigit-v1.8-submission2
+
+      - type: dir
+        path: ../multigit
+
 
       - type: script
         dest-filename: multigit.sh
