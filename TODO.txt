@@ -3,8 +3,6 @@
 # Windows
 
 # Flatpak packaging
-- use CDN for the screenshots
-- export to a flatpak repository
 - sign with gpg key
 
 ## Nice to have
