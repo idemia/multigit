@@ -23,6 +23,9 @@ import enum
 from PySide6.QtWidgets import QTreeWidget, QMenu, QApplication, QMessageBox, QAbstractItemView, QTreeWidgetItem, QHeaderView, QDialog
 from PySide6.QtGui import QIcon, QMouseEvent, QContextMenuEvent, QPixmap, QAction
 from PySide6.QtCore import Qt, QPoint, Signal, QPoint
+import pathlib
+  
+
 
 from src import mg_const
 from src import mg_config as mgc
@@ -77,6 +80,8 @@ class MgRepoTree(QTreeWidget):
     rmbMenu: QMenu
     rmbTgitMenu: QMenu
 
+    isTreeView: bool = True
+
     show_column_menu = Signal(QPoint)
 
     def __init__(self, *args: Any) -> None:
@@ -93,9 +98,10 @@ class MgRepoTree(QTreeWidget):
         self.header().setFont(f)
         self.header().setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
 
-        self.sortByColumn(mg_const.COL_REPO_NAME, Qt.SortOrder.AscendingOrder)
-        self.setColumnWidth(mg_const.COL_UPDATE, 40)
-        self.setIndentation(10)
+        self.sortByColumn(0, Qt.SortOrder.AscendingOrder)
+        self.setColumnWidth(0, 300) 
+        self.setColumnWidth(1, 40)  
+        self.setIndentation(15)     # indentation for the TreeView
 
         self.configureColumns()
 
@@ -119,10 +125,15 @@ class MgRepoTree(QTreeWidget):
     def configureColumns(self) -> None:
         self.setColumnCount(mg_const.COL_NB)
         self.setHeaderLabels(mg_const.COL_TITLES)
+        
+     
+        self.headerItem().setText(0, "Git Repo Path")
+        self.headerItem().setText(1, "")
+        
         self.setSelectionMode(QAbstractItemView.SelectionMode.ExtendedSelection)
         self.setAllColumnsShowFocus(True)
         self.header().setSortIndicatorShown(True)
-        self.headerItem().setToolTip(mg_const.COL_UPDATE, mg_const.MSG_TOOLTIP_UPDATE)
+        self.headerItem().setToolTip(1, mg_const.MSG_TOOLTIP_UPDATE)
         self.headerItem().setToolTip(mg_const.COL_STATUS, mg_const.MSG_TOOLTIP_STATUS)
         self.headerItem().setToolTip(mg_const.COL_REMOTE_SYNCHRO, mg_const.MSG_TOOLTIP_REMOTE_SYNCHRO)
 
@@ -215,9 +226,17 @@ class MgRepoTree(QTreeWidget):
         self.mgActions.actionTGitBranch   .triggered.connect(self.slotTGitBranch)
 
 
+
     def slotContextMenuRequested(self, p: QPoint) -> None:
         '''Capture the right-button mouse click action to display a menu'''
-        self.rmbMenu.exec_(self.viewport().mapToGlobal(p)) # qme.globalPos())
+        
+        item = self.itemAt(p)
+
+        if item is None or not hasattr(item, 'repoInfo'):
+            dbg('Clic droit sur un dossier ou dans le vide : menu ignoré')
+            return
+
+        self.rmbMenu.exec_(self.viewport().mapToGlobal(p))
 
 
     def slotHeaderContextMenuRequested(self, p: QPoint) -> None:
@@ -234,9 +253,14 @@ class MgRepoTree(QTreeWidget):
     def deleteRepos(self, deletedRepo: List[MgRepoInfo]) -> None:
         '''Remove all the items related to the listed repositories'''
         for repoInfo in deletedRepo:
-            for itemIdx in range(self.topLevelItemCount()):
-                if self.topLevelItem(itemIdx).text(mg_const.COL_REPO_NAME) == repoInfo.name:     # type: ignore # topLevelItem(itemIdx) exists and is not None
-                    self.takeTopLevelItem(itemIdx)
+            for item in self.allRepoItems():
+                if item.text(mg_const.COL_REPO_NAME) == repoInfo.name:
+                    parent = item.parent()
+                    if parent:
+                        parent.removeChild(item)
+                    else:
+                        idx = self.indexOfTopLevelItem(item)
+                        self.takeTopLevelItem(idx)
                     break  # we only have one such item per repo, no need to continue searching
             else:
                 warn('Item not found for deleted repo: %s' % repoInfo.name)
@@ -245,25 +269,64 @@ class MgRepoTree(QTreeWidget):
         QApplication.processEvents()
 
 
-    def addRepos(self, repoInfoList: List[MgRepoInfo]) -> List[MgRepoTreeItem]:
-        '''Add the listed repos as items to this repoTree.
-        Return the list of MgRepoTreeItem created'''
+    def addRepos(self, repoInfoList: List[MgRepoInfo]) -> List[MgRepoTreeItem]:     
         noSelectedItem = (self.topLevelItemCount() == 0)
-
         items: List[MgRepoTreeItem] = []
+        isTreeView = getattr(self, 'isTreeView', True)
+        self.setRootIsDecorated(isTreeView)
+        existing_items: Dict[str, QTreeWidgetItem] = {}
 
-        # first step, we fill the list of repo
-        for repoInfo in repoInfoList:
+        if isTreeView:
+            def get_or_create_parent(path_obj: pathlib.Path) -> Any:
+                # Returns a QTreeWidgetItem, or self (MgRepoTree) for the root level.
+                if path_obj == path_obj.parent or str(path_obj) == '.':
+                    return existing_items.get('.', self)
+
+                posix_str = path_obj.as_posix()
+                if posix_str in existing_items:
+                    return existing_items[posix_str]
+
+                parent_of_folder = get_or_create_parent(path_obj.parent)
+
+                folder_item = QTreeWidgetItem(parent_of_folder)
+                folder_item.setText(0, path_obj.name)
+                folder_item.setIcon(0, QIcon(':/img/icons8-open-folder-64.png'))
+
+                existing_items[posix_str] = folder_item
+                if parent_of_folder is not self:
+                    parent_of_folder.setExpanded(True)
+
+                return folder_item
+
+        
+        repoInfoList_sorted = sorted(repoInfoList, key=lambda r: r.name)
+
+        for repoInfo in repoInfoList_sorted:
             item = MgRepoTreeItem(repoInfo, self)
+            
+      
+            if isTreeView:
+                parent_path = pathlib.Path(repoInfo.name).parent
+                parent_item = get_or_create_parent(parent_path)
+
+                if parent_item != self:
+                    idx = self.indexOfTopLevelItem(item)
+                    if idx >= 0:
+                        self.takeTopLevelItem(idx)
+                    parent_item.addChild(item)
+                    parent_item.setExpanded(True)
+                    
+                existing_items[repoInfo.name] = item 
+                existing_items[pathlib.Path(repoInfo.name).as_posix()] = item
+
+            item.fillRepoItem()
             items.append(item)
+
             if noSelectedItem:
                 self.setCurrentItem(item)
                 noSelectedItem = False
 
-            self.autoAdjustColumnSize()
-
         return items
-
 
     def autoAdjustColumnSize(self) -> None:
         '''Adjust automatically the column size to the largest item'''
@@ -291,14 +354,32 @@ class MgRepoTree(QTreeWidget):
 
 
     def allRepoItems(self) -> List[MgRepoTreeItem]:
-        '''Return the list of all MgRepoTreeItem of the widget'''
-        items = []
+        '''Return the list of all MgRepoTreeItem of the widget (Recursive)'''
+        items: List[MgRepoTreeItem] = []
+
+        def collect_children(parent_item: QTreeWidgetItem) -> None:
+            for i in range(parent_item.childCount()):
+                child = parent_item.child(i)
+
+                if hasattr(child, 'repoInfo'):
+                    items.append(cast(MgRepoTreeItem, child))
+                collect_children(child)
+
         for idx in range(self.topLevelItemCount()):
             item = self.topLevelItem(idx)
-            if item and item.type() == TWI_TYPE_REPO:
+            if item is None:
+                continue
+            if hasattr(item, 'repoInfo'):
                 items.append(cast(MgRepoTreeItem, item))
+            collect_children(item)
+
         return items
 
+    def rebuildTree(self) -> None:
+        '''Destroy the tree and rebuild it with the new view''' 
+        repos = self.allRepos()  
+        self.clear()            
+        self.addRepos(repos)
 
     ##########################################################################
     #
@@ -359,7 +440,8 @@ class MgRepoTree(QTreeWidget):
         '''Called when user double-clicked or presses enter on an item. Call user-defined action'''
         dbg('slotItemActivated()')
 
-        if item.type() == TWI_TYPE_GROUP:
+        if item.type() == TWI_TYPE_GROUP or not hasattr(item, 'repoInfo'):
+            
             item.setExpanded(not item.isExpanded())
             return
 
@@ -410,11 +492,12 @@ class MgRepoTree(QTreeWidget):
 
     def doRefreshItems(self, items: List[MgRepoTreeItem]) -> None:
         for it in items:
-            # clear items before updating them, this is better visually
-            it.markItemInProgress()
+            if hasattr(it, 'markItemInProgress'):
+                it.markItemInProgress()
 
         for it in items:
-            it.repoInfo.refresh()
+            if hasattr(it, 'repoInfo'):
+                it.repoInfo.refresh()
 
 
     def slotMenuCopyAboutToShow(self) -> None:
