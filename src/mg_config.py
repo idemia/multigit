@@ -22,10 +22,18 @@ from pathlib import Path
 from pprint import pformat
 import logging, traceback
 import datetime, shutil
+from functools import lru_cache
 
 from PySide6.QtCore import Qt
 from PySide6.QtWidgets import QMessageBox, QApplication
 from PySide6.QtGui import QColor
+
+SUFFIX_ACTIVATED        = '_ACTIVATED'
+SUFFIX_AUTODETECT       = '_AUTODETECT'
+SUFFIX_MANUAL_PATH      = '_MANUAL_PATH'
+SUFFIX_CMD_TYPE         = '_CMD_TYPE'
+SUFFIX_APP_NAME         = '_APP_NAME'
+
 
 # keys for the configuration file
 CONFIG_MAINWINDOW_GEOMETRY = 'MAINWINDOW_GEOMETRY'
@@ -76,6 +84,7 @@ CONFIG_CLONE_USERNAME = 'CONFIG_CONFIG_CLONE_USERNAME'
 CONFIG_FETCH_ON_STARTUP = 'CONFIG_FETCH_ON_STARTUP'
 CONFIG_DISPLAY_FETCH_ON_STARTUP_COUNTDOWN = 'CONFIG_DISPLAY_FETCH_ON_STARTUP_COUNTDOWN'
 CONFIG_CONFIRM_BEFORE_QUIT = 'CONFIG_CONFIRM_BEFORE_QUIT'
+CONFIG_SHOW_GETTING_STARTED = 'CONFIG_SHOW_GETTING_STARTED'
 
 # Format is: 0xAARRGGBB with AA = alpha, RR = red, GG = green, BB = blue
 DEFAULT_CONFIG_HEAD_COLOR_BRANCH = QColor(Qt.GlobalColor.blue).rgb()
@@ -89,6 +98,7 @@ __CONFIG_INSTANCE = None
 
 T = TypeVar('T')
 
+@lru_cache(maxsize=1)
 def get_config_instance() -> 'MgConfig':
     '''Return an instance of the configuration of Multigit, with the default configuration path'''
     global __CONFIG_INSTANCE

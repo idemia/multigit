@@ -15,12 +15,14 @@
 #
 
 
-import unittest, os
+import unittest, os, sys, pathlib
 
 from PySide6.QtWidgets import QApplication, QTreeWidget, QTreeWidgetItem
 
 from src.mg_utils import htmlize_diff, handle_cr_in_text, set_username_on_git_url, add_suffix_if_missing, extractInt, \
-    hasGitAuthFailureMsg, isGitCommandRequiringAuth, anonymise_git_url, strip_protocol_from_url, collectColumnText
+    hasGitAuthFailureMsg, isGitCommandRequiringAuth, anonymise_git_url, strip_protocol_from_url, collectColumnText, \
+    normalize_path
+
 from src.mg_config import MgConfig
 from src.mg_const import MSG_BIG_DIFF
 from src.mg_repo_info import match_ahead_behind, is_not_sha1, MgRepoInfo
@@ -269,38 +271,37 @@ bla bla bla
 
 
     def test_isGitCommandRequiringAuth(self):
-        self.assertEqual(isGitCommandRequiringAuth(['git', 'push', '--verbose']), True)
-        self.assertEqual(isGitCommandRequiringAuth(['git', 'pull']), True)
-        self.assertEqual(isGitCommandRequiringAuth(['git', 'fetch', '--progress']), True)
+        self.assertEqual(isGitCommandRequiringAuth(['push', '--verbose']), True)
+        self.assertEqual(isGitCommandRequiringAuth(['pull']), True)
+        self.assertEqual(isGitCommandRequiringAuth(['fetch', '--progress']), True)
 
         for cmdline in [
-            ['git.exe', '--version'],
-            ['git.exe', '-C', r'C:\work\Multigit\Dev', 'log', '-1'],
-            ['git.exe', '-C', r'C:\work\Multigit\Dev', 'remote', '--verbose'],
-            ['git.exe', '-C', r'C:\work\Multigit\Dev', 'status', '--porcelain', '--branch'],
-            ['git.exe', '-C', r'C:\work\Multigit\Sandbox_http', 'diff', '-u', '--patience', '--stat'],
-            ['git.exe', '-C', r'C:\work\Multigit\tmp\submodule2', 'checkout', 'master'],
-            ['git.exe', '-C', r'C:\work\Multigit\tmp\toto2\subdir1\subdir1_repo1', 'merge', 'dev'],
-            ['git.exe', '-C', r'C:\work\Multigit\tmp\toto2\subdir1\subdir1_repo1', 'status', '--porcelain', '--branch'],
-            ['git.exe', '-C', r'C:\work\Multigit\tmp\toto2\subdir1\subdir1_repo1', 'tag', '--list', '--sort',
-             'creatordate'],
-            ['git.exe', '-C', r'C:\work\Multigit\tmp\toto2\subdir1\subdir1_repo2', 'branch'],
-            ['git.exe', '-C', r'C:\work\Multigit\tmp\toto2\subdir1\subdir1_repo2', 'checkout', 'dev'],
-            ['git.exe', '-C', r'C:\work\Multigit\tmp\toto2\subdir1\subdir1_repo2', 'checkout', 'int'],
-            ['git.exe', '-C', r'C:\work\Multigit\tmp\toto2\subdir1\subdir1_repo1', 'tag', 'int_112234', '-F', r'C:\Users\g582619\AppData\Local\Temp\tmp_b_uwll1']
+            [ '--version'],
+            [ '-C', r'C:\work\Multigit\Dev', 'log', '-1'],
+            [ '-C', r'C:\work\Multigit\Dev', 'remote', '--verbose'],
+            [ '-C', r'C:\work\Multigit\Dev', 'status', '--porcelain', '--branch'],
+            [ '-C', r'C:\work\Multigit\Sandbox_http', 'diff', '-u', '--patience', '--stat'],
+            [ '-C', r'C:\work\Multigit\tmp\submodule2', 'checkout', 'master'],
+            [ '-C', r'C:\work\Multigit\tmp\toto2\subdir1\subdir1_repo1', 'merge', 'dev'],
+            [ '-C', r'C:\work\Multigit\tmp\toto2\subdir1\subdir1_repo1', 'status', '--porcelain', '--branch'],
+            [ '-C', r'C:\work\Multigit\tmp\toto2\subdir1\subdir1_repo1', 'tag', '--list', '--sort', 'create'],
+            [ '-C', r'C:\work\Multigit\tmp\toto2\subdir1\subdir1_repo2', 'branch'],
+            [ '-C', r'C:\work\Multigit\tmp\toto2\subdir1\subdir1_repo2', 'checkout', 'dev'],
+            [ '-C', r'C:\work\Multigit\tmp\toto2\subdir1\subdir1_repo2', 'checkout', 'int'],
+            [ '-C', r'C:\work\Multigit\tmp\toto2\subdir1\subdir1_repo1', 'tag', 'int_112234', '-F', r'C:\Users\g582619\AppData\Local\Temp\tmp_b_uwll1']
         ]:
             with self.subTest(' '.join(cmdline)):
                 self.assertEqual(isGitCommandRequiringAuth(cmdline), False)
 
         for cmdline in [
-            ['git.exe', '-C', r'C:\work\Multigit\Sandbox_http', 'fetch', '--verbose', '--prune'],
-            ['git.exe', '-C', r'C:\work\Multigit\tmp\toto2\subdir1\subdir1_repo1', 'fetch', '--prune'],
-            ['git.exe', '-C', r'C:\work\Multigit\tmp\toto2\subdir1\subdir1_repo1', 'pull'],
-            ['git.exe', '-C', r'C:\work\Multigit\tmp\toto2\subdir1\subdir1_repo1', 'push', '-u', '--progress', 'origin', 'int:int'],
-            ['git.exe', '-C', r'C:\work\Multigit\tmp\toto2\subdir1\subdir1_repo1', 'push', 'origin', 'int_112234'],
-            ['git.exe', '-C', r'C:\work\Multigit\tmp\toto2\subdir1\subdir1_repo2', 'fetch', '--prune'],
-            ['git.exe', 'clone', '--progress file://C:/work/Multigit/Sandbox/', r'C:\work\Multigit\tmp\submodule2'],
-            ['git.exe', 'clone', '--progress file://C:/work/Multigit/Sandbox/', r'C:\work\Multigit\tmp\submodule2'],
+            [ '-C', r'C:\work\Multigit\Sandbox_http', 'fetch', '--verbose', '--prune'],
+            [ '-C', r'C:\work\Multigit\tmp\toto2\subdir1\subdir1_repo1', 'fetch', '--prune'],
+            [ '-C', r'C:\work\Multigit\tmp\toto2\subdir1\subdir1_repo1', 'pull'],
+            [ '-C', r'C:\work\Multigit\tmp\toto2\subdir1\subdir1_repo1', 'push', '-u', '--progress', 'origin', 'int:int'],
+            [ '-C', r'C:\work\Multigit\tmp\toto2\subdir1\subdir1_repo1', 'push', 'origin', 'int_112234'],
+            [ '-C', r'C:\work\Multigit\tmp\toto2\subdir1\subdir1_repo2', 'fetch', '--prune'],
+            [ 'clone', '--progress file://C:/work/Multigit/Sandbox/', r'C:\work\Multigit\tmp\submodule2'],
+            [ 'clone', '--progress file://C:/work/Multigit/Sandbox/', r'C:\work\Multigit\tmp\submodule2'],
         ]:
             with self.subTest(' '.join(cmdline)):
                 self.assertEqual(isGitCommandRequiringAuth(cmdline), True)
@@ -443,7 +444,29 @@ p, li { white-space: pre-wrap;font-family:'Courier New'; font-size:8pt; font-wei
         sout = htmlize_diff(sin, 1000)
         self.assertEqual(sout, sout_ref)
 
+    def test_normalize_path(self) -> None:
+        assert normalize_path(r'toto\titi\tutu', 'win32') == r'toto\titi\tutu'
+        assert normalize_path(r'toto/titi/tutu', 'win32') == r'toto\titi\tutu'
+        assert normalize_path(r'toto/titi\tutu', 'win32') == r'toto\titi\tutu'
 
+        assert normalize_path(pathlib.Path(r'toto\titi\tutu'), 'win32') == r'toto\titi\tutu'
+        assert normalize_path(pathlib.Path(r'toto/titi/tutu'), 'win32') == r'toto\titi\tutu'
+        assert normalize_path(pathlib.Path(r'toto/titi\tutu'), 'win32') == r'toto\titi\tutu'
+
+        assert normalize_path(r'toto\titi\tutu', 'linux') == r'toto/titi/tutu'
+        assert normalize_path(r'toto/titi/tutu', 'linux') == r'toto/titi/tutu'
+        assert normalize_path(r'toto/titi\tutu', 'linux') == r'toto/titi/tutu'
+
+        assert normalize_path(pathlib.Path(r'toto\titi\tutu'), 'linux') == r'toto/titi/tutu'
+        assert normalize_path(pathlib.Path(r'toto/titi/tutu'), 'linux') == r'toto/titi/tutu'
+        assert normalize_path(pathlib.Path(r'toto/titi\tutu'), 'linux') == r'toto/titi/tutu'
+
+        if sys.platform == 'win32':
+            assert normalize_path(r'toto/titi\tutu') == r'toto\titi\tutu'
+        else:
+            assert normalize_path(r'toto/titi\tutu', 'linux') == r'toto/titi/tutu'
+
+        
 
 class TestUtilityFunctionsWithTree(unittest.TestCase):
 

@@ -22,7 +22,7 @@ from typing import Dict, Any, List, Union, TYPE_CHECKING
 if TYPE_CHECKING:
     from src.mg_repo_info import MultiRepo, MgRepoInfo
 
-from src.mg_utils import anonymise_git_url
+from src.mg_utils import anonymise_git_url, normalize_path
 
 logger = logging.getLogger('mg_json_mgit_parser')
 dbg = logger.debug
@@ -133,13 +133,13 @@ class Repository:
         self.head = head
         self.head_type = head_type
         # remove / or \ from the beginning of dest
-        self.destination = dest.lstrip("/\\")
+        self.destination = normalize_path(dest).lstrip("/\\")
         self.update_basepath(base_path)
         self.description = ''
 
     def update_basepath(self, base_path: str) -> None:
         '''Propagate the base_path information to all repositories, to fill the full path'''
-        self.dest_fullpath = str(pathlib.Path(base_path) / self.destination)
+        self.dest_fullpath = normalize_path(pathlib.Path(base_path) / self.destination)
 
     def fill_from_json(self, dic_rep: Dict[str, str], base_path: str) -> None:
         # JSON input dictionnary format
@@ -153,7 +153,7 @@ class Repository:
         self.head = dic_rep.get("head", "")
         self.head_type = dic_rep.get("head_type", "")
         # remove / or \ from the beginning of destination
-        self.destination = dic_rep.get("destination", "").strip("/\\")
+        self.destination = normalize_path(dic_rep.get("destination", "").strip("/\\"))
         self.description = dic_rep.get("description", "").strip()
         self.update_basepath(base_path)
 

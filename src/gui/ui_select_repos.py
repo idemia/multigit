@@ -3,7 +3,7 @@
 ################################################################################
 ## Form generated from reading UI file 'ui_select_repos.ui'
 ##
-## Created by: Qt User Interface Compiler version 6.8.2
+## Created by: Qt User Interface Compiler version 6.11.0
 ##
 ## WARNING! All changes made in this file will be lost when recompiling UI file!
 ################################################################################
@@ -39,6 +39,7 @@ class Ui_SelectRepos(object):
         self.label = QLabel(SelectRepos)
         self.label.setObjectName(u"label")
         font = QFont()
+        font.setPointSize(11)
         font.setBold(True)
         self.label.setFont(font)
 
@@ -95,7 +96,7 @@ class Ui_SelectRepos(object):
 
         self.treeWidgetAvailRepos = MgRepoTree(SelectRepos)
         __qtreewidgetitem = QTreeWidgetItem()
-        __qtreewidgetitem.setText(0, u"1");
+        __qtreewidgetitem.setText(0, u"1")
         self.treeWidgetAvailRepos.setHeaderItem(__qtreewidgetitem)
         self.treeWidgetAvailRepos.setObjectName(u"treeWidgetAvailRepos")
         sizePolicy2 = QSizePolicy(QSizePolicy.Policy.MinimumExpanding, QSizePolicy.Policy.MinimumExpanding)
@@ -176,7 +177,7 @@ class Ui_SelectRepos(object):
 
         self.treeWidgetSelectedRepos = MgRepoTree(SelectRepos)
         __qtreewidgetitem1 = QTreeWidgetItem()
-        __qtreewidgetitem1.setText(0, u"1");
+        __qtreewidgetitem1.setText(0, u"1")
         self.treeWidgetSelectedRepos.setHeaderItem(__qtreewidgetitem1)
         self.treeWidgetSelectedRepos.setObjectName(u"treeWidgetSelectedRepos")
         sizePolicy3 = QSizePolicy(QSizePolicy.Policy.MinimumExpanding, QSizePolicy.Policy.MinimumExpanding)
@@ -221,14 +222,14 @@ class Ui_SelectRepos(object):
 
     def retranslateUi(self, SelectRepos: QDialog) -> None:
         SelectRepos.setWindowTitle(QCoreApplication.translate("SelectRepos", u"Select repositories", None))
-        self.label.setText(QCoreApplication.translate("SelectRepos", u"Available repositories :", None))
+        self.label.setText(QCoreApplication.translate("SelectRepos", u"Available repositories", None))
         self.label_3.setText(QCoreApplication.translate("SelectRepos", u"Apply filter :", None))
         self.labelLineHidden.setText(QCoreApplication.translate("SelectRepos", u"3 lines hidden", None))
         self.pushButtonMoveAllUp.setText(QCoreApplication.translate("SelectRepos", u"AllDown", None))
         self.pushButtonMoveUp.setText(QCoreApplication.translate("SelectRepos", u"Down", None))
         self.pushButtonMoveDown.setText(QCoreApplication.translate("SelectRepos", u"Up", None))
         self.pushButtonMoveAllDown.setText(QCoreApplication.translate("SelectRepos", u"AllUp", None))
-        self.label_2.setText(QCoreApplication.translate("SelectRepos", u"Targeted repositories :", None))
+        self.label_2.setText(QCoreApplication.translate("SelectRepos", u"Targeted repositories", None))
         self.labelRepoSelected.setText(QCoreApplication.translate("SelectRepos", u"TextLabel", None))
     # retranslateUi
 

@@ -8,17 +8,20 @@ Introduction
 
 Multigit help users to manage many Git repositories simultaneously.
 
-Version 1.8 (in progress)
-----------------------------
-Synchronize with IDEMIA internal version
+Version 1.8.0 (2026-04-20)
+--------------------------
 
-
-New features
+**New features**
 
 * Add auto-stash capabilities to all operations involving branch merging
 * configure the displayed columns with a context menu
+* Multigit now detects conflicted files
+* Sublime Merge is detected when installed as a Snap or a Flatpak
+* Multigit is available as Flatpak for simpler installation under Linux
+* Multigit is available as a Chocolatey package for simpler installation under Windows
+* Add a `Getting Started` documentation, showed on the first launch
 
-Improvements
+**Improvements**
 
 * on the repository tab bar, duplicate, close or rename a tab with a context menu
 * on the repository tab bar, middle-click on a tab button closes the current tab
@@ -26,20 +29,24 @@ Improvements
 * when deleting a remote branch, validate with a confirmation dialog
 * in the git execution window, allow to copy the logs with a context menu
 * in the dialogs git switch branch, delete branch, checkout tag, add context menu to copy the repository list
-* Multigit now detects conflicted files
 * Porting to MacOs X (thank to Boyaquotes)
 * cloning now supports multiple git repository targeting the same directory
 * deleting directories is now a visible task in the execution window
 * When applying a Multigit file, ask the user if he wants to delete the missing repositories
 * When quitting add posibility of a confirmation dialog
+* Detect when too many authentication failures and warn the user before possibly locking his account
+* Normalize the path separators according to the platform
 
-Bugfix
+**Bugfixes**
   
 * deals correctly with symlinks creating cycles when looking for git directories (thank to cedric-chadaleux)
 * Multigit was too agressive in detecting git repository, do not mandate existence of `hooks` and `info`
 * Field SHA1 was not updated sometimes after a fetch
 * First line of git output was not included in the display
 * when doing commit + push, sometimes, push was done before the commit
+* Handle cloning multiple repositories to the same target directory
+* When applying a multigit file, the display was not updated after selecting a multigit file
+
 
 
 Version 1.7.1 (2025-02-05)

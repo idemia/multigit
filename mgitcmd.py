@@ -13,7 +13,7 @@
 #     See the License for the specific language governing permissions and
 #     limitations under the License.
 #
-from typing import Union, List, Optional
+from typing import Union, List, Optional, cast
 import os, sys
 import argparse, sys, os
 from pathlib import Path
@@ -26,7 +26,7 @@ if __package__:
 
 from src import mg_const as mgc
 from src.mg_json_mgit_parser import ProjectStructure
-from src.mg_tools import RunProcess, ExecGit
+from src.mg_tools import RunProcess, ExecGit, MgExecutable, CmdType, ExecStatus
 
 HELP = '''
 mgitcmd clone path_to_mgit_file.mgit [--dest path_to_dir] [--shallow] 
@@ -92,8 +92,8 @@ def cmd_clone(fname: str, dest_dir: Optional[str], shallow: bool) -> None:
         print('Aborting')
         sys.exit(-1)
 
-    prog_git = ExecGit.get_executable()
-    if prog_git is None or len(prog_git) == 0:
+    exec = ExecGit.get_executable()
+    if exec.is_empty():
         print('Can not find git with executable!')
         print('Please put it on the path or define git location in the Multigit settings.')
         sys.exit(-1)
@@ -103,15 +103,15 @@ def cmd_clone(fname: str, dest_dir: Optional[str], shallow: bool) -> None:
             print('[[ %s ]]' % task)
             continue
 
-        git_cmd = [prog_git, *task]
+        task = cast(List[str], task)
 
-        # our pool process does not handle force blocking, launch directly
-        print('> ' + ' '.join(git_cmd))
-        exit_code, cmd_out = RunProcess().exec_blocking(git_cmd, allow_errors=True)
+        print('> ' + ' '.join([exec.path, *task]))
+        exec_status, exit_code, cmd_out = RunProcess().exec_blocking(exec, cmd_args=task)
         print(cmd_out)
 
-        if exit_code != 0:
-            print('Git failure (exit code %d)' % exit_code)
+        ExecGit.handle_process_return(exec_status, exit_code, cmd_out, allow_errors=False, with_msg_box=False)
+
+        if exec_status != ExecStatus.Ok or exit_code != 0:
             sys.exit(-1)
 
     print('Clone successful.')

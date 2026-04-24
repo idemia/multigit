@@ -35,8 +35,8 @@ Files:
 * generate_ui.bat: calls the src/gui/generate_ui.bat to generate all python files from ui files
 * images/generate_resource.bat: calls the images/generate_resources.bat to generate the resource file
                          multigit_resource_rc.py from the images/multigit_resources.qrc
-* generate_html_whatsnew.py: converts the README.md into src/gui/content_whatisnew.py so
-                             that the README content can be shown by MultiGit
+* generate_html.py: converts the CHANGE_LOG.md into src/gui/content_whatisnew.py so
+                             that the CHANGE_LOG content can be shown by MultiGit
                              This is typically done during the release process
 
 (packageing related stuff)

@@ -4,10 +4,10 @@
 #define NAME "Multigit"
 
 ; only digits allowed here
-#define VERSION "1.7.1"
+#define VERSION "1.8.0"
 
 ; text also allowed here
-#define VERSIONSTR "1.7.1"
+#define VERSIONSTR "1.8.0"
 
  [_ISTool]
 EnableISX=false
@@ -45,6 +45,9 @@ Source: Doc\multigit-json-schema.json; DestDir: {app}
 [Icons]
 Name: {group}\{#NAME} {#VERSIONSTR}; Filename: {app}\{#NAME}.exe;
 Name: {group}\{cm:UninstallProgram,{#NAME} {#VERSIONSTR}}; Filename: "{uninstallexe}";WorkingDir: {app};
+
+[Run]
+Filename: {app}\{#NAME}.exe; Description: "Launch Multigit"; Flags: postinstall nowait skipifsilent
 
 
 [Code]

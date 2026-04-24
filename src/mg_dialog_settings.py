@@ -14,9 +14,10 @@
 #     limitations under the License.
 #
 import sys
-from typing import TYPE_CHECKING, Union, Literal
+from typing import TYPE_CHECKING, Union, Literal, Type, Optional
+from dataclasses import dataclass
 
-from PySide6.QtWidgets import QFileDialog, QDialog, QColorDialog, QWidget
+from PySide6.QtWidgets import QFileDialog, QDialog, QColorDialog, QWidget, QLabel, QLineEdit, QRadioButton, QCheckBox, QPushButton, QGroupBox
 from PySide6.QtGui import QColor
 from PySide6.QtCore import Qt
 
@@ -24,16 +25,174 @@ if TYPE_CHECKING:
     from src.mg_repo_tree import MgRepoTree
 from src.gui.ui_preferences import Ui_Preferences
 from src.mg_tools import ExecGit, ExecTortoiseGit, ExecSourceTree, ExecSublimeMerge, ExecGitBash, ExecExplorer, \
-    ExecGitGui, ExecGitK
+    ExecGitGui, ExecGitK, CmdType, MgExecutable, ExecTool
 import src.mg_const as mg_const
 import src.mg_config as mgc
+
+
+@dataclass
+class ProgramUiElements:
+    '''Container for all the UI elements describing a possible program execution'''
+    groupBoxProgram: QGroupBox
+    labelChoose: QLabel
+    checkBoxActivated: Optional[QCheckBox]
+    radioAutoDetect: QRadioButton
+    lineEditAutoDetect: QLineEdit
+    radioManual: QRadioButton
+    lineEditManual: QLineEdit
+    pushButtonManualBrowse: QPushButton
+    radioFlatpak: Optional[QRadioButton]
+    lineEditFlatpak: Optional[QLineEdit]
+    radioSnap: Optional[QRadioButton]
+    lineEditSnap: Optional[QLineEdit]
+
+
+class ProgramUiAdjuster:
+    '''Class responsible to setup and adjust the UI according to configuration and user actions'''
+
+    def __init__(self, execClass: Type[ExecTool], ui: ProgramUiElements) -> None:
+        self.execClass = execClass
+        self.ui = ui
+
+
+    def setup_ui(self) -> None:
+
+        if self.execClass.platform_supported():
+            # Case 1: autodetect works, with either direct command output, snap in a direct command, flatapak id through flatpak,
+            #         direct command through flatpak-spawn, snap command through flatpak-spawn (last two when running inside flatpak)
+            # Case 2: autodetect does not work, command must be manually specified by user
+            #      2.1: direct path
+            #      2.2: snap name 
+            #      2.3: flatpak id
+
+            exec = self.execClass.config_read_exec()
+            program_auto_detect = self.execClass.config_read_entry(mgc.SUFFIX_AUTODETECT, True)
+            auto_detect_exec = self.execClass.autodetect_executable()
+
+            # if config is invalid, switch back to auto-detect
+            program_auto_detect = program_auto_detect or exec.is_empty()
+
+            self.ui.labelChoose.setText(f'Choose {self.execClass.get_exec_name()} executable')
+            if self.ui.checkBoxActivated is not None:
+                self.ui.checkBoxActivated.toggled.connect(self.enable_if_activated)
+                self.ui.checkBoxActivated.setChecked(self.execClass.shouldShow())
+
+            self.ui.radioAutoDetect.setChecked(program_auto_detect)
+            self.ui.lineEditAutoDetect.setText(auto_detect_exec.path or auto_detect_exec.name)
+
+            self.ui.radioManual.setChecked(exec.cmd_type == CmdType.DirectCmd)
+            self.ui.lineEditManual.setText(exec.path)
+            self.ui.lineEditManual.setEnabled(exec.cmd_type == CmdType.DirectCmd)
+            self.ui.pushButtonManualBrowse.setEnabled(exec.cmd_type == CmdType.DirectCmd)
+            self.ui.pushButtonManualBrowse.clicked.connect(self.slotBrowseExecutable)
+
+            if self.execClass.flatpak_supported() and self.ui.radioFlatpak and self.ui.lineEditFlatpak :
+                self.ui.radioFlatpak.setVisible(True)
+                self.ui.lineEditFlatpak.setVisible(True)
+                if exec.cmd_type == CmdType.FlatpakProgram:
+                    self.ui.radioFlatpak.setChecked(True)
+                    self.ui.lineEditFlatpak.setText(exec.name)
+                else:
+                    self.ui.radioFlatpak.setChecked(False)
+                    self.ui.lineEditFlatpak.setText('')
+            else:
+                if self.ui.radioFlatpak:
+                    self.ui.radioFlatpak.setVisible(False)
+                if self.ui.lineEditFlatpak:
+                    self.ui.lineEditFlatpak.setVisible(False)
+
+            if self.execClass.snap_supported() and self.ui.radioSnap and self.ui.lineEditSnap :
+                self.ui.radioSnap.setVisible(True)
+                self.ui.lineEditSnap.setVisible(True)
+                if exec.cmd_type == CmdType.SnapProgram:
+                    self.ui.radioSnap.setChecked(True)
+                    self.ui.lineEditSnap.setText(exec.name)
+                else:
+                    self.ui.radioSnap.setChecked(False)
+                    self.ui.lineEditSnap.setText('')
+            else:
+                if self.ui.radioSnap:
+                    self.ui.radioSnap.setVisible(False)
+                if self.ui.lineEditSnap:
+                    self.ui.lineEditSnap.setVisible(False)
+        else:
+            self.ui.groupBoxProgram.setVisible(False)
+
+        self.enable_if_activated(self.ui.checkBoxActivated.isChecked() if self.ui.checkBoxActivated else True)
+
+
+    def enable_if_activated(self, activated: bool) -> None:
+        self.ui.radioAutoDetect.setEnabled(activated)
+
+        self.ui.radioManual.setEnabled(activated)
+        enable_manual_widgets = activated and self.ui.radioManual.isChecked()
+        self.ui.lineEditManual.setEnabled( enable_manual_widgets )
+        self.ui.pushButtonManualBrowse.setEnabled( enable_manual_widgets )
+
+        if self.execClass.flatpak_supported() and self.ui.radioFlatpak and self.ui.lineEditFlatpak :
+            self.ui.radioFlatpak.setEnabled(activated)
+            enable_flatpak_widgets = activated and self.ui.radioFlatpak.isChecked()
+            self.ui.lineEditFlatpak.setEnabled( enable_flatpak_widgets )
+
+        if self.execClass.snap_supported() and self.ui.radioSnap and self.ui.lineEditSnap :
+            self.ui.radioSnap.setEnabled(activated)
+            enable_snap_widgets = activated and self.ui.radioSnap.isChecked()
+            self.ui.lineEditSnap.setEnabled( enable_snap_widgets )
+
+
+    def slotBrowseExecutable(self) -> None:
+        '''Browse for executable and set the result in the ui dialog'''
+        current_exe = str(self.ui.lineEditManual.text())
+        
+        filter = ''
+        # how to browser for the executable: 
+        if self.execClass.GENERIC_PROGRAM:
+            if sys.platform == 'win32':
+                filter = '.exe'
+        else:
+            filter = self.execClass.get_exec_name()
+
+        result, _ = QFileDialog.getOpenFileName(None, f"Select {self.execClass.DISPLAY_NAME} Executable", current_exe, filter)
+        if result:
+            self.ui.lineEditManual.setText(result)
+
+
+    def write_config(self) -> None:
+        '''Write the configuration according to the current state of the UI'''
+        activated = self.ui.checkBoxActivated.isChecked() if self.ui.checkBoxActivated else False
+        autodetect_checked = self.ui.radioAutoDetect.isChecked()
+        manual_checked = self.ui.radioManual.isChecked()
+        flatpak_checked = self.ui.radioFlatpak.isChecked() if self.ui.radioFlatpak else False
+        snap_checked = self.ui.radioSnap.isChecked() if self.ui.radioSnap else False
+        manual_path = self.ui.lineEditManual.text()
+        flatpak_name = self.ui.lineEditFlatpak.text() if self.ui.lineEditFlatpak else ''
+        snap_name = self.ui.lineEditSnap.text() if self.ui.lineEditSnap else ''
+
+        self.execClass.config_write_entry(mgc.SUFFIX_AUTODETECT, autodetect_checked)
+        self.execClass.config_write_entry(mgc.SUFFIX_ACTIVATED, activated)
+
+        cmd_type, path, name = '', '', ''
+        if manual_checked:
+            cmd_type = CmdType.DirectCmd.value
+        elif flatpak_checked:
+            cmd_type = CmdType.FlatpakProgram.value
+            name = flatpak_name
+        elif snap_checked:
+            cmd_type = CmdType.SnapProgram.value
+            name = snap_name
+
+        self.execClass.config_write_entry(mgc.SUFFIX_CMD_TYPE, cmd_type)
+        self.execClass.config_write_entry(mgc.SUFFIX_APP_NAME, name)
+        self.execClass.config_write_entry(mgc.SUFFIX_MANUAL_PATH, manual_path)
+
+
+
 
 class MgDialogSettings(QDialog):
     ui: Ui_Preferences
 
     def __init__(self, parent: QWidget) -> None:
         super().__init__(parent)
-        self.setWindowFlag(Qt.WindowType.WindowContextHelpButtonHint, False)
         self.ui = Ui_Preferences()
         self.ui.setupUi(self)
 
@@ -95,126 +254,133 @@ class MgDialogSettings(QDialog):
 
         ### Second tab stuff
 
-        # git stuff
-        git_auto_detect = (True if config[mgc.CONFIG_GIT_AUTODETECT] is None
-                           else config[mgc.CONFIG_GIT_AUTODETECT])
-        self.ui.labelExecGitChoose.setText(f'Choose {ExecGit.get_exec_name()} executable location')
-        self.ui.radioGitAutoDetect.setChecked(git_auto_detect)
-        self.ui.lineEditGitAutoDetect.setText(ExecGit.autodetect_executable())
-        self.ui.radioGitManual.setChecked(not git_auto_detect)
-        self.ui.lineEditGitManual.setText(config[mgc.CONFIG_GIT_MANUAL_PATH] or '')
-        self.ui.lineEditGitManual.setEnabled(not git_auto_detect)
-        self.ui.pushButtonGitManualBrowse.setEnabled(not git_auto_detect)
-        self.ui.pushButtonGitManualBrowse.clicked.connect(self.slotEditPrefBrowseForGit)
+        self.ui_adjuster_git = ProgramUiAdjuster(ExecGit, ProgramUiElements(
+            groupBoxProgram=self.ui.groupBoxGit,
+            labelChoose=self.ui.labelExecGitChoose,
+            checkBoxActivated=None,
+            radioAutoDetect=self.ui.radioGitAutoDetect,
+            lineEditAutoDetect=self.ui.lineEditGitAutoDetect,
+            radioManual=self.ui.radioGitManual,
+            lineEditManual=self.ui.lineEditGitManual,
+            pushButtonManualBrowse=self.ui.pushButtonGitManualBrowse,
+            radioFlatpak=None, # git does not support flatpak execution
+            lineEditFlatpak=None,
+            radioSnap=None, # git does not support snap execution
+            lineEditSnap=None
+        ))
+        self.ui_adjuster_git.setup_ui()
 
-        if ExecTortoiseGit.platform_supported():
-            self.ui.checkBoxTortoiseGit.toggled.connect(self.enableTGitIfActivated)
-            self.ui.checkBoxTortoiseGit.setChecked(ExecTortoiseGit.shouldShow())
-            tgit_auto_detect = True if config[mgc.CONFIG_TORTOISEGIT_AUTODETECT] is None else config[mgc.CONFIG_TORTOISEGIT_AUTODETECT]
-            self.ui.radioTGitAutoDetect.setChecked(tgit_auto_detect)
-            self.ui.lineEditTGitAutoDetect.setText(ExecTortoiseGit.autodetect_executable())
-            self.ui.radioTGitManual.setChecked(not tgit_auto_detect)
-            self.ui.lineEditTGitManual.setText(config[mgc.CONFIG_TORTOISEGIT_MANUAL_PATH] or '')
-            self.ui.lineEditTGitManual.setEnabled(not tgit_auto_detect)
-            self.ui.pushButtonTGitManualBrowse.setEnabled(not tgit_auto_detect)
-            self.ui.pushButtonTGitManualBrowse.clicked.connect(self.slotEditPrefBrowseForTortoiseGit)
-            self.enableTGitIfActivated()
-        else:
-            self.ui.groupBoxTGit.setVisible(False)
+        self.ui_adjuster_tortoise_git = ProgramUiAdjuster(ExecTortoiseGit, ProgramUiElements(
+            groupBoxProgram=self.ui.groupBoxTGit,
+            labelChoose=self.ui.labelExecTGitChoose,
+            checkBoxActivated=self.ui.checkBoxTortoiseGit,
+            radioAutoDetect=self.ui.radioTGitAutoDetect,
+            lineEditAutoDetect=self.ui.lineEditTGitAutoDetect,
+            radioManual=self.ui.radioTGitManual,
+            lineEditManual=self.ui.lineEditTGitManual,
+            pushButtonManualBrowse=self.ui.pushButtonTGitManualBrowse,
+            radioFlatpak=None, # TortoiseGit does not support flatpak execution
+            lineEditFlatpak=None,
+            radioSnap=None, # TortoiseGit does not support snap execution
+            lineEditSnap=None
+        ))
+        self.ui_adjuster_tortoise_git.setup_ui()
 
+        self.ui_adjuster_sourcetree = ProgramUiAdjuster(ExecSourceTree, ProgramUiElements(
+            groupBoxProgram=self.ui.groupBoxSourcetree,
+            labelChoose=self.ui.labelExecSourcetreeChoose,
+            checkBoxActivated=self.ui.checkBoxSourcetree,
+            radioAutoDetect=self.ui.radioSourcetreeAutoDetect,
+            lineEditAutoDetect=self.ui.lineEditSourcetreeAutoDetect,
+            radioManual=self.ui.radioSourcetreeManual,
+            lineEditManual=self.ui.lineEditSourcetreeManual,
+            pushButtonManualBrowse=self.ui.pushButtonSourcetreeManualBrowse,
+            radioFlatpak=None, # SourceTree does not support flatpak execution
+            lineEditFlatpak=None,
+            radioSnap=None, # SourceTree does not support snap execution
+            lineEditSnap=None
+        ))
+        self.ui_adjuster_sourcetree.setup_ui()
 
-        if ExecSourceTree.platform_supported():
-            self.ui.checkBoxSourceTree.toggled.connect(self.enableSTreeIfActivated)
-            self.ui.checkBoxSourceTree.setChecked(ExecSourceTree.shouldShow())
-            stree_auto_detect = True if config[mgc.CONFIG_SOURCETREE_AUTODETECT] is None else config[mgc.CONFIG_SOURCETREE_AUTODETECT]
-            self.ui.radioSourcetreeAutoDetect.setChecked(stree_auto_detect)
-            self.ui.lineEditSourcetreeAutoDetect.setText(ExecSourceTree.autodetect_executable())
-            self.ui.radioSourcetreeManual.setChecked(not stree_auto_detect)
-            self.ui.lineEditSourcetreeManual.setText(config[mgc.CONFIG_SOURCETREE_MANUAL_PATH] or '')
-            self.ui.lineEditSourcetreeManual.setEnabled(not stree_auto_detect)
-            self.ui.pushButtonSourcetreeManualBrowse.setEnabled(not stree_auto_detect)
-            self.ui.pushButtonSourcetreeManualBrowse.clicked.connect(self.slotEditPrefBrowseForSourcetree)
-            self.enableSTreeIfActivated()
-        else:
-            self.ui.groupBoxSourceTree.setVisible(False)
+        self.ui_adjuster_sublime = ProgramUiAdjuster(ExecSublimeMerge, ProgramUiElements(
+            groupBoxProgram=self.ui.groupBoxSublimemerge,
+            labelChoose=self.ui.labelExecSublimemergeChoose,
+            checkBoxActivated=self.ui.checkBoxSublimeMerge,
+            radioAutoDetect=self.ui.radioSublimemergeAutoDetect,
+            lineEditAutoDetect=self.ui.lineEditSublimemergeAutoDetect,
+            radioManual=self.ui.radioSublimemergeManual,
+            lineEditManual=self.ui.lineEditSublimemergeManual,
+            pushButtonManualBrowse=self.ui.pushButtonSublimemergeManualBrowse,
+            radioFlatpak=self.ui.radioSublimemergeFlatpak,
+            lineEditFlatpak=self.ui.lineEditSublimemergeFlatpak,
+            radioSnap=self.ui.radioSublimemergeSnap,
+            lineEditSnap=self.ui.lineEditSublimemergeSnap
+        ))
+        self.ui_adjuster_sublime.setup_ui()
 
+        self.ui_adjuster_gitbash = ProgramUiAdjuster(ExecGitBash, ProgramUiElements(
+            groupBoxProgram=self.ui.groupBoxGitBash,
+            labelChoose=self.ui.labelExecGitBashChoose,
+            checkBoxActivated=self.ui.checkBoxGitBash,
+            radioAutoDetect=self.ui.radioGitBashAutoDetect,
+            lineEditAutoDetect=self.ui.lineEditGitBashAutoDetect,
+            radioManual=self.ui.radioGitBashManual,
+            lineEditManual=self.ui.lineEditGitBashManual,
+            pushButtonManualBrowse=self.ui.pushButtonGitBashManualBrowse,
+            radioFlatpak=None, # git-bash does not support flatpak execution
+            lineEditFlatpak=None,
+            radioSnap=None, # git-bash does not support snap execution
+            lineEditSnap=None
+        ))
+        self.ui_adjuster_gitbash.setup_ui()
 
-        if ExecSublimeMerge.platform_supported():
-            self.ui.labelExecSublimemergeChoose.setText(f'Choose {ExecSublimeMerge.get_exec_name()} executable location')
-            self.ui.checkBoxSublimeMerge.toggled.connect(self.enableSublimeIfActivated)
-            self.ui.checkBoxSublimeMerge.setChecked(ExecSublimeMerge.shouldShow())
-            smerge_auto_detect = True if config[mgc.CONFIG_SUBLIMEMERGE_AUTODETECT] is None else config[mgc.CONFIG_SUBLIMEMERGE_AUTODETECT]
-            self.ui.radioSublimemergeAutoDetect.setChecked(smerge_auto_detect)
-            self.ui.lineEditSublimemergeAutoDetect.setText(ExecSublimeMerge.autodetect_executable())
-            self.ui.radioSublimemergeManual.setChecked(not smerge_auto_detect)
-            self.ui.lineEditSublimemergeManual.setText(config[mgc.CONFIG_SUBLIMEMERGE_MANUAL_PATH] or '')
-            self.ui.lineEditSublimemergeManual.setEnabled(not smerge_auto_detect)
-            self.ui.pushButtonSublimemergeManualBrowse.setEnabled(not smerge_auto_detect)
-            self.ui.pushButtonSublimemergeManualBrowse.clicked.connect(self.slotEditPrefBrowseForSublime)
-            self.enableSublimeIfActivated()
-        else:
-            self.ui.groupBoxSublimemerge.setVisible(False)
+        self.ui_adjuster_git = ProgramUiAdjuster(ExecGitGui, ProgramUiElements(
+            groupBoxProgram=self.ui.groupBoxGitGui,
+            labelChoose=self.ui.labelExecGitGuiChoose,
+            checkBoxActivated=self.ui.checkBoxGitGui,
+            radioAutoDetect=self.ui.radioGitGuiAutoDetect,
+            lineEditAutoDetect=self.ui.lineEditGitGuiAutoDetect,
+            radioManual=self.ui.radioGitGuiManual,
+            lineEditManual=self.ui.lineEditGitGuiManual,
+            pushButtonManualBrowse=self.ui.pushButtonGitGuiManualBrowse,
+            radioFlatpak=None, # git-gui does not support flatpak execution
+            lineEditFlatpak=None,
+            radioSnap=None, # git-gui does not support snap execution
+            lineEditSnap=None
+        ))
+        self.ui_adjuster_git.setup_ui()
 
+        self.ui_adjuster_gitk = ProgramUiAdjuster(ExecGitK, ProgramUiElements(
+            groupBoxProgram=self.ui.groupBoxGitK,
+            labelChoose=self.ui.labelExecGitkChoose,
+            checkBoxActivated=self.ui.checkBoxGitK,
+            radioAutoDetect=self.ui.radioGitKAutoDetect,
+            lineEditAutoDetect=self.ui.lineEditGitKAutoDetect,
+            radioManual=self.ui.radioGitKManual,
+            lineEditManual=self.ui.lineEditGitKManual,
+            pushButtonManualBrowse=self.ui.pushButtonGitKManualBrowse,
+            radioFlatpak=None, # gitk does not support flatpak execution
+            lineEditFlatpak=None,
+            radioSnap=None, # gitk does not support snap execution
+            lineEditSnap=None
+        ))
+        self.ui_adjuster_gitk.setup_ui()
 
-        if ExecGitBash.platform_supported():
-            self.ui.checkBoxGitBash.toggled.connect(self.enableGitBashIfActivated)
-            self.ui.checkBoxGitBash.setChecked(ExecGitBash.shouldShow())
-            gitbash_auto_detect = True if config[mgc.CONFIG_GITBASH_AUTODETECT] is None else config[mgc.CONFIG_GITBASH_AUTODETECT]
-            self.ui.radioGitBashAutoDetect.setChecked(gitbash_auto_detect)
-            self.ui.lineEditGitBashAutoDetect.setText(ExecGitBash.autodetect_executable())
-            self.ui.radioGitBashManual.setChecked(not gitbash_auto_detect)
-            self.ui.lineEditGitBashManual.setText(config[mgc.CONFIG_GIT_MANUAL_PATH] or '')
-            self.ui.lineEditGitBashManual.setEnabled(not gitbash_auto_detect)
-            self.ui.pushButtonGitBashManualBrowse.setEnabled(not gitbash_auto_detect)
-            self.ui.pushButtonGitBashManualBrowse.clicked.connect(self.slotEditPrefBrowseForGitBash)
-            self.enableGitBashIfActivated()
-        else:
-            self.ui.groupBoxGitBash.setVisible(False)
-
-
-        if ExecGitGui.platform_supported():
-            self.ui.checkBoxGitGui.toggled.connect(self.enableGitGuiIfActivated)
-            self.ui.checkBoxGitGui.setChecked(ExecGitGui.shouldShow())
-            gitgui_auto_detect = True if config[mgc.CONFIG_GITGUI_AUTODETECT] is None else config[mgc.CONFIG_GITGUI_AUTODETECT]
-            self.ui.radioGitGuiAutoDetect.setChecked(gitgui_auto_detect)
-            self.ui.lineEditGitGuiAutoDetect.setText(ExecGitGui.autodetect_executable())
-            self.ui.radioGitGuiManual.setChecked(not gitgui_auto_detect)
-            self.ui.lineEditGitGuiManual.setText(config[mgc.CONFIG_GITGUI_MANUAL_PATH] or '')
-            self.ui.lineEditGitGuiManual.setEnabled(not gitgui_auto_detect)
-            self.ui.pushButtonGitGuiManualBrowse.setEnabled(not gitgui_auto_detect)
-            self.ui.pushButtonGitGuiManualBrowse.clicked.connect(self.slotEditPrefBrowseForGitGui)
-            self.enableGitGuiIfActivated()
-        else:
-            self.ui.groupBoxGitGui.setVisible(False)
-
-
-        if ExecGitK.platform_supported():
-            self.ui.labelExecGitkChoose.setText(f'Choose {ExecGitK.get_exec_name()} executable location')
-            self.ui.checkBoxGitK.toggled.connect(self.enableGitKIfActivated)
-            self.ui.checkBoxGitK.setChecked(ExecGitK.shouldShow())
-            gitk_auto_detect = True if config[mgc.CONFIG_GITK_AUTODETECT] is None else config[mgc.CONFIG_GITK_AUTODETECT]
-            self.ui.radioGitKAutoDetect.setChecked(gitk_auto_detect)
-            self.ui.lineEditGitKAutoDetect.setText(ExecGitK.autodetect_executable())
-            self.ui.radioGitKManual.setChecked(not gitk_auto_detect)
-            self.ui.lineEditGitKManual.setText(config[mgc.CONFIG_GITK_MANUAL_PATH] or '')
-            self.ui.lineEditGitKManual.setEnabled(not gitk_auto_detect)
-            self.ui.pushButtonGitKManualBrowse.setEnabled(not gitk_auto_detect)
-            self.ui.pushButtonGitKManualBrowse.clicked.connect(self.slotEditPrefBrowseForGitK)
-            self.enableGitKIfActivated()
-        else:
-            self.ui.groupBoxGitBash.setVisible(False)
-
-
-
-        explorer_auto_detect = True if config[mgc.CONFIG_EXPLORER_AUTODETECT] is None else config[mgc.CONFIG_EXPLORER_AUTODETECT]
-        self.ui.radioExplorerAutoDetect.setChecked(explorer_auto_detect)
-        self.ui.lineEditExplorerAutoDetect.setText(ExecExplorer.autodetect_executable())
-        self.ui.radioExplorerManual.setChecked(not explorer_auto_detect)
-        self.ui.lineEditExplorerManual.setText(config[mgc.CONFIG_GIT_MANUAL_PATH] or '')
-        self.ui.lineEditExplorerManual.setEnabled(not explorer_auto_detect)
-        self.ui.pushButtonExplorerManualBrowse.setEnabled(not explorer_auto_detect)
-        self.ui.pushButtonExplorerManualBrowse.clicked.connect( self.slotEditPrefBrowseForExplorer )
-
+        self.ui_adjuster_explorer = ProgramUiAdjuster(ExecExplorer, ProgramUiElements(
+            groupBoxProgram=self.ui.groupBoxExplorer,
+            labelChoose=self.ui.labelExecExplorerChoose,
+            checkBoxActivated=None, # explorer is always activated, no checkbox
+            radioAutoDetect=self.ui.radioExplorerAutoDetect,
+            lineEditAutoDetect=self.ui.lineEditExplorerAutoDetect,
+            radioManual=self.ui.radioExplorerManual,
+            lineEditManual=self.ui.lineEditExplorerManual,
+            pushButtonManualBrowse=self.ui.pushButtonExplorerManualBrowse,
+            radioFlatpak=self.ui.radioExplorerFlatpak,
+            lineEditFlatpak=self.ui.lineEditExplorerFlatpak,
+            radioSnap=self.ui.radioExplorerSnap,
+            lineEditSnap=self.ui.lineEditExplorerSnap,
+        ))
+        self.ui_adjuster_explorer.setup_ui()
 
 
     ### First tab stuff
@@ -234,136 +400,6 @@ class MgDialogSettings(QDialog):
         if color.isValid():
             self.colorTag.setNamedColor(color.name())
             self.updateColorButtons()
-
-
-    ### Second tab stuff
-
-    def slotEditPrefBrowseForGit(self) -> None:
-        '''Browse for git executable and set the result in the ui dialog'''
-        current_git_exe = str(self.ui.lineEditGitManual.text())
-        result, _ = QFileDialog.getOpenFileName(self, "Select Git Executable", current_git_exe, ExecGit.get_exec_name())
-        if result:
-            self.ui.lineEditGitManual.setText(result)
-
-
-    def slotEditPrefBrowseForTortoiseGit(self) -> None:
-        '''Browse for TortoiseGitProc executable and set the result in the ui dialog'''
-        current_tgit_exe = str(self.ui.lineEditTGitManual.text())
-        result, _ = QFileDialog.getOpenFileName(self, "Select the TortoiseGitProc Executable", current_tgit_exe, ExecTortoiseGit.get_exec_name())
-        if result:
-            self.ui.lineEditTGitManual.setText(result)
-
-
-    def slotEditPrefBrowseForSourcetree(self) -> None:
-        '''Browse for Sourcetree executable and set the result in the ui dialog'''
-        current_st_exe = str(self.ui.lineEditSourcetreeManual.text())
-        result, _ = QFileDialog.getOpenFileName(self, "Select Sourcetree Executable", current_st_exe, ExecSourceTree.get_exec_name())
-        if result:
-            self.ui.lineEditSourcetreeManual.setText(result)
-
-
-    def slotEditPrefBrowseForSublime(self) -> None:
-        '''Browse for SublimeMerge executable and set the result in the ui dialog'''
-        current_exe = str(self.ui.lineEditSublimemergeManual.text())
-        result, _ = QFileDialog.getOpenFileName(self, "Select SublimeMerge Executable", current_exe, ExecSublimeMerge.get_exec_name())
-        if result:
-            self.ui.lineEditSublimemergeManual.setText(result)
-
-
-    def slotEditPrefBrowseForGitBash(self) -> None:
-        '''Browse for git-bash executable and set the result in the ui dialog'''
-        current_exe = str(self.ui.lineEditGitBashManual.text())
-        result, _ = QFileDialog.getOpenFileName(self, "Select git-bash Executable", current_exe, ExecGitBash.get_exec_name())
-        if result:
-            self.ui.lineEditGitBashManual.setText(result)
-
-
-    def slotEditPrefBrowseForGitGui(self) -> None:
-        '''Browse for git-gui executable and set the result in the ui dialog'''
-        current_exe = str(self.ui.lineEditGitGuiManual.text())
-        result, _ = QFileDialog.getOpenFileName(self, "Select git-gui Executable", current_exe, ExecGitGui.get_exec_name())
-        if result:
-            self.ui.lineEditGitGuiManual.setText(result)
-
-
-    def slotEditPrefBrowseForGitK(self) -> None:
-        '''Browse for gitk executable and set the result in the ui dialog'''
-        current_exe = str(self.ui.lineEditGitKManual.text())
-        result, _ = QFileDialog.getOpenFileName(self, "Select gitk Executable", current_exe, ExecGitK.get_exec_name())
-        if result:
-            self.ui.lineEditGitKManual.setText(result)
-
-
-    def slotEditPrefBrowseForExplorer(self) -> None:
-        '''Browse for explorer program executable and set the result in the ui dialog'''
-        current_st_exe = str(self.ui.lineEditExplorerManual.text())
-        pattern = ''
-        if sys.platform == 'win32':
-            pattern = '.exe'
-        result, _ = QFileDialog.getOpenFileName(self, "Select a directory explorer program", current_st_exe, pattern)
-        if result:
-            self.ui.lineEditExplorerManual.setText(result)
-
-
-    def enableTGitIfActivated(self) -> None:
-        enable_tgit_stuff = self.ui.checkBoxTortoiseGit.isChecked()
-        self.ui.radioTGitAutoDetect.setEnabled(enable_tgit_stuff)
-        self.ui.radioTGitManual.setEnabled(enable_tgit_stuff)
-
-        enable_manual_widgets = enable_tgit_stuff and self.ui.radioTGitManual.isChecked()
-        self.ui.lineEditTGitManual.setEnabled( enable_manual_widgets )
-        self.ui.pushButtonTGitManualBrowse.setEnabled( enable_manual_widgets )
-
-
-    def enableSTreeIfActivated(self) -> None:
-        enable_stree_stuff = self.ui.checkBoxSourceTree.isChecked() 
-        self.ui.radioSourcetreeManual.setEnabled(enable_stree_stuff)
-        self.ui.radioSourcetreeAutoDetect.setEnabled(enable_stree_stuff)
-
-        enable_manual_widgets = enable_stree_stuff and self.ui.radioSourcetreeManual.isChecked()
-        self.ui.lineEditSourcetreeManual.setEnabled( enable_manual_widgets )
-        self.ui.pushButtonSourcetreeManualBrowse.setEnabled( enable_manual_widgets )
-
-
-    def enableSublimeIfActivated(self) -> None:
-        enable_sublime_stuff = self.ui.checkBoxSublimeMerge.isChecked() 
-        self.ui.radioSublimemergeManual.setEnabled(enable_sublime_stuff)
-        self.ui.radioSublimemergeAutoDetect.setEnabled(enable_sublime_stuff)
-
-        enable_manual_widgets = enable_sublime_stuff and self.ui.radioSublimemergeManual.isChecked()
-        self.ui.lineEditSublimemergeManual.setEnabled( enable_manual_widgets )
-        self.ui.pushButtonSublimemergeManualBrowse.setEnabled( enable_manual_widgets )
-
-
-    def enableGitBashIfActivated(self) -> None:
-        enable_gitbash_stuff = self.ui.checkBoxGitBash.isChecked() 
-        self.ui.radioGitBashManual.setEnabled(enable_gitbash_stuff)
-        self.ui.radioGitBashAutoDetect.setEnabled(enable_gitbash_stuff)
-
-        enable_manual_widgets = enable_gitbash_stuff and self.ui.radioGitBashManual.isChecked()
-        self.ui.lineEditGitBashManual.setEnabled( enable_manual_widgets )
-        self.ui.pushButtonGitBashManualBrowse.setEnabled( enable_manual_widgets )
-
-
-    def enableGitGuiIfActivated(self) -> None:
-        enable_stuff = self.ui.checkBoxGitGui.isChecked() 
-        self.ui.radioGitGuiManual.setEnabled(enable_stuff)
-        self.ui.radioGitGuiAutoDetect.setEnabled(enable_stuff)
-
-        enable_manual_widgets = enable_stuff and self.ui.radioGitGuiManual.isChecked()
-        self.ui.lineEditGitGuiManual.setEnabled( enable_manual_widgets )
-        self.ui.pushButtonGitGuiManualBrowse.setEnabled( enable_manual_widgets )
-
-
-    def enableGitKIfActivated(self) -> None:
-        enable_stuff = self.ui.checkBoxGitK.isChecked() 
-        self.ui.radioGitKManual.setEnabled(enable_stuff)
-        self.ui.radioGitKAutoDetect.setEnabled(enable_stuff)
-
-        enable_manual_widgets = enable_stuff and self.ui.radioGitKManual.isChecked()
-        self.ui.lineEditGitKManual.setEnabled( enable_manual_widgets )
-        self.ui.pushButtonGitKManualBrowse.setEnabled( enable_manual_widgets )
-
 
 
 
@@ -389,27 +425,16 @@ def runDialogEditSettings(parent: QWidget, tabPage: Union[Literal[0], Literal[1]
     config[mgc.CONFIG_CONFIRM_BEFORE_QUIT] = dlg.ui.checkBoxConfirmWhenQuitting.isChecked()
 
     ### Second tab stuff
-    config[mgc.CONFIG_GIT_AUTODETECT] = dlg.ui.radioGitAutoDetect.isChecked()
-    config[mgc.CONFIG_GIT_MANUAL_PATH] = dlg.ui.lineEditGitManual.text()
-    config[mgc.CONFIG_TORTOISEGIT_ACTIVATED] = dlg.ui.checkBoxTortoiseGit.isChecked()
-    config[mgc.CONFIG_TORTOISEGIT_AUTODETECT] = dlg.ui.radioTGitAutoDetect.isChecked()
-    config[mgc.CONFIG_TORTOISEGIT_MANUAL_PATH] = dlg.ui.lineEditTGitManual.text()
-    config[mgc.CONFIG_SOURCETREE_ACTIVATED] = dlg.ui.checkBoxSourceTree.isChecked()
-    config[mgc.CONFIG_SOURCETREE_AUTODETECT] = dlg.ui.radioSourcetreeAutoDetect.isChecked()
-    config[mgc.CONFIG_SOURCETREE_MANUAL_PATH] = dlg.ui.lineEditSourcetreeManual.text()
-    config[mgc.CONFIG_SUBLIMEMERGE_ACTIVATED] = dlg.ui.checkBoxSublimeMerge.isChecked()
-    config[mgc.CONFIG_SUBLIMEMERGE_AUTODETECT] = dlg.ui.radioSublimemergeAutoDetect.isChecked()
-    config[mgc.CONFIG_SUBLIMEMERGE_MANUAL_PATH] = dlg.ui.lineEditSublimemergeManual.text()
-    config[mgc.CONFIG_GITBASH_ACTIVATED] = dlg.ui.checkBoxGitBash.isChecked()
-    config[mgc.CONFIG_GITBASH_AUTODETECT] = dlg.ui.radioGitBashAutoDetect.isChecked()
-    config[mgc.CONFIG_GITBASH_MANUAL_PATH] = dlg.ui.lineEditGitBashManual.text()
-    config[mgc.CONFIG_GITGUI_ACTIVATED] = dlg.ui.checkBoxGitGui.isChecked()
-    config[mgc.CONFIG_GITGUI_AUTODETECT] = dlg.ui.radioGitGuiAutoDetect.isChecked()
-    config[mgc.CONFIG_GITGUI_MANUAL_PATH] = dlg.ui.lineEditGitGuiManual.text()
-    config[mgc.CONFIG_GITK_ACTIVATED] = dlg.ui.checkBoxGitK.isChecked()
-    config[mgc.CONFIG_GITK_AUTODETECT] = dlg.ui.radioGitKAutoDetect.isChecked()
-    config[mgc.CONFIG_GITK_MANUAL_PATH] = dlg.ui.lineEditGitKManual.text()
-    config[mgc.CONFIG_EXPLORER_AUTODETECT] = dlg.ui.radioExplorerAutoDetect.isChecked()
-    config[mgc.CONFIG_EXPLORER_MANUAL_PATH] = dlg.ui.lineEditExplorerManual.text()
+    for ui_adjuster in [
+        dlg.ui_adjuster_explorer,
+        dlg.ui_adjuster_git,
+        dlg.ui_adjuster_sublime,
+        dlg.ui_adjuster_gitk,
+        dlg.ui_adjuster_git,
+        dlg.ui_adjuster_gitbash,
+        dlg.ui_adjuster_sourcetree,
+        dlg.ui_adjuster_tortoise_git
+    ]:
+        ui_adjuster.write_config()
     config.save()
 

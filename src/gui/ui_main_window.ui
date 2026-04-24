@@ -33,7 +33,7 @@
      <x>0</x>
      <y>0</y>
      <width>290</width>
-     <height>33</height>
+     <height>22</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -114,6 +114,7 @@
     <property name="toolTipsVisible">
      <bool>true</bool>
     </property>
+    <addaction name="actionGettingStarted"/>
     <addaction name="actionWhatIsNew"/>
     <addaction name="actionShowMultiGitLogFiles"/>
     <addaction name="actionAbout"/>
@@ -254,7 +255,7 @@
     <bool>true</bool>
    </property>
    <property name="text">
-    <string>Show Last Commit tab</string>
+    <string>Show Last Commit panel</string>
    </property>
   </action>
   <action name="actionViewModifiedFiles">
@@ -262,7 +263,7 @@
     <bool>true</bool>
    </property>
    <property name="text">
-    <string>Show Modified Files tab</string>
+    <string>Show Modified Files panel</string>
    </property>
   </action>
   <action name="actionViewColSha1">
@@ -315,6 +316,11 @@
    </property>
    <property name="priority">
     <enum>QAction::Priority::LowPriority</enum>
+   </property>
+  </action>
+  <action name="actionGettingStarted">
+   <property name="text">
+    <string>Getting Started</string>
    </property>
   </action>
  </widget>

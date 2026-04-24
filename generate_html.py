@@ -48,10 +48,6 @@ def markdown2qthtml(md_text: str) -> str:
     html_text: str
     html_text = markdown2.markdown(md_text)
     html_text = html_text.replace('<h1>', '<h1 align="center">')
-    html_text = html_text.replace('<code>\n', '<p style="background-color:#f5f5f5;"><blockquote><pre><code>\n')
-    html_text = html_text.replace('</code>\n', '</code></pre></blockquote></p>\n')
-    html_text = html_text.replace('<code>', '<code><span style="background-color:#f5f5f5;">')
-    html_text = html_text.replace('</code>', '</span></code>')
     return html_text
 
 
@@ -75,13 +71,18 @@ if __name__ == '__main__':
                        pathlib.Path(__file__).parent/'src/gui/content_full_license_info.py',
                        )
 
+    markdown_to_python(pathlib.Path(__file__).parent / 'doc/getting_started.md',
+                       pathlib.Path(__file__).parent/'src/gui/content_getting_started.py',
+                       )
+
     if '--show' in sys.argv:
-        from src.mg_dialog_whatisnew import showWhatIsNew
+        from src.mg_dialog_whatisnew import showWhatIsNew, showGettingStarted
         from src.mg_dialog_about import showDialogAbout
         from PySide6.QtWidgets import QApplication
         _ = QApplication([])
-        showWhatIsNew()
-        showDialogAbout(None)
+        showGettingStarted()
+        #showWhatIsNew()
+        #showDialogAbout(None)
 
 
 

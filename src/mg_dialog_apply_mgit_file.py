@@ -16,7 +16,7 @@
 
 
 from typing import List, Any, TYPE_CHECKING, Set
-import logging, pathlib, json, os, subprocess, shutil, time, stat
+import logging, pathlib, json, os
 
 from PySide6.QtWidgets import QDialog, QWidget, QFileDialog, QMessageBox, QTreeWidgetItem, QPushButton, QDialogButtonBox
 from PySide6.QtCore import Qt, QTimer, QRegularExpression
@@ -38,16 +38,6 @@ from src.mg_const import MSG_AUTO_STASH
 logger = logging.getLogger('mg_dialog_adjust_project_from_mgit')
 dbg = logger.debug
 warn = logger.warning
-
-
-# Cases:
-# 1. projConfFile and projDestDir are valid
-# 2. update projConfFile
-#       2.a -> parse the file -> valid file -> update full GUI
-#       2.b -> parse the file -> invalid file -> report error, clear the GUI
-# 3. update projDestDir
-#       3.a update proj repos destination -> update the display of repo items
-#       3.b json file was invalid -> do nothing
 
 
 class MgDialogApplyMgitFile(QDialog):
@@ -179,8 +169,7 @@ class MgDialogApplyMgitFile(QDialog):
             return
 
         self.ui.lineEditMgitFile.setText(mgitFile)
-        # this will trigger a redisplay of all repos, no need for explicit call to self.updateDisplayOfMultigitFile()
-        self.slotUsernameUpdated()
+        self.propagateMgitFileUpdated(True, True)
 
 
     def propagateMgitFileUpdated(self, report_file_errors: bool = True, report_parse_errors: bool = True) -> bool:
@@ -247,11 +236,11 @@ class MgDialogApplyMgitFile(QDialog):
             # there are errors, can not accept the dialog
             return
 
-        targetRepoSet = set(repo.destination for repo in self.proj.repos)
-        currentRepoSet = set(repo.name for repo in self.currentRepos)
+        targetRepoSet = set(str(pathlib.Path(repo.destination)) for repo in self.proj.repos)
+        currentRepoSet = set(str(pathlib.Path(repo.name)) for repo in self.currentRepos)
 
         repoNameToCreate = targetRepoSet - currentRepoSet
-        repoPathToCreateDirExists = set(repo.dest_fullpath for repo in self.proj.repos
+        repoPathToCreateDirExists = set(str(pathlib.Path(repo.dest_fullpath)) for repo in self.proj.repos
                                             if repo.destination in repoNameToCreate and os.path.exists(repo.dest_fullpath))
         repoNameToRemove = currentRepoSet - targetRepoSet
         self.reposToDelete = list(sorted(repoNameToRemove))
@@ -331,6 +320,10 @@ def runDialogApplyMgitFile(window: 'MgMainWindow', baseDir: str, allRepos: List[
     :param window: application window
     :return:
     """
+    if baseDir == '':
+        QMessageBox.warning(window, 'Apply multigit file error', 'Can not apply a multigit file if the base directory is empty')
+        return
+
     dialogApplyMgitFile = MgDialogApplyMgitFile(window, baseDir, allRepos)
 
     # display dialog
@@ -348,7 +341,7 @@ def runDialogApplyMgitFile(window: 'MgMainWindow', baseDir: str, allRepos: List[
     reposToAdjust.sort(key=lambda r: r.destination)
 
     for repoDictInfo in reposToAdjust:
-        repoName = repoDictInfo.destination
+        repoName = str(pathlib.Path(repoDictInfo.destination))
         repoDestPath = repoDictInfo.dest_fullpath
 
         if repoName in dialogApplyMgitFile.reposToClone:
@@ -391,7 +384,7 @@ def runDialogApplyMgitFile(window: 'MgMainWindow', baseDir: str, allRepos: List[
             if pathlib.Path(repo.fullpath).exists():
                 taskGroup = MgExecTaskGroup(f'Deleting repository no longer present', repo)
                 taskGroup.tasks.append(
-                    MgTaskDelDirectory(f'Deleting repository no longer present',
+                    MgTaskDelDirectory(f'Deleting repository {repo.name} no longer present',
                                        repo,
                                        repo.fullpath,
                                        )

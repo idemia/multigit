@@ -17,23 +17,55 @@
 
 from typing import Optional
 
-from PySide6.QtWidgets import QWidget, QDialog, QTextEdit, QPushButton, QVBoxLayout, QHBoxLayout, QFrame
+from PySide6.QtWidgets import QWidget, QDialog, QTextEdit, QPushButton, QVBoxLayout, QHBoxLayout, QFrame, QMessageBox
 from PySide6.QtCore import Qt
 
-from src.gui.content_whatisnew import content_html
+from src.gui.content_whatisnew import content_html as whatsnew_html_content
+from src.gui.content_getting_started import content_html as getting_started_html_content
 from src.mg_const import *
 import src.mg_config as mgc
 
 
-def showWhatisnewIfAppropriate() -> None:
-    '''Show the 'What is new' dialog if it was never shown for the current version of MultiGit'''
-    last_shown = mgc.get_config_instance()[mgc.CONFIG_LAST_SHOWN_WHATISNEW]
-    if last_shown is not None and last_shown < VERSION:
+def showLaunchDialog() -> None:
+    '''Show the `Getting started` dialog if this is the very first launch.
+
+    If not the first launch, show the 'What is new' dialog if it was never shown for the current version of MultiGit'''
+
+    config = mgc.get_config_instance()
+    show_getting_started = config[mgc.CONFIG_SHOW_GETTING_STARTED]
+    if show_getting_started is None:
+        config[mgc.CONFIG_SHOW_GETTING_STARTED] = False
+        config.save()
+        showGettingStarted()
+        return
+
+
+    last_whatsnew_showed = config[mgc.CONFIG_LAST_SHOWN_WHATISNEW]
+    if last_whatsnew_showed is not None and last_whatsnew_showed < VERSION:
+        config[mgc.CONFIG_LAST_SHOWN_WHATISNEW] = VERSION
+        config.save()
         showWhatIsNew()
-        mgc.get_config_instance()[mgc.CONFIG_LAST_SHOWN_WHATISNEW] = VERSION
+        return
+
+
+    if config[mgc.CONFIG_DISPLAY_FETCH_ON_STARTUP_COUNTDOWN] == 0:
+        answer = QMessageBox.question(None, 'Activate fetch on startup ?', 'Multigit can fetch all your repositories when you launch it. '
+                                'Do you want to activate this behavior ?\n\nNote that you can change it later in the settings dialog.\n')
+        fetchReposOnStartup = (answer == QMessageBox.StandardButton.Yes)
+        config[mgc.CONFIG_FETCH_ON_STARTUP] = fetchReposOnStartup
+        config.save()
+        return
 
 
 def showWhatIsNew(parent: Optional[QWidget] = None) -> None:
+    showDialogWithHtmlContent(whatsnew_html_content, parent)
+
+
+def showGettingStarted(parent: Optional[QWidget] = None) -> None:
+    showDialogWithHtmlContent(getting_started_html_content, parent)
+
+
+def showDialogWithHtmlContent(html_content: str, parent: Optional[QWidget] = None) -> None:
     '''Show what's new dialog'''
     dialog = QDialog(parent)
     dialog.setWindowTitle("What's New")
@@ -41,7 +73,7 @@ def showWhatIsNew(parent: Optional[QWidget] = None) -> None:
 
     text = QTextEdit(dialog)
     text.setReadOnly(True)
-    text.setHtml(content_html)
+    text.setHtml(html_content)
     text.setFrameShape( QFrame.Shape.NoFrame )
     text.zoomIn(2)
 

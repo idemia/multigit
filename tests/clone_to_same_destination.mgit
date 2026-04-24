@@ -1,0 +1,21 @@
+{
+    "description": "Clone with 2 clones on the same target, triggering a move of directory",
+    "fileFormatVersion": "1.0",
+    "postCloneCommands": [],
+    "repositories": [
+        {
+            "destination": "clone_with_move_directory",
+            "head": "main",
+            "head_type": "branch",
+            "url": "https://github.com/bluebird75/multigit-playground.git"
+        },
+        {
+            "destination": "clone_with_move_directory",
+            "head": "dev-feature1",
+            "head_type": "branch",
+            "url": "https://github.com/bluebird75/multigit-playground.git"
+        }
+    ],
+    "variables": {}
+}
+

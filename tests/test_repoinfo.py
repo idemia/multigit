@@ -51,9 +51,9 @@ def git_exec(*args: str, gitdir: Union[str, pathlib.Path] = '', allow_errors: bo
     Raises an exception if the command did not return with 0 status.
     '''
     if gitdir:
-        args = tuple([ '-C', str(gitdir) ] + list(args))
+        args = [ '-C', str(gitdir) ] + list(args)
 
-    return ExecGit.exec_blocking(args, '', allow_errors)
+    return ExecGit.exec_blocking(list(args), '', allow_errors)
 
 
 GIT_SUPPORTS_SETTING_BRANCH_NAME = False

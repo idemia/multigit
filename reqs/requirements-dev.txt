@@ -1,5 +1,5 @@
 ### for running multigit
-pyside6
+pyside6-essentials
 concurrent-log-handler
 
 ### for developing multigit

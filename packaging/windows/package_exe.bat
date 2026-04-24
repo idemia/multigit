@@ -3,7 +3,7 @@ pushd %~dp0\..\..
 @FOR /F "delims=" %%a in ('python -c "from src.mg_const import VERSION; print(VERSION)"') do SET VERSION=%%a
 @echo Packaging MultiGit v%VERSION%
 
-python generate_html_whatsnew.py
+python generate_html.py
 
 @set ZIP7="C:\Program Files\7-Zip\7z.exe"
 @rmdir /s /q dist\multigit 2>NUL
