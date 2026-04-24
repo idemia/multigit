@@ -275,7 +275,50 @@ class TestRepoInfo(TempGitDirReady):
         self.assertEqual(ri.branches_local, [DEFAULT_BRANCH_NAME])
         self.assertEqual(ri.branches_remote, [])
 
+    def test_repo_info_submodule(self) -> None:
+        print('    - test_repo_info_submodule')
+        
+        # 1. Setup paths
+        sub_origin = pathlib.Path(self.gitdir) / 'sub_origin'
+        main_repo = pathlib.Path(self.gitdir) / 'main_repo'
+        
+        # 2. Create the source repository with a commit
+        if sub_origin.exists(): rmtree_failsafe(sub_origin)
+        sub_origin.mkdir()
+        git_init_repo(sub_origin)
+        add_content(sub_origin, 'sub_file.txt', 'content')
 
+        # 3. Create the parent repository with a commit
+        if main_repo.exists(): rmtree_failsafe(main_repo)
+        main_repo.mkdir()
+        git_init_repo(main_repo)
+        add_content(main_repo, 'initial.txt', 'init')
+
+        # 4. Add the submodule
+        # IMPORTANT: Recent Git versions block local submodules by default.
+        # We bypass this with '-c protocol.file.allow=always'
+        sub_origin_url = sub_origin.as_posix()
+        
+        git_exec('-c', 'protocol.file.allow=always', 
+                 'submodule', 'add', '--', sub_origin_url, 'libs/my_sub', 
+                 gitdir=main_repo)
+        
+        git_commit(str(main_repo), 'Add submodule')
+
+        # 5. VERIFICATION
+        # Root repo check (Directory)
+        ric_main = MgRepoInfo('main', str(main_repo))
+        ric_main.refresh()
+        self.assertTrue((pathlib.Path(ric_main.fullpath) / '.git').is_dir())
+
+        # Submodule check (File)
+        sub_path = main_repo / 'libs' / 'my_sub'
+        ric_sub = MgRepoInfo('libs/my_sub', str(sub_path))
+        ric_sub.refresh()
+        
+        git_path_sub = pathlib.Path(ric_sub.fullpath) / '.git'
+        self.assertTrue(git_path_sub.exists())
+        self.assertTrue(git_path_sub.is_file(), "Submodule .git must be a FILE (gitlink)")
 
     def test_repo_info(self) -> None:
         self.dir1 = pathlib.Path(self.gitdir) / 'dir1'

@@ -1078,6 +1078,14 @@ def is_git_repo(git_dir: Path) -> bool:
     if git_dir.name != '.git':
         return False
 
+    if git_dir.is_file():
+        try:
+            with open(git_dir, 'r', encoding='utf8') as f:
+                content = f.read().strip()
+                return content.startswith('gitdir:')
+        except Exception as e:
+            return False
+
     if sys.platform == 'win32':
         # we don't want to scan the recycle bin
         try:
@@ -1115,6 +1123,7 @@ def scan_git_dirs(base_path: str) -> Generator[str, str, None]:
             continue
 
         visited.add(resolved_path)
+
         try:
             dir_content = os.scandir(dirpath)
         except PermissionError:
@@ -1123,20 +1132,22 @@ def scan_git_dirs(base_path: str) -> Generator[str, str, None]:
 
         for entry in dir_content:
             try:
-                if not entry.is_dir(follow_symlinks=True):
-                    continue
+              if entry.name == '.git':
+                  if is_git_repo(Path(entry.path)):
+                      yield entry.path
+                  continue 
 
-                if entry.name == '.git' and is_git_repo(Path(entry.path)):
-                    yield entry.path
-                    continue
+              if not entry.is_dir(follow_symlinks=True):
+                  continue
+
+              if entry.name.startswith('.'):
+                  # directries starting with . are often not relevant, don't scan them
+                  continue
+
             except OSError:
                 # we could not access the entry for some reason, it's ok,just continue scanning
                 continue
-
-            if entry.name.startswith('.'):
-                # directries starting with . are often not relevant, don't scan them
-                continue
-
+           
             path_to_visit.append(entry.path)
 
 
