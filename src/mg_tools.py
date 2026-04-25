@@ -612,45 +612,6 @@ class ExecTortoiseGit(ExecTool):
     ]
 
 
-
-#######################################################
-#       SourceTree stuff
-#######################################################
-
-class ExecSourceTree(ExecTool):
-    DISPLAY_NAME = 'SourceTree'
-
-    SUPPORTED_PLATFORMS = ['win32']
-
-    WIN32_PATH_CANDIDATES = [
-        Path(os.environ.get("ProgramFiles(x86)", '')) / "Atlassian" / "SourceTree",
-        Path(os.environ.get("PROGRAMW6432", '')) / "Atlassian" / "SourceTree",
-        Path(os.environ.get("ProgramFiles", '')) / "Atlassian" / "SourceTree",
-    ]
-
-    EXEC_NAME_WIN32 = "SourceTree.exe"
-
-    CONFIG_ENTRY_BASE = 'CONFIG_SOURCETREE'
-
-    ACTION_RUN_SOURCETREE_TEXT = 'Run SourceTree'
-    ACTION_RUN_SOURCETREE_ICON = ":/img/sourcetree.ico"
-    ACTION_RUN_SOURCETREE_TOOLTIP = 'Open a SourceTree tab for each repository'
-
-    DBC_RUNSOURCETREE = 'Run SourceTree'
-
-    DOUBLE_CLICK_ACTIONS = [
-        DBC_RUNSOURCETREE,
-    ]
-
-    @staticmethod
-    def runDoubleClick(selectedRepos: List['MgRepoInfo']) -> None:
-        dbg(f'ExecSourceTree.runDoubleClick({selectedRepos})')
-        for repo in selectedRepos:
-            ExecSourceTree.exec_non_blocking(['-t', str(repo.fullpath)])
-
-
-
-
 #######################################################
 #       SublimeMerge stuff
 #######################################################
@@ -691,6 +652,44 @@ class ExecSublimeMerge(ExecTool):
         dbg(f'ExecSublimeMerge.runDoubleClick({selectedRepos})')
         for repo in selectedRepos:
             ExecSublimeMerge.exec_non_blocking([str(repo.fullpath)])
+
+
+
+#######################################################
+#       SourceTree stuff
+#######################################################
+
+class ExecSourceTree(ExecTool):
+    DISPLAY_NAME = 'SourceTree'
+
+    SUPPORTED_PLATFORMS = ['win32']
+
+    WIN32_PATH_CANDIDATES = [
+        Path(os.environ.get("ProgramFiles(x86)", '')) / "Atlassian" / "SourceTree",
+        Path(os.environ.get("PROGRAMW6432", '')) / "Atlassian" / "SourceTree",
+        Path(os.environ.get("ProgramFiles", '')) / "Atlassian" / "SourceTree",
+    ]
+
+    EXEC_NAME_WIN32 = "SourceTree.exe"
+
+    CONFIG_ENTRY_BASE = 'CONFIG_SOURCETREE'
+
+    ACTION_RUN_SOURCETREE_TEXT = 'Run SourceTree'
+    ACTION_RUN_SOURCETREE_ICON = ":/img/sourcetree.ico"
+    ACTION_RUN_SOURCETREE_TOOLTIP = 'Open a SourceTree tab for each repository'
+
+    DBC_RUNSOURCETREE = 'Run SourceTree'
+
+    DOUBLE_CLICK_ACTIONS = [
+        DBC_RUNSOURCETREE,
+    ]
+
+    @staticmethod
+    def runDoubleClick(selectedRepos: List['MgRepoInfo']) -> None:
+        dbg(f'ExecSourceTree.runDoubleClick({selectedRepos})')
+        for repo in selectedRepos:
+            ExecSourceTree.exec_non_blocking(['-t', str(repo.fullpath)])
+
 
 
 #######################################################
