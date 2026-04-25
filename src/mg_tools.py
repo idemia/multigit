@@ -679,8 +679,8 @@ class ExecSublimeMerge(ExecTool):
 
     @staticmethod
     def runDoubleClick(selectedRepos: List['MgRepoInfo']) -> None:
-        dbg(f'ExecSublimeMerge.runDoubleClick({selectedRepos})')
         '''Run SublimeMerge on the current repos'''
+        dbg(f'ExecSublimeMerge.runDoubleClick({selectedRepos})')
         for repo in selectedRepos:
             ExecSublimeMerge.exec_non_blocking([str(repo.fullpath)])
 
@@ -706,8 +706,10 @@ class ExecGitBash(ExecTool):
 
     CONFIG_ENTRY_BASE = 'CONFIG_GITBASH'
 
+    DBC_RUNGITBASH = 'Run git-bash'
+
     DOUBLE_CLICK_ACTIONS = [
-        mg_const.DBC_RUNGITBASH,
+        DBC_RUNGITBASH,
     ]
 
 
@@ -735,9 +737,18 @@ class ExecGitGui(ExecTool):
 
     CONFIG_ENTRY_BASE = 'CONFIG_GITGUI'
 
+    DBC_RUNGITGUI = 'Run Git Gui'
+
     DOUBLE_CLICK_ACTIONS = [
-        mg_const.DBC_RUNGITGUI,
+        DBC_RUNGITGUI,
     ]
+
+    @staticmethod
+    def runDoubleClick(selectedRepos: List['MgRepoInfo']) -> None:
+        dbg(f'ExecGitGui.runDoubleClick({selectedRepos})')
+        for repo in selectedRepos:
+            # allow errors needed because git-gui never returns 0 on Windows
+            ExecGitGui.exec_non_blocking([], workdir=str(repo.fullpath), allow_errors=True)
 
 
 #######################################################
@@ -770,9 +781,18 @@ class ExecGitK(ExecTool):
 
     CONFIG_ENTRY_BASE = 'CONFIG_GITK'
 
+    DBC_RUNGITK = 'Run GitK'
+
     DOUBLE_CLICK_ACTIONS = [
-        mg_const.DBC_RUNGITK,
+        DBC_RUNGITK,
     ]
+
+    @staticmethod
+    def runDoubleClick(selectedRepos: List['MgRepoInfo']) -> None:
+        dbg(f'ExecGitK.runDoubleClick({selectedRepos})')
+        for repo in selectedRepos:
+            # allow errors needed because gitk never returns 0 on Windows
+            ExecGitK.exec_non_blocking([], workdir=str(repo.fullpath), allow_errors=True)
 
 
 #######################################################

@@ -387,9 +387,9 @@ class MgRepoTree(QTreeWidget):
 
             ExecSourceTree.DBC_RUNSOURCETREE: self.slotSourcetree,
             ExecSublimeMerge.DBC_RUNSUBLIMEMERGE: self.slotSublimemerge,
-            mg_const.DBC_RUNGITGUI           : self.slotGitGui,
-            mg_const.DBC_RUNGITK             : self.slotGitK,
-            mg_const.DBC_RUNGITBASH          : self.slotGitBash,
+            ExecGitGui.DBC_RUNGITGUI           : self.slotGitGui,
+            ExecGitK.DBC_RUNGITK             : self.slotGitK,
+            ExecGitBash.DBC_RUNGITBASH          : self.slotGitBash,
 
         } # type: Dict[str, Callable[[], None]]
 
@@ -720,24 +720,6 @@ class MgRepoTree(QTreeWidget):
     #
     ##########################################################################
 
-
-    def slotSourcetree(self) -> None:
-        self.slotRunProgram(ExecSourceTree)
-
-
-    def slotGitGui(self) -> None:
-        '''Run git Gui on the current repos'''
-        dbg('slotGitGui')
-        if not self.confirmIfNoOrTooManySelectedItems('Git GUI'):
-            return
-
-        for item in self.selectedRepoItems():
-            repo = item.repoInfo
-            # allow errors needed because git-gui never returns 0
-            ExecGitGui.exec_non_blocking([], workdir=str(repo.fullpath), allow_errors=True,
-                callback = lambda _1, _2: repo.refresh())
-
-
     def slotRunProgram(self, exec: Type[ExecTool]) -> None:
         dbg(f'slotRunProgram({exec.DISPLAY_NAME}')
         if not self.confirmIfNoOrTooManySelectedItems(exec.DISPLAY_NAME):
@@ -746,18 +728,16 @@ class MgRepoTree(QTreeWidget):
         selectedRepos = [item.repoInfo for item in self.selectedRepoItems()]
         exec.runDoubleClick(selectedRepos)
 
+
+    def slotSourcetree(self) -> None:
+        self.slotRunProgram(ExecSourceTree)
+
+    def slotGitGui(self) -> None:
+        self.slotRunProgram(ExecGitGui)
+
     def slotSublimemerge(self) -> None:
         '''Run SublimeMewrge on the current repos'''
         self.slotRunProgram(ExecSublimeMerge)
 
     def slotGitK(self) -> None:
-        '''Run GitK on the current repos'''
-        dbg('slotGitK')
-        if not self.confirmIfNoOrTooManySelectedItems('GitK'):
-            return
-
-        for item in self.selectedRepoItems():
-            repo = item.repoInfo
-            # ExecGitK.exec_non_blocking([], workdir=str(repo.fullpath), callback=repo.refresh)
-            ExecGitK.exec_non_blocking([], workdir=str(repo.fullpath), allow_errors=True,
-                        callback = lambda _1, _2: repo.refresh())
+        self.slotRunProgram(ExecGitK)
