@@ -133,7 +133,7 @@ class MgMainWindow(QMainWindow, Ui_MainWindow):
     def dispatchToActiveTreeOfMultigitTab(self, methodName: str, *staticArgs: Any) -> Callable[..., None]:
         '''Return a function which calls the methodName on all tab widget
         '''
-        def callActiveTreeOfMultigitTabMethod(*dynamicArgs) -> None:
+        def callActiveTreeOfMultigitTabMethod(*dynamicArgs: Any) -> None:
             targetMethod = getattr(self.currentMultigit().repoTree, methodName)
             targetMethod(*staticArgs, *dynamicArgs)
 
