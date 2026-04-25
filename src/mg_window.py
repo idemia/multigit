@@ -211,10 +211,8 @@ class MgMainWindow(QMainWindow, Ui_MainWindow):
         self.mgActions.actionGitRunCommand.triggered.connect(self.dispatchToActiveTreeOfMultigitTab('slotGitRunCommand'))
 
         # Menu Git programs
-        self.mgActions.actionSourceTree.triggered.connect(self.dispatchToActiveTreeOfMultigitTab('slotRunProgram', ExecSourceTree))
-        self.mgActions.actionSublimeMerge.triggered.connect(self.dispatchToActiveTreeOfMultigitTab('slotRunProgram', ExecSublimeMerge))
-        self.mgActions.actionGitGui.triggered.connect(self.dispatchToActiveTreeOfMultigitTab('slotRunProgram', ExecGitGui))
-        self.mgActions.actionGitK.triggered.connect(self.dispatchToActiveTreeOfMultigitTab('slotRunProgram', ExecGitK))
+        for execToolAction in self.mgActions.execToolActionsDict.values():
+            execToolAction.triggered.connect(self.dispatchToActiveTreeOfMultigitTab('slotRunProgram', execToolAction.ExecTool))
 
         self.mgActions.actionTGitShowLog  .triggered.connect(self.dispatchToActiveTreeOfMultigitTab('slotTGitShowLog'))
         self.mgActions.actionTGitCommit   .triggered.connect(self.dispatchToActiveTreeOfMultigitTab('slotTGitCommit'))

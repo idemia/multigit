@@ -126,6 +126,12 @@ class ExecTool:
     # is completed with CONFIG_SUFFIX_* to store the different information.
     CONFIG_ENTRY_BASE: str
 
+    ACTIONS: List[Tuple[str, str, str]] = [
+        # Description of the menu actions in the format:
+        #    (Menu Text, Icon Path or emty string, Tooltip)
+        #    ...
+    ]
+
     DOUBLE_CLICK_ACTIONS: List[str] = []
 
     SESSION_CACHE: Dict[Type['ExecTool'], MgExecutable] = {
@@ -636,9 +642,9 @@ class ExecSublimeMerge(ExecTool):
 
     CONFIG_ENTRY_BASE = 'CONFIG_SUBLIMEMERGE'
 
-    ACTION_RUN_SUBLIMEMERGE_TEXT = 'Run SublimeMerge'
-    ACTION_RUN_SUBLIMEMERGE_ICON = ":/img/sublime_merge.ico"
-    ACTION_RUN_SUBLIMEMERGE_TOOLTIP = 'Open a SublimeMerge tab for each repository'
+    ACTIONS = [
+        ('Run SublimeMerge', ":/img/sublime_merge.ico", 'Open a SublimeMerge tab for each repository')
+    ]
 
     DBC_RUNSUBLIMEMERGE = 'Run SublimeMerge'
 
@@ -674,9 +680,9 @@ class ExecSourceTree(ExecTool):
 
     CONFIG_ENTRY_BASE = 'CONFIG_SOURCETREE'
 
-    ACTION_RUN_SOURCETREE_TEXT = 'Run SourceTree'
-    ACTION_RUN_SOURCETREE_ICON = ":/img/sourcetree.ico"
-    ACTION_RUN_SOURCETREE_TOOLTIP = 'Open a SourceTree tab for each repository'
+    ACTIONS = [
+        ('Run SourceTree', ":/img/sourcetree.ico", 'Open a SourceTree tab for each repository'),
+    ]
 
     DBC_RUNSOURCETREE = 'Run SourceTree'
 
@@ -713,9 +719,9 @@ class ExecGitBash(ExecTool):
 
     CONFIG_ENTRY_BASE = 'CONFIG_GITBASH'
 
-    ACTION_RUN_GITBASH_TEXT = 'Git bash here'
-    ACTION_RUN_GITBASH_ICON = ":/img/git-bash.ico"
-    ACTION_RUN_GITBASH_TOOLTIP = 'Open a git bash window for each repository'
+    ACTIONS = [
+        ('Git bash here', ":/img/git-bash.ico", 'Open a git bash window for each repository'),
+    ]
 
     DBC_RUNGITBASH = 'Run git-bash'
 
@@ -748,8 +754,9 @@ class ExecGitGui(ExecTool):
 
     CONFIG_ENTRY_BASE = 'CONFIG_GITGUI'
 
-    ACTION_RUN_GITGUI_TEXT = 'Run Git GUI'
-    ACTION_RUN_GITGUI_TOOLTIP = 'Open a Git-gui window for each repository'
+    ACTIONS = [
+        ('Git Gui', "", 'Open a git-gui window for each repository'),
+    ]
 
     DBC_RUNGITGUI = 'Run Git Gui'
 
@@ -795,8 +802,9 @@ class ExecGitK(ExecTool):
 
     CONFIG_ENTRY_BASE = 'CONFIG_GITK'
 
-    ACTION_RUN_GITK_TEXT = 'Run GitK'
-    ACTION_RUN_GITK_TOOLTIP = 'Open a GitK for each repository'
+    ACTIONS = [
+        ('Gitk', "", 'Open a gitk window for each repository'),
+    ]
 
     DBC_RUNGITK = 'Run GitK'
 

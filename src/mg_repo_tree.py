@@ -198,10 +198,8 @@ class MgRepoTree(QTreeWidget):
         self.mgActions.actionGitRunCommand.triggered.connect(self.slotGitRunCommand)
 
         # Menu Git programs
-        self.mgActions.actionSourceTree.triggered.connect(lambda : self.slotRunProgram(ExecSourceTree))
-        self.mgActions.actionSublimeMerge.triggered.connect(lambda : self.slotRunProgram(ExecSublimeMerge))
-        self.mgActions.actionGitGui.triggered.connect(lambda : self.slotRunProgram(ExecGitGui))
-        self.mgActions.actionGitK.triggered.connect(lambda : self.slotRunProgram(ExecGitK))
+        for execToolAction in self.mgActions.execToolActionsDict.values():
+            execToolAction.triggered.connect(lambda : self.slotRunProgram(execToolAction.ExecTool))
 
         self.mgActions.actionTGitShowLog  .triggered.connect(self.slotTGitShowLog)
         self.mgActions.actionTGitCommit   .triggered.connect(self.slotTGitCommit)

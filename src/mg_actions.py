@@ -15,7 +15,7 @@
 #
 
 
-from typing import List, Any, Callable, TYPE_CHECKING, Tuple
+from typing import List, Any, Callable, TYPE_CHECKING, Tuple, Type
 
 import functools, logging
 
@@ -24,8 +24,7 @@ from PySide6.QtGui import QAction, QIcon, QPixmap, QTransform
 from PySide6.QtWidgets import QMenu, QWidget
 
 from src.mg_const import SHORT_SHA1_NB_DIGITS
-from src.mg_tools import ExecSublimeMerge, ExecTortoiseGit, ExecSourceTree, ExecGitBash, ExecGitGui, ExecGitK
-from src.mg_repo_info import MgRepoInfo
+from src.mg_tools import ExecTool, ExecSublimeMerge, ExecTortoiseGit, ExecSourceTree, ExecGitBash, ExecGitGui, ExecGitK
 if TYPE_CHECKING:
     from src.mg_repo_tree import MgRepoTree
 
@@ -44,11 +43,23 @@ def getFetchIcon() -> QIcon:
     return QIcon(pixmap_fetch)
 
 
+class MgExecToolAction(QAction):
+    '''Action to run a program'''
+    def __init__(self, ExecTool: Type[ExecTool], action_desc: tuple[str, str, str], *args: Any) -> None:
+        super().__init__(*args)
+        self.ExecTool = ExecTool
+        self.setText(action_desc[0])
+        if action_desc[1]:
+            self.setIcon(QIcon(action_desc[1]))
+        self.setToolTip(action_desc[2])
+
+
 class MgActions(QObject):
     '''Class to hold all the actions which are duplicated between the main window and each MgRepoTree'''
 
     actionGitFetchAll: QAction          # added externally to MgActions
     actionGitFetchAllOnAllTabs: QAction          # added externally to MgActions
+    execToolActionsDict: dict[str, MgExecToolAction]
 
     def __init__(self, parent: QWidget) -> None:
         super().__init__(parent)
@@ -200,11 +211,6 @@ class MgActions(QObject):
         self.actionGitDeleteTag.setShortcut("Alt+Shift+D")
         self.actionGitDeleteTag.setToolTip('Open dialog for deleting a tag')
 
-        self.actionGitBash = QAction(self)
-        self.actionGitBash.setText(ExecGitBash.ACTION_RUN_GITBASH_TEXT)
-        self.actionGitBash.setIcon(QIcon(ExecGitBash.ACTION_RUN_GITBASH_ICON))
-        self.actionGitBash.setToolTip(ExecGitBash.ACTION_RUN_GITBASH_TOOLTIP)
-
         self.actionGitRunCommand = QAction(self)
         self.actionGitRunCommand.setText("Run git command")
         self.actionGitRunCommand.setShortcut("Ctrl+G")
@@ -215,24 +221,14 @@ class MgActions(QObject):
         self.actionConfigureGitProgram.setEnabled(True)
         self.actionConfigureGitProgram.setText("Open settings to configure a Git Program")
 
-        self.actionSublimeMerge = QAction(self)
-        self.actionSublimeMerge.setText(ExecSublimeMerge.ACTION_RUN_SUBLIMEMERGE_TEXT)
-        self.actionSublimeMerge.setIcon(QIcon(ExecSublimeMerge.ACTION_RUN_SUBLIMEMERGE_ICON))
-        self.actionSublimeMerge.setToolTip(ExecSublimeMerge.ACTION_RUN_SUBLIMEMERGE_TOOLTIP)
+        self.execToolActionsDict = {}
+        for ExecTool in [ExecSublimeMerge, ExecSourceTree, ExecGitGui, ExecGitK]:
+            for action_desc in ExecTool.ACTIONS:
+                action = MgExecToolAction(ExecTool, action_desc, self)
+                self.execToolActionsDict[action.text()] = action
 
-        self.actionSourceTree = QAction(self)
-        self.actionSourceTree.setText(ExecSourceTree.ACTION_RUN_SOURCETREE_TEXT)
-        self.actionSourceTree.setIcon(QIcon(ExecSourceTree.ACTION_RUN_SOURCETREE_ICON))
-        self.actionSourceTree.setToolTip(ExecSourceTree.ACTION_RUN_SOURCETREE_TOOLTIP)
-
-        self.actionGitGui = QAction(self)
-        self.actionGitGui.setText(ExecGitGui.ACTION_RUN_GITGUI_TEXT)
-        self.actionGitGui.setToolTip(ExecGitGui.ACTION_RUN_GITGUI_TOOLTIP)
-
-        self.actionGitK = QAction(self)
-        self.actionGitK.setText(ExecGitK.ACTION_RUN_GITK_TEXT)
-        self.actionGitK.setToolTip(ExecGitK.ACTION_RUN_GITK_TOOLTIP)
-
+        if ExecGitBash.ACTIONS:
+            self.actionGitBash = MgExecToolAction(ExecGitBash, ExecGitBash.ACTIONS[0], self)
 
         ######## TortoiseGit actions ##########
 
@@ -356,10 +352,8 @@ class MgActions(QObject):
 
     def setupMenuGitPrograms(self, menuGitPrograms: QMenu, includeConfigureGitPrograms: bool) -> None:
         '''Install more actions in the GitPrograms menu'''
-        menuGitPrograms.addAction(self.actionSourceTree)
-        menuGitPrograms.addAction(self.actionSublimeMerge)
-        menuGitPrograms.addAction(self.actionGitGui)
-        menuGitPrograms.addAction(self.actionGitK)
+        for execToolAction in self.execToolActionsDict.values():
+            menuGitPrograms.addAction(execToolAction)
         self.menuTGit = menuGitPrograms.addMenu("Tortoise Git")
         self.menuTGit.setIcon(QIcon(":/img/tgit_tortoise.ico"))
         self.setupMenuTortoiseGit(self.menuTGit)
@@ -384,25 +378,18 @@ class MgActions(QObject):
 
     def enableAvailableScm(self) -> None:
         '''Adjust Git Programs menu and RMB menu'''
-        showTortoiseGit = ExecTortoiseGit.shouldShow()
-        showSourceTree = ExecSourceTree.shouldShow()
-        showSublimeMerge = ExecSublimeMerge.shouldShow()
-        showGitBash = ExecGitBash.shouldShow()
-        showGitGui = ExecGitGui.shouldShow()
-        showGitK = ExecGitK.shouldShow()
+        hideConfigureMenu = False
 
         # fix menu actions
-        self.actionSourceTree.setVisible(showSourceTree)
-        self.actionSublimeMerge.setVisible(showSublimeMerge)
-        self.actionGitBash.setVisible(showGitBash)
-        self.actionGitGui.setVisible(showGitGui)
-        self.actionGitK.setVisible(showGitK)
-        self.menuTGit.menuAction().setVisible(showTortoiseGit)
+        for execToolAction in self.execToolActionsDict.values():
+            execToolAction.setVisible(execToolAction.ExecTool.shouldShow())
+            hideConfigureMenu |= execToolAction.ExecTool.shouldShow()
 
-        if showTortoiseGit or showSourceTree or showSublimeMerge or showGitGui or showGitK:
-            self.actionConfigureGitProgram.setVisible(False)
-        else:
-            self.actionConfigureGitProgram.setVisible(True)
+        showTortoiseGit = ExecTortoiseGit.shouldShow()
+        self.menuTGit.menuAction().setVisible(showTortoiseGit)
+        hideConfigureMenu |= showTortoiseGit
+
+        self.actionConfigureGitProgram.setVisible(not hideConfigureMenu)
 
 
     def setupDynamicMenuCopy(self, repoTree: 'MgRepoTree') -> None:
