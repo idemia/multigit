@@ -632,6 +632,10 @@ class ExecSourceTree(ExecTool):
 
     CONFIG_ENTRY_BASE = 'CONFIG_SOURCETREE'
 
+    ACTION_RUN_SOURCETREE_TEXT = 'Run SourceTree'
+    ACTION_RUN_SOURCETREE_ICON = ":/img/sourcetree.ico"
+    ACTION_RUN_SOURCETREE_TOOLTIP = 'Open a SourceTree tab for each repository'
+
     DBC_RUNSOURCETREE = 'Run SourceTree'
 
     DOUBLE_CLICK_ACTIONS = [
@@ -671,6 +675,10 @@ class ExecSublimeMerge(ExecTool):
 
     CONFIG_ENTRY_BASE = 'CONFIG_SUBLIMEMERGE'
 
+    ACTION_RUN_SUBLIMEMERGE_TEXT = 'Run SublimeMerge'
+    ACTION_RUN_SUBLIMEMERGE_ICON = ":/img/sublime_merge.ico"
+    ACTION_RUN_SUBLIMEMERGE_TOOLTIP = 'Open a SublimeMerge tab for each repository'
+
     DBC_RUNSUBLIMEMERGE = 'Run SublimeMerge'
 
     DOUBLE_CLICK_ACTIONS = [
@@ -706,6 +714,10 @@ class ExecGitBash(ExecTool):
 
     CONFIG_ENTRY_BASE = 'CONFIG_GITBASH'
 
+    ACTION_RUN_GITBASH_TEXT = 'Git bash here'
+    ACTION_RUN_GITBASH_ICON = ":/img/git-bash.ico"
+    ACTION_RUN_GITBASH_TOOLTIP = 'Open a git bash window for each repository'
+
     DBC_RUNGITBASH = 'Run git-bash'
 
     DOUBLE_CLICK_ACTIONS = [
@@ -736,6 +748,9 @@ class ExecGitGui(ExecTool):
     EXEC_NAME_LINUX = "git-gui"
 
     CONFIG_ENTRY_BASE = 'CONFIG_GITGUI'
+
+    ACTION_RUN_GITGUI_TEXT = 'Run Git GUI'
+    ACTION_RUN_GITGUI_TOOLTIP = 'Open a Git-gui window for each repository'
 
     DBC_RUNGITGUI = 'Run Git Gui'
 
@@ -780,6 +795,9 @@ class ExecGitK(ExecTool):
     EXEC_NAME_DARWIN = "gitk"
 
     CONFIG_ENTRY_BASE = 'CONFIG_GITK'
+
+    ACTION_RUN_GITK_TEXT = 'Run GitK'
+    ACTION_RUN_GITK_TOOLTIP = 'Open a GitK for each repository'
 
     DBC_RUNGITK = 'Run GitK'
 

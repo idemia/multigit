@@ -201,9 +201,9 @@ class MgActions(QObject):
         self.actionGitDeleteTag.setToolTip('Open dialog for deleting a tag')
 
         self.actionGitBash = QAction(self)
-        self.actionGitBash.setText("Git bash here")
-        self.actionGitBash.setIcon(QIcon(":/img/git-bash.ico"))
-        self.actionGitBash.setToolTip('Open a git bash window for each repository')
+        self.actionGitBash.setText(ExecGitBash.ACTION_RUN_GITBASH_TEXT)
+        self.actionGitBash.setIcon(QIcon(ExecGitBash.ACTION_RUN_GITBASH_ICON))
+        self.actionGitBash.setToolTip(ExecGitBash.ACTION_RUN_GITBASH_TOOLTIP)
 
         self.actionGitRunCommand = QAction(self)
         self.actionGitRunCommand.setText("Run git command")
@@ -216,24 +216,23 @@ class MgActions(QObject):
         self.actionConfigureGitProgram.setText("Open settings to configure a Git Program")
 
         self.actionSublimeMerge = QAction(self)
-        self.actionSublimeMerge.setText("Run SublimeMerge")
-        self.actionSublimeMerge.setIcon(QIcon(":/img/sublime_merge.ico"))
-        self.actionSublimeMerge.setToolTip('Open a SublimeMerge tab for each repository')
+        self.actionSublimeMerge.setText(ExecSublimeMerge.ACTION_RUN_SUBLIMEMERGE_TEXT)
+        self.actionSublimeMerge.setIcon(QIcon(ExecSublimeMerge.ACTION_RUN_SUBLIMEMERGE_ICON))
+        self.actionSublimeMerge.setToolTip(ExecSublimeMerge.ACTION_RUN_SUBLIMEMERGE_TOOLTIP)
 
         self.actionSourceTree = QAction(self)
-        self.actionSourceTree.setText("Run SourceTree")
-        self.actionSourceTree.setIcon(QIcon(":/img/sourcetree.ico"))
-        self.actionSourceTree.setToolTip('Open a SourceTree tab for each repository')
+        self.actionSourceTree.setText(ExecSourceTree.ACTION_RUN_SOURCETREE_TEXT)
+        self.actionSourceTree.setIcon(QIcon(ExecSourceTree.ACTION_RUN_SOURCETREE_ICON))
+        self.actionSourceTree.setToolTip(ExecSourceTree.ACTION_RUN_SOURCETREE_TOOLTIP)
 
         self.actionGitGui = QAction(self)
-        self.actionGitGui.setText("Run Git GUI")
-        # self.actionGitGui.setIcon(QIcon(":/img/sourcetree.ico"))
-        self.actionGitGui.setToolTip('Open a git GUI tab for each repository')
+        self.actionGitGui.setText(ExecGitGui.ACTION_RUN_GITGUI_TEXT)
+        self.actionGitGui.setToolTip(ExecGitGui.ACTION_RUN_GITGUI_TOOLTIP)
 
         self.actionGitK = QAction(self)
-        self.actionGitK.setText("Run GitK")
-        # self.actionGitK.setIcon(QIcon(":/img/sourcetree.ico"))
-        self.actionGitK.setToolTip('Open a GitK tab for each repository')
+        self.actionGitK.setText(ExecGitK.ACTION_RUN_GITK_TEXT)
+        self.actionGitK.setToolTip(ExecGitK.ACTION_RUN_GITK_TOOLTIP)
+
 
         ######## TortoiseGit actions ##########
 
