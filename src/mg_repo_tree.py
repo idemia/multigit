@@ -385,7 +385,7 @@ class MgRepoTree(QTreeWidget):
             mg_const.DBC_TORTOISEGITPULL     : self.slotTGitPull,
             mg_const.DBC_TORTOISEGITFETCH    : self.slotTGitFetch,
 
-            mg_const.DBC_RUNSOURCETREE       : self.slotSourcetree,
+            ExecSourceTree.DBC_RUNSOURCETREE: self.slotSourcetree,
             ExecSublimeMerge.DBC_RUNSUBLIMEMERGE: self.slotSublimemerge,
             mg_const.DBC_RUNGITGUI           : self.slotGitGui,
             mg_const.DBC_RUNGITK             : self.slotGitK,
@@ -722,16 +722,8 @@ class MgRepoTree(QTreeWidget):
 
 
     def slotSourcetree(self) -> None:
-        '''Run sourcetree on the current repos'''
-        dbg('slotSourcetree')
-        if not self.confirmIfNoOrTooManySelectedItems('SourceTree'):
-            return
+        self.slotRunProgram(ExecSourceTree)
 
-        for item in self.selectedRepoItems():
-            repo = item.repoInfo
-            # run sourcetree
-            ExecSourceTree.exec_non_blocking(['-t', str(repo.fullpath)],
-                callback = lambda _1, _2: repo.refresh())
 
     def slotGitGui(self) -> None:
         '''Run git Gui on the current repos'''
@@ -754,11 +746,9 @@ class MgRepoTree(QTreeWidget):
         selectedRepos = [item.repoInfo for item in self.selectedRepoItems()]
         exec.runDoubleClick(selectedRepos)
 
-
     def slotSublimemerge(self) -> None:
         '''Run SublimeMewrge on the current repos'''
         self.slotRunProgram(ExecSublimeMerge)
-
 
     def slotGitK(self) -> None:
         '''Run GitK on the current repos'''

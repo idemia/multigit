@@ -632,9 +632,18 @@ class ExecSourceTree(ExecTool):
 
     CONFIG_ENTRY_BASE = 'CONFIG_SOURCETREE'
 
+    DBC_RUNSOURCETREE = 'Run SourceTree'
+
     DOUBLE_CLICK_ACTIONS = [
-        mg_const.DBC_RUNSOURCETREE,
+        DBC_RUNSOURCETREE,
     ]
+
+    @staticmethod
+    def runDoubleClick(selectedRepos: List['MgRepoInfo']) -> None:
+        dbg(f'ExecSourceTree.runDoubleClick({selectedRepos})')
+        for repo in selectedRepos:
+            ExecSourceTree.exec_non_blocking(['-t', str(repo.fullpath)])
+
 
 
 
@@ -670,6 +679,7 @@ class ExecSublimeMerge(ExecTool):
 
     @staticmethod
     def runDoubleClick(selectedRepos: List['MgRepoInfo']) -> None:
+        dbg(f'ExecSublimeMerge.runDoubleClick({selectedRepos})')
         '''Run SublimeMerge on the current repos'''
         for repo in selectedRepos:
             ExecSublimeMerge.exec_non_blocking([str(repo.fullpath)])
