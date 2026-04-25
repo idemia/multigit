@@ -15,7 +15,7 @@
 #
 
 
-from typing import Sequence, Union, Optional, Callable, Tuple, Any, List, Dict, Type, Generator
+from typing import Sequence, Union, Optional, Callable, Tuple, Any, List, Dict, Type, Generator, TYPE_CHECKING
 
 import logging, sys, os
 from pathlib import Path
@@ -27,6 +27,8 @@ from PySide6.QtCore import QObject, QProcess, Signal, SignalInstance
 from PySide6.QtWidgets import QMessageBox, QApplication, QWidget
 
 from src import mg_config
+if TYPE_CHECKING:
+    from src.mg_repo_info import MgRepoInfo
 from src.mg_utils import hasGitAuthFailureMsg
 import src.mg_const as mg_const
 from src.mg_auth_failure_mgr import MgAuthFailureMgr
@@ -128,6 +130,11 @@ class ExecTool:
 
     SESSION_CACHE: Dict[Type['ExecTool'], MgExecutable] = {
     }
+
+
+    @staticmethod
+    def runDoubleClick(selectedRepos: List['MgRepoInfo']) -> None:
+        raise NotImplementedError('runDoubleClick() not implemented for this tool')
 
 
     @classmethod
@@ -655,9 +662,17 @@ class ExecSublimeMerge(ExecTool):
 
     CONFIG_ENTRY_BASE = 'CONFIG_SUBLIMEMERGE'
 
+    DBC_RUNSUBLIMEMERGE = 'Run SublimeMerge'
+
     DOUBLE_CLICK_ACTIONS = [
-        mg_const.DBC_RUNSUBLIMEMERGE,
+        DBC_RUNSUBLIMEMERGE,
     ]
+
+    @staticmethod
+    def runDoubleClick(selectedRepos: List['MgRepoInfo']) -> None:
+        '''Run SublimeMerge on the current repos'''
+        for repo in selectedRepos:
+            ExecSublimeMerge.exec_non_blocking([str(repo.fullpath)])
 
 
 #######################################################

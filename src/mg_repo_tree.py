@@ -15,7 +15,7 @@
 #
 
 
-from typing import List, Any, Optional, Dict, Callable, cast, Tuple
+from typing import List, Any, Optional, Dict, Callable, cast, Tuple, Type
 import logging
 import functools
 import enum
@@ -26,7 +26,7 @@ from PySide6.QtCore import Qt, QPoint, Signal, QPoint
 
 from src import mg_const
 from src import mg_config as mgc
-from src.mg_tools import ExecTortoiseGit, ExecGitBash, ExecSourceTree, ExecSublimeMerge, ExecGit, ExecGitK, ExecExplorer, ExecGitGui
+from src.mg_tools import ExecTortoiseGit, ExecGitBash, ExecSourceTree, ExecSublimeMerge, ExecGit, ExecGitK, ExecExplorer, ExecGitGui, ExecTool
 from src.mg_repo_info import MgRepoInfo
 from src.mg_repo_tree_item import MgRepoTreeItem
 from src.mg_exec_window import MgExecWindow
@@ -199,7 +199,7 @@ class MgRepoTree(QTreeWidget):
 
         # Menu Git programs
         self.mgActions.actionSourceTree.triggered.connect(self.slotSourcetree)
-        self.mgActions.actionSublimeMerge.triggered.connect(self.slotSublimemerge)
+        self.mgActions.actionSublimeMerge.triggered.connect(lambda _: self.slotRunProgram(ExecSublimeMerge))
         self.mgActions.actionGitGui.triggered.connect(self.slotGitGui)
         self.mgActions.actionGitK.triggered.connect(self.slotGitK)
 
@@ -386,7 +386,7 @@ class MgRepoTree(QTreeWidget):
             mg_const.DBC_TORTOISEGITFETCH    : self.slotTGitFetch,
 
             mg_const.DBC_RUNSOURCETREE       : self.slotSourcetree,
-            mg_const.DBC_RUNSUBLIMEMERGE     : self.slotSublimemerge,
+            ExecSublimeMerge.DBC_RUNSUBLIMEMERGE: self.slotSublimemerge,
             mg_const.DBC_RUNGITGUI           : self.slotGitGui,
             mg_const.DBC_RUNGITK             : self.slotGitK,
             mg_const.DBC_RUNGITBASH          : self.slotGitBash,
@@ -745,16 +745,20 @@ class MgRepoTree(QTreeWidget):
             ExecGitGui.exec_non_blocking([], workdir=str(repo.fullpath), allow_errors=True,
                 callback = lambda _1, _2: repo.refresh())
 
-    def slotSublimemerge(self) -> None:
-        '''Run SublimeMewrge on the current repos'''
-        dbg('slotSublimemerge')
-        if not self.confirmIfNoOrTooManySelectedItems('Sublime Merge'):
+
+    def slotRunProgram(self, exec: Type[ExecTool]) -> None:
+        dbg(f'slotRunProgram({exec.DISPLAY_NAME}')
+        if not self.confirmIfNoOrTooManySelectedItems(exec.DISPLAY_NAME):
             return
 
-        for item in self.selectedRepoItems():
-            repo = item.repoInfo
-            ExecSublimeMerge.exec_non_blocking([str(repo.fullpath)],
-                callback = lambda _1, _2: repo.refresh())
+        selectedRepos = [item.repoInfo for item in self.selectedRepoItems()]
+        exec.runDoubleClick(selectedRepos)
+
+
+    def slotSublimemerge(self) -> None:
+        '''Run SublimeMewrge on the current repos'''
+        self.slotRunProgram(ExecSublimeMerge)
+
 
     def slotGitK(self) -> None:
         '''Run GitK on the current repos'''
