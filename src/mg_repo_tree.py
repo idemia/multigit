@@ -198,10 +198,10 @@ class MgRepoTree(QTreeWidget):
         self.mgActions.actionGitRunCommand.triggered.connect(self.slotGitRunCommand)
 
         # Menu Git programs
-        self.mgActions.actionSourceTree.triggered.connect(self.slotSourcetree)
-        self.mgActions.actionSublimeMerge.triggered.connect(lambda _: self.slotRunProgram(ExecSublimeMerge))
-        self.mgActions.actionGitGui.triggered.connect(self.slotGitGui)
-        self.mgActions.actionGitK.triggered.connect(self.slotGitK)
+        self.mgActions.actionSourceTree.triggered.connect(lambda : self.slotRunProgram(ExecSourceTree))
+        self.mgActions.actionSublimeMerge.triggered.connect(lambda : self.slotRunProgram(ExecSublimeMerge))
+        self.mgActions.actionGitGui.triggered.connect(lambda : self.slotRunProgram(ExecGitGui))
+        self.mgActions.actionGitK.triggered.connect(lambda : self.slotRunProgram(ExecGitK))
 
         self.mgActions.actionTGitShowLog  .triggered.connect(self.slotTGitShowLog)
         self.mgActions.actionTGitCommit   .triggered.connect(self.slotTGitCommit)
@@ -385,11 +385,11 @@ class MgRepoTree(QTreeWidget):
             mg_const.DBC_TORTOISEGITPULL     : self.slotTGitPull,
             mg_const.DBC_TORTOISEGITFETCH    : self.slotTGitFetch,
 
-            ExecSourceTree.DBC_RUNSOURCETREE: self.slotSourcetree,
-            ExecSublimeMerge.DBC_RUNSUBLIMEMERGE: self.slotSublimemerge,
-            ExecGitGui.DBC_RUNGITGUI           : self.slotGitGui,
-            ExecGitK.DBC_RUNGITK             : self.slotGitK,
-            ExecGitBash.DBC_RUNGITBASH          : self.slotGitBash,
+            ExecSourceTree.DBC_RUNSOURCETREE: lambda : self.slotRunProgram(ExecSourceTree),
+            ExecSublimeMerge.DBC_RUNSUBLIMEMERGE: lambda : self.slotRunProgram(ExecSublimeMerge),
+            ExecGitGui.DBC_RUNGITGUI           : lambda : self.slotRunProgram(ExecGitGui),
+            ExecGitK.DBC_RUNGITK             : lambda : self.slotRunProgram(ExecGitK),
+            ExecGitBash.DBC_RUNGITBASH          : lambda : self.slotRunProgram(ExecGitBash),
 
         } # type: Dict[str, Callable[[], None]]
 
@@ -727,17 +727,3 @@ class MgRepoTree(QTreeWidget):
 
         selectedRepos = [item.repoInfo for item in self.selectedRepoItems()]
         exec.runDoubleClick(selectedRepos)
-
-
-    def slotSourcetree(self) -> None:
-        self.slotRunProgram(ExecSourceTree)
-
-    def slotGitGui(self) -> None:
-        self.slotRunProgram(ExecGitGui)
-
-    def slotSublimemerge(self) -> None:
-        '''Run SublimeMewrge on the current repos'''
-        self.slotRunProgram(ExecSublimeMerge)
-
-    def slotGitK(self) -> None:
-        self.slotRunProgram(ExecGitK)

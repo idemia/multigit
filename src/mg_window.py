@@ -35,7 +35,7 @@ from src.mg_plugin_mgr import pluginMgrInstance
 from src.mg_multigit_widget import MgMultigitWidget
 from src.mg_repo_tree_item import MgRepoTreeItem
 from src.mg_repo_tree import MgRepoTree
-from src.mg_tools import ExecExplorer, ExecGit
+from src.mg_tools import ExecExplorer, ExecGit, ExecSublimeMerge, ExecSourceTree, ExecGitBash, ExecGitGui, ExecGitK
 from src.mg_dialog_settings import runDialogEditSettings
 from src.mg_exec_window import MgExecWindow
 from src import mg_config as mgc
@@ -130,22 +130,12 @@ class MgMainWindow(QMainWindow, Ui_MainWindow):
         return callActiveMultigitTabMethod
 
 
-    def dispatchToActiveTreeOfMultigitTab(self, methodName: str, with_arg1: bool = False) -> Union[Callable[[], None], Callable[[Any], None]]:
+    def dispatchToActiveTreeOfMultigitTab(self, methodName: str, *staticArgs: Any) -> Callable[..., None]:
         '''Return a function which calls the methodName on all tab widget
-        (at the time where the method is called).
-
-        The method may support an argument if with_arg1 is True
         '''
-        callActiveTreeOfMultigitTabMethod: Union[Callable[[], None], Callable[[Any], None]]
-        if with_arg1:
-            def callActiveTreeOfMultigitTabMethod(arg1: Any) -> None:
-                targetMethod = getattr(self.currentMultigit().repoTree, methodName)
-                targetMethod(arg1)
-
-        else:
-            def callActiveTreeOfMultigitTabMethod() -> None:
-                targetMethod = getattr(self.currentMultigit().repoTree, methodName)
-                targetMethod()
+        def callActiveTreeOfMultigitTabMethod(*dynamicArgs) -> None:
+            targetMethod = getattr(self.currentMultigit().repoTree, methodName)
+            targetMethod(*staticArgs, *dynamicArgs)
 
         return callActiveTreeOfMultigitTabMethod
 
@@ -191,7 +181,7 @@ class MgMainWindow(QMainWindow, Ui_MainWindow):
         self.mgActions.actionShowInExplorer.triggered.connect(self.dispatchToActiveTreeOfMultigitTab('slotShowInExplorer'))
 
         # Submenu: copy
-        self.mgActions.menuCopy.triggered.connect(self.dispatchToActiveTreeOfMultigitTab('slotMenuCopyAction', True))
+        self.mgActions.menuCopy.triggered.connect(self.dispatchToActiveTreeOfMultigitTab('slotMenuCopyAction'))
         self.mgActions.menuCopy.aboutToShow.connect(self.slotMenuCopyAboutToShow)
         self.mgActions.menuCopy.aboutToHide.connect(self.slotMenuCopyAboutToHide)
 
@@ -217,14 +207,14 @@ class MgMainWindow(QMainWindow, Ui_MainWindow):
         self.mgActions.actionGitSwitchBranch.triggered.connect(self.dispatchToActiveTreeOfMultigitTab('slotGitSwitchBranch'))
         self.mgActions.actionGitCheckoutTag.triggered.connect(self.dispatchToActiveTreeOfMultigitTab('slotGitCheckoutTag'))
         self.mgActions.actionGitDeleteBranch.triggered.connect(self.dispatchToActiveTreeOfMultigitTab('slotGitDeleteBranch'))
-        self.mgActions.actionGitBash.triggered.connect(self.dispatchToActiveTreeOfMultigitTab('slotGitBash'))
+        self.mgActions.actionGitBash.triggered.connect(self.dispatchToActiveTreeOfMultigitTab('slotRunProgram', ExecGitBash))
         self.mgActions.actionGitRunCommand.triggered.connect(self.dispatchToActiveTreeOfMultigitTab('slotGitRunCommand'))
 
         # Menu Git programs
-        self.mgActions.actionSourceTree.triggered.connect(self.dispatchToActiveTreeOfMultigitTab('slotSourcetree'))
-        self.mgActions.actionSublimeMerge.triggered.connect(self.dispatchToActiveTreeOfMultigitTab('slotSublimemerge'))
-        self.mgActions.actionGitGui.triggered.connect(self.dispatchToActiveTreeOfMultigitTab('slotGitGui'))
-        self.mgActions.actionGitK.triggered.connect(self.dispatchToActiveTreeOfMultigitTab('slotGitK'))
+        self.mgActions.actionSourceTree.triggered.connect(self.dispatchToActiveTreeOfMultigitTab('slotRunProgram', ExecSourceTree))
+        self.mgActions.actionSublimeMerge.triggered.connect(self.dispatchToActiveTreeOfMultigitTab('slotRunProgram', ExecSublimeMerge))
+        self.mgActions.actionGitGui.triggered.connect(self.dispatchToActiveTreeOfMultigitTab('slotRunProgram', ExecGitGui))
+        self.mgActions.actionGitK.triggered.connect(self.dispatchToActiveTreeOfMultigitTab('slotRunProgram', ExecGitK))
 
         self.mgActions.actionTGitShowLog  .triggered.connect(self.dispatchToActiveTreeOfMultigitTab('slotTGitShowLog'))
         self.mgActions.actionTGitCommit   .triggered.connect(self.dispatchToActiveTreeOfMultigitTab('slotTGitCommit'))
