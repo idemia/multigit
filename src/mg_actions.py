@@ -24,7 +24,7 @@ from PySide6.QtGui import QAction, QIcon, QPixmap, QTransform
 from PySide6.QtWidgets import QMenu, QWidget
 
 from src.mg_const import SHORT_SHA1_NB_DIGITS
-from src.mg_tools import ExecTool, ExecSublimeMerge, ExecTortoiseGit, ExecSourceTree, ExecGitBash, ExecGitGui, ExecGitK
+from src.mg_tools import ExecTool, ExecTortoiseGit, ExecGitBash
 if TYPE_CHECKING:
     from src.mg_repo_tree import MgRepoTree
 
@@ -222,7 +222,7 @@ class MgActions(QObject):
         self.actionConfigureGitProgram.setText("Open settings to configure a Git Program")
 
         self.execToolActionsDict = {}
-        for ExecToolClass in [ExecSublimeMerge, ExecSourceTree, ExecGitGui, ExecGitK]:
+        for ExecToolClass in ExecTool.getExecTools():
             for action_desc in ExecToolClass.ACTIONS:
                 action = MgExecToolAction(ExecToolClass, action_desc, self)
                 self.execToolActionsDict[action.text()] = action

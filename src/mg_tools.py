@@ -138,6 +138,9 @@ class ExecTool:
     SESSION_CACHE: Dict[Type['ExecTool'], MgExecutable] = {
     }
 
+    @staticmethod
+    def getExecTools() -> 'List[Type[ExecTool]]':
+        return [ExecSublimeMerge, ExecSourceTree, ExecGitGui, ExecGitK]
 
     @staticmethod
     def runAction(selectedRepos: List['MgRepoInfo']) -> None:

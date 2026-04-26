@@ -35,7 +35,7 @@ from src.mg_plugin_mgr import pluginMgrInstance
 from src.mg_multigit_widget import MgMultigitWidget
 from src.mg_repo_tree_item import MgRepoTreeItem
 from src.mg_repo_tree import MgRepoTree
-from src.mg_tools import ExecExplorer, ExecGit, ExecSublimeMerge, ExecSourceTree, ExecGitBash, ExecGitGui, ExecGitK
+from src.mg_tools import ExecExplorer, ExecGit, ExecGitBash
 from src.mg_dialog_settings import runDialogEditSettings
 from src.mg_exec_window import MgExecWindow
 from src import mg_config as mgc
