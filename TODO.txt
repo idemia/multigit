@@ -1,10 +1,10 @@
-# Linux
-
-# Windows
-
 # Flatpak packaging
 - sign with gpg key
 
 ## Nice to have
 - ensure that generate_ui and other packaging commands are run in CI and captured in dependencies
 
+
+
+### v1.10
+- aciton git bash needs to be reviewed
