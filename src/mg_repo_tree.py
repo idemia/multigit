@@ -199,7 +199,7 @@ class MgRepoTree(QTreeWidget):
 
         # Menu Git programs
         for execToolAction in self.mgActions.execToolActionsDict.values():
-            execToolAction.triggered.connect(lambda : self.slotRunProgram(execToolAction.ExecTool))
+            execToolAction.triggered.connect(lambda : execToolAction.ExecTool.runProgramOnSelected(self))
 
         self.mgActions.actionTGitShowLog  .triggered.connect(self.slotTGitShowLog)
         self.mgActions.actionTGitCommit   .triggered.connect(self.slotTGitCommit)
@@ -362,8 +362,8 @@ class MgRepoTree(QTreeWidget):
             return
 
         # Make sure you don't forget any action!
-        actionToPerform = {
-            mg_const.DBC_GITCOMMIT: self.slotGitCommit,
+        actionToPerform: Dict[str, Callable[[], None]] = {
+            mg_const.DBC_GITCOMMIT           : self.slotGitCommit,
             mg_const.DBC_GITCREATEBRANCH     : self.slotGitCreateBranch,
             mg_const.DBC_GITSWITCHBRANCH     : self.slotGitSwitchBranch,
             mg_const.DBC_GITPUSH             : self.slotGitPush,
@@ -718,10 +718,6 @@ class MgRepoTree(QTreeWidget):
     #
     ##########################################################################
 
-    def slotRunProgram(self, exec: Type[ExecTool]) -> None:
-        dbg(f'slotRunProgram({exec.DISPLAY_NAME}')
-        if not self.confirmIfNoOrTooManySelectedItems(exec.DISPLAY_NAME):
-            return
-
-        selectedRepos = [item.repoInfo for item in self.selectedRepoItems()]
-        exec.runDoubleClick(selectedRepos)
+    def slotRunProgram(self, ExecToolClass: Type[ExecTool]) -> None:
+        dbg(f'slotRunProgram({ExecToolClass.DISPLAY_NAME}')
+        ExecToolClass.runProgramOnSelected(self)

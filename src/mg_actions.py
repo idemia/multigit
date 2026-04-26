@@ -222,9 +222,9 @@ class MgActions(QObject):
         self.actionConfigureGitProgram.setText("Open settings to configure a Git Program")
 
         self.execToolActionsDict = {}
-        for ExecTool in [ExecSublimeMerge, ExecSourceTree, ExecGitGui, ExecGitK]:
-            for action_desc in ExecTool.ACTIONS:
-                action = MgExecToolAction(ExecTool, action_desc, self)
+        for ExecToolClass in [ExecSublimeMerge, ExecSourceTree, ExecGitGui, ExecGitK]:
+            for action_desc in ExecToolClass.ACTIONS:
+                action = MgExecToolAction(ExecToolClass, action_desc, self)
                 self.execToolActionsDict[action.text()] = action
 
         if ExecGitBash.ACTIONS:

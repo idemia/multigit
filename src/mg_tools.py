@@ -29,6 +29,7 @@ from PySide6.QtWidgets import QMessageBox, QApplication, QWidget
 from src import mg_config
 if TYPE_CHECKING:
     from src.mg_repo_info import MgRepoInfo
+    from src.mg_repo_tree import MgRepoTree
 from src.mg_utils import hasGitAuthFailureMsg
 import src.mg_const as mg_const
 from src.mg_auth_failure_mgr import MgAuthFailureMgr
@@ -139,8 +140,18 @@ class ExecTool:
 
 
     @staticmethod
-    def runDoubleClick(selectedRepos: List['MgRepoInfo']) -> None:
-        raise NotImplementedError('runDoubleClick() not implemented for this tool')
+    def runAction(selectedRepos: List['MgRepoInfo']) -> None:
+        raise NotImplementedError('runAction() not implemented for this tool')
+
+
+    @classmethod
+    def runProgramOnSelected(cls, repoTree: 'MgRepoTree') -> None:
+        dbg(f'runProgram({cls.DISPLAY_NAME}, action)')
+        if not repoTree.confirmIfNoOrTooManySelectedItems(cls.DISPLAY_NAME):
+            return
+
+        selectedRepos = [item.repoInfo for item in repoTree.selectedRepoItems()]
+        cls.runAction(selectedRepos)
 
 
     @classmethod
@@ -653,9 +664,9 @@ class ExecSublimeMerge(ExecTool):
     ]
 
     @staticmethod
-    def runDoubleClick(selectedRepos: List['MgRepoInfo']) -> None:
-        '''Run SublimeMerge on the current repos'''
-        dbg(f'ExecSublimeMerge.runDoubleClick({selectedRepos})')
+    def runAction(selectedRepos: List['MgRepoInfo']) -> None:
+        '''Run SublimeMerge on the repos'''
+        dbg(f'ExecSublimeMerge.runAction({selectedRepos})')
         for repo in selectedRepos:
             ExecSublimeMerge.exec_non_blocking([str(repo.fullpath)])
 
@@ -691,8 +702,8 @@ class ExecSourceTree(ExecTool):
     ]
 
     @staticmethod
-    def runDoubleClick(selectedRepos: List['MgRepoInfo']) -> None:
-        dbg(f'ExecSourceTree.runDoubleClick({selectedRepos})')
+    def runAction(selectedRepos: List['MgRepoInfo']) -> None:
+        dbg(f'ExecSourceTree.runAction({selectedRepos})')
         for repo in selectedRepos:
             ExecSourceTree.exec_non_blocking(['-t', str(repo.fullpath)])
 
@@ -765,8 +776,8 @@ class ExecGitGui(ExecTool):
     ]
 
     @staticmethod
-    def runDoubleClick(selectedRepos: List['MgRepoInfo']) -> None:
-        dbg(f'ExecGitGui.runDoubleClick({selectedRepos})')
+    def runAction(selectedRepos: List['MgRepoInfo']) -> None:
+        dbg(f'ExecGitGui.runAction({selectedRepos})')
         for repo in selectedRepos:
             # allow errors needed because git-gui never returns 0 on Windows
             ExecGitGui.exec_non_blocking([], workdir=str(repo.fullpath), allow_errors=True)
@@ -813,8 +824,8 @@ class ExecGitK(ExecTool):
     ]
 
     @staticmethod
-    def runDoubleClick(selectedRepos: List['MgRepoInfo']) -> None:
-        dbg(f'ExecGitK.runDoubleClick({selectedRepos})')
+    def runAction(selectedRepos: List['MgRepoInfo']) -> None:
+        dbg(f'ExecGitK.runAction({selectedRepos})')
         for repo in selectedRepos:
             # allow errors needed because gitk never returns 0 on Windows
             ExecGitK.exec_non_blocking([], workdir=str(repo.fullpath), allow_errors=True)
