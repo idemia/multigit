@@ -45,13 +45,13 @@ def getFetchIcon() -> QIcon:
 
 class MgExecToolAction(QAction):
     '''Action to run a program'''
-    def __init__(self, ExecTool: Type[ExecTool], action_desc: tuple[str, str, str], *args: Any) -> None:
+    def __init__(self, ExecTool: Type[ExecTool], action_desc: tuple[str, str, str, str], *args: Any) -> None:
         super().__init__(*args)
         self.ExecTool = ExecTool
-        self.setText(action_desc[0])
-        if action_desc[1]:
-            self.setIcon(QIcon(action_desc[1]))
-        self.setToolTip(action_desc[2])
+        self.setText(action_desc[ExecTool.ACTION_IDX_NAME])
+        if action_desc[ExecTool.ACTION_IDX_ICON_PATH]:
+            self.setIcon(QIcon(action_desc[ExecTool.ACTION_IDX_ICON_PATH]))
+        self.setToolTip(action_desc[ExecTool.ACTION_IDX_TOOLTIP])
 
 
 class MgActions(QObject):

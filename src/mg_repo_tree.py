@@ -389,7 +389,7 @@ class MgRepoTree(QTreeWidget):
             ExecGitK.DBC_RUNGITK             : lambda : self.slotRunProgram(ExecGitK),
             ExecGitBash.DBC_RUNGITBASH          : lambda : self.slotRunProgram(ExecGitBash),
 
-        } # type: Dict[str, Callable[[], None]]
+        }
 
         if mgc.get_config_instance()[mgc.CONFIG_DOUBLE_CLICK_ACTION] in actionToPerform:
             actionToPerform[mgc.get_config_instance()[mgc.CONFIG_DOUBLE_CLICK_ACTION]]()

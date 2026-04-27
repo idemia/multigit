@@ -17,7 +17,7 @@
 
 from typing import Sequence, Union, Optional, Callable, Tuple, Any, List, Dict, Type, Generator, TYPE_CHECKING
 
-import logging, sys, os
+import logging, sys, os, shlex
 from pathlib import Path
 from collections import deque
 from enum import Enum, auto
@@ -127,9 +127,14 @@ class ExecTool:
     # is completed with CONFIG_SUFFIX_* to store the different information.
     CONFIG_ENTRY_BASE: str
 
-    ACTIONS: List[Tuple[str, str, str]] = [
+    ACTION_IDX_NAME = 0
+    ACTION_IDX_CMD_LINE = 1
+    ACTION_IDX_ICON_PATH = 2
+    ACTION_IDX_TOOLTIP = 3
+
+    ACTIONS: List[Tuple[str, str, str, str]] = [
         # Description of the menu actions in the format:
-        #    (Menu Text, Icon Path or emty string, Tooltip)
+        #    (Menu Text, command-line arguments, Icon Path or emty string, Tooltip)
         #    ...
     ]
 
@@ -142,9 +147,22 @@ class ExecTool:
     def getExecTools() -> 'List[Type[ExecTool]]':
         return [ExecSublimeMerge, ExecSourceTree, ExecGitGui, ExecGitK]
 
-    @staticmethod
-    def runAction(selectedRepos: List['MgRepoInfo']) -> None:
-        raise NotImplementedError('runAction() not implemented for this tool')
+
+    @classmethod
+    def runAction(cls, selectedRepos: List['MgRepoInfo']) -> None:
+        if not cls.ACTIONS:
+            raise NotImplementedError('No action available for tool: {cls.DISPLAY_NAME}')
+
+        action = cls.ACTIONS[0]
+        for repo in selectedRepos:
+            try:
+                posix_mode = not sys.platform == 'win32'
+                action_cmd_line_args = shlex.split( action[cls.ACTION_IDX_CMD_LINE].format(repository_path=str(repo.fullpath)), posix=posix_mode)
+            except ValueError as e:
+                error(f'Error when splitting command-line: {action[cls.ACTION_IDX_CMD_LINE]}')
+                continue
+
+            cls.exec_non_blocking(action_cmd_line_args, workdir=repo.fullpath, allow_errors=True)
 
 
     @classmethod
@@ -657,7 +675,7 @@ class ExecSublimeMerge(ExecTool):
     CONFIG_ENTRY_BASE = 'CONFIG_SUBLIMEMERGE'
 
     ACTIONS = [
-        ('Run SublimeMerge', ":/img/sublime_merge.ico", 'Open a SublimeMerge tab for each repository')
+        ('Run SublimeMerge', '{repository_path}', ":/img/sublime_merge.ico", 'Open a SublimeMerge tab for each repository')
     ]
 
     DBC_RUNSUBLIMEMERGE = 'Run SublimeMerge'
@@ -665,14 +683,6 @@ class ExecSublimeMerge(ExecTool):
     DOUBLE_CLICK_ACTIONS = [
         DBC_RUNSUBLIMEMERGE,
     ]
-
-    @staticmethod
-    def runAction(selectedRepos: List['MgRepoInfo']) -> None:
-        '''Run SublimeMerge on the repos'''
-        dbg(f'ExecSublimeMerge.runAction({selectedRepos})')
-        for repo in selectedRepos:
-            ExecSublimeMerge.exec_non_blocking([str(repo.fullpath)])
-
 
 
 #######################################################
@@ -695,7 +705,7 @@ class ExecSourceTree(ExecTool):
     CONFIG_ENTRY_BASE = 'CONFIG_SOURCETREE'
 
     ACTIONS = [
-        ('Run SourceTree', ":/img/sourcetree.ico", 'Open a SourceTree tab for each repository'),
+        ('Run SourceTree', '-t {repository_path}', ":/img/sourcetree.ico", 'Open a SourceTree tab for each repository'),
     ]
 
     DBC_RUNSOURCETREE = 'Run SourceTree'
@@ -703,12 +713,6 @@ class ExecSourceTree(ExecTool):
     DOUBLE_CLICK_ACTIONS = [
         DBC_RUNSOURCETREE,
     ]
-
-    @staticmethod
-    def runAction(selectedRepos: List['MgRepoInfo']) -> None:
-        dbg(f'ExecSourceTree.runAction({selectedRepos})')
-        for repo in selectedRepos:
-            ExecSourceTree.exec_non_blocking(['-t', str(repo.fullpath)])
 
 
 
@@ -734,7 +738,7 @@ class ExecGitBash(ExecTool):
     CONFIG_ENTRY_BASE = 'CONFIG_GITBASH'
 
     ACTIONS = [
-        ('Git bash here', ":/img/git-bash.ico", 'Open a git bash window for each repository'),
+        ('Git bash here', '', ":/img/git-bash.ico", 'Open a git bash window for each repository'),
     ]
 
     DBC_RUNGITBASH = 'Run git-bash'
@@ -769,7 +773,7 @@ class ExecGitGui(ExecTool):
     CONFIG_ENTRY_BASE = 'CONFIG_GITGUI'
 
     ACTIONS = [
-        ('Git Gui', "", 'Open a git-gui window for each repository'),
+        ('Git Gui', '', "", 'Open a git-gui window for each repository'),
     ]
 
     DBC_RUNGITGUI = 'Run Git Gui'
@@ -777,13 +781,6 @@ class ExecGitGui(ExecTool):
     DOUBLE_CLICK_ACTIONS = [
         DBC_RUNGITGUI,
     ]
-
-    @staticmethod
-    def runAction(selectedRepos: List['MgRepoInfo']) -> None:
-        dbg(f'ExecGitGui.runAction({selectedRepos})')
-        for repo in selectedRepos:
-            # allow errors needed because git-gui never returns 0 on Windows
-            ExecGitGui.exec_non_blocking([], workdir=str(repo.fullpath), allow_errors=True)
 
 
 #######################################################
@@ -817,7 +814,7 @@ class ExecGitK(ExecTool):
     CONFIG_ENTRY_BASE = 'CONFIG_GITK'
 
     ACTIONS = [
-        ('Gitk', "", 'Open a gitk window for each repository'),
+        ('Gitk', '', "", 'Open a gitk window for each repository'),
     ]
 
     DBC_RUNGITK = 'Run GitK'
@@ -825,13 +822,6 @@ class ExecGitK(ExecTool):
     DOUBLE_CLICK_ACTIONS = [
         DBC_RUNGITK,
     ]
-
-    @staticmethod
-    def runAction(selectedRepos: List['MgRepoInfo']) -> None:
-        dbg(f'ExecGitK.runAction({selectedRepos})')
-        for repo in selectedRepos:
-            # allow errors needed because gitk never returns 0 on Windows
-            ExecGitK.exec_non_blocking([], workdir=str(repo.fullpath), allow_errors=True)
 
 
 #######################################################
