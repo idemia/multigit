@@ -16,7 +16,7 @@
 
 
 from typing import cast, Match, Any, Iterable, Sequence, Union, List, Iterator, Optional
-import html, os, pathlib, re, shutil, stat, logging, time, subprocess, sys
+import html, os, pathlib, re, shutil, stat, logging, time, subprocess, sys, shlex
 
 from PySide6.QtWidgets import QTreeWidget, QTreeWidgetItem
 
@@ -456,4 +456,3 @@ def normalize_path(p: Union[str, pathlib.Path], platform: Optional[str] = None) 
         return str(pathlib.PureWindowsPath(p))
     else:
         return str(pathlib.PureWindowsPath(p).as_posix())
-

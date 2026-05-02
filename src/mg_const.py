@@ -122,6 +122,8 @@ MSG_TOOLTIP_REMOTE_SYNCHRO = 'Delta vs origin'
 ############################################
 
 ### All possible double-click actions
+DBC_UNDEFINED          = 'Undefined'
+DBC_DONOTHING          = 'Do nothing'
 DBC_GITCOMMIT          = 'Git Commit'
 DBC_GITCREATEBRANCH    = 'Git Create Branch'
 DBC_GITSWITCHBRANCH    = 'Git Switch Branch'
@@ -130,7 +132,6 @@ DBC_GITPULL            = 'Git Pull'
 DBC_GITFETCH           = 'Git Fetch'
 DBC_REPOSITORYPROPERTIES = 'Repository Properties'
 DBC_SHOWINEXPLORER     = 'Show in Explorer'
-DBC_DONOTHING          = 'Do nothing'
 DBC_TORTOISEGITSHOWLOG = 'TortoiseGit ShowLog'
 DBC_TORTOISEGITSWITCH  = 'TortoiseGit Switch'
 DBC_TORTOISEGITBRANCH  = 'TortoiseGit Branch'

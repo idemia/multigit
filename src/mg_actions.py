@@ -24,7 +24,7 @@ from PySide6.QtGui import QAction, QIcon, QPixmap, QTransform
 from PySide6.QtWidgets import QMenu, QWidget
 
 from src.mg_const import SHORT_SHA1_NB_DIGITS
-from src.mg_tools import ExecTool, ExecTortoiseGit, ExecGitBash
+from src.mg_tools import ExecTool, ExecTortoiseGit
 if TYPE_CHECKING:
     from src.mg_repo_tree import MgRepoTree
 
@@ -47,6 +47,7 @@ class MgExecToolAction(QAction):
     '''Action to run a program'''
     def __init__(self, ExecTool: Type[ExecTool], action_desc: tuple[str, str, str, str], *args: Any) -> None:
         super().__init__(*args)
+        self.action_desc = action_desc
         self.ExecTool = ExecTool
         self.setText(action_desc[ExecTool.ACTION_IDX_NAME])
         if action_desc[ExecTool.ACTION_IDX_ICON_PATH]:
@@ -225,10 +226,8 @@ class MgActions(QObject):
         for ExecToolClass in ExecTool.getExecTools():
             for action_desc in ExecToolClass.ACTIONS:
                 action = MgExecToolAction(ExecToolClass, action_desc, self)
-                self.execToolActionsDict[action.text()] = action
+                self.execToolActionsDict[action.action_desc[ExecTool.ACTION_IDX_NAME]] = action
 
-        if ExecGitBash.ACTIONS:
-            self.actionGitBash = MgExecToolAction(ExecGitBash, ExecGitBash.ACTIONS[0], self)
 
         ######## TortoiseGit actions ##########
 
@@ -346,7 +345,6 @@ class MgActions(QObject):
         menuGit.addAction( self.actionGitDeleteBranch)
         menuGit.addAction( self.actionGitDeleteTag)
         menuGit.addSeparator()
-        menuGit.addAction( self.actionGitBash )
         menuGit.addAction( self.actionGitRunCommand )
 
 

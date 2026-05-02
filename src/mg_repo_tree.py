@@ -26,7 +26,7 @@ from PySide6.QtCore import Qt, QPoint, Signal, QPoint
 
 from src import mg_const
 from src import mg_config as mgc
-from src.mg_tools import ExecTortoiseGit, ExecGitBash, ExecSourceTree, ExecSublimeMerge, ExecGit, ExecGitK, ExecExplorer, ExecGitGui, ExecTool
+from src.mg_tools import ExecTortoiseGit, ExecExplorer, ExecTool
 from src.mg_repo_info import MgRepoInfo
 from src.mg_repo_tree_item import MgRepoTreeItem
 from src.mg_exec_window import MgExecWindow
@@ -194,12 +194,12 @@ class MgRepoTree(QTreeWidget):
         self.mgActions.actionGitCheckoutTag.triggered.connect(self.slotGitCheckoutTag)
         self.mgActions.actionGitDeleteBranch.triggered.connect(self.slotGitDeleteBranch)
         self.mgActions.actionGitDeleteTag.triggered.connect(self.slotGitDeleteTag)
-        self.mgActions.actionGitBash.triggered.connect(self.slotGitBash)
         self.mgActions.actionGitRunCommand.triggered.connect(self.slotGitRunCommand)
 
         # Menu Git programs
         for execToolAction in self.mgActions.execToolActionsDict.values():
-            execToolAction.triggered.connect(lambda : execToolAction.ExecTool.runProgramOnSelected(self))
+            execToolAction.triggered.connect(
+                lambda : execToolAction.ExecTool.runActionOnSelectedItems(execToolAction.text(), self))
 
         self.mgActions.actionTGitShowLog  .triggered.connect(self.slotTGitShowLog)
         self.mgActions.actionTGitCommit   .triggered.connect(self.slotTGitCommit)
@@ -362,7 +362,7 @@ class MgRepoTree(QTreeWidget):
             return
 
         # Make sure you don't forget any action!
-        actionToPerform: Dict[str, Callable[[], None]] = {
+        actionToPerformSlots: Dict[str, Callable[[], None]] = {
             mg_const.DBC_GITCOMMIT           : self.slotGitCommit,
             mg_const.DBC_GITCREATEBRANCH     : self.slotGitCreateBranch,
             mg_const.DBC_GITSWITCHBRANCH     : self.slotGitSwitchBranch,
@@ -382,21 +382,22 @@ class MgRepoTree(QTreeWidget):
             mg_const.DBC_TORTOISEGITPUSH     : self.slotTGitPush,
             mg_const.DBC_TORTOISEGITPULL     : self.slotTGitPull,
             mg_const.DBC_TORTOISEGITFETCH    : self.slotTGitFetch,
-
-            ExecSourceTree.DBC_RUNSOURCETREE: lambda : self.slotRunProgram(ExecSourceTree),
-            ExecSublimeMerge.DBC_RUNSUBLIMEMERGE: lambda : self.slotRunProgram(ExecSublimeMerge),
-            ExecGitGui.DBC_RUNGITGUI           : lambda : self.slotRunProgram(ExecGitGui),
-            ExecGitK.DBC_RUNGITK             : lambda : self.slotRunProgram(ExecGitK),
-            ExecGitBash.DBC_RUNGITBASH          : lambda : self.slotRunProgram(ExecGitBash),
-
         }
 
-        if mgc.get_config_instance()[mgc.CONFIG_DOUBLE_CLICK_ACTION] in actionToPerform:
-            actionToPerform[mgc.get_config_instance()[mgc.CONFIG_DOUBLE_CLICK_ACTION]]()
-        else:
+        double_click_action = mgc.get_config_instance().get(mgc.CONFIG_DOUBLE_CLICK_ACTION, mg_const.DBC_UNDEFINED)
+        if double_click_action == mg_const.DBC_UNDEFINED:
             button = QMessageBox.question(self, "Action for double-click", "Action for double-click is not yet defined.\nDo you want to open the settings dialog to define it ?")
             if button == QMessageBox.StandardButton.Yes:
                 runDialogEditSettings(self, tabPage=0)
+            return
+
+
+        if double_click_action in actionToPerformSlots:
+            actionToPerformSlots[double_click_action]()
+            return
+
+        repo = cast(MgRepoTreeItem, item).repoInfo
+        ExecTool.runAction(double_click_action, [repo])
 
 
     def slotRefreshSelected(self) -> None:
@@ -608,18 +609,6 @@ class MgRepoTree(QTreeWidget):
         runDialogGitSwitchDelete(self, DeleteOrSwitchBranchOrTag.DELETE_TAG, self.selectedRepos(), self.allRepos())
 
 
-    def slotGitBash(self) -> None:
-        '''Run git-bash on the current repos'''
-        dbg('slotGitBash')
-        if not self.confirmIfNoOrTooManySelectedItems('Git bash'):
-            return
-
-        for item in self.selectedRepoItems():
-            repo = item.repoInfo
-            # after git bash, we also want to refresh the URL
-            ExecGitBash.exec_non_blocking([], workdir=repo.fullpath,
-                callback = lambda _1, _2: repo.deepRefresh())
-
     def slotGitRunCommand(self) -> None:
         '''Run a custom git command'''
         dbg('slotGitRunCommand')
@@ -718,6 +707,6 @@ class MgRepoTree(QTreeWidget):
     #
     ##########################################################################
 
-    def slotRunProgram(self, ExecToolClass: Type[ExecTool]) -> None:
-        dbg(f'slotRunProgram({ExecToolClass.DISPLAY_NAME}')
-        ExecToolClass.runProgramOnSelected(self)
+    def slotRunActionOnSelectedItems(self, action: str) -> None:
+        dbg(f'slotRunActionOnSelectedItems({action}')
+        ExecTool.runActionOnSelectedItems(action, self)

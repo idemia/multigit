@@ -33,9 +33,8 @@ from src.mg_dialog_apply_mgit_file import runDialogApplyMgitFile
 from src.mg_dialog_about import showDialogAbout
 from src.mg_plugin_mgr import pluginMgrInstance
 from src.mg_multigit_widget import MgMultigitWidget
-from src.mg_repo_tree_item import MgRepoTreeItem
 from src.mg_repo_tree import MgRepoTree
-from src.mg_tools import ExecExplorer, ExecGit, ExecGitBash
+from src.mg_tools import ExecExplorer, ExecGit, ExecTool
 from src.mg_dialog_settings import runDialogEditSettings
 from src.mg_exec_window import MgExecWindow
 from src import mg_config as mgc
@@ -207,12 +206,12 @@ class MgMainWindow(QMainWindow, Ui_MainWindow):
         self.mgActions.actionGitSwitchBranch.triggered.connect(self.dispatchToActiveTreeOfMultigitTab('slotGitSwitchBranch'))
         self.mgActions.actionGitCheckoutTag.triggered.connect(self.dispatchToActiveTreeOfMultigitTab('slotGitCheckoutTag'))
         self.mgActions.actionGitDeleteBranch.triggered.connect(self.dispatchToActiveTreeOfMultigitTab('slotGitDeleteBranch'))
-        self.mgActions.actionGitBash.triggered.connect(self.dispatchToActiveTreeOfMultigitTab('slotRunProgram', ExecGitBash))
         self.mgActions.actionGitRunCommand.triggered.connect(self.dispatchToActiveTreeOfMultigitTab('slotGitRunCommand'))
 
         # Menu Git programs
         for execToolAction in self.mgActions.execToolActionsDict.values():
-            execToolAction.triggered.connect(self.dispatchToActiveTreeOfMultigitTab('slotRunProgram', execToolAction.ExecTool))
+            execToolAction.triggered.connect(self.dispatchToActiveTreeOfMultigitTab('slotRunActionOnSelectedItems',
+                                                                                    execToolAction.action_desc[ExecTool.ACTION_IDX_NAME]))
 
         self.mgActions.actionTGitShowLog  .triggered.connect(self.dispatchToActiveTreeOfMultigitTab('slotTGitShowLog'))
         self.mgActions.actionTGitCommit   .triggered.connect(self.dispatchToActiveTreeOfMultigitTab('slotTGitCommit'))

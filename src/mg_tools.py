@@ -22,6 +22,7 @@ from pathlib import Path
 from collections import deque
 from enum import Enum, auto
 from dataclasses import dataclass
+import itertools
 
 from PySide6.QtCore import QObject, QProcess, Signal, SignalInstance
 from PySide6.QtWidgets import QMessageBox, QApplication, QWidget
@@ -138,41 +139,52 @@ class ExecTool:
         #    ...
     ]
 
-    DOUBLE_CLICK_ACTIONS: List[str] = []
-
     SESSION_CACHE: Dict[Type['ExecTool'], MgExecutable] = {
     }
 
     @staticmethod
     def getExecTools() -> 'List[Type[ExecTool]]':
-        return [ExecSublimeMerge, ExecSourceTree, ExecGitGui, ExecGitK]
+        return [ExecSublimeMerge, ExecSourceTree, ExecGitGui, ExecGitK, ExecGitBash]
 
 
-    @classmethod
-    def runAction(cls, selectedRepos: List['MgRepoInfo']) -> None:
-        if not cls.ACTIONS:
-            raise NotImplementedError('No action available for tool: {cls.DISPLAY_NAME}')
+    @staticmethod
+    def runAction(action: str, selectedRepos: List['MgRepoInfo']) -> None:
+        dbg(f'runAction({action}, {len(selectedRepos)} repos')
 
-        action = cls.ACTIONS[0]
+        found = False
+        action_desc = None
+        for ExecToolClass in ExecTool.getExecTools():
+            for action_desc in ExecToolClass.ACTIONS:
+                if action == action_desc[ExecTool.ACTION_IDX_NAME]:
+                    found = True
+                    break
+            if found:
+                break
+
+        if not found:
+            raise ValueError(f'Action "{action}" not found in any ExecTool')
+
+        assert action_desc, f'Action "{action}" not found in any ExecTool'
+
         for repo in selectedRepos:
             try:
                 posix_mode = not sys.platform == 'win32'
-                action_cmd_line_args = shlex.split( action[cls.ACTION_IDX_CMD_LINE].format(repository_path=str(repo.fullpath)), posix=posix_mode)
+                action_cmd_line_args = shlex.split( action_desc[ExecTool.ACTION_IDX_CMD_LINE].format(repository_path=str(repo.fullpath)), posix=posix_mode)
             except ValueError as e:
-                error(f'Error when splitting command-line: {action[cls.ACTION_IDX_CMD_LINE]}')
+                error(f'Error when splitting command-line: {action_desc[ExecTool.ACTION_IDX_CMD_LINE]}')
                 continue
 
-            cls.exec_non_blocking(action_cmd_line_args, workdir=repo.fullpath, allow_errors=True)
+            ExecToolClass.exec_non_blocking(action_cmd_line_args, workdir=repo.fullpath, allow_errors=True)
 
 
     @classmethod
-    def runProgramOnSelected(cls, repoTree: 'MgRepoTree') -> None:
+    def runActionOnSelectedItems(cls, action: str, repoTree: 'MgRepoTree') -> None:
         dbg(f'runProgram({cls.DISPLAY_NAME}, action)')
         if not repoTree.confirmIfNoOrTooManySelectedItems(cls.DISPLAY_NAME):
             return
 
         selectedRepos = [item.repoInfo for item in repoTree.selectedRepoItems()]
-        cls.runAction(selectedRepos)
+        cls.runAction(action, selectedRepos)
 
 
     @classmethod
@@ -524,11 +536,11 @@ class ExecTool:
 
     @classmethod
     def doubleClickActions(cls) -> List[str]:
-        '''Return the double click actions provided by this tool on the current platform'''
+        '''Return the double-click actions provided by this tool on the current platform'''
         if not cls.platform_supported() or not cls.shouldShow():
             return []
 
-        return cls.DOUBLE_CLICK_ACTIONS
+        return [ action_desc[ExecTool.ACTION_IDX_NAME] for action_desc in cls.ACTIONS]
 
 
 #######################################################
@@ -678,12 +690,6 @@ class ExecSublimeMerge(ExecTool):
         ('Run SublimeMerge', '{repository_path}', ":/img/sublime_merge.ico", 'Open a SublimeMerge tab for each repository')
     ]
 
-    DBC_RUNSUBLIMEMERGE = 'Run SublimeMerge'
-
-    DOUBLE_CLICK_ACTIONS = [
-        DBC_RUNSUBLIMEMERGE,
-    ]
-
 
 #######################################################
 #       SourceTree stuff
@@ -708,13 +714,6 @@ class ExecSourceTree(ExecTool):
         ('Run SourceTree', '-t {repository_path}', ":/img/sourcetree.ico", 'Open a SourceTree tab for each repository'),
     ]
 
-    DBC_RUNSOURCETREE = 'Run SourceTree'
-
-    DOUBLE_CLICK_ACTIONS = [
-        DBC_RUNSOURCETREE,
-    ]
-
-
 
 #######################################################
 #       GitBash stuff
@@ -738,13 +737,7 @@ class ExecGitBash(ExecTool):
     CONFIG_ENTRY_BASE = 'CONFIG_GITBASH'
 
     ACTIONS = [
-        ('Git bash here', '', ":/img/git-bash.ico", 'Open a git bash window for each repository'),
-    ]
-
-    DBC_RUNGITBASH = 'Run git-bash'
-
-    DOUBLE_CLICK_ACTIONS = [
-        DBC_RUNGITBASH,
+        ('Run git-bash', '', ":/img/git-bash.ico", 'Open a git bash window for each repository'),
     ]
 
 
@@ -774,12 +767,6 @@ class ExecGitGui(ExecTool):
 
     ACTIONS = [
         ('Git Gui', '', "", 'Open a git-gui window for each repository'),
-    ]
-
-    DBC_RUNGITGUI = 'Run Git Gui'
-
-    DOUBLE_CLICK_ACTIONS = [
-        DBC_RUNGITGUI,
     ]
 
 
@@ -814,13 +801,7 @@ class ExecGitK(ExecTool):
     CONFIG_ENTRY_BASE = 'CONFIG_GITK'
 
     ACTIONS = [
-        ('Gitk', '', "", 'Open a gitk window for each repository'),
-    ]
-
-    DBC_RUNGITK = 'Run GitK'
-
-    DOUBLE_CLICK_ACTIONS = [
-        DBC_RUNGITK,
+        ('Run Gitk', '', "", 'Open a gitk window for each repository'),
     ]
 
 
