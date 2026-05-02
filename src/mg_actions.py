@@ -14,8 +14,7 @@
 #     limitations under the License.
 #
 
-
-from typing import List, Any, Callable, TYPE_CHECKING, Tuple, Type
+from typing import List, Any, Callable, TYPE_CHECKING, Tuple, Type, Dict
 
 import functools, logging
 
@@ -45,7 +44,7 @@ def getFetchIcon() -> QIcon:
 
 class MgExecToolAction(QAction):
     '''Action to run a program'''
-    def __init__(self, ExecTool: Type[ExecTool], action_desc: tuple[str, str, str, str], *args: Any) -> None:
+    def __init__(self, ExecTool: Type[ExecTool], action_desc: Tuple[str, str, str, str], *args: Any) -> None:
         super().__init__(*args)
         self.action_desc = action_desc
         self.ExecTool = ExecTool
@@ -60,7 +59,7 @@ class MgActions(QObject):
 
     actionGitFetchAll: QAction          # added externally to MgActions
     actionGitFetchAllOnAllTabs: QAction          # added externally to MgActions
-    execToolActionsDict: dict[str, MgExecToolAction]
+    execToolActionsDict: Dict[str, MgExecToolAction]
 
     def __init__(self, parent: QWidget) -> None:
         super().__init__(parent)
