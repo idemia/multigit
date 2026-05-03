@@ -216,6 +216,7 @@ class MgDialogSettings(QDialog):
         doubleClickActions = [
             *[action for ExecToolClass in ExecTool.getExecTools()
                             for action in ExecToolClass.doubleClickActions() ],
+            *ExecTortoiseGit.doubleClickActions(),
             mg_const.DBC_DONOTHING,
             mg_const.DBC_GITCOMMIT,
             mg_const.DBC_GITCREATEBRANCH,
