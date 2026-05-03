@@ -44,7 +44,7 @@ def getFetchIcon() -> QIcon:
 
 class MgExecToolAction(QAction):
     '''Action to run a program'''
-    def __init__(self, ExecTool: Type[ExecTool], action_desc: Tuple[str, str, str, str], *args: Any) -> None:
+    def __init__(self, ExecTool: Type[ExecTool], action_desc: tuple[str, str, str, str], *args: Any) -> None:
         super().__init__(*args)
         self.action_desc = action_desc
         self.ExecTool = ExecTool
@@ -59,7 +59,7 @@ class MgActions(QObject):
 
     actionGitFetchAll: QAction          # added externally to MgActions
     actionGitFetchAllOnAllTabs: QAction          # added externally to MgActions
-    execToolActionsDict: Dict[str, MgExecToolAction]
+    execToolActionsDict: dict[str, MgExecToolAction]
 
     def __init__(self, parent: QWidget) -> None:
         super().__init__(parent)
