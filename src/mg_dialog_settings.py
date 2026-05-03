@@ -213,7 +213,9 @@ class MgDialogSettings(QDialog):
 
 
         self.ui.comboBoxDoubleClickAction.clear()
-        universalDoubleClickActions = [
+        doubleClickActions = [
+            *[action for ExecToolClass in ExecTool.getExecTools()
+                            for action in ExecToolClass.doubleClickActions() ],
             mg_const.DBC_DONOTHING,
             mg_const.DBC_GITCOMMIT,
             mg_const.DBC_GITCREATEBRANCH,
@@ -225,13 +227,6 @@ class MgDialogSettings(QDialog):
             mg_const.DBC_SHOWINEXPLORER,
         ]
 
-        doubleClickActions = universalDoubleClickActions
-        doubleClickActions.extend( ExecTortoiseGit.doubleClickActions() )
-        doubleClickActions.extend( ExecSourceTree.doubleClickActions() )
-        doubleClickActions.extend( ExecSublimeMerge.doubleClickActions() )
-        doubleClickActions.extend( ExecGitK.doubleClickActions() )
-        doubleClickActions.extend( ExecGitGui.doubleClickActions() )
-        doubleClickActions.extend( ExecGitBash.doubleClickActions() )
 
         for action in doubleClickActions:
             self.ui.comboBoxDoubleClickAction.addItem(action)
