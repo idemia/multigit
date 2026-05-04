@@ -17,6 +17,7 @@
 
 <RCC>
   <qresource prefix="img">
+    <file>icon_git.png</file>
     <file>multigit-logo-256.png</file>
     <file>multigit-logo-16.png</file>
     <file>tgit_tortoise.ico</file>

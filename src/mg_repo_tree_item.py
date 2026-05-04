@@ -62,10 +62,9 @@ class MgRepoTreeItem(QTreeWidgetItem):
     def __init__(self, repoInfo: MgRepoInfo, *args: Any) -> None:
         super().__init__(*args)
         self.ignoreUpdates = False
-        if self.text(COL_REPO_NAME) == '':
-            # we are completely empty, fill with minimalistic information
-            self.setText(COL_UPDATE, '')
-            self.setText(COL_REPO_NAME, repoInfo.name)
+        if self.text(0) == '': 
+            self.setText(1, '')
+            self.setText(0, repoInfo.name)
             self.setText(COL_HEAD, '...')
             self.setText(COL_STATUS, '...')
             self.setText(COL_REMOTE_SYNCHRO, '...')
@@ -80,13 +79,11 @@ class MgRepoTreeItem(QTreeWidgetItem):
         self.repoInfo.repo_deleted.connect(self.slotRepoDeleted)
 
         self.filledColumns = MgRepoTreeItem.ColumnFlags(0)
-
         self.setToolTips()
 
 
     def setToolTips(self) -> None:
-        '''Set tooltip for all columns'''
-        self.setToolTip(COL_REPO_NAME, self.repoInfo.name)
+        self.setToolTip(0, self.repoInfo.name) 
         self.setToolTip(COL_STATUS, MSG_TOOLTIP_STATUS)
         self.setToolTip(COL_REMOTE_SYNCHRO, MSG_TOOLTIP_REMOTE_SYNCHRO)
 
@@ -105,9 +102,9 @@ class MgRepoTreeItem(QTreeWidgetItem):
     @ignoreCppObjectDeletedError
     def markItemInProgress(self) -> None:
         dbg('markItemInProgress(%s)' % self.repoInfo.name)
-        self.setText(COL_UPDATE, '')
-        self.setIcon(COL_UPDATE, QIcon(':img/icons8-loader-96.png'))
-        self.setToolTip(COL_UPDATE, MSG_TOOLTIP_UPDATE)
+        self.setText(1, '') 
+        self.setIcon(1, QIcon(':img/icons8-loader-96.png'))
+        self.setToolTip(1, MSG_TOOLTIP_UPDATE)
         QApplication.processEvents()
 
 
@@ -147,16 +144,47 @@ class MgRepoTreeItem(QTreeWidgetItem):
 
     @ignoreCppObjectDeletedError
     def fillRepoItem(self) -> None:
-        '''Fill a QTreeWidgetItem from the associated repoInfo'''
-        dbg('fillRepoItem(%s, ...)' % self.repoInfo.name)
-        self.setIcon(COL_UPDATE, getIcon(IconSet.Empty))
-        self.setText(COL_UPDATE, '')
-        self.setToolTip(COL_UPDATE, '')
-        self.setText(COL_REPO_NAME, self.repoInfo.name)
-        self.setToolTip(COL_REPO_NAME, self.repoInfo.name)
+        repoInfo = self.repoInfo
+        import pathlib
+        from PySide6.QtGui import QIcon
+        
+        
+        self.setIcon(1, QIcon())
+        self.setText(1, '')
+        self.setToolTip(1, '')
+
+        isTreeView = getattr(self.treeWidget(), 'isTreeView', True)
+
+        
+        git_path = pathlib.Path(repoInfo.fullpath) / '.git'
+        is_submodule = git_path.is_file()
+
+        if is_submodule:
+            self.setIcon(0, QIcon(':/img/git_black.png')) 
+        else:
+            self.setIcon(0, QIcon(':/img/icon_git.png'))  
+        
+
+        if isTreeView:
+            # --- Tree View---
+            if self.parent() is None:
+                display_name = repoInfo.name
+            else:
+                display_name = pathlib.Path(repoInfo.name).name
+        else:
+            # --- Flat View ---
+            display_name = repoInfo.name
+            
+
+        self.setText(0, display_name)
+        self.setToolTip(0, repoInfo.name)
+
+     
         self.setText(COL_HEAD, self.repoInfo.head)
         self.setText(COL_STATUS, self.repoInfo.status)
         self.setText(COL_REMOTE_SYNCHRO, self.repoInfo.remote_synchro )
+        
+
         if self.repoInfo.remote_synchro == MSG_LOCAL_BRANCH:
             # add a tooltip to give an easy-fix for the missing remote branch
             self.setToolTip(COL_REMOTE_SYNCHRO, MSG_LOCAL_BRANCH_TOOLTIP)
