@@ -261,7 +261,9 @@ class MgMainWindow(QMainWindow, Ui_MainWindow):
 
         # save splitter state as a list of bytes, to avoid accessing the QSplitter buffer directly. I suspect
         # that there are sometimes buffer overflow in this buffer, creating bugs in the config file.
-        self.config[mgc.CONFIG_SPLITTER_STATE_V2] = [int(v) for v in bytes(self.currentMultigit().splitter.saveState())]
+        current_tab = self.currentMultigit()
+        if current_tab is not None and hasattr(current_tab, 'splitter'):
+            self.config[mgc.CONFIG_SPLITTER_STATE_V2] = [int(v) for v in bytes(current_tab.splitter.saveState())]
 
         all_open_tabs = [(self.tabRepos.tabText(tabIdx), cast(MgMultigitWidget, self.tabRepos.widget(tabIdx)).multiRepo.base_dir)
                          for tabIdx in range(self.tabRepos.count())
