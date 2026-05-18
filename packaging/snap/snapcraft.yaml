@@ -23,13 +23,7 @@ apps:
     plugs:
       - home
       - network
-      - network-bind
       - removable-media
-      - desktop
-      - desktop-legacy
-      - x11
-      - wayland
-      - unity7
     environment:
       PYTHONPATH: $SNAP/usr/lib/python3/dist-packages:$SNAP/lib/python3.10/site-packages:$SNAP
 
