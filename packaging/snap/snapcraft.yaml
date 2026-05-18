@@ -1,0 +1,71 @@
+name: multigit
+base: core22
+version: '1.8.0'
+summary: Graphical tool for projects with multiple git repositories
+description: |
+  Multigit is a graphical tool designed to simplify working with projects
+  composed of multiple git repositories.
+  It allows you to view the status of all your repositories at once,
+  and perform common git operations on multiple repositories simultaneously.
+
+grade: stable
+confinement: strict
+
+layout:
+  /usr/share/icons:
+    bind: $SNAP/usr/share/icons
+
+apps:
+  multigit:
+    command: bin/multigit
+    desktop: usr/share/applications/multigit.desktop
+    extensions: [gnome]
+    plugs:
+      - home
+      - network
+      - network-bind
+      - removable-media
+      - desktop
+      - desktop-legacy
+      - x11
+      - wayland
+      - unity7
+    environment:
+      PYTHONPATH: $SNAP/usr/lib/python3/dist-packages:$SNAP/lib/python3.10/site-packages:$SNAP
+
+parts:
+  multigit:
+    plugin: python
+    source: .
+    python-requirements:
+      - reqs/requirements-release.txt
+    stage-packages:
+      - python3-pyside6
+      - libpyside6-6
+      - libshiboken6-6
+      - git
+    override-build: |
+      craftctl default
+      
+      # Install desktop file and icons
+      mkdir -p $SNAPCRAFT_PART_INSTALL/usr/share/applications
+      # Fix Exec and Icon in desktop file
+      sed -e 's|Exec=multigit.sh|Exec=multigit|' \
+          -e 's|Icon=io.github.idemia.Multigit|Icon=multigit|' \
+          packaging/flatpak/io.github.idemia.Multigit.desktop > $SNAPCRAFT_PART_INSTALL/usr/share/applications/multigit.desktop
+      
+      mkdir -p $SNAPCRAFT_PART_INSTALL/usr/share/icons/hicolor/256x256/apps
+      cp images/multigit-logo-256.png $SNAPCRAFT_PART_INSTALL/usr/share/icons/hicolor/256x256/apps/multigit.png
+      mkdir -p $SNAPCRAFT_PART_INSTALL/usr/share/icons/hicolor/64x64/apps
+      cp images/multigit-logo-64.png $SNAPCRAFT_PART_INSTALL/usr/share/icons/hicolor/64x64/apps/multigit.png
+      mkdir -p $SNAPCRAFT_PART_INSTALL/usr/share/icons/hicolor/48x48/apps
+      cp images/multigit-logo-48.png $SNAPCRAFT_PART_INSTALL/usr/share/icons/hicolor/48x48/apps/multigit.png
+      mkdir -p $SNAPCRAFT_PART_INSTALL/usr/share/icons/hicolor/32x32/apps
+      cp images/multigit-logo-32.png $SNAPCRAFT_PART_INSTALL/usr/share/icons/hicolor/32x32/apps/multigit.png
+      mkdir -p $SNAPCRAFT_PART_INSTALL/usr/share/icons/hicolor/16x16/apps
+      cp images/multigit-logo-16.png $SNAPCRAFT_PART_INSTALL/usr/share/icons/hicolor/16x16/apps/multigit.png
+
+      # Wrapper script
+      mkdir -p $SNAPCRAFT_PART_INSTALL/bin
+      printf "#!/bin/sh\nexec \$SNAP/bin/python3 \$SNAP/multigit.py \"\$@\"\n" > $SNAPCRAFT_PART_INSTALL/bin/multigit
+      chmod +x $SNAPCRAFT_PART_INSTALL/bin/multigit
