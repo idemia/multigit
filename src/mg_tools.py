@@ -139,6 +139,8 @@ class ExecTool:
         #    ...
     ]
 
+    DOUBLE_CLICK_ACTIONS: List[str] = []
+
     SESSION_CACHE: Dict[Type['ExecTool'], MgExecutable] = {
     }
 
@@ -539,6 +541,9 @@ class ExecTool:
         '''Return the double-click actions provided by this tool on the current platform'''
         if not cls.platform_supported() or not cls.shouldShow():
             return []
+
+        if cls.DOUBLE_CLICK_ACTIONS:
+            return cls.DOUBLE_CLICK_ACTIONS
 
         return [ action_desc[ExecTool.ACTION_IDX_NAME] for action_desc in cls.ACTIONS]
 
