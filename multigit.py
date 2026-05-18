@@ -39,7 +39,7 @@ if __package__:
 import src.multigit_resources_rc        # uses side-effects to make resources available
 from src.mg_window import MgMainWindow
 from src import mg_const
-from src.mg_tools import isRunningInsideFlatpak
+from src.mg_tools import isRunningInsideFlatpak, isRunningInsideSnap
 
 # by default Qt abort on Python exceptions so we need to provide
 # our own hook that does the job
@@ -276,7 +276,9 @@ def main() -> None:
         qt_version = 'unknown'
     logging.info( 'Using Python v%s and Qt for Python %s' % (platform.python_version(), qt_version))
     if isRunningInsideFlatpak():
-        logging.debug('Running inside flatpak container')
+        logging.info('Running inside flatpak container')
+    if isRunningInsideSnap():
+        logging.info('Running inside snap container')
     main_gui()
     logging.info( 'Exit.' )
 

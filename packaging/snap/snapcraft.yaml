@@ -9,7 +9,7 @@ description: |
   and perform common git operations on multiple repositories simultaneously.
 
 grade: stable
-confinement: strict
+confinement: classic
 
 layout:
   /usr/share/icons:
@@ -20,10 +20,6 @@ apps:
     command: bin/multigit
     desktop: usr/share/applications/multigit.desktop
     extensions: [gnome]
-    plugs:
-      - home
-      - network
-      - removable-media
     environment:
       PYTHONPATH: $SNAP/usr/lib/python3/dist-packages:$SNAP/lib/python3.10/site-packages:$SNAP
 
@@ -33,20 +29,13 @@ parts:
     source: .
     python-requirements:
       - reqs/requirements-release.txt
-    stage-packages:
-      - python3-pyside6
-      - libpyside6-6
-      - libshiboken6-6
-      - git
+    stage-packages: []
     override-build: |
       craftctl default
       
       # Install desktop file and icons
       mkdir -p $SNAPCRAFT_PART_INSTALL/usr/share/applications
-      # Fix Exec and Icon in desktop file
-      sed -e 's|Exec=multigit.sh|Exec=multigit|' \
-          -e 's|Icon=io.github.idemia.Multigit|Icon=multigit|' \
-          packaging/flatpak/io.github.idemia.Multigit.desktop > $SNAPCRAFT_PART_INSTALL/usr/share/applications/multigit.desktop
+      cp packaging/linux/multigit.desktop $SNAPCRAFT_PART_INSTALL/usr/share/applications/multigit.desktop
       
       mkdir -p $SNAPCRAFT_PART_INSTALL/usr/share/icons/hicolor/256x256/apps
       cp images/multigit-logo-256.png $SNAPCRAFT_PART_INSTALL/usr/share/icons/hicolor/256x256/apps/multigit.png

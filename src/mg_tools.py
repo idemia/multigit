@@ -96,6 +96,11 @@ def isRunningInsideFlatpak() -> bool:
     return 'FLATPAK_ID' in os.environ
 
 
+def isRunningInsideSnap() -> bool:
+    '''Return True if running inside a snap container'''
+    return 'SNAP' in os.environ
+
+
 class ExecTool:
     # Program display name to use when presenting to the user
     DISPLAY_NAME: str = ''
