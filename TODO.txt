@@ -1,5 +1,15 @@
-# Flatpak packaging
-- sign with gpg key
+## snap
+
+- check if official destkop path is: /usr/share/apps or /usr/share/applications ?
+- see if path to icon in destkop file need to be updated, like descibed in https://documentation.ubuntu.com/snapcraft/stable/how-to/crafting/configure-package-information/#copy-the-desktop-entry-from-the-app-s-files
+- see if we can detect that snap is not run in classic mode using snap config hooks
+- should we declare KDE Neon as extension ?
+- managing python:
+    core24 and lower
+    Projects with strict or devmode confinement can safely use the base snap’s interpreter, so they typically do not need to include Python.
+    Projects with classic confinement cannot use the base snap’s interpreter and thus must always bundle it. This is typically done with the stage-packages key.
+- let snapcraft.yml use information from appstream ?
+
 
 ## Nice to have
 - ensure that generate_ui and other packaging commands are run in CI and captured in dependencies
@@ -8,3 +18,4 @@
 
 ### v1.10
 - aciton git bash needs to be reviewed
+- check empty config / double click behavior and choice in settings dialog
