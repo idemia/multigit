@@ -206,6 +206,7 @@ class MgMainWindow(QMainWindow, Ui_MainWindow):
         self.mgActions.actionGitSwitchBranch.triggered.connect(self.dispatchToActiveTreeOfMultigitTab('slotGitSwitchBranch'))
         self.mgActions.actionGitCheckoutTag.triggered.connect(self.dispatchToActiveTreeOfMultigitTab('slotGitCheckoutTag'))
         self.mgActions.actionGitDeleteBranch.triggered.connect(self.dispatchToActiveTreeOfMultigitTab('slotGitDeleteBranch'))
+        self.mgActions.actionGitDeleteTag.triggered.connect(self.dispatchToActiveTreeOfMultigitTab('slotGitDeleteTag'))
         self.mgActions.actionGitRunCommand.triggered.connect(self.dispatchToActiveTreeOfMultigitTab('slotGitRunCommand'))
 
         # Menu Git programs
