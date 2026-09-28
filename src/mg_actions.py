@@ -59,7 +59,7 @@ class MgActions(QObject):
 
     actionGitFetchAll: QAction          # added externally to MgActions
     actionGitFetchAllOnAllTabs: QAction          # added externally to MgActions
-    execToolActionsDict: dict[str, MgExecToolAction]
+    execToolActionsDict: Dict[str, MgExecToolAction]
 
     def __init__(self, parent: QWidget) -> None:
         super().__init__(parent)
