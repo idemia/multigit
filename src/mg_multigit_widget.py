@@ -18,8 +18,9 @@
 from typing import cast, List, Optional, Dict
 import logging, pathlib
 
-from PySide6.QtWidgets import QMessageBox, QApplication, QWidget
+from PySide6.QtWidgets import QMessageBox, QApplication, QWidget, QCheckBox
 from PySide6.QtCore import Qt, Signal, QByteArray, QTimer, QPoint
+
 
 from src.mg_repo_info import MultiRepo
 from src.mg_repo_tree_item import MgRepoTreeItem
@@ -55,6 +56,8 @@ class MgMultigitWidget(QWidget, Ui_MultigitWidget):
         self.buttonHistoryBaseDir.historyItemTriggered.connect( lambda title, message: self.openDir(title) )
         self.buttonHistoryBaseDir.fillHistory(self.config.lruAsList(mgc.CONFIG_LAST_OPENED))
         self.buttonOpenBaseDir.clicked.connect(self.sig_request_dir_open)
+        
+
 
 
         if self.config[mgc.CONFIG_SPLITTER_STATE_V2]:
@@ -68,6 +71,13 @@ class MgMultigitWidget(QWidget, Ui_MultigitWidget):
 
         self.tabWidget.setCurrentIndex(0)
         self.tabWidget.currentChanged.connect( self.slotTabWidgetIndexChanged )
+
+
+        self.treeToggle = QCheckBox("Tree View")
+        self.treeToggle.setChecked(True) 
+        self.treeToggle.toggled.connect(self.slotToggleTreeView)
+        self.horizontalLayout.insertWidget(0, self.treeToggle)
+        self.horizontalLayout.insertSpacing(1, 15)
 
 
 ##########################################################################
@@ -123,6 +133,12 @@ class MgMultigitWidget(QWidget, Ui_MultigitWidget):
         # 2nd step, we fill the repo information
         for it in items:
             it.repoInfo.refresh()
+
+
+    def slotToggleTreeView(self, checked: bool) -> None:
+        '''Switch between Flat View and Tree View'''
+        self.repoTree.isTreeView = checked
+        self.repoTree.rebuildTree()
 
 
     def slotItemSelectionChanged(self) -> None:
