@@ -15,16 +15,16 @@
 #
 
 
-from typing import List, Any, Optional, Dict, Callable, cast, Tuple, Type
+from typing import List, Any, Optional, Dict, Callable, cast, Union
 import logging
 import functools
 import enum
+import os
 
 from PySide6.QtWidgets import QTreeWidget, QMenu, QApplication, QMessageBox, QAbstractItemView, QTreeWidgetItem, QHeaderView, QDialog
-from PySide6.QtGui import QIcon, QMouseEvent, QContextMenuEvent, QPixmap, QAction
-from PySide6.QtCore import Qt, QPoint, Signal, QPoint
-import pathlib
-  
+from PySide6.QtGui import QIcon, QPixmap, QAction
+from PySide6.QtCore import Qt, Signal, QPoint
+
 
 
 from src import mg_const
@@ -268,11 +268,6 @@ class MgRepoTree(QTreeWidget):
 
 
     def addRepos(self, repoInfoList: List[MgRepoInfo]) -> List[MgRepoTreeItem]:
-        import os
-        from PySide6.QtWidgets import QTreeWidgetItem
-        from PySide6.QtGui import QIcon
-        from typing import Union  # Assure-toi que c'est bien importé en haut
-        
         noSelectedItem = (self.topLevelItemCount() == 0)
         items: List[MgRepoTreeItem] = []
         
