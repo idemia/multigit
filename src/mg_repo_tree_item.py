@@ -17,6 +17,7 @@
 
 from typing import Any, TYPE_CHECKING, Optional, cast, Tuple
 import logging
+import pathlib
 
 from PySide6.QtCore import Qt
 from PySide6.QtGui import QIcon, QColor, QPalette
@@ -145,10 +146,6 @@ class MgRepoTreeItem(QTreeWidgetItem):
     @ignoreCppObjectDeletedError
     def fillRepoItem(self) -> None:
         repoInfo = self.repoInfo
-        import pathlib
-        from PySide6.QtGui import QIcon
-        
-        
         self.setIcon(1, QIcon())
         self.setText(1, '')
         self.setToolTip(1, '')
