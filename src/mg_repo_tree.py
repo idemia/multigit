@@ -98,10 +98,9 @@ class MgRepoTree(QTreeWidget):
         self.header().setFont(f)
         self.header().setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
 
-        self.sortByColumn(0, Qt.SortOrder.AscendingOrder)
-        self.setColumnWidth(0, 300) 
-        self.setColumnWidth(1, 40)  
-        self.setIndentation(15)     # indentation for the TreeView
+        self.sortByColumn(mg_const.COL_REPO_NAME, Qt.SortOrder.AscendingOrder)
+        self.setColumnWidth(mg_const.COL_UPDATE, 40)
+        self.setIndentation(15)
 
         self.configureColumns()
 
@@ -125,15 +124,10 @@ class MgRepoTree(QTreeWidget):
     def configureColumns(self) -> None:
         self.setColumnCount(mg_const.COL_NB)
         self.setHeaderLabels(mg_const.COL_TITLES)
-        
-     
-        self.headerItem().setText(0, "Git Repo Path")
-        self.headerItem().setText(1, "")
-        
         self.setSelectionMode(QAbstractItemView.SelectionMode.ExtendedSelection)
         self.setAllColumnsShowFocus(True)
         self.header().setSortIndicatorShown(True)
-        self.headerItem().setToolTip(1, mg_const.MSG_TOOLTIP_UPDATE)
+        self.headerItem().setToolTip(mg_const.COL_UPDATE, mg_const.MSG_TOOLTIP_UPDATE)
         self.headerItem().setToolTip(mg_const.COL_STATUS, mg_const.MSG_TOOLTIP_STATUS)
         self.headerItem().setToolTip(mg_const.COL_REMOTE_SYNCHRO, mg_const.MSG_TOOLTIP_REMOTE_SYNCHRO)
 
@@ -291,8 +285,8 @@ class MgRepoTree(QTreeWidget):
                 parent_of_folder = get_or_create_parent(parent_dir)
 
                 folder_item = QTreeWidgetItem(parent_of_folder)
-                folder_item.setText(0, os.path.basename(path_str)) 
-                folder_item.setIcon(0, QIcon(':/img/icons8-open-folder-64.png'))
+                folder_item.setText(mg_const.COL_REPO_NAME, os.path.basename(path_str))
+                folder_item.setIcon(mg_const.COL_REPO_NAME, QIcon(':/img/icons8-open-folder-64.png'))
 
                 existing_items[path_str] = folder_item
                 if isinstance(parent_of_folder, QTreeWidgetItem):
@@ -327,6 +321,8 @@ class MgRepoTree(QTreeWidget):
             if noSelectedItem:
                 self.setCurrentItem(item)
                 noSelectedItem = False
+
+            self.autoAdjustColumnSize()
 
         return items
 
