@@ -29,16 +29,15 @@ MAX_DIFF_LINES = 1000
 MAX_GIT_DBG_OUT_CHAR = 5000
 
 COL_REPO_NAME = 0
-COL_UPDATE = 1
-COL_HEAD = 2
-COL_STATUS = 3
-COL_REMOTE_SYNCHRO = 4
-COL_SHA1 = 5
-COL_URL = 6
-COL_NB = 7
-COL_TITLES = ['Git Repo Path', '', 'Head', 'Status', 'Synchro current branch', 'SHA1', 'URL']
+COL_HEAD = 1
+COL_STATUS = 2
+COL_REMOTE_SYNCHRO = 3
+COL_SHA1 = 4
+COL_URL = 5
+COL_NB = 6
+COL_TITLES = ['Git Repo Path', 'Head', 'Status', 'Synchro current branch', 'SHA1', 'URL']
 
-SHORT_SHA1_NB_DIGITS = 7
+SHORT_SHA1_NB_DIGITS = 6
 
 # This is filled when initializing the application
 PATH_LOG_NORMAL: Optional[pathlib.Path]
@@ -111,7 +110,6 @@ MSG_GIT_EXEC_ALL_OK = 'Successful execution of %d git %s'
 MSG_GIT_EXEC_1_OK = 'Successful execution of git %s'
 MSG_GIT_SOME_FAILED = 'Failed execution of git %s, %d errors out of %d'
 
-MSG_TOOLTIP_UPDATE = 'git information refresh in progress'
 MSG_TOOLTIP_STATUS = 'Display whether files are modified'
 MSG_TOOLTIP_REMOTE_SYNCHRO = 'Delta vs origin'
 
