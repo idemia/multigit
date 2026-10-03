@@ -29,7 +29,7 @@ if TYPE_CHECKING:
     from src.mg_repo_tree import MgRepoTree
 from src.mg_repo_info import MgRepoInfo
 from src.mg_repo_tree_item import MgRepoTreeItem
-from src.mg_const import COL_NB, COL_TITLES, COL_REPO_NAME, COL_UPDATE
+from src.mg_const import COL_NB, COL_TITLES, COL_REPO_NAME
 
 logger = logging.getLogger('mg_dialog_utils')
 dbg = logger.debug
@@ -64,8 +64,6 @@ def prepareTreeWidgetRepoList(treeWidget: QTreeWidget) -> None:
     f.setBold(True)
     treeWidget.header().setFont(f)
     treeWidget.sortByColumn(COL_REPO_NAME, Qt.SortOrder.AscendingOrder)
-    treeWidget.headerItem().setText(COL_UPDATE, "")
-    treeWidget.setColumnHidden(COL_UPDATE, True)
     treeWidget.clear()
 
 

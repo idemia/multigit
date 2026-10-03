@@ -99,7 +99,6 @@ class MgRepoTree(QTreeWidget):
         self.header().setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
 
         self.sortByColumn(mg_const.COL_REPO_NAME, Qt.SortOrder.AscendingOrder)
-        self.setColumnWidth(mg_const.COL_UPDATE, 40)
         self.setIndentation(15)
 
         self.configureColumns()
@@ -127,7 +126,6 @@ class MgRepoTree(QTreeWidget):
         self.setSelectionMode(QAbstractItemView.SelectionMode.ExtendedSelection)
         self.setAllColumnsShowFocus(True)
         self.header().setSortIndicatorShown(True)
-        self.headerItem().setToolTip(mg_const.COL_UPDATE, mg_const.MSG_TOOLTIP_UPDATE)
         self.headerItem().setToolTip(mg_const.COL_STATUS, mg_const.MSG_TOOLTIP_STATUS)
         self.headerItem().setToolTip(mg_const.COL_REMOTE_SYNCHRO, mg_const.MSG_TOOLTIP_REMOTE_SYNCHRO)
 
