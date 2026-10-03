@@ -28,15 +28,15 @@ VERSION = '1.8.0'
 MAX_DIFF_LINES = 1000
 MAX_GIT_DBG_OUT_CHAR = 5000
 
-COL_UPDATE = 0
-COL_REPO_NAME = 1
+COL_REPO_NAME = 0
+COL_UPDATE = 1
 COL_HEAD = 2
 COL_STATUS = 3
 COL_REMOTE_SYNCHRO = 4
 COL_SHA1 = 5
 COL_URL = 6
 COL_NB = 7
-COL_TITLES = ['', 'Git Repo Path', 'Head', 'Status', 'Synchro current branch', 'SHA1', 'URL']
+COL_TITLES = ['Git Repo Path', '', 'Head', 'Status', 'Synchro current branch', 'SHA1', 'URL']
 
 SHORT_SHA1_NB_DIGITS = 7
 
