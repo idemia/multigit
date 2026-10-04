@@ -177,33 +177,11 @@ class MgMultigitWidget(QWidget, Ui_MultigitWidget):
 
     def slotSetLastCommit(self, repo_name: str, last_commit: str) -> None:
         dbg('slotSetLastCommit("%s", ...)' % repo_name)
-        currentItem = self.repoTree.currentItem()
-        if currentItem is None or currentItem.type() == TWI_TYPE_GROUP:
-            return
-
-        currentRepoName = currentItem.text(COL_REPO_NAME)
-        if repo_name != currentRepoName:
-            logger.warning('Received last commit result for repo "%s" but repo selected is "%s". Call ignored' % (repo_name, currentRepoName))
-            # the selection changed between the time where the lastCommit info was requested and it was received
-            # just ignore it
-            return
-
         self.textEditCommit.setText(last_commit)
 
 
     def displayRepoDiff(self, repo_name: str, repo_diff: str) -> None:
         dbg('displayRepoDiff("%s", ...)' % repo_name)
-        currentItem = self.repoTree.currentItem()
-        if currentItem is None:
-            return
-
-        currentRepoName = currentItem.text(COL_REPO_NAME)
-        if repo_name != currentRepoName:
-            logger.warning('Received diff result for repo "%s" but repo selected is "%s". Call ignored' % (repo_name, currentRepoName))
-            # the selection changed between the time where the lastCommit info was requested and it was received
-            # just ignore it
-            return
-
         self.textEditModFiles.setText(htmlize_diff(repo_diff or '', MAX_DIFF_LINES))
 
 
