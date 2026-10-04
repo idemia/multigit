@@ -220,13 +220,6 @@ class MgRepoTree(QTreeWidget):
 
     def slotContextMenuRequested(self, p: QPoint) -> None:
         '''Capture the right-button mouse click action to display a menu'''
-        
-        item = self.itemAt(p)
-
-        if item is None or not hasattr(item, 'repoInfo'):
-            dbg('Clic droit sur un dossier ou dans le vide : menu ignoré')
-            return
-
         self.rmbMenu.exec_(self.viewport().mapToGlobal(p))
 
 
