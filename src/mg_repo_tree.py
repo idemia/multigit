@@ -80,7 +80,7 @@ class MgRepoTree(QTreeWidget):
     rmbMenu: QMenu
     rmbTgitMenu: QMenu
 
-    isTreeView: bool = True
+    isTreeView: bool
 
     show_column_menu = Signal(QPoint)
 
@@ -90,6 +90,7 @@ class MgRepoTree(QTreeWidget):
         # to allow right-mouse-button click signal
         self.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
         self.setItemsExpandable(True)
+        self.isTreeView = True
 
         f = self.header().font()
         f.setBold(True)
@@ -263,12 +264,11 @@ class MgRepoTree(QTreeWidget):
         noSelectedItem = (self.topLevelItemCount() == 0)
         items: List[MgRepoTreeItem] = []
         
-        isTreeView = getattr(self, 'isTreeView', True)
-        self.setRootIsDecorated(isTreeView)
+        self.setRootIsDecorated(self.isTreeView)
 
         existing_items = {}
 
-        if isTreeView:
+        if self.isTreeView:
             def get_or_create_parent(path_str: str) -> Union['QTreeWidget', QTreeWidgetItem]:
               
                 path_str = path_str.replace('\\', '/')
@@ -297,7 +297,7 @@ class MgRepoTree(QTreeWidget):
         for repoInfo in repoInfoList_sorted:
             item = MgRepoTreeItem(repoInfo, self)
             
-            if isTreeView:
+            if self.isTreeView:
                 normalized_repo_name = repoInfo.name.replace('\\', '/')
                 parent_path = os.path.dirname(normalized_repo_name).replace('\\', '/')
                 
