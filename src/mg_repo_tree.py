@@ -282,7 +282,7 @@ class MgRepoTree(QTreeWidget):
                 parent_dir = os.path.dirname(path_str).replace('\\', '/')
                 parent_of_folder = get_or_create_parent(parent_dir)
 
-                folder_item = QTreeWidgetItem(parent_of_folder)
+                folder_item = QTreeWidgetItem(parent_of_folder, TWI_TYPE_GROUP)
                 folder_item.setText(mg_const.COL_REPO_NAME, os.path.basename(path_str))
                 folder_item.setIcon(mg_const.COL_REPO_NAME, QIcon(':/img/icons8-open-folder-64.png'))
 
@@ -295,7 +295,7 @@ class MgRepoTree(QTreeWidget):
         repoInfoList_sorted = sorted(repoInfoList, key=lambda r: r.name)
 
         for repoInfo in repoInfoList_sorted:
-            item = MgRepoTreeItem(repoInfo, self)
+            item = MgRepoTreeItem(repoInfo, self, TWI_TYPE_REPO)
             
             if self.isTreeView:
                 normalized_repo_name = repoInfo.name.replace('\\', '/')
@@ -324,6 +324,7 @@ class MgRepoTree(QTreeWidget):
 
         return items
 
+
     def autoAdjustColumnSize(self) -> None:
         '''Adjust automatically the column size to the largest item'''
         for i in range(self.columnCount()):
@@ -331,10 +332,26 @@ class MgRepoTree(QTreeWidget):
         QApplication.processEvents()
 
 
+    def extendWithItemChildren(self, itemList: List[QTreeWidgetItem]) -> List[MgRepoTreeItem]:
+        '''Take a list of QTreeWidgetItem and return the list of MgRepoTreeItem, including the nested
+        repositories'''
+        items: List[MgRepoTreeItem] = []
+        itemsToInspect: List[QTreeWidgetItem] = itemList[:]
+        while itemsToInspect:
+            item = itemsToInspect.pop(0)
+            if item.type() == TWI_TYPE_REPO:
+                if item not in items:
+                    items.append(cast(MgRepoTreeItem, item))
+
+            # we do a depth-first iteration
+            itemsToInspect = [item.child(childIdx) for childIdx in range(item.childCount())] + itemsToInspect
+
+        return items
+
+
     def selectedRepoItems(self) -> List[MgRepoTreeItem]:
         '''Return the list of selected MgRepoTreeItem'''
-        items = [item for item in self.selectedItems() if item.type() == TWI_TYPE_REPO]
-        return cast(List[MgRepoTreeItem], items)
+        return self.extendWithItemChildren(list(self.selectedItems()))
 
 
     def selectedRepos(self) -> List[MgRepoInfo]:
@@ -351,31 +368,17 @@ class MgRepoTree(QTreeWidget):
 
     def allRepoItems(self) -> List[MgRepoTreeItem]:
         '''Return the list of all MgRepoTreeItem of the widget (Recursive)'''
-        items: List[MgRepoTreeItem] = []
+        items = [self.topLevelItem(itemIdx) for itemIdx in range(self.topLevelItemCount())]
+        items = [item for item in items if item] # to make mypy happy, exclude None
+        return self.extendWithItemChildren(items)
 
-        def collect_children(parent_item: QTreeWidgetItem) -> None:
-            for i in range(parent_item.childCount()):
-                child = parent_item.child(i)
-
-                if hasattr(child, 'repoInfo'):
-                    items.append(cast(MgRepoTreeItem, child))
-                collect_children(child)
-
-        for idx in range(self.topLevelItemCount()):
-            item = self.topLevelItem(idx)
-            if item is None:
-                continue
-            if hasattr(item, 'repoInfo'):
-                items.append(cast(MgRepoTreeItem, item))
-            collect_children(item)
-
-        return items
 
     def rebuildTree(self) -> None:
         '''Destroy the tree and rebuild it with the new view''' 
         repos = self.allRepos()  
         self.clear()            
         self.addRepos(repos)
+
 
     ##########################################################################
     #
@@ -433,11 +436,10 @@ class MgRepoTree(QTreeWidget):
 
 
     def slotItemActivated(self, item: QTreeWidgetItem, _col: int) -> None:
-        '''Called when user double-clicked or presses enter on an item. Call user-defined action'''
+        '''Called when user double-clicked or presses <enter> on an item. Call user-defined action'''
         dbg('slotItemActivated()')
 
-        if item.type() == TWI_TYPE_GROUP or not hasattr(item, 'repoInfo'):
-            
+        if item.type() == TWI_TYPE_GROUP:
             item.setExpanded(not item.isExpanded())
             return
 
