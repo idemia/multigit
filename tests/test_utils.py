@@ -466,7 +466,9 @@ p, li { white-space: pre-wrap;font-family:'Courier New'; font-size:8pt; font-wei
         else:
             assert normalize_path(r'toto/titi\tutu', 'linux') == r'toto/titi/tutu'
 
-        
+        assert normalize_path(pathlib.Path(r''), 'linux') == r'.'
+        assert normalize_path(pathlib.Path(r''), 'win32') == r'.'
+
 
 class TestUtilityFunctionsWithTree(unittest.TestCase):
 

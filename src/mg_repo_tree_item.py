@@ -23,7 +23,6 @@ from PySide6.QtCore import Qt
 from PySide6.QtGui import QIcon, QColor, QPalette
 from PySide6.QtWidgets import QTreeWidgetItem, QApplication, QWidget, QTreeWidget
 
-import mg_const
 from src.mg_utils import extractInt, ignoreCppObjectDeletedError
 from src import mg_config as mgc
 from src.mg_const import COL_REPO_NAME, COL_HEAD, COL_STATUS, COL_REMOTE_SYNCHRO, DISPLAY_IN_BOLD_MSG, \
@@ -155,9 +154,9 @@ class MgRepoTreeItem(QTreeWidgetItem):
         is_submodule = git_path.is_file()
 
         if is_submodule:
-            self.setIcon(mg_const.COL_REPO_NAME, QIcon(':/img/git_black.png'))
+            self.setIcon(COL_REPO_NAME, QIcon(':/img/git_black.png'))
         else:
-            self.setIcon(mg_const.COL_REPO_NAME, QIcon(':/img/icon_git.png'))
+            self.setIcon(COL_REPO_NAME, QIcon(':/img/icon_git.png'))
         
 
         if isTreeView:
@@ -171,8 +170,8 @@ class MgRepoTreeItem(QTreeWidgetItem):
             display_name = self.repoInfo.name
             
 
-        self.setText(mg_const.COL_REPO_NAME, display_name)
-        self.setToolTip(mg_const.COL_REPO_NAME, self.repoInfo.name)
+        self.setText(COL_REPO_NAME, display_name)
+        self.setToolTip(COL_REPO_NAME, self.repoInfo.name)
 
      
         self.setText(COL_HEAD, self.repoInfo.head)
