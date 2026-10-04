@@ -446,6 +446,7 @@ def ignoreCppObjectDeletedError(method: Any) -> Any:
 
     return protected_method
 
+
 def normalize_path(p: Union[str, pathlib.Path], platform: Optional[str] = None) -> str:
     '''Return the path normalized to the target platform, converting / to \\ or \\ to / where appropriate
 
