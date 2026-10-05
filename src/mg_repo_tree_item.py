@@ -148,18 +148,13 @@ class MgRepoTreeItem(QTreeWidgetItem):
         self.setText(COL_REPO_NAME, self.repoInfo.name)
         self.setToolTip(COL_REPO_NAME, self.repoInfo.name)
 
-        isTreeView = getattr(self.treeWidget(), 'isTreeView', True)
-
-        git_path = pathlib.Path(self.repoInfo.fullpath) / '.git'
-        is_submodule = git_path.is_file()
-
-        if is_submodule:
+        if self.repoInfo.is_submodule:
             self.setIcon(COL_REPO_NAME, QIcon(':/img/git_black.png'))
         else:
             self.setIcon(COL_REPO_NAME, QIcon(':/img/icon_git.png'))
         
 
-        if isTreeView:
+        if cast('MgRepoTree', self.treeWidget()).isTreeView:
             # --- Tree View---
             if self.parent() is None:
                 display_name = self.repoInfo.name
