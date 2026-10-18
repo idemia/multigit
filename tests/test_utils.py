@@ -19,10 +19,9 @@ import unittest, os, sys, pathlib
 
 from PySide6.QtWidgets import QApplication, QTreeWidget, QTreeWidgetItem
 
-from mg_utils import build_tree_of_repositories
 from src.mg_utils import htmlize_diff, handle_cr_in_text, set_username_on_git_url, add_suffix_if_missing, extractInt, \
     hasGitAuthFailureMsg, isGitCommandRequiringAuth, anonymise_git_url, strip_protocol_from_url, collectColumnText, \
-    normalize_path
+    normalize_path, build_tree_of_repositories
 
 from src.mg_config import MgConfig
 from src.mg_const import MSG_BIG_DIFF

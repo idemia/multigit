@@ -130,6 +130,7 @@ def git_commit(repo: str, msg: str, allow_errors: bool = False) -> str:
     '''Commit the repo with the message passed in argument and return the SHA1 of the commit.'''
     out = git_exec('-C', repo, 'commit', '-m', msg, allow_errors=allow_errors)
     sha1 = out.split(']')[0].split(' ')[-1]
+    sha1 = sha1[:6]
     return sha1
 
 
