@@ -253,7 +253,7 @@ class MgRepoTree(QTreeWidget):
         QApplication.processEvents()
 
 
-    def addRepoTree(self, parent: QTreeWidget | QTreeWidgetItem, tree: list[tuple[str, MgRepoInfo | None, list[Any]]]) -> None:
+    def addRepoTree(self, parent: 'QTreeWidget | QTreeWidgetItem', tree: list[tuple[str, MgRepoInfo | None, list[Any]]]) -> None:
         '''Recursively create the tree structure described in tree'''
         for node in tree:
             name, repoInfo, children = node
