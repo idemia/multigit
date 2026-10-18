@@ -257,6 +257,7 @@ class MgRepoTree(QTreeWidget):
         '''Recursively create the tree structure described in tree'''
         for node in tree:
             name, repoInfo, children = node
+            item: QTreeWidgetItem
             if repoInfo:
                 # repository
                 item = MgRepoTreeItem(repoInfo)
@@ -338,8 +339,8 @@ class MgRepoTree(QTreeWidget):
 
     def allRepoItems(self) -> List[MgRepoTreeItem]:
         '''Return the list of all MgRepoTreeItem of the widget (Recursive)'''
-        items = [self.topLevelItem(itemIdx) for itemIdx in range(self.topLevelItemCount())]
-        items = [item for item in items if item] # to make mypy happy, exclude None
+        items_or_none = [self.topLevelItem(itemIdx) for itemIdx in range(self.topLevelItemCount())]
+        items = [item for item in items_or_none if item] # to make mypy happy, exclude None
         return self.extendWithItemChildren(items)
 
 
