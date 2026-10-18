@@ -22,9 +22,8 @@ import enum
 import os
 
 from PySide6.QtWidgets import QTreeWidget, QMenu, QApplication, QMessageBox, QAbstractItemView, QTreeWidgetItem, QHeaderView, QDialog
-from PySide6.QtGui import QIcon, QPixmap, QAction
+from PySide6.QtGui import QIcon, QPixmap, QAction, QMouseEvent
 from PySide6.QtCore import Qt, Signal, QPoint
-
 
 
 from src import mg_const
@@ -37,6 +36,7 @@ from src.mg_dialog_view_properties import runDialogGitProperties
 from src.mg_dialog_settings import runDialogEditSettings
 from src.mg_actions import MgActions
 from src.mg_plugin_mgr import pluginMgrInstance
+from src.mg_utils import build_tree_of_repositories
 
 logger = logging.getLogger('mg_repo_tree')
 dbg = logger.debug
@@ -253,69 +253,44 @@ class MgRepoTree(QTreeWidget):
         QApplication.processEvents()
 
 
-    def addRepos(self, repoInfoList: List[MgRepoInfo]) -> List[MgRepoTreeItem]:
+    def addRepoTree(self, parent: QTreeWidget | QTreeWidgetItem, tree: list[tuple[str, MgRepoInfo | None, list[Any]]]) -> None:
+        '''Recursively create the tree structure described in tree'''
+        for node in tree:
+            name, repoInfo, children = node
+            if repoInfo:
+                # repository
+                item = MgRepoTreeItem(repoInfo)
+                item.setText(mg_const.COL_REPO_NAME, name)
+            else:
+                # directory
+                item = QTreeWidgetItem([name], TWI_TYPE_GROUP)
+                item.setIcon(mg_const.COL_REPO_NAME, QIcon(':/img/icons8-open-folder-64.png'))
+            if isinstance(parent, QTreeWidget):
+                parent.addTopLevelItem(item)
+            else:
+                parent.addChild(item)
+            self.addRepoTree( item, children )
+            item.setExpanded(True)
+
+
+    def addRepos(self, repoInfoList: List[MgRepoInfo]) -> None:
         noSelectedItem = (self.topLevelItemCount() == 0)
         items: List[MgRepoTreeItem] = []
         
         self.setRootIsDecorated(self.isTreeView)
 
-        existing_items = {}
-
         if self.isTreeView:
-            def get_or_create_parent(path_str: str) -> Union['QTreeWidget', QTreeWidgetItem]:
-              
-                path_str = path_str.replace('\\', '/')
-                if path_str in ['', '.', '/']:
-                    return self
+            repo_tree = build_tree_of_repositories(repoInfoList)
+            self.addRepoTree( self, repo_tree )
 
-                if path_str in existing_items:
-                    return existing_items[path_str]
+        else:
+            for repoInfo in sorted(repoInfoList, key=lambda r: r.name):
+                self.addTopLevelItem(MgRepoTreeItem(repoInfo))
 
-                
-                parent_dir = os.path.dirname(path_str).replace('\\', '/')
-                parent_of_folder = get_or_create_parent(parent_dir)
+        if noSelectedItem:
+            pass # self.setCurrentItem(item)
 
-                folder_item = QTreeWidgetItem(parent_of_folder, TWI_TYPE_GROUP)
-                folder_item.setText(mg_const.COL_REPO_NAME, os.path.basename(path_str))
-                folder_item.setIcon(mg_const.COL_REPO_NAME, QIcon(':/img/icons8-open-folder-64.png'))
-
-                existing_items[path_str] = folder_item
-                if isinstance(parent_of_folder, QTreeWidgetItem):
-                    parent_of_folder.setExpanded(True)
-
-                return folder_item
-
-        repoInfoList_sorted = sorted(repoInfoList, key=lambda r: r.name)
-
-        for repoInfo in repoInfoList_sorted:
-            item = MgRepoTreeItem(repoInfo, self, TWI_TYPE_REPO)
-            
-            if self.isTreeView:
-                normalized_repo_name = repoInfo.name.replace('\\', '/')
-                parent_path = os.path.dirname(normalized_repo_name).replace('\\', '/')
-                
-                parent_item = get_or_create_parent(parent_path)
-
-                if isinstance(parent_item, QTreeWidgetItem):
-                    idx = self.indexOfTopLevelItem(item)
-                    if idx >= 0:
-                        self.takeTopLevelItem(idx)
-                    parent_item.addChild(item)
-                    parent_item.setExpanded(True)
-                    
-             
-                existing_items[normalized_repo_name] = item 
-
-            item.fillRepoItem()
-            items.append(item)
-
-            if noSelectedItem:
-                self.setCurrentItem(item)
-                noSelectedItem = False
-
-            self.autoAdjustColumnSize()
-
-        return items
+        self.autoAdjustColumnSize()
 
 
     def autoAdjustColumnSize(self) -> None:
@@ -326,8 +301,10 @@ class MgRepoTree(QTreeWidget):
 
 
     def extendWithItemChildren(self, itemList: List[QTreeWidgetItem]) -> List[MgRepoTreeItem]:
-        '''Take a list of QTreeWidgetItem and return the list of MgRepoTreeItem, including the nested
-        repositories'''
+        '''Unwrap a nested structure of MgRepoTreeItem and QTreeWidgetItem into a list of MgRepoTreeItem.
+
+        Take a list of QTreeWidgetItem and return the list of MgRepoTreeItem, including the nested
+        repositories, but excluding the non repository items'''
         items: List[MgRepoTreeItem] = []
         itemsToInspect: List[QTreeWidgetItem] = itemList[:]
         while itemsToInspect:
@@ -379,6 +356,23 @@ class MgRepoTree(QTreeWidget):
     #
     ##########################################################################
 
+    def mousePressEvent(self, event: QMouseEvent) -> None:
+        if event.button() == Qt.MouseButton.LeftButton:
+            item = self.itemAt(event.pos())
+            if item:
+                rect = self.visualItemRect(item)
+
+                # Approximate branch / indicator area
+                branchLeft = rect.left() - self.indentation()
+                if event.pos().x() >= branchLeft and event.pos().x() < rect.left():
+                    if item.childCount():
+                        self.slotItemExpandCollapseClicked(item)
+                    return
+
+        return super().mousePressEvent(event)
+
+
+
     def getGitExecWindow(self) -> MgExecWindow:
         '''Get the running git execution window if any, or create it if necessary'''
         if self.gitExecWindow is None:
@@ -426,6 +420,12 @@ class MgRepoTree(QTreeWidget):
         Returns False if we should abort processing
         '''
         return self.confirmIfTooManySelectedItems(dialogName) and self.confirmIfNoSelectedItems()
+
+
+    def slotItemExpandCollapseClicked(self, item: QTreeWidgetItem) -> None:
+        '''Called when user clicks on the expand/collapse icon'''
+        dbg('slotItemExpandCollapseClicked()')
+        item.setExpanded(not item.isExpanded())
 
 
     def slotItemActivated(self, item: QTreeWidgetItem, _col: int) -> None:

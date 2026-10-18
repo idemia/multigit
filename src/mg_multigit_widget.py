@@ -124,15 +124,15 @@ class MgMultigitWidget(QWidget, Ui_MultigitWidget):
             # we keep that one blocking, it's very quick anyways
             self.multiRepo.find_git_repos()
 
-            items = self.repoTree.addRepos(self.multiRepo.repo_list)
+            self.repoTree.addRepos(self.multiRepo.repo_list)
 
         finally:
             # all items are visible now, we can restore the cursor
             self.setCursor(Qt.CursorShape.ArrowCursor)
 
         # 2nd step, we fill the repo information
-        for it in items:
-            it.repoInfo.refresh()
+        for repoInfo in self.repoTree.allRepos():
+            repoInfo.refresh()
 
 
     def slotToggleTreeView(self, checked: bool) -> None:

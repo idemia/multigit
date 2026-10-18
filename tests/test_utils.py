@@ -19,6 +19,7 @@ import unittest, os, sys, pathlib
 
 from PySide6.QtWidgets import QApplication, QTreeWidget, QTreeWidgetItem
 
+from mg_utils import build_tree_of_repositories
 from src.mg_utils import htmlize_diff, handle_cr_in_text, set_username_on_git_url, add_suffix_if_missing, extractInt, \
     hasGitAuthFailureMsg, isGitCommandRequiringAuth, anonymise_git_url, strip_protocol_from_url, collectColumnText, \
     normalize_path
@@ -526,4 +527,52 @@ class TestUtilityFunctionsWithTree(unittest.TestCase):
         item = QTreeWidgetItem(['  toto', 'titi'])
         item2 = QTreeWidgetItem(item, ['', '  tata  '])
         self.assertEqual(collectColumnText(0, item, True), ['toto', '    tata'])
+
+
+    def test_build_tree_of_repositories(self):
+        repo_root = MgRepoInfo('.', '.')
+        repo_root_empty = MgRepoInfo('', '')
+        repo_module1 = MgRepoInfo('src/module1', 'src/module1')
+        repo_module2 = MgRepoInfo('src/module2', 'src/module2')
+        repo_module2_1 = MgRepoInfo('src/module2/module2_1', 'src/module2/module_2_1')
+        repo_module3 = MgRepoInfo('module3', 'module3')
+        assert build_tree_of_repositories([repo_root]) == [('.', repo_root, [])]
+        assert build_tree_of_repositories([repo_root_empty]) == [('.', repo_root_empty, [])]
+        assert build_tree_of_repositories([repo_root_empty, repo_module1, repo_module2]) == [
+            ('.', repo_root_empty, [
+                ('src', None, [
+                    ('module1', repo_module1, []),
+                    ('module2', repo_module2, []),
+                ])
+            ])
+        ]
+
+        assert build_tree_of_repositories([repo_root_empty, repo_module2, repo_module1, repo_module3]) == [
+            ('.', repo_root_empty, [
+                ('src', None, [
+                    ('module1', repo_module1, []),
+                    ('module2', repo_module2, []),
+                ]),
+                ('module3', repo_module3, []),
+            ])
+        ]
+
+        assert build_tree_of_repositories([repo_module2, repo_module1, repo_module3]) == [
+                ('src', None, [
+                    ('module1', repo_module1, []),
+                    ('module2', repo_module2, []),
+                ]),
+                ('module3', repo_module3, []),
+        ]
+
+        assert build_tree_of_repositories([repo_module2, repo_module1, repo_module3, repo_module2_1]) == [
+                ('src', None, [
+                    ('module1', repo_module1, []),
+                    ('module2', repo_module2, [
+                        ('module2_1', repo_module2_1, [])
+                    ]),
+                ]),
+                ('module3', repo_module3, []),
+        ]
+
 

@@ -29,6 +29,8 @@ from src.mg_const import COL_REPO_NAME, COL_HEAD, COL_STATUS, COL_REMOTE_SYNCHRO
     DISPLAY_IN_ITALIC_MSG, COL_SHA1, SHORT_SHA1_NB_DIGITS, COL_URL, MSG_LOCAL_BRANCH, MSG_LOCAL_BRANCH_TOOLTIP, \
     MSG_TOOLTIP_STATUS, MSG_TOOLTIP_REMOTE_SYNCHRO
 from src.mg_repo_info import MgRepoInfo
+if TYPE_CHECKING:
+    from src.mg_repo_tree import MgRepoTree
 
 dbg = logging.getLogger('mg_repo_tree_item').debug
 error = logging.getLogger('mg_repo_tree_item').error

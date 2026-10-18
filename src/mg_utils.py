@@ -15,12 +15,14 @@
 #
 
 
-from typing import cast, Match, Any, Iterable, Sequence, Union, List, Iterator, Optional
+from typing import cast, Match, Any, Iterable, Sequence, Union, List, Iterator, Optional, TYPE_CHECKING
 import html, os, pathlib, re, shutil, stat, logging, time, subprocess, sys, shlex
 
 from PySide6.QtWidgets import QTreeWidget, QTreeWidgetItem
 
 from src.mg_const import MSG_BIG_DIFF, GIT_AUTH_FAILURE_MARKER
+if TYPE_CHECKING:
+    from src.mg_repo_info import MgRepoInfo
 
 logger = logging.getLogger('mg_utils')
 dbg = logger.debug
@@ -457,3 +459,69 @@ def normalize_path(p: Union[str, pathlib.Path], platform: Optional[str] = None) 
         return str(pathlib.PureWindowsPath(p))
     else:
         return str(pathlib.PureWindowsPath(p).as_posix())
+
+
+def build_tree_of_repositories(repoInfoList: 'list[MgRepoInfo]') -> 'list[tuple[str, MgRepoInfo | None, list[Any]]]':
+    '''Build a tree structure from a repository list
+
+    The returned structure is a tree with each leaf containing 3 elements:
+        - name of the current leaf
+        - MgRepoInfo structure if this is a git repository, or None if this is simply a directory container
+        - list of children leaves
+
+    Example:
+        build_tree_of_repositories( [ MgRepoInfo('.'), MgRepoInfo('src/module1'), MgRepoInfo('src/module2') ] )
+        ->
+        [ ('.', MgRepoInfo('.'), [
+                ('src', None, [
+                    ('module1', MgRepoInfo('src/module1'), []),
+                    ('module2', MgRepoInfo('src/module2'), []),
+                ]),
+            ]
+        ]
+    '''
+    tree: 'dict[str, tuple[str, MgRepoInfo | None, dict[str, Any]]]' = {}
+    sorted_repos = sorted(repoInfoList, key=lambda repoInfo: repoInfo.name)
+    for repo in sorted_repos:
+        repo_name = repo.name if repo.name != '.' else ''
+        name_parts = repo_name.split('\\')
+
+        t = tree
+        for dir_part in name_parts[:-1]:
+            if not dir_part in t:
+                t[dir_part] = (dir_part, None, {})
+            t = t[dir_part][2]
+
+        repo_part = name_parts[-1]
+        if repo_part in t:
+            if t[repo_part][1] != None:
+                print('Two repositories with the same path!', repo, t)
+            t[repo_part] = (t[repo_part][0], repo, t[repo_part][2])
+        else:
+            t[repo_part] = (repo_part, repo, {})
+
+    # put directories first and convert structure to nested lists
+    def unwrap_tree(tree_dict: 'dict[str, tuple[str, MgRepoInfo | None, dict[str, Any]]]') -> 'list[tuple[str, MgRepoInfo | None, list[Any]]]':
+        return [ (t[0] or '.', t[1], unwrap_tree(t[2])) for t in sorted(tree_dict.values(), key=lambda v: (int(bool(v[1])), v[0])) ]
+
+    ret_tree = unwrap_tree(tree)
+
+    # fixup '.' for root tree and make descendants of root tree
+    root_leaf = None
+    for base_leaf in ret_tree:
+        if base_leaf[0] == '.':
+            root_leaf = base_leaf
+            break
+
+    if root_leaf:
+        i = 0
+        while i < len(ret_tree):
+            if ret_tree[i][0] == '.':
+                i += 1
+                continue
+
+            root_leaf[2].append(ret_tree[i])
+            del ret_tree[i]
+
+
+    return ret_tree
