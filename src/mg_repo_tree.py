@@ -15,7 +15,7 @@
 #
 
 
-from typing import List, Any, Optional, Dict, Callable, cast, Union
+from typing import List, Any, Optional, Dict, Callable, cast, Tuple
 import logging
 import functools
 import enum
@@ -253,7 +253,7 @@ class MgRepoTree(QTreeWidget):
         QApplication.processEvents()
 
 
-    def addRepoTree(self, parent: 'QTreeWidget | QTreeWidgetItem', tree: 'list[tuple[str, MgRepoInfo | None, list[Any]]]') -> None:
+    def addRepoTree(self, parent: 'QTreeWidget | QTreeWidgetItem', tree: 'List[Tuple[str, MgRepoInfo | None, List[Any]]]') -> None:
         '''Recursively create the tree structure described in tree'''
         for node in tree:
             name, repoInfo, children = node

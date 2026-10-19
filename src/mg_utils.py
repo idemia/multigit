@@ -15,7 +15,7 @@
 #
 
 
-from typing import cast, Match, Any, Iterable, Sequence, Union, List, Iterator, Optional, TYPE_CHECKING
+from typing import cast, Match, Any, Iterable, Sequence, Union, List, Iterator, Optional, TYPE_CHECKING, Tuple, Dict
 import html, os, pathlib, re, shutil, stat, logging, time, subprocess, sys, shlex
 
 from PySide6.QtWidgets import QTreeWidget, QTreeWidgetItem
@@ -461,7 +461,7 @@ def normalize_path(p: Union[str, pathlib.Path], platform: Optional[str] = None) 
         return str(pathlib.PureWindowsPath(p).as_posix())
 
 
-def build_tree_of_repositories(repoInfoList: 'list[MgRepoInfo]') -> 'list[tuple[str, MgRepoInfo | None, list[Any]]]':
+def build_tree_of_repositories(repoInfoList: 'List[MgRepoInfo]') -> 'List[Tuple[str, MgRepoInfo | None, List[Any]]]':
     '''Build a tree structure from a repository list
 
     The returned structure is a tree with each leaf containing 3 elements:
@@ -480,7 +480,7 @@ def build_tree_of_repositories(repoInfoList: 'list[MgRepoInfo]') -> 'list[tuple[
             ]
         ]
     '''
-    tree: 'dict[str, tuple[str, MgRepoInfo | None, dict[str, Any]]]' = {}
+    tree: 'Dict[str, Tuple[str, MgRepoInfo | None, Dict[str, Any]]]' = {}
     sorted_repos = sorted(repoInfoList, key=lambda repoInfo: repoInfo.name)
     for repo in sorted_repos:
         repo_name = repo.name if repo.name != '.' else ''
@@ -504,7 +504,7 @@ def build_tree_of_repositories(repoInfoList: 'list[MgRepoInfo]') -> 'list[tuple[
             t[repo_part] = (repo_part, repo, {})
 
     # put directories first and convert structure to nested lists
-    def unwrap_tree(tree_dict: 'dict[str, tuple[str, MgRepoInfo | None, dict[str, Any]]]') -> 'list[tuple[str, MgRepoInfo | None, list[Any]]]':
+    def unwrap_tree(tree_dict: 'Dict[str, Tuple[str, MgRepoInfo | None, Dict[str, Any]]]') -> 'List[Tuple[str, MgRepoInfo | None, List[Any]]]':
         return [ (t[0] or '.', t[1], unwrap_tree(t[2])) for t in sorted(tree_dict.values(), key=lambda v: (int(bool(v[1])), v[0])) ]
 
     ret_tree = unwrap_tree(tree)
