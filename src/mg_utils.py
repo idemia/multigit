@@ -484,7 +484,10 @@ def build_tree_of_repositories(repoInfoList: 'list[MgRepoInfo]') -> 'list[tuple[
     sorted_repos = sorted(repoInfoList, key=lambda repoInfo: repoInfo.name)
     for repo in sorted_repos:
         repo_name = repo.name if repo.name != '.' else ''
-        name_parts = repo_name.split('\\')
+        if repo_name.count('/') > repo_name.count('\\'):
+            name_parts = repo_name.split('/')
+        else:
+            name_parts = repo_name.split('\\')
 
         t = tree
         for dir_part in name_parts[:-1]:
