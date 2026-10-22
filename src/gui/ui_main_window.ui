@@ -89,6 +89,7 @@
      <addaction name="menuColumns"/>
     </widget>
     <addaction name="menuShow"/>
+    <addaction name="actionRepositoryAsTree"/>
     <addaction name="actionRefreshAll"/>
    </widget>
    <widget class="QMenu" name="menuGit">
@@ -264,6 +265,14 @@
    </property>
    <property name="text">
     <string>Show Modified Files panel</string>
+   </property>
+  </action>
+  <action name="actionRepositoryAsTree">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Tree view for repositories</string>
    </property>
   </action>
   <action name="actionViewColSha1">

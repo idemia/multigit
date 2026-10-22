@@ -349,6 +349,9 @@ class MgRepoTree(QTreeWidget):
         repos = self.allRepos()  
         self.clear()            
         self.addRepos(repos)
+        # Rebuilt items are empty, fill their value from existing repoInfo 
+        for item in self.allRepoItems():
+            item.fillRepoItem()
 
 
     ##########################################################################
