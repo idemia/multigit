@@ -18,7 +18,7 @@
 from typing import cast, List, Optional, Dict
 import logging, pathlib
 
-from PySide6.QtWidgets import QMessageBox, QApplication, QWidget, QCheckBox
+from PySide6.QtWidgets import QMessageBox, QApplication, QWidget
 from PySide6.QtCore import Qt, Signal, QByteArray, QTimer, QPoint
 
 
@@ -51,6 +51,7 @@ class MgMultigitWidget(QWidget, Ui_MultigitWidget):
         self.multiRepo = MultiRepo('')
 
         self.config = mgc.get_config_instance()
+        self.slotToggleTreeView(self.config.get(mgc.CONFIG_VIEW_REPO_AS_TREEVIEW, True))
 
         # basedir buttons
         self.buttonHistoryBaseDir.historyItemTriggered.connect( lambda title, message: self.openDir(title) )
@@ -71,13 +72,6 @@ class MgMultigitWidget(QWidget, Ui_MultigitWidget):
 
         self.tabWidget.setCurrentIndex(0)
         self.tabWidget.currentChanged.connect( self.slotTabWidgetIndexChanged )
-
-
-        self.treeToggle = QCheckBox("Tree View")
-        self.treeToggle.setChecked(True) 
-        self.treeToggle.toggled.connect(self.slotToggleTreeView)
-        self.horizontalLayout.insertWidget(0, self.treeToggle)
-        self.horizontalLayout.insertSpacing(1, 15)
 
 
 ##########################################################################

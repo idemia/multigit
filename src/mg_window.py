@@ -167,6 +167,8 @@ class MgMainWindow(QMainWindow, Ui_MainWindow):
         self.actionViewLastCommit.changed.connect(self.slotViewTabChanged)
         self.actionViewModifiedFiles.setChecked(mgc.get_config_instance().get(mgc.CONFIG_VIEW_TAB_MOD_FILES, True))
         self.actionViewModifiedFiles.changed.connect(self.slotViewTabChanged)
+        self.actionRepositoryAsTree.setChecked(self.config.get(mgc.CONFIG_VIEW_REPO_AS_TREEVIEW, True))
+        self.actionRepositoryAsTree.changed.connect(self.slotViewRepoAsTreeChanged)
 
         # Submenu: show columns
         # (trigger the slot once to setup the GUI)
@@ -484,6 +486,15 @@ class MgMainWindow(QMainWindow, Ui_MainWindow):
 
         self.config[mgc.CONFIG_VIEW_TAB_LAST_COMMIT] = showTabLastCommit
         self.config[mgc.CONFIG_VIEW_TAB_MOD_FILES] = showTabModFiles
+
+
+    def slotViewRepoAsTreeChanged(self) -> None:
+        showTreeView = self.actionRepositoryAsTree.isChecked()
+        for tabIdx in range(self.tabRepos.count()):
+            self.multigitWidgetFromIdx(tabIdx).slotToggleTreeView(showTreeView)
+
+        self.config[mgc.CONFIG_VIEW_REPO_AS_TREEVIEW] = showTreeView
+        self.config.save()
 
 
     def slotViewColSha1Changed(self) -> None:
