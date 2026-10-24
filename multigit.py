@@ -20,7 +20,6 @@ import os
 import platform
 import sys, logging, datetime, tempfile, pathlib
 import ctypes
-import logging.handlers
 import traceback as tb_module
 from typing import Type, Optional
 from types import TracebackType
