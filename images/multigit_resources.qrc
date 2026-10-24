@@ -17,7 +17,6 @@
 
 <RCC>
   <qresource prefix="img">
-    <file>icon_git.png</file>
     <file>multigit-logo-256.png</file>
     <file>multigit-logo-16.png</file>
     <file>tgit_tortoise.ico</file>
@@ -35,6 +34,7 @@
     <file>tgit_switch.ico</file>
     <file>git_white.png</file>
     <file>git_black.png</file>
+    <file>git_red.png</file>
     <file>sublime_merge.ico</file>
     <file>sourcetree.ico</file>
     <file>git-bash.ico</file>

@@ -153,7 +153,7 @@ class MgRepoTreeItem(QTreeWidgetItem):
         if self.repoInfo.is_submodule:
             self.setIcon(COL_REPO_NAME, QIcon(':/img/git_black.png'))
         else:
-            self.setIcon(COL_REPO_NAME, QIcon(':/img/icon_git.png'))
+            self.setIcon(COL_REPO_NAME, QIcon(':/img/git_red.png'))
         
 
         if cast('MgRepoTree', self.treeWidget()).isTreeView:
