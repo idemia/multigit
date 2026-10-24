@@ -197,6 +197,8 @@ class MgRepoTree(QTreeWidget):
         self.mgActions.actionGitCheckoutTag.triggered.connect(self.slotGitCheckoutTag)
         self.mgActions.actionGitDeleteBranch.triggered.connect(self.slotGitDeleteBranch)
         self.mgActions.actionGitDeleteTag.triggered.connect(self.slotGitDeleteTag)
+        self.mgActions.actionGitSubmoduleInit.triggered.connect(self.slotGitSubmoduleInit)
+        self.mgActions.actionGitSubmoduleUpdate.triggered.connect(self.slotGitSubmoduleUpdate)
         self.mgActions.actionGitRunCommand.triggered.connect(self.slotGitRunCommand)
 
         # Menu Git programs
@@ -696,6 +698,18 @@ class MgRepoTree(QTreeWidget):
         # local import to prevent circular dependencies
         from src.mg_dialog_git_switch_delete_branch import runDialogGitSwitchDelete, DeleteOrSwitchBranchOrTag
         runDialogGitSwitchDelete(self, DeleteOrSwitchBranchOrTag.DELETE_TAG, self.selectedRepos(), self.allRepos())
+
+
+    def slotGitSubmoduleInit(self) -> None:
+        '''Run `git sumodule init` on listed repos'''
+        dbg('slotGitSubmoduleInit()')
+        self.runGitCommand('Submodule initialization', ['submodule', 'init'])
+
+
+    def slotGitSubmoduleUpdate(self) -> None:
+        '''Run `git submodule update` on listed repos'''
+        dbg('slotGitSubmoduleUpdate()')
+        self.runGitCommand('Submodule update', ['submodule', 'update'])
 
 
     def slotGitRunCommand(self) -> None:
