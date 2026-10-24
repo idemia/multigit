@@ -17,6 +17,7 @@
 
 from typing import Any, TYPE_CHECKING, Optional, cast, Tuple
 import logging
+import pathlib
 
 from PySide6.QtCore import Qt
 from PySide6.QtGui import QIcon, QColor, QPalette
@@ -24,11 +25,12 @@ from PySide6.QtWidgets import QTreeWidgetItem, QApplication, QWidget, QTreeWidge
 
 from src.mg_utils import extractInt, ignoreCppObjectDeletedError
 from src import mg_config as mgc
-from src.mg_const import COL_UPDATE, COL_REPO_NAME, COL_HEAD, COL_STATUS, COL_REMOTE_SYNCHRO, DISPLAY_IN_BOLD_MSG, \
+from src.mg_const import COL_REPO_NAME, COL_HEAD, COL_STATUS, COL_REMOTE_SYNCHRO, DISPLAY_IN_BOLD_MSG, \
     DISPLAY_IN_ITALIC_MSG, COL_SHA1, SHORT_SHA1_NB_DIGITS, COL_URL, MSG_LOCAL_BRANCH, MSG_LOCAL_BRANCH_TOOLTIP, \
-    MSG_TOOLTIP_UPDATE, MSG_TOOLTIP_STATUS, MSG_TOOLTIP_REMOTE_SYNCHRO
-from src.mg_exec_task_item import getIcon, IconSet
+    MSG_TOOLTIP_STATUS, MSG_TOOLTIP_REMOTE_SYNCHRO
 from src.mg_repo_info import MgRepoInfo
+if TYPE_CHECKING:
+    from src.mg_repo_tree import MgRepoTree
 
 dbg = logging.getLogger('mg_repo_tree_item').debug
 error = logging.getLogger('mg_repo_tree_item').error
@@ -64,7 +66,6 @@ class MgRepoTreeItem(QTreeWidgetItem):
         self.ignoreUpdates = False
         if self.text(COL_REPO_NAME) == '':
             # we are completely empty, fill with minimalistic information
-            self.setText(COL_UPDATE, '')
             self.setText(COL_REPO_NAME, repoInfo.name)
             self.setText(COL_HEAD, '...')
             self.setText(COL_STATUS, '...')
@@ -80,7 +81,6 @@ class MgRepoTreeItem(QTreeWidgetItem):
         self.repoInfo.repo_deleted.connect(self.slotRepoDeleted)
 
         self.filledColumns = MgRepoTreeItem.ColumnFlags(0)
-
         self.setToolTips()
 
 
@@ -105,9 +105,7 @@ class MgRepoTreeItem(QTreeWidgetItem):
     @ignoreCppObjectDeletedError
     def markItemInProgress(self) -> None:
         dbg('markItemInProgress(%s)' % self.repoInfo.name)
-        self.setText(COL_UPDATE, '')
-        self.setIcon(COL_UPDATE, QIcon(':img/icons8-loader-96.png'))
-        self.setToolTip(COL_UPDATE, MSG_TOOLTIP_UPDATE)
+        self.setIcon(COL_REPO_NAME, QIcon(':img/icons8-loader-96.png'))
         QApplication.processEvents()
 
 
@@ -149,14 +147,35 @@ class MgRepoTreeItem(QTreeWidgetItem):
     def fillRepoItem(self) -> None:
         '''Fill a QTreeWidgetItem from the associated repoInfo'''
         dbg('fillRepoItem(%s, ...)' % self.repoInfo.name)
-        self.setIcon(COL_UPDATE, getIcon(IconSet.Empty))
-        self.setText(COL_UPDATE, '')
-        self.setToolTip(COL_UPDATE, '')
         self.setText(COL_REPO_NAME, self.repoInfo.name)
         self.setToolTip(COL_REPO_NAME, self.repoInfo.name)
+
+        if self.repoInfo.is_submodule:
+            self.setIcon(COL_REPO_NAME, QIcon(':/img/git_black.png'))
+        else:
+            self.setIcon(COL_REPO_NAME, QIcon(':/img/icon_git.png'))
+        
+
+        if cast('MgRepoTree', self.treeWidget()).isTreeView:
+            # --- Tree View---
+            if self.parent() is None:
+                display_name = self.repoInfo.name
+            else:
+                display_name = pathlib.Path(self.repoInfo.name).name
+        else:
+            # --- Flat View ---
+            display_name = self.repoInfo.name
+            
+
+        self.setText(COL_REPO_NAME, display_name)
+        self.setToolTip(COL_REPO_NAME, self.repoInfo.name)
+
+     
         self.setText(COL_HEAD, self.repoInfo.head)
         self.setText(COL_STATUS, self.repoInfo.status)
         self.setText(COL_REMOTE_SYNCHRO, self.repoInfo.remote_synchro )
+        
+
         if self.repoInfo.remote_synchro == MSG_LOCAL_BRANCH:
             # add a tooltip to give an easy-fix for the missing remote branch
             self.setToolTip(COL_REMOTE_SYNCHRO, MSG_LOCAL_BRANCH_TOOLTIP)

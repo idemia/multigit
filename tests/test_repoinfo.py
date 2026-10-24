@@ -130,6 +130,7 @@ def git_commit(repo: str, msg: str, allow_errors: bool = False) -> str:
     '''Commit the repo with the message passed in argument and return the SHA1 of the commit.'''
     out = git_exec('-C', repo, 'commit', '-m', msg, allow_errors=allow_errors)
     sha1 = out.split(']')[0].split(' ')[-1]
+    sha1 = sha1[:6]
     return sha1
 
 
@@ -310,6 +311,7 @@ class TestRepoInfo(TempGitDirReady):
         ric_main = MgRepoInfo('main', str(main_repo))
         ric_main.refresh()
         self.assertTrue((pathlib.Path(ric_main.fullpath) / '.git').is_dir())
+        self.assertFalse(ric_main.is_submodule)
 
         # Submodule check (File)
         sub_path = main_repo / 'libs' / 'my_sub'
@@ -319,6 +321,7 @@ class TestRepoInfo(TempGitDirReady):
         git_path_sub = pathlib.Path(ric_sub.fullpath) / '.git'
         self.assertTrue(git_path_sub.exists())
         self.assertTrue(git_path_sub.is_file(), "Submodule .git must be a FILE (gitlink)")
+        self.assertTrue(ric_sub.is_submodule)
 
     def test_repo_info(self) -> None:
         self.dir1 = pathlib.Path(self.gitdir) / 'dir1'

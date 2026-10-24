@@ -15,14 +15,16 @@
 #
 
 
-from typing import List, Any, Optional, Dict, Callable, cast, Tuple, Type
+from typing import List, Any, Optional, Dict, Callable, cast, Tuple
 import logging
 import functools
 import enum
+import os
 
 from PySide6.QtWidgets import QTreeWidget, QMenu, QApplication, QMessageBox, QAbstractItemView, QTreeWidgetItem, QHeaderView, QDialog
-from PySide6.QtGui import QIcon, QMouseEvent, QContextMenuEvent, QPixmap, QAction
-from PySide6.QtCore import Qt, QPoint, Signal, QPoint
+from PySide6.QtGui import QIcon, QPixmap, QAction, QMouseEvent
+from PySide6.QtCore import Qt, Signal, QPoint
+
 
 from src import mg_const
 from src import mg_config as mgc
@@ -34,6 +36,7 @@ from src.mg_dialog_view_properties import runDialogGitProperties
 from src.mg_dialog_settings import runDialogEditSettings
 from src.mg_actions import MgActions
 from src.mg_plugin_mgr import pluginMgrInstance
+from src.mg_utils import build_tree_of_repositories
 
 logger = logging.getLogger('mg_repo_tree')
 dbg = logger.debug
@@ -77,6 +80,8 @@ class MgRepoTree(QTreeWidget):
     rmbMenu: QMenu
     rmbTgitMenu: QMenu
 
+    isTreeView: bool
+
     show_column_menu = Signal(QPoint)
 
     def __init__(self, *args: Any) -> None:
@@ -85,6 +90,7 @@ class MgRepoTree(QTreeWidget):
         # to allow right-mouse-button click signal
         self.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
         self.setItemsExpandable(True)
+        self.isTreeView = True
 
         f = self.header().font()
         f.setBold(True)
@@ -94,8 +100,7 @@ class MgRepoTree(QTreeWidget):
         self.header().setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
 
         self.sortByColumn(mg_const.COL_REPO_NAME, Qt.SortOrder.AscendingOrder)
-        self.setColumnWidth(mg_const.COL_UPDATE, 40)
-        self.setIndentation(10)
+        self.setIndentation(15)
 
         self.configureColumns()
 
@@ -122,7 +127,6 @@ class MgRepoTree(QTreeWidget):
         self.setSelectionMode(QAbstractItemView.SelectionMode.ExtendedSelection)
         self.setAllColumnsShowFocus(True)
         self.header().setSortIndicatorShown(True)
-        self.headerItem().setToolTip(mg_const.COL_UPDATE, mg_const.MSG_TOOLTIP_UPDATE)
         self.headerItem().setToolTip(mg_const.COL_STATUS, mg_const.MSG_TOOLTIP_STATUS)
         self.headerItem().setToolTip(mg_const.COL_REMOTE_SYNCHRO, mg_const.MSG_TOOLTIP_REMOTE_SYNCHRO)
 
@@ -213,9 +217,10 @@ class MgRepoTree(QTreeWidget):
         self.mgActions.actionTGitBranch   .triggered.connect(self.slotTGitBranch)
 
 
+
     def slotContextMenuRequested(self, p: QPoint) -> None:
         '''Capture the right-button mouse click action to display a menu'''
-        self.rmbMenu.exec_(self.viewport().mapToGlobal(p)) # qme.globalPos())
+        self.rmbMenu.exec_(self.viewport().mapToGlobal(p))
 
 
     def slotHeaderContextMenuRequested(self, p: QPoint) -> None:
@@ -232,9 +237,14 @@ class MgRepoTree(QTreeWidget):
     def deleteRepos(self, deletedRepo: List[MgRepoInfo]) -> None:
         '''Remove all the items related to the listed repositories'''
         for repoInfo in deletedRepo:
-            for itemIdx in range(self.topLevelItemCount()):
-                if self.topLevelItem(itemIdx).text(mg_const.COL_REPO_NAME) == repoInfo.name:     # type: ignore # topLevelItem(itemIdx) exists and is not None
-                    self.takeTopLevelItem(itemIdx)
+            for item in self.allRepoItems():
+                if item.text(mg_const.COL_REPO_NAME) == repoInfo.name:
+                    parent = item.parent()
+                    if parent:
+                        parent.removeChild(item)
+                    else:
+                        idx = self.indexOfTopLevelItem(item)
+                        self.takeTopLevelItem(idx)
                     break  # we only have one such item per repo, no need to continue searching
             else:
                 warn('Item not found for deleted repo: %s' % repoInfo.name)
@@ -243,24 +253,45 @@ class MgRepoTree(QTreeWidget):
         QApplication.processEvents()
 
 
-    def addRepos(self, repoInfoList: List[MgRepoInfo]) -> List[MgRepoTreeItem]:
-        '''Add the listed repos as items to this repoTree.
-        Return the list of MgRepoTreeItem created'''
+    def addRepoTree(self, parent: 'QTreeWidget | QTreeWidgetItem', tree: 'List[Tuple[str, MgRepoInfo | None, List[Any]]]') -> None:
+        '''Recursively create the tree structure described in tree'''
+        for node in tree:
+            name, repoInfo, children = node
+            item: QTreeWidgetItem
+            if repoInfo:
+                # repository
+                item = MgRepoTreeItem(repoInfo)
+                item.setText(mg_const.COL_REPO_NAME, name)
+            else:
+                # directory
+                item = QTreeWidgetItem([name], TWI_TYPE_GROUP)
+                item.setIcon(mg_const.COL_REPO_NAME, QIcon(':/img/icons8-open-folder-64.png'))
+            if isinstance(parent, QTreeWidget):
+                parent.addTopLevelItem(item)
+            else:
+                parent.addChild(item)
+            self.addRepoTree( item, children )
+            item.setExpanded(True)
+
+
+    def addRepos(self, repoInfoList: List[MgRepoInfo]) -> None:
         noSelectedItem = (self.topLevelItemCount() == 0)
-
         items: List[MgRepoTreeItem] = []
+        
+        self.setRootIsDecorated(self.isTreeView)
 
-        # first step, we fill the list of repo
-        for repoInfo in repoInfoList:
-            item = MgRepoTreeItem(repoInfo, self)
-            items.append(item)
-            if noSelectedItem:
-                self.setCurrentItem(item)
-                noSelectedItem = False
+        if self.isTreeView:
+            repo_tree = build_tree_of_repositories(repoInfoList)
+            self.addRepoTree( self, repo_tree )
 
-            self.autoAdjustColumnSize()
+        else:
+            for repoInfo in sorted(repoInfoList, key=lambda r: r.name):
+                self.addTopLevelItem(MgRepoTreeItem(repoInfo))
 
-        return items
+        if noSelectedItem:
+            pass # self.setCurrentItem(item)
+
+        self.autoAdjustColumnSize()
 
 
     def autoAdjustColumnSize(self) -> None:
@@ -270,10 +301,28 @@ class MgRepoTree(QTreeWidget):
         QApplication.processEvents()
 
 
+    def extendWithItemChildren(self, itemList: List[QTreeWidgetItem]) -> List[MgRepoTreeItem]:
+        '''Unwrap a nested structure of MgRepoTreeItem and QTreeWidgetItem into a list of MgRepoTreeItem.
+
+        Take a list of QTreeWidgetItem and return the list of MgRepoTreeItem, including the nested
+        repositories, but excluding the non repository items'''
+        items: List[MgRepoTreeItem] = []
+        itemsToInspect: List[QTreeWidgetItem] = itemList[:]
+        while itemsToInspect:
+            item = itemsToInspect.pop(0)
+            if item.type() == TWI_TYPE_REPO:
+                if item not in items:
+                    items.append(cast(MgRepoTreeItem, item))
+
+            # we do a depth-first iteration
+            itemsToInspect = [item.child(childIdx) for childIdx in range(item.childCount())] + itemsToInspect
+
+        return items
+
+
     def selectedRepoItems(self) -> List[MgRepoTreeItem]:
         '''Return the list of selected MgRepoTreeItem'''
-        items = [item for item in self.selectedItems() if item.type() == TWI_TYPE_REPO]
-        return cast(List[MgRepoTreeItem], items)
+        return self.extendWithItemChildren(list(self.selectedItems()))
 
 
     def selectedRepos(self) -> List[MgRepoInfo]:
@@ -289,13 +338,20 @@ class MgRepoTree(QTreeWidget):
 
 
     def allRepoItems(self) -> List[MgRepoTreeItem]:
-        '''Return the list of all MgRepoTreeItem of the widget'''
-        items = []
-        for idx in range(self.topLevelItemCount()):
-            item = self.topLevelItem(idx)
-            if item and item.type() == TWI_TYPE_REPO:
-                items.append(cast(MgRepoTreeItem, item))
-        return items
+        '''Return the list of all MgRepoTreeItem of the widget (Recursive)'''
+        items_or_none = [self.topLevelItem(itemIdx) for itemIdx in range(self.topLevelItemCount())]
+        items = [item for item in items_or_none if item] # to make mypy happy, exclude None
+        return self.extendWithItemChildren(items)
+
+
+    def rebuildTree(self) -> None:
+        '''Destroy the tree and rebuild it with the new view''' 
+        repos = self.allRepos()  
+        self.clear()            
+        self.addRepos(repos)
+        # Rebuilt items are empty, fill their value from existing repoInfo 
+        for item in self.allRepoItems():
+            item.fillRepoItem()
 
 
     ##########################################################################
@@ -303,6 +359,23 @@ class MgRepoTree(QTreeWidget):
     #       Actions on selected items
     #
     ##########################################################################
+
+    def mousePressEvent(self, event: QMouseEvent) -> None:
+        if event.button() == Qt.MouseButton.LeftButton:
+            item = self.itemAt(event.pos())
+            if item:
+                rect = self.visualItemRect(item)
+
+                # Approximate branch / indicator area
+                branchLeft = rect.left() - self.indentation()
+                if event.pos().x() >= branchLeft and event.pos().x() < rect.left():
+                    if item.childCount():
+                        self.slotItemExpandCollapseClicked(item)
+                    return
+
+        return super().mousePressEvent(event)
+
+
 
     def getGitExecWindow(self) -> MgExecWindow:
         '''Get the running git execution window if any, or create it if necessary'''
@@ -353,8 +426,14 @@ class MgRepoTree(QTreeWidget):
         return self.confirmIfTooManySelectedItems(dialogName) and self.confirmIfNoSelectedItems()
 
 
+    def slotItemExpandCollapseClicked(self, item: QTreeWidgetItem) -> None:
+        '''Called when user clicks on the expand/collapse icon'''
+        dbg('slotItemExpandCollapseClicked()')
+        item.setExpanded(not item.isExpanded())
+
+
     def slotItemActivated(self, item: QTreeWidgetItem, _col: int) -> None:
-        '''Called when user double-clicked or presses enter on an item. Call user-defined action'''
+        '''Called when user double-clicked or presses <enter> on an item. Call user-defined action'''
         dbg('slotItemActivated()')
 
         if item.type() == TWI_TYPE_GROUP:
@@ -409,11 +488,12 @@ class MgRepoTree(QTreeWidget):
 
     def doRefreshItems(self, items: List[MgRepoTreeItem]) -> None:
         for it in items:
-            # clear items before updating them, this is better visually
-            it.markItemInProgress()
+            if hasattr(it, 'markItemInProgress'):
+                it.markItemInProgress()
 
         for it in items:
-            it.repoInfo.refresh()
+            if hasattr(it, 'repoInfo'):
+                it.repoInfo.refresh()
 
 
     def slotMenuCopyAboutToShow(self) -> None:

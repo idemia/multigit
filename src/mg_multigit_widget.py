@@ -21,6 +21,7 @@ import logging, pathlib
 from PySide6.QtWidgets import QMessageBox, QApplication, QWidget
 from PySide6.QtCore import Qt, Signal, QByteArray, QTimer, QPoint
 
+
 from src.mg_repo_info import MultiRepo
 from src.mg_repo_tree_item import MgRepoTreeItem
 from src.mg_repo_tree import TWI_TYPE_GROUP
@@ -50,11 +51,14 @@ class MgMultigitWidget(QWidget, Ui_MultigitWidget):
         self.multiRepo = MultiRepo('')
 
         self.config = mgc.get_config_instance()
+        self.slotToggleTreeView(self.config.get(mgc.CONFIG_VIEW_REPO_AS_TREEVIEW, True))
 
         # basedir buttons
         self.buttonHistoryBaseDir.historyItemTriggered.connect( lambda title, message: self.openDir(title) )
         self.buttonHistoryBaseDir.fillHistory(self.config.lruAsList(mgc.CONFIG_LAST_OPENED))
         self.buttonOpenBaseDir.clicked.connect(self.sig_request_dir_open)
+        
+
 
 
         if self.config[mgc.CONFIG_SPLITTER_STATE_V2]:
@@ -114,15 +118,21 @@ class MgMultigitWidget(QWidget, Ui_MultigitWidget):
             # we keep that one blocking, it's very quick anyways
             self.multiRepo.find_git_repos()
 
-            items = self.repoTree.addRepos(self.multiRepo.repo_list)
+            self.repoTree.addRepos(self.multiRepo.repo_list)
 
         finally:
             # all items are visible now, we can restore the cursor
             self.setCursor(Qt.CursorShape.ArrowCursor)
 
         # 2nd step, we fill the repo information
-        for it in items:
-            it.repoInfo.refresh()
+        for repoInfo in self.repoTree.allRepos():
+            repoInfo.refresh()
+
+
+    def slotToggleTreeView(self, checked: bool) -> None:
+        '''Switch between Flat View and Tree View'''
+        self.repoTree.isTreeView = checked
+        self.repoTree.rebuildTree()
 
 
     def slotItemSelectionChanged(self) -> None:
@@ -161,33 +171,11 @@ class MgMultigitWidget(QWidget, Ui_MultigitWidget):
 
     def slotSetLastCommit(self, repo_name: str, last_commit: str) -> None:
         dbg('slotSetLastCommit("%s", ...)' % repo_name)
-        currentItem = self.repoTree.currentItem()
-        if currentItem is None or currentItem.type() == TWI_TYPE_GROUP:
-            return
-
-        currentRepoName = currentItem.text(COL_REPO_NAME)
-        if repo_name != currentRepoName:
-            logger.warning('Received last commit result for repo "%s" but repo selected is "%s". Call ignored' % (repo_name, currentRepoName))
-            # the selection changed between the time where the lastCommit info was requested and it was received
-            # just ignore it
-            return
-
         self.textEditCommit.setText(last_commit)
 
 
     def displayRepoDiff(self, repo_name: str, repo_diff: str) -> None:
         dbg('displayRepoDiff("%s", ...)' % repo_name)
-        currentItem = self.repoTree.currentItem()
-        if currentItem is None:
-            return
-
-        currentRepoName = currentItem.text(COL_REPO_NAME)
-        if repo_name != currentRepoName:
-            logger.warning('Received diff result for repo "%s" but repo selected is "%s". Call ignored' % (repo_name, currentRepoName))
-            # the selection changed between the time where the lastCommit info was requested and it was received
-            # just ignore it
-            return
-
         self.textEditModFiles.setText(htmlize_diff(repo_diff or '', MAX_DIFF_LINES))
 
 
