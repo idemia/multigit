@@ -200,6 +200,7 @@ class MgRepoTree(QTreeWidget):
         self.mgActions.actionGitSubmoduleInit.triggered.connect(self.slotGitSubmoduleInit)
         self.mgActions.actionGitSubmoduleUpdate.triggered.connect(self.slotGitSubmoduleUpdate)
         self.mgActions.actionGitRunCommand.triggered.connect(self.slotGitRunCommand)
+        self.rmbGitMenu.aboutToShow.connect(self.slotGitMenuAboutToShow)
 
         # Menu Git programs
         for execToolAction in self.mgActions.execToolActionsDict.values():
@@ -222,6 +223,11 @@ class MgRepoTree(QTreeWidget):
     def slotContextMenuRequested(self, p: QPoint) -> None:
         '''Capture the right-button mouse click action to display a menu'''
         self.rmbMenu.exec_(self.viewport().mapToGlobal(p))
+
+
+    def slotGitMenuAboutToShow(self) -> None:
+        '''Enable submodule actions only for selected repositories containing submodules'''
+        self.mgActions.enableMenuGitSubmodules(self.selectedRepos())
 
 
     def slotHeaderContextMenuRequested(self, p: QPoint) -> None:

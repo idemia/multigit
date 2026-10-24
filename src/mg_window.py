@@ -209,7 +209,10 @@ class MgMainWindow(QMainWindow, Ui_MainWindow):
         self.mgActions.actionGitCheckoutTag.triggered.connect(self.dispatchToActiveTreeOfMultigitTab('slotGitCheckoutTag'))
         self.mgActions.actionGitDeleteBranch.triggered.connect(self.dispatchToActiveTreeOfMultigitTab('slotGitDeleteBranch'))
         self.mgActions.actionGitDeleteTag.triggered.connect(self.dispatchToActiveTreeOfMultigitTab('slotGitDeleteTag'))
+        self.mgActions.actionGitSubmoduleInit.triggered.connect(self.dispatchToActiveTreeOfMultigitTab('slotGitSubmoduleInit'))
+        self.mgActions.actionGitSubmoduleUpdate.triggered.connect(self.dispatchToActiveTreeOfMultigitTab('slotGitSubmoduleUpdate'))
         self.mgActions.actionGitRunCommand.triggered.connect(self.dispatchToActiveTreeOfMultigitTab('slotGitRunCommand'))
+        self.menuGit.aboutToShow.connect(self.slotGitMenuAboutToShow)
 
         # Menu Git programs
         for execToolAction in self.mgActions.execToolActionsDict.values():
@@ -515,6 +518,12 @@ class MgMainWindow(QMainWindow, Ui_MainWindow):
             repoTree.slotViewColUrlChanged(showColUrl)
         mgc.get_config_instance()[mgc.CONFIG_VIEW_COL_URL] = showColUrl
         mgc.get_config_instance().save()
+
+
+    def slotGitMenuAboutToShow(self) -> None:
+        '''Enable submodule actions only for selected repositories containing submodules'''
+        self.mgActions.enableMenuGitSubmodules(self.currentMultigit().repoTree.selectedRepos())
+
 
     def slotMenuCopyAboutToShow(self) -> None:
         '''Called when user clicked on the copy submenu. Fills the items of the menu'''

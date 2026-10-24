@@ -23,6 +23,7 @@ from PySide6.QtGui import QAction, QIcon, QPixmap, QTransform
 from PySide6.QtWidgets import QMenu, QWidget
 
 from src.mg_const import SHORT_SHA1_NB_DIGITS
+from src.mg_repo_info import MgRepoInfo 
 from src.mg_tools import ExecTool, ExecTortoiseGit
 if TYPE_CHECKING:
     from src.mg_repo_tree import MgRepoTree
@@ -353,10 +354,11 @@ class MgActions(QObject):
         menuGit.addAction( self.actionGitCheckoutTag)
         menuGit.addAction( self.actionGitDeleteBranch)
         menuGit.addAction( self.actionGitDeleteTag)
-        menuSubmodules = menuGit.addMenu("Submodules")
-        menuSubmodules.setIcon(QIcon(":/img/git_red_submodule.png"))
-        menuSubmodules.addAction(self.actionGitSubmoduleInit)
-        menuSubmodules.addAction(self.actionGitSubmoduleUpdate)
+        self.menuSubmodules = menuGit.addMenu("Submodules")
+        self.menuSubmodules.setIcon(QIcon(":/img/git_red_submodule.png"))
+        self.menuSubmodules.addAction(self.actionGitSubmoduleInit)
+        self.menuSubmodules.addAction(self.actionGitSubmoduleUpdate)
+        self.menuSubmodules.setEnabled(False)
         menuGit.addSeparator()
         menuGit.addAction( self.actionGitRunCommand )
 
@@ -385,6 +387,10 @@ class MgActions(QObject):
         menuTGit.addAction( self.actionTGitTag )
         menuTGit.addAction( self.actionTGitSwitch )
         menuTGit.addAction( self.actionTGitBranch )
+
+
+    def enableMenuGitSubmodules(self, repos: List[MgRepoInfo]) -> None:
+        self.menuSubmodules.setEnabled(any((repo.is_submodule_parent or repo.is_submodule) for repo in repos))
 
 
     def enableAvailableScm(self) -> None:
