@@ -211,6 +211,14 @@ class MgActions(QObject):
         self.actionGitDeleteTag.setShortcut("Alt+Shift+D")
         self.actionGitDeleteTag.setToolTip('Open dialog for deleting a tag')
 
+        self.actionGitSubmoduleInit = QAction(self)
+        self.actionGitSubmoduleInit.setText("Init")
+        self.actionGitSubmoduleInit.setToolTip('Run the `submodule init` command (registers the submodules directories)')
+
+        self.actionGitSubmoduleUpdate = QAction(self)
+        self.actionGitSubmoduleUpdate.setText("Update")
+        self.actionGitSubmoduleUpdate.setToolTip('Run the `submodule update` command (updates/restores submodules to the versions defined in the submodule root')
+
         self.actionGitRunCommand = QAction(self)
         self.actionGitRunCommand.setText("Run git command")
         self.actionGitRunCommand.setShortcut("Ctrl+G")
@@ -328,8 +336,10 @@ class MgActions(QObject):
 
 
 
-    def setupMenuGit(self, menuGit: QMenu) -> None:
+    def setupMenuGit(self, menuGit: QMenu, inRmbMenu: bool) -> None:
         '''Install all actions in the git menu'''
+        if inRmbMenu:
+            menuGit.setIcon(QIcon(":/img/git_red.png"))
         menuGit.addAction( self.actionGitProperties)
         menuGit.addAction( self.actionGitCommit )
         menuGit.addAction( self.actionGitRevert )
@@ -343,6 +353,10 @@ class MgActions(QObject):
         menuGit.addAction( self.actionGitCheckoutTag)
         menuGit.addAction( self.actionGitDeleteBranch)
         menuGit.addAction( self.actionGitDeleteTag)
+        menuSubmodules = menuGit.addMenu("Submodules")
+        menuSubmodules.setIcon(QIcon(":/img/git_red_submodule.png"))
+        menuSubmodules.addAction(self.actionGitSubmoduleInit)
+        menuSubmodules.addAction(self.actionGitSubmoduleUpdate)
         menuGit.addSeparator()
         menuGit.addAction( self.actionGitRunCommand )
 

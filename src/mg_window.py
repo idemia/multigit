@@ -104,7 +104,7 @@ class MgMainWindow(QMainWindow, Ui_MainWindow):
         self.menuGit.addAction(self.mgActions.actionGitFetchAll)
         self.menuGit.addAction(self.mgActions.actionGitFetchAllOnAllTabs)
         self.menuGit.addSeparator()
-        self.mgActions.setupMenuGit(self.menuGit)
+        self.mgActions.setupMenuGit(self.menuGit, inRmbMenu=False)
 
         # menu git programs
         self.mgActions.setupMenuGitPrograms(self.menuGitPrograms, includeConfigureGitPrograms=True)
