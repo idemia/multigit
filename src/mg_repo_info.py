@@ -246,6 +246,7 @@ class MgRepoInfo(QObject):
     fullpath: str               # the full path to the repository, used for running git commands
     url: Optional[str]          # None when not filled yet, string (possibly empty) when filled
     is_submodule: bool          # True/False, filled during RepoInfo creation
+    is_submodule_parent: bool   # True/False, filled during RepoInfo creation
     status: str                 # emtpy string when not filled, string when filled. Description of the modified files
     tag: str                    # current tag we are on, if any. Empty string when not pointing on a tag
     branch: str                 # current branch we are on, if any. Emtpy string when not on a branch, "<empty repo>" is also a valid value
@@ -299,6 +300,7 @@ class MgRepoInfo(QObject):
         # full path to our repo
         self.fullpath = normalize_path(pathlib.Path(fullpath).resolve())
         self.is_submodule = (pathlib.Path(self.fullpath) / '.git').is_file()
+        self.is_submodule_parent = (pathlib.Path(self.fullpath) / '.gitmodules').is_file()
 
         self._clear_all()
 
