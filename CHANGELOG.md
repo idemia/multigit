@@ -8,6 +8,14 @@ Introduction
 
 Multigit help users to manage many Git repositories simultaneously.
 
+Version 1.9.0 (in progress)
+---------------------------
+
+**New features**
+
+* Repositories are now grouped in a tree view by default
+
+
 Version 1.8.0 (2026-04-20)
 --------------------------
 
