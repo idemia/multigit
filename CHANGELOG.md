@@ -14,6 +14,7 @@ Version 1.9.0 (in progress)
 **New features**
 
 * Repositories are now grouped in a tree view by default
+* submodules root repository is now correctly detected as a git repository
 
 
 Version 1.8.0 (2026-04-20)

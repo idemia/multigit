@@ -1,3 +1,11 @@
+## Repo as tree
+- rework doRefreshItem()
+- slotItemExpandCollapse() - is it really a slot ?
+- git icon name for black /red is not consistent
+- update ChangeLog
+
+
+
 ## snap
 
 - check if official destkop path is: /usr/share/apps or /usr/share/applications ?
