@@ -321,8 +321,19 @@ class MgRepoTree(QTreeWidget):
 
 
     def selectedRepoItems(self) -> List[MgRepoTreeItem]:
-        '''Return the list of selected MgRepoTreeItem'''
-        return self.extendWithItemChildren(list(self.selectedItems()))
+        '''Return the list of selected MgRepoTreeItem
+
+        We apply the following rules:
+       - one directory selected: all children are selected
+        - one repository selected: only this repository is selected, even if it has children
+        - multiple items selected: no children are selected, only the repositories part are selected
+
+        '''
+        selectedItems = list(self.selectedItems())
+        if len(selectedItems) == 1 and selectedItems[0].type() == TWI_TYPE_GROUP:
+            return self.extendWithItemChildren(selectedItems)
+        else:
+            return [item for item in selectedItems if item.type() == TWI_TYPE_REPO]
 
 
     def selectedRepos(self) -> List[MgRepoInfo]:
@@ -488,12 +499,11 @@ class MgRepoTree(QTreeWidget):
 
     def doRefreshItems(self, items: List[MgRepoTreeItem]) -> None:
         for it in items:
-            if hasattr(it, 'markItemInProgress'):
-                it.markItemInProgress()
+            # clear items before updating them, this is better visually
+            it.markItemInProgress()
 
         for it in items:
-            if hasattr(it, 'repoInfo'):
-                it.repoInfo.refresh()
+            it.repoInfo.refresh()
 
 
     def slotMenuCopyAboutToShow(self) -> None:
