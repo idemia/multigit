@@ -15,7 +15,7 @@
 #
 
 
-from typing import List, Any, Optional, Dict, Callable, cast, Tuple
+from typing import List, Any, Optional, Dict, Callable, cast, Tuple, Cast
 import logging
 import functools
 import enum
@@ -333,7 +333,7 @@ class MgRepoTree(QTreeWidget):
         if len(selectedItems) == 1 and selectedItems[0].type() == TWI_TYPE_GROUP:
             return self.extendWithItemChildren(selectedItems)
         else:
-            return [item for item in selectedItems if item.type() == TWI_TYPE_REPO]
+            return Cast(List[MgRepoTreeItem], [item for item in selectedItems if item.type() == TWI_TYPE_REPO])
 
 
     def selectedRepos(self) -> List[MgRepoInfo]:
