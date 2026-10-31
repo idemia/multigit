@@ -151,9 +151,11 @@ class MgRepoTreeItem(QTreeWidgetItem):
         self.setToolTip(COL_REPO_NAME, self.repoInfo.name)
 
         if self.repoInfo.is_submodule:
-            self.setIcon(COL_REPO_NAME, QIcon(':/img/git_black.png'))
+            self.setIcon(COL_REPO_NAME, QIcon(':/img/git_red_submodule.png'))
+        elif self.repoInfo.is_submodule_parent:
+            self.setIcon(COL_REPO_NAME, QIcon(':/img/git_red_submodule.png'))
         else:
-            self.setIcon(COL_REPO_NAME, QIcon(':/img/icon_git.png'))
+            self.setIcon(COL_REPO_NAME, QIcon(':/img/git_red.png'))
         
 
         if cast('MgRepoTree', self.treeWidget()).isTreeView:
