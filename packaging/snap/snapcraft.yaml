@@ -59,8 +59,3 @@ parts:
       mkdir -p $SNAPCRAFT_PART_INSTALL/usr/share/icons/hicolor/16x16/apps
       cp images/multigit-logo-16.png $SNAPCRAFT_PART_INSTALL/usr/share/icons/hicolor/16x16/apps/multigit.png
 
-      # Wrapper script: call the snap-local Python interpreter and keep the app
-      # independent from the host machine.
-      mkdir -p $SNAPCRAFT_PART_INSTALL/bin
-      printf "#!/bin/sh\nexec \"\$SNAP/usr/bin/python3\" \"\$SNAP/multigit.py\" \"\$@\"\n" > $SNAPCRAFT_PART_INSTALL/bin/multigit
-      chmod +x $SNAPCRAFT_PART_INSTALL/bin/multigit

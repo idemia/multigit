@@ -1,6 +1,7 @@
 build/
 dist/
 packaging/snap/project-source/
+packaging/snap/*.snap
 Setup/
 .mypy_cache
 .idea
@@ -9,5 +10,6 @@ __pycache__
 env*
 release/
 examples/
-/images/incoming
+images/incoming
+
 TODO-link.txt
