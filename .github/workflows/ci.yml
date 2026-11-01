@@ -1,3 +1,4 @@
+
 name: Continuous Integration
 
 env:
@@ -5,30 +6,31 @@ env:
 
 on:
   push:
-    branches: [ snap-packaging ]
+    branches: [ main, develop ]
   pull_request:
-    branches: [ snap-packaging ]
+    branches: [ main, develop ]
   workflow_dispatch:
     inputs:
       branch:
         description: "Branch to run on"
         required: false
-        default: "snap-packaging"
-
+        default: "main"
+        
 jobs:
+  test-windows:
 
-  test-linux:
-
-    runs-on: ubuntu-24.04
+    runs-on: windows-latest
     strategy:
       fail-fast: false
       matrix:
         include:
           # oldest supported version of python
+          - python-version: "3.8"
+          # oldest supported version of python
           - python-version: "3.14"
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v5
@@ -39,8 +41,6 @@ jobs:
 
       - name: Install dependencies
         run: |
-          sudo apt update && sudo apt install -y libegl-mesa0 libgl1 libglx-mesa0 libegl1-mesa-dev
-          sudo ls -l /usr/lib/x86_64-linux-gnu/libEGL.so.1
           python -m pip install -r reqs/requirements-dev.txt
           pip list
 
@@ -48,38 +48,41 @@ jobs:
         run: |
           pytest
 
-      - name: run type checking
-        run: |
-          mypy .
+  test-linux:
 
-  snap-linux-lxd:
-    if: github.ref == 'refs/heads/snap-packaging'
     runs-on: ubuntu-24.04
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          # oldest supported version of python
+          - python-version: "3.8"
+
+          # oldest supported version of python
+          - python-version: "3.14"
+
 
     steps:
-      - uses: actions/checkout@v4
+    - uses: actions/checkout@v7
 
-      - name: Set up LXD
-        uses: canonical/setup-lxd@v1
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v5
+      with:
+        python-version: ${{ matrix.python-version }}
+        cache: pip
+        cache-dependency-path: '**/requirements-dev.txt'
 
-      - name: Install Snapcraft
-        run: sudo snap install snapcraft --classic
+    - name: Install dependencies
+      run: |
+        sudo apt update && sudo apt install -y libegl-mesa0 libgl1 libglx-mesa0 libegl1-mesa-dev 
+        sudo ls -l /usr/lib/x86_64-linux-gnu/libEGL.so.1
+        python -m pip install -r reqs/requirements-dev.txt
+        pip list
 
-      - name: Build snap with LXD
-        run: |
-          bash packaging/snap/prepare-source.sh
-          cd packaging/snap
-          if ! snapcraft pack; then
-            log_file=$(ls -t ~/.local/state/snapcraft/log/snapcraft-*.log 2>/dev/null | head -n 1)
-            if [ -n "$log_file" ]; then
-              echo "Snapcraft log: $log_file"
-              tail -n 200 "$log_file"
-            fi
-            exit 1
-          fi
+    - name: run tests
+      run: |
+        pytest
 
-      - name: Upload LXD-built snap artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: multigit-snap-lxd
-          path: packaging/snap/*.snap
+    - name: run type checking
+      run: |
+        mypy .
