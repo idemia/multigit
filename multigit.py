@@ -38,7 +38,7 @@ if __package__:
 import src.multigit_resources_rc        # uses side-effects to make resources available
 from src.mg_window import MgMainWindow
 from src import mg_const
-from src.mg_tools import isRunningInsideFlatpak, isRunningInsideSnap
+from src.mg_tools import isRunningInsideSnap
 
 # by default Qt abort on Python exceptions so we need to provide
 # our own hook that does the job
@@ -139,10 +139,7 @@ def configure_logpath(debug_activated: bool = False, run_from_tests: bool = Fals
         xdg_config_home: str
 
         # we want to use the same config file for inside flatpak or outside
-        if isRunningInsideFlatpak():
-            xdg_config_home_var = 'XDG_HOST_CONFIG_HOME'
-        else:
-            xdg_config_home_var = 'XDG_CONFIG_HOME'
+        xdg_config_home_var = 'XDG_CONFIG_HOME'
 
         if os.environ.get(xdg_config_home_var, ''):
             xdg_config_home = os.environ[xdg_config_home_var]
@@ -274,8 +271,6 @@ def main() -> None:
     except ImportError:
         qt_version = 'unknown'
     logging.info( 'Using Python v%s and Qt for Python %s' % (platform.python_version(), qt_version))
-    if isRunningInsideFlatpak():
-        logging.info('Running inside flatpak container')
     if isRunningInsideSnap():
         logging.info('Running inside snap container')
     main_gui()
