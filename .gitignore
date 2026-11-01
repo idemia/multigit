@@ -1,5 +1,6 @@
 build/
 dist/
+packaging/snap/project-source/
 Setup/
 .mypy_cache
 .idea
@@ -10,5 +11,3 @@ release/
 examples/
 /images/incoming
 TODO-link.txt
-.flatpak-builder
-builddir

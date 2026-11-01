@@ -1,5 +1,5 @@
 name: multigit
-base: core24
+base: core26
 version: '1.8.0'
 summary: Graphical tool for projects with multiple git repositories
 description: |
@@ -28,19 +28,18 @@ apps:
       - home
       - network
     environment:
-      PYTHONPATH: $SNAP/usr/lib/python3/dist-packages:$SNAP/lib/python3.10/site-packages:$SNAP
+      PYTHONPATH: $SNAP/usr/lib/python3/dist-packages:$SNAP/lib/python3.12/site-packages:$SNAP
 
 parts:
   multigit:
     plugin: python
     source: project-source
-    build-packages:
+
+    stage-packages: 
       - python3
       - python3-venv
       - python3-pip
-    python-requirements:
-      - reqs/requirements-release.txt
-    stage-packages: []
+
     override-build: |
       craftctl default
 
