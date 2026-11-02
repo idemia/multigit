@@ -1,3 +1,4 @@
+
 ## snap
 
 - check if official destkop path is: /usr/share/apps or /usr/share/applications ?

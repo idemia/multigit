@@ -114,8 +114,7 @@ class MgRepoTree(QTreeWidget):
         self.rmbMenu = QMenu(self)
         self.mgActions.setupMenuView(self.rmbMenu, True)
         self.rmbGitMenu = self.rmbMenu.addMenu("Git")
-        self.rmbGitMenu.setIcon(QIcon(":/img/git_black.png"))
-        self.mgActions.setupMenuGit(self.rmbGitMenu)
+        self.mgActions.setupMenuGit(self.rmbGitMenu, inRmbMenu=True)
         self.mgActions.setupMenuGitPrograms(self.rmbMenu, includeConfigureGitPrograms=False)
         self.setupConnections()
         pluginMgrInstance.setupRepoRmbMenu(self)
@@ -198,7 +197,10 @@ class MgRepoTree(QTreeWidget):
         self.mgActions.actionGitCheckoutTag.triggered.connect(self.slotGitCheckoutTag)
         self.mgActions.actionGitDeleteBranch.triggered.connect(self.slotGitDeleteBranch)
         self.mgActions.actionGitDeleteTag.triggered.connect(self.slotGitDeleteTag)
+        self.mgActions.actionGitSubmoduleInit.triggered.connect(self.slotGitSubmoduleInit)
+        self.mgActions.actionGitSubmoduleUpdate.triggered.connect(self.slotGitSubmoduleUpdate)
         self.mgActions.actionGitRunCommand.triggered.connect(self.slotGitRunCommand)
+        self.rmbGitMenu.aboutToShow.connect(self.slotGitMenuAboutToShow)
 
         # Menu Git programs
         for execToolAction in self.mgActions.execToolActionsDict.values():
@@ -221,6 +223,11 @@ class MgRepoTree(QTreeWidget):
     def slotContextMenuRequested(self, p: QPoint) -> None:
         '''Capture the right-button mouse click action to display a menu'''
         self.rmbMenu.exec_(self.viewport().mapToGlobal(p))
+
+
+    def slotGitMenuAboutToShow(self) -> None:
+        '''Enable submodule actions only for selected repositories containing submodules'''
+        self.mgActions.enableMenuGitSubmodules(self.selectedRepos())
 
 
     def slotHeaderContextMenuRequested(self, p: QPoint) -> None:
@@ -321,8 +328,19 @@ class MgRepoTree(QTreeWidget):
 
 
     def selectedRepoItems(self) -> List[MgRepoTreeItem]:
-        '''Return the list of selected MgRepoTreeItem'''
-        return self.extendWithItemChildren(list(self.selectedItems()))
+        '''Return the list of selected MgRepoTreeItem
+
+        We apply the following rules:
+       - one directory selected: all children are selected
+        - one repository selected: only this repository is selected, even if it has children
+        - multiple items selected: no children are selected, only the repositories part are selected
+
+        '''
+        selectedItems = list(self.selectedItems())
+        if len(selectedItems) == 1 and selectedItems[0].type() == TWI_TYPE_GROUP:
+            return self.extendWithItemChildren(selectedItems)
+        else:
+            return cast(List[MgRepoTreeItem], [item for item in selectedItems if item.type() == TWI_TYPE_REPO])
 
 
     def selectedRepos(self) -> List[MgRepoInfo]:
@@ -488,12 +506,11 @@ class MgRepoTree(QTreeWidget):
 
     def doRefreshItems(self, items: List[MgRepoTreeItem]) -> None:
         for it in items:
-            if hasattr(it, 'markItemInProgress'):
-                it.markItemInProgress()
+            # clear items before updating them, this is better visually
+            it.markItemInProgress()
 
         for it in items:
-            if hasattr(it, 'repoInfo'):
-                it.repoInfo.refresh()
+            it.repoInfo.refresh()
 
 
     def slotMenuCopyAboutToShow(self) -> None:
@@ -687,6 +704,18 @@ class MgRepoTree(QTreeWidget):
         # local import to prevent circular dependencies
         from src.mg_dialog_git_switch_delete_branch import runDialogGitSwitchDelete, DeleteOrSwitchBranchOrTag
         runDialogGitSwitchDelete(self, DeleteOrSwitchBranchOrTag.DELETE_TAG, self.selectedRepos(), self.allRepos())
+
+
+    def slotGitSubmoduleInit(self) -> None:
+        '''Run `git sumodule init` on listed repos'''
+        dbg('slotGitSubmoduleInit()')
+        self.runGitCommand('Submodule initialization', ['submodule', 'init'])
+
+
+    def slotGitSubmoduleUpdate(self) -> None:
+        '''Run `git submodule update` on listed repos'''
+        dbg('slotGitSubmoduleUpdate()')
+        self.runGitCommand('Submodule update', ['submodule', 'update'])
 
 
     def slotGitRunCommand(self) -> None:

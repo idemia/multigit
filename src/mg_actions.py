@@ -23,6 +23,7 @@ from PySide6.QtGui import QAction, QIcon, QPixmap, QTransform
 from PySide6.QtWidgets import QMenu, QWidget
 
 from src.mg_const import SHORT_SHA1_NB_DIGITS
+from src.mg_repo_info import MgRepoInfo 
 from src.mg_tools import ExecTool, ExecTortoiseGit
 if TYPE_CHECKING:
     from src.mg_repo_tree import MgRepoTree
@@ -211,6 +212,14 @@ class MgActions(QObject):
         self.actionGitDeleteTag.setShortcut("Alt+Shift+D")
         self.actionGitDeleteTag.setToolTip('Open dialog for deleting a tag')
 
+        self.actionGitSubmoduleInit = QAction(self)
+        self.actionGitSubmoduleInit.setText("Init")
+        self.actionGitSubmoduleInit.setToolTip('Run the `submodule init` command (registers the submodules directories)')
+
+        self.actionGitSubmoduleUpdate = QAction(self)
+        self.actionGitSubmoduleUpdate.setText("Update")
+        self.actionGitSubmoduleUpdate.setToolTip('Run the `submodule update` command (updates/restores submodules to the versions defined in the submodule root')
+
         self.actionGitRunCommand = QAction(self)
         self.actionGitRunCommand.setText("Run git command")
         self.actionGitRunCommand.setShortcut("Ctrl+G")
@@ -328,8 +337,10 @@ class MgActions(QObject):
 
 
 
-    def setupMenuGit(self, menuGit: QMenu) -> None:
+    def setupMenuGit(self, menuGit: QMenu, inRmbMenu: bool) -> None:
         '''Install all actions in the git menu'''
+        if inRmbMenu:
+            menuGit.setIcon(QIcon(":/img/git_red.png"))
         menuGit.addAction( self.actionGitProperties)
         menuGit.addAction( self.actionGitCommit )
         menuGit.addAction( self.actionGitRevert )
@@ -343,6 +354,11 @@ class MgActions(QObject):
         menuGit.addAction( self.actionGitCheckoutTag)
         menuGit.addAction( self.actionGitDeleteBranch)
         menuGit.addAction( self.actionGitDeleteTag)
+        self.menuSubmodules = menuGit.addMenu("Submodules")
+        self.menuSubmodules.setIcon(QIcon(":/img/git_red_submodule.png"))
+        self.menuSubmodules.addAction(self.actionGitSubmoduleInit)
+        self.menuSubmodules.addAction(self.actionGitSubmoduleUpdate)
+        self.menuSubmodules.setEnabled(False)
         menuGit.addSeparator()
         menuGit.addAction( self.actionGitRunCommand )
 
@@ -371,6 +387,10 @@ class MgActions(QObject):
         menuTGit.addAction( self.actionTGitTag )
         menuTGit.addAction( self.actionTGitSwitch )
         menuTGit.addAction( self.actionTGitBranch )
+
+
+    def enableMenuGitSubmodules(self, repos: List[MgRepoInfo]) -> None:
+        self.menuSubmodules.setEnabled(any((repo.is_submodule_parent or repo.is_submodule) for repo in repos))
 
 
     def enableAvailableScm(self) -> None:

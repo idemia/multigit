@@ -47,7 +47,6 @@ EXIT_CODE_COULD_NOT_START_PROCESS = -102
 GIT_EXIT_CODE_STOPPED_BECAUSE_AUTH_FAILURE = -103
 EXIT_CODE_CRASHED = -104
 
-FLATPAK_SPAWN = ['flatpak-spawn', '--host']
 SNAP_BIN_DIR = '/snap/bin'
 
 class CmdType(Enum):
@@ -85,15 +84,15 @@ class MgExecutable:
             return 'NoCmd()'
         elif self.cmd_type == CmdType.FlatpakProgram:
             return f'FlatpakProgram({self.name})'
+        elif self.cmd_type == CmdType.SnapProgram:
+            return f'SnapProgram({self.name})'
         else:
             return f'{self.cmd_type}({self.path})'
 
 
-def isRunningInsideFlatpak() -> bool:
-    """Return TTrue if running inside a flatpak container.
-
-    Used to use proper flatpak launcher when launching an external program"""
-    return 'FLATPAK_ID' in os.environ
+def isRunningInsideSnap() -> bool:
+    '''Return True if running inside a snap container'''
+    return 'SNAP' in os.environ
 
 
 class ExecTool:
@@ -339,8 +338,7 @@ class ExecTool:
 
     @classmethod
     def find_prog_exec(cls) -> MgExecutable:
-        '''Scans locations path_candidates to see if the expected program exists. When running inside a flatpak sandbox,
-        looks for the program on the host file system with flatpak-spawn.
+        '''Scans locations path_candidates to see if the expected program exists.
 
         If not found, and if EXEC_NAME_SNAP is defined, looks for a an executable with this name in /snap/bin.
 
@@ -362,16 +360,10 @@ class ExecTool:
         for candidate_path in possible_full_paths:
             dbg('find_prog_exec() - looking at: {}'.format(str(candidate_path)))
 
-            if isRunningInsideFlatpak():
-                if not flatpak_host_file_exists(candidate_path):
-                    continue
-                dbg('Found program at flatpak host: {}'.format(str(candidate_path)))
-                return MgExecutable(CmdType.DirectCmd, str(candidate_path))
-            else:
-                if not candidate_path.exists():
-                    continue
-                dbg('Found program at: {}'.format(str(candidate_path)))
-                return MgExecutable(CmdType.DirectCmd, str(candidate_path))
+            if not candidate_path.exists():
+                continue
+            dbg('Found program at: {}'.format(str(candidate_path)))
+            return MgExecutable(CmdType.DirectCmd, str(candidate_path))
             
         # not found on the path candidates
 
@@ -924,8 +916,6 @@ class RunProcess(QObject):
          program, flatpak app id for a flatpak program
         cmd_args: arguments to execute.
 
-        If running inside a flatpak container, the command is executed on the host with flatpak-spawn
-
         May block while a process is currently under execution
         '''
         dbg(f'create_process({exec} {cmd_args}, working_dir={working_dir})')
@@ -943,9 +933,6 @@ class RunProcess(QObject):
 
         if cmd_type == CmdType.SnapProgram:
             self.cmd_line = [f'{SNAP_BIN_DIR}/{exec.name}'] + self.cmd_line
-
-        if isRunningInsideFlatpak():
-            self.cmd_line = FLATPAK_SPAWN + self.cmd_line
 
         dbg(f'create_process() cmd_line={self.cmd_line}')
 
@@ -1019,7 +1006,7 @@ class RunProcess(QObject):
                    ) -> None:
         '''Execute a program asynchronously and calls cb_git_done() when the command completes.
 
-        exec: the executable to run, with the information to run it properly (flatpak spawn, direct command, ...)
+        exec: the executable to run, with the information to run it properly (direct command, ...)
         cmd_args: the arguments to the program without the program itself.
 
         Calls: cb_done(exec_status, git_exit_code, git_output)
@@ -1210,14 +1197,3 @@ def scan_git_dirs(base_path: str) -> Generator[str, str, None]:
            
             path_to_visit.append(entry.path)
 
-
-
-def flatpak_host_file_exists(fpath: Path) -> bool:
-    '''Check whether a given file exists on the flatpak host file system, by using sh to run a test command on the host.'''
-    # assumption here: sh is on the path on the host. Very very likely
-    # If it turns out to be a wrong assumption we can always organise a search for a shell or a python
-    assert isRunningInsideFlatpak(), 'flatpak_host_file_exists() should only be called when running inside flatpak'
-    USE_SH_TO_CHECK_THAT_FILE_EXISTS = ['sh', '-c', f'[ -e "{fpath}" ]']
-    exec = MgExecutable(CmdType.DirectCmd, path=USE_SH_TO_CHECK_THAT_FILE_EXISTS[0])
-    exec_status, exit_code, output = RunProcess().exec_blocking(exec, cmd_args=USE_SH_TO_CHECK_THAT_FILE_EXISTS[1:])
-    return exec_status == ExecStatus.Ok and exit_code == 0

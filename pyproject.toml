@@ -30,7 +30,7 @@ classifiers = [
 ]
 
 dependencies = [
-    "pyside6",
+    "pyside6-essentials",
     "concurrent-log-handler",
 ]
 
