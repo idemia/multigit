@@ -45,6 +45,10 @@ files_to_exclude = set([
     'PySide6\\plugins\\imageformats\\qwbmp.dll',
     'PySide6\\plugins\\imageformats\\qwebp.dll',
 
+    'PySide6\\plugins\\networkinformation\\qnetworklistmanager.dll',
+    'PySide6\\plugins\\tls\\qschannelbackend.dll',
+    'PySide6\\plugins\\tls\\qcertonlybackend.dll',
+
     'PySide6\\plugins\\platforms\\qoffscreen.dll',
     'PySide6\\plugins\\platforms\\qdirect2d.dll',
     'PySide6\\plugins\\platforms\\qminimal.dll',
@@ -58,6 +62,8 @@ files_to_exclude = set([
     'PySide6\\Qt6QmlWorkerScript.dll',
     'PySide6\\Qt6Quick.dll',
     'PySide6\\Qt6Svg.dll',
+    'PySide6\\Qt6VirtualKeyboard.dll',
+
     'PySide6\\QtNetwork.pyd',
 
     'PySide6\\translations\\qt_ar.qm',
@@ -74,6 +80,8 @@ files_to_exclude = set([
     'PySide6\\translations\\qt_gd.qm',
     'PySide6\\translations\\qt_gl.qm',
     'PySide6\\translations\\qt_he.qm',
+    'PySide6\\translations\\qt_kk.qm',
+    'PySide6\\translations\\qt_lg.qm',
     'PySide6\\translations\\qt_help_ar.qm',
     'PySide6\\translations\\qt_help_bg.qm',
     'PySide6\\translations\\qt_help_ca.qm',
@@ -89,6 +97,7 @@ files_to_exclude = set([
     'PySide6\\translations\\qt_help_it.qm',
     'PySide6\\translations\\qt_help_ja.qm',
     'PySide6\\translations\\qt_help_ka.qm',
+    'PySide6\\translations\\qt_help_kk.qm',
     'PySide6\\translations\\qt_help_ko.qm',
     'PySide6\\translations\\qt_help_nl.qm',
     'PySide6\\translations\\qt_help_nn.qm',
@@ -97,6 +106,7 @@ files_to_exclude = set([
     'PySide6\\translations\\qt_help_ru.qm',
     'PySide6\\translations\\qt_help_sk.qm',
     'PySide6\\translations\\qt_help_sl.qm',
+    'PySide6\\translations\\qt_help_sv.qm',
     'PySide6\\translations\\qt_help_tr.qm',
     'PySide6\\translations\\qt_help_uk.qm',
     'PySide6\\translations\\qt_help_zh_CN.qm',
@@ -141,13 +151,16 @@ files_to_exclude = set([
     'PySide6\\translations\\qtbase_ja.qm',
     'PySide6\\translations\\qtbase_ka.qm',
     'PySide6\\translations\\qtbase_ko.qm',
+    'PySide6\\translations\\qtbase_kk.qm',
     'PySide6\\translations\\qtbase_lv.qm',
+    'PySide6\\translations\\qtbase_lg.qm',
     'PySide6\\translations\\qtbase_nl.qm',
     'PySide6\\translations\\qtbase_nn.qm',
     'PySide6\\translations\\qtbase_pl.qm',
     'PySide6\\translations\\qtbase_pt_BR.qm',
     'PySide6\\translations\\qtbase_ru.qm',
     'PySide6\\translations\\qtbase_sk.qm',
+    'PySide6\\translations\\qtbase_sv.qm',
     'PySide6\\translations\\qtbase_tr.qm',
     'PySide6\\translations\\qtbase_uk.qm',
     'PySide6\\translations\\qtbase_zh_CN.qm',
@@ -160,9 +173,9 @@ def exclude_from_toc(toc: 'TOC', exclude_list: 'List[str]') -> 'TOC':
   for (dst, src, toc_type) in toc:
     if dst in exclude_list:
       rm_toc.append( (dst, src, toc_type) )
-      print('\t\t\t\tExcluding:', dst)
+      print(f'\t\t\t\tExcluding: "{dst}"')
     else:
-      print('Keeping:', dst)
+      print(f'Keeping: "{dst}"')
 
   # this is needed for some versions of pyinstaller
   if getattr(toc, '__sub__', None):

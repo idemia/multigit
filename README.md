@@ -80,8 +80,7 @@ in an isolated environment and will not interfere with your system Python or oth
     $ multigit
 ```
 
-*Note: on PyPi, Multigit is registered as multigit_gx because there is already a multigit software* . The recommended way is
-to use `pipx` to install it:
+*Note: on PyPi, Multigit is registered as multigit_gx because there is already a multigit software* .
 
 
 #### Adjustments when running on Linux
