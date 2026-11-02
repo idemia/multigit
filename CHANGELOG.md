@@ -8,13 +8,14 @@ Introduction
 
 Multigit help users to manage many Git repositories simultaneously.
 
-Version 1.9.0 (in progress)
+Version 1.9.0 (2026-11-05)
 ---------------------------
 
 **New features**
 
 * Repositories are now grouped in a tree view by default
 * submodules root repository is now correctly detected as a git repository
+* Multigit is available as a snap
 
 
 Version 1.8.0 (2026-04-20)

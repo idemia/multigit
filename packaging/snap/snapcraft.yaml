@@ -1,6 +1,6 @@
 name: multigit
 base: core26
-version: '1.8.0'
+version: '1.9.0'
 summary: Graphical tool for projects with multiple git repositories
 description: |
   Multigit is a graphical tool designed to simplify working with projects

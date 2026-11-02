@@ -18,11 +18,13 @@ import re, pathlib
 here = pathlib.Path(__file__).parent.resolve()
 windows_dir = here / 'windows'
 chocolatey_dir = here / 'chocolatey'
+snap_dir = here / 'snap'
 
 reVersion = r'([\d.][\w\-_.]+)'
 
 files = [
-    (here.parent / 'src/mg_const.py',          re.compile(f"VERSION = '{reVersion}'"), 'Free string'),
+    (here.parent / 'src/mg_const.py',            re.compile(f"VERSION = '{reVersion}'"), 'Free string'),
+    (snap_dir    / 'snapcraft.yaml',             re.compile(f"version: '{reVersion}'"), 'Free string'),
     (windows_dir / 'multigit_version_info.txt',  re.compile(fr"StringStruct\('FileVersion', '{reVersion}'\),"), 'Free string'),
     (windows_dir / 'multigit_version_info.txt',  re.compile(fr"StringStruct\('ProductVersion', '{reVersion}'\),"), 'Free string'),
     (windows_dir / 'Multigit.iss',               re.compile(r'#define VERSION "([\d\.]+)"'), 'Only digits and dots allowed'),
