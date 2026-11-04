@@ -54,16 +54,18 @@ Multigit is installation is possible through different formats and on different 
 
 #### Classic installer
 
-Classic Windows installer is available on the GitHub release page as `Multigit.OpenSource.X.Y.Z.exe`. 
+Classic Windows installer is available on the [GitHub release page](https://github.com/idemia/multigit/releases) as `Multigit.OpenSource.X.Y.Z.exe`. 
 Just run it and look for Multigit in your Applications.
 
 #### Chocolatey package
 
-Multigit is available as a Chocolatey package, which is the recommended way to install it on Windows. Just run:
+Multigit is available as a [Chocolatey package](https://community.chocolatey.org/packages/multigit), which is the recommended way to install it on Windows. Just run:
 
 ```
     choco install multigit
 ```
+
+At this time (nov 2026), only the version 1.8.0 is available on chocolatey, version 1.9.0 is still awaiting moderation.
 
 ### Linux
 
@@ -117,7 +119,7 @@ This worked for me by for example:
 
 #### Future
 
-We are working on providing multigit as a snap and as a flatpak, but it is not available yet. 
+We are working on providing multigit as a snap, but it is not available yet. 
 
 
 License
